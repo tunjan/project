@@ -1,0 +1,58 @@
+/*
+  These are build-time directives for Tailwind CSS.
+  During the 'npm run build' process, Vite and PostCSS will replace these
+  with the generated CSS classes based on their usage in your .tsx files.
+  This is the correct way to include Tailwind in a project.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Global base styles are defined in a dedicated layer.
+  This ensures consistency and follows best practices.
+*/
+@layer base {
+  body {
+    @apply bg-white text-black font-sans;
+  }
+}
+
+/*
+  Component-specific styles, like for third-party libraries,
+  should be defined in the components layer. This keeps them organized
+  and separate from utility classes.
+*/
+@layer components {
+  /*
+    Custom Leaflet styles now live here, not in an inline <style> tag in index.html.
+  */
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    background: white;
+    box-shadow: none;
+    border-radius: 0;
+    border: 1px solid black;
+  }
+  .leaflet-popup-content {
+    margin: 10px;
+  }
+}
+
+/*
+  Custom utility classes or animations are defined in the utilities layer.
+*/
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -1,3 +1,12 @@
+/node_modules
+/.pnp
+.pnp.js
+
+# Build artifacts
+/dist
+/dist-ssr
+/build
+
 # Logs
 logs
 *.log
@@ -7,21 +16,31 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Editor directories and files
+# IDE / Editor directories
+.idea
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables
+# Never commit secrets!
+.env
+.env.local
+.env.*.local
+*.local
 
 # Vercel
 .vercel
