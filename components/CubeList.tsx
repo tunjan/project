@@ -96,12 +96,12 @@ const CubeList: React.FC<CubeListProps> = ({ onSelectCube, onNavigate }) => {
                        </ViewToggleButton>
                     </div>
                     {/* Region Filter */}
-                    <div>
+                    <div className="border border-black">
                         <select
                             id="region-filter"
                             value={selectedRegion}
                             onChange={e => setSelectedRegion(e.target.value)}
-                            className="block w-full border border-black bg-white py-1.5 px-3 text-sm font-semibold text-black focus:ring-0 h-full"
+                            className="w-full border border-black bg-white py-1.5 px-3 text-sm font-semibold text-black"
                             aria-label="Filter by region"
                         >
                             <option value="all">All Regions</option>

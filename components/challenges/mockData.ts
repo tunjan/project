@@ -29,4 +29,30 @@ export const mockChallenges: Challenge[] = [
             { id: 'chapter-toronto', name: 'Toronto', progress: 78 },
         ].sort((a, b) => b.progress - a.progress),
     },
+    {
+        id: 'challenge-3',
+        title: 'Q4 Vegan Outreach Sign-ups',
+        description: 'Chapter with the most new sign-ups to the Vegan Outreach program by year-end wins a special grant.',
+        metric: 'New Sign-ups',
+        goal: 500,
+        endDate: new Date('2025-12-31T23:59:59Z'),
+        participants: [
+            { id: 'chapter-berlin', name: 'Berlin', progress: 380 },
+            { id: 'chapter-sydney', name: 'Sydney', progress: 410 },
+            { id: 'chapter-london', name: 'London', progress: 350 },
+        ].sort((a, b) => b.progress - a.progress),
+    },
+    {
+        id: 'challenge-4',
+        title: 'Spring Cube Attendance Boost',
+        description: 'The chapter with the highest percentage increase in Cube attendance during spring months receives new outreach equipment.',
+        metric: 'Attendance Increase (%)',
+        goal: 20,
+        endDate: new Date('2026-05-31T23:59:59Z'),
+        participants: [
+            { id: 'chapter-ny', name: 'New York', progress: 18 },
+            { id: 'chapter-paris', name: 'Paris', progress: 15 },
+            { id: 'chapter-tokyo', name: 'Tokyo', progress: 22 },
+        ].sort((a, b) => b.progress - a.progress),
+    },
 ];

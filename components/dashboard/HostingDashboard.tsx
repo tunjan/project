@@ -16,9 +16,9 @@ const TabButton: React.FC<{
 }> = ({ onClick, isActive, count, children }) => (
   <button
     onClick={onClick}
-    className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold transition-colors duration-200 border-b-2 ${
+    className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
       isActive
-        ? 'border-[#d81313] text-black'
+        ? ' text-black'
         : 'border-transparent text-neutral-500 hover:text-black'
     }`}
   >

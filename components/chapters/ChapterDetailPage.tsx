@@ -13,7 +13,7 @@ interface ChapterDetailPageProps {
 }
 
 const StatCard: React.FC<{ icon: React.ReactNode; title: string; value: string | number }> = ({ icon, title, value }) => (
-    <div className="bg-white border border-black p-4 h-full">
+    <div className="bg-white p-4 h-full">
         <div className="flex items-center">
             <div className="text-[#d81313]">{icon}</div>
             <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">{title}</p>
@@ -87,7 +87,7 @@ const ChapterDetailPage: React.FC<ChapterDetailPageProps> = ({ chapter, onBack }
                     )}
                 </div>
 
-                <div className="border border-black bg-white p-8 mb-8">
+                <div className="bg-white mb-16 mt-8">
                     <p className="text-base font-semibold text-[#d81313] uppercase tracking-wide">{chapter.country}</p>
                     <h1 className="mt-1 text-4xl md:text-5xl font-extrabold text-black">{chapter.name} Chapter</h1>
                 </div>

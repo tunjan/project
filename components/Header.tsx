@@ -154,39 +154,20 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, onLogout, onNo
                 <NavButton onClick={() => onNavigate('dashboard')} isActive={currentView === 'dashboard'}>
                   <span>Dashboard</span>
                 </NavButton>
+                <NavButton onClick={() => onNavigate('outreach')} isActive={currentView === 'outreach'}>
+                  <span>Outreach</span>
+                </NavButton>
+                <NavButton onClick={() => onNavigate('resources')} isActive={currentView === 'resources'}>
+                  <span>Resources</span>
+                </NavButton>
+                <NavButton onClick={() => onNavigate('management')} isActive={currentView === 'management'}>
+                  <span>Management</span>
+                </NavButton>
+                <NavButton onClick={() => onNavigate('analytics')} isActive={currentView === 'analytics'}>
+                  <span>Analytics</span>
+                </NavButton>
 
-                <div className="relative" ref={moreMenuRef}>
-                    <NavButton onClick={handleMoreMenuToggle} isActive={isMoreMenuActive}>
-                        <span>More</span>
-                        <ChevronDownIcon className="w-4 h-4 ml-1" />
-                    </NavButton>
-                    {isMoreMenuOpen && (
-                        <div className="absolute top-full mt-2 w-56 bg-white border border-black shadow-lg z-30 right-0 animate-fade-in">
-                            <div className="py-1">
-                                <DropdownItem onClick={() => handleNavigateAndCloseMenus('outreach')} isActive={currentView === 'outreach'}>
-                                    <ClipboardListIcon className="w-4 h-4 mr-3" />
-                                    <span>Outreach Log</span>
-                                </DropdownItem>
-                                <DropdownItem onClick={() => handleNavigateAndCloseMenus('resources')} isActive={currentView === 'resources'}>
-                                    <BookOpenIcon className="w-4 h-4 mr-3" />
-                                    <span>Resources</span>
-                                </DropdownItem>
-                                {hasOrganizerRole(currentUser) && (
-                                    <div className="border-t border-neutral-200 my-1">
-                                        <DropdownItem onClick={() => handleNavigateAndCloseMenus('management')} isActive={currentView === 'management' || currentView === 'memberProfile'}>
-                                            <ShieldCheckIcon className="w-4 h-4 mr-3" />
-                                            <span>Management</span>
-                                        </DropdownItem>
-                                        <DropdownItem onClick={() => handleNavigateAndCloseMenus('analytics')} isActive={currentView === 'analytics'}>
-                                            <ChartBarIcon className="w-4 h-4 mr-3" />
-                                            <span>Analytics</span>
-                                        </DropdownItem>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                
 
               </nav>
             )}

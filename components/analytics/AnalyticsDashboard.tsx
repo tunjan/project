@@ -1,23 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { type User, type CubeEvent, type Chapter, Role, type OutreachLog } from '../../types';
-import { 
-    getGlobalStats, 
-    getChapterStats, 
-    getEventTrendsByMonth,
-    getConversionRate,
-    getActivistRetention,
-    getMemberGrowth,
-    getTopActivistsByHours,
-    getAverageActivistsPerEvent
-} from '../../utils/analytics';
+import React, { useMemo } from 'react';
+import { useAnalyticsData } from '../../hooks/useAnalyticsData';
 import BarChart from './BarChart';
 import LineChart from './LineChart';
 import { ClockIcon, UsersIcon, TrendingUpIcon, GlobeAltIcon, SparklesIcon, UserGroupIcon } from '../icons';
-import { ROLE_HIERARCHY } from '../../utils/auth';
-import { useAuth } from '../../contexts/AuthContext';
-import { useData } from '../../contexts/DataContext';
 import Challenges from '../challenges/Challenges';
-
 
 interface AnalyticsDashboardProps {}
 
@@ -29,7 +15,7 @@ const StatCard: React.FC<{ icon: React.ReactNode; title: string; value: string |
         </div>
         <p className="mt-2 text-4xl font-extrabold text-black">{value}</p>
         {tooltip && (
-            <div className="absolute bottom-full mb-2 w-max px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute bottom-full mb-2 w-max px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                 {tooltip}
             </div>
         )}
@@ -37,118 +23,24 @@ const StatCard: React.FC<{ icon: React.ReactNode; title: string; value: string |
 );
 
 const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
-    const { currentUser } = useAuth();
-    const { users: allUsers, events: allEvents, chapters, outreachLogs } = useData();
-
-    if (!currentUser) return null;
-
-    const { availableCountries, chaptersForFilter, defaultCountry, defaultChapter } = useMemo(() => {
-        const userLevel = ROLE_HIERARCHY[currentUser.role];
-
-        if (userLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN]) {
-            return {
-                availableCountries: ['global', ...new Set(chapters.map(c => c.country))],
-                chaptersForFilter: chapters,
-                defaultCountry: 'global',
-                defaultChapter: 'all'
-            };
-        }
-        if (currentUser.role === Role.REGIONAL_ORGANISER && currentUser.managedCountry) {
-            const myCountry = currentUser.managedCountry;
-            const myChapters = chapters.filter(c => c.country === myCountry);
-            return {
-                availableCountries: [myCountry],
-                chaptersForFilter: myChapters,
-                defaultCountry: myCountry,
-                defaultChapter: 'all'
-            };
-        }
-        if (currentUser.role === Role.CHAPTER_ORGANISER && currentUser.organiserOf) {
-            const myChapters = chapters.filter(c => currentUser.organiserOf!.includes(c.name));
-            const myCountries = [...new Set(myChapters.map(c => c.country))];
-            return {
-                availableCountries: myCountries,
-                chaptersForFilter: myChapters,
-                defaultCountry: myCountries.length > 0 ? myCountries[0] : 'global',
-                defaultChapter: myChapters.length === 1 ? myChapters[0].name : 'all',
-            };
-        }
-        return { availableCountries: [], chaptersForFilter: [], defaultCountry: 'global', defaultChapter: 'all' };
-    }, [currentUser, chapters]);
-
-    const [selectedCountry, setSelectedCountry] = useState(defaultCountry);
-    const [selectedChapter, setSelectedChapter] = useState(defaultChapter);
-
-    useEffect(() => {
-        setSelectedCountry(defaultCountry);
-        setSelectedChapter(defaultChapter);
-    }, [defaultCountry, defaultChapter]);
-
-    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCountry(e.target.value);
-        setSelectedChapter('all');
-    };
-
-    const handleChapterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedChapter(e.target.value);
-    };
-
-    const chaptersInSelectedCountry = useMemo(() => {
-        if (selectedCountry === 'global') {
-            return chaptersForFilter;
-        }
-        return chaptersForFilter.filter(c => c.country === selectedCountry);
-    }, [selectedCountry, chaptersForFilter]);
-
     const {
-        filteredUsers,
-        filteredEvents,
-        filteredChapters,
-        filteredOutreachLogs,
+        selectedCountry,
+        selectedChapter,
+        handleCountryChange,
+        handleChapterChange,
+        availableCountries,
+        chaptersInSelectedCountry,
         viewTitle,
-        isChapterView
-    } = useMemo(() => {
-        let chaptersToAnalyze = chaptersForFilter;
-        let title = 'Global Overview';
-        let viewIsChapter = false;
-
-        if (selectedChapter !== 'all') {
-            const chap = chapters.find(c => c.name === selectedChapter);
-            if (chap) {
-                chaptersToAnalyze = [chap];
-                title = `${chap.name} Chapter`;
-                viewIsChapter = true;
-            }
-        } else if (selectedCountry !== 'global') {
-            chaptersToAnalyze = chapters.filter(c => c.country === selectedCountry);
-            title = `${selectedCountry} Region`;
-        }
-
-        const chapterNames = chaptersToAnalyze.map(c => c.name);
-        const eventsToAnalyze = allEvents.filter(e => chapterNames.includes(e.city));
-        const usersToAnalyze = allUsers.filter(u => u.chapters.some(c => chapterNames.includes(c)));
-        const eventIds = new Set(eventsToAnalyze.map(e => e.id));
-        const outreachLogsToAnalyze = outreachLogs.filter(log => eventIds.has(log.eventId));
-        
-        return {
-            filteredUsers: usersToAnalyze,
-            filteredEvents: eventsToAnalyze,
-            filteredChapters: chaptersToAnalyze,
-            filteredOutreachLogs: outreachLogsToAnalyze,
-            viewTitle: title,
-            isChapterView: viewIsChapter,
-        };
-    }, [selectedCountry, selectedChapter, allUsers, allEvents, chapters, outreachLogs, chaptersForFilter]);
-
-    const overviewStats = useMemo(() => getGlobalStats(filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs), [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]);
-    const chapterStats = useMemo(() => getChapterStats(filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs), [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]);
-    const eventTrends = useMemo(() => getEventTrendsByMonth(filteredEvents, 12), [filteredEvents]);
-    const memberGrowth = useMemo(() => getMemberGrowth(filteredUsers, 12), [filteredUsers]);
-    
-    const conversionRate = useMemo(() => getConversionRate(filteredOutreachLogs, overviewStats.totalHours), [filteredOutreachLogs, overviewStats.totalHours]);
-    const activistRetention = useMemo(() => getActivistRetention(filteredUsers, filteredEvents), [filteredUsers, filteredEvents]);
-    const avgActivistsPerEvent = useMemo(() => getAverageActivistsPerEvent(filteredEvents), [filteredEvents]);
-    const topActivists = useMemo(() => getTopActivistsByHours(filteredUsers, 5), [filteredUsers]);
+        isChapterView,
+        overviewStats,
+        chapterStats,
+        eventTrends,
+        memberGrowth,
+        conversionRate,
+        activistRetention,
+        avgActivistsPerEvent,
+        topActivists
+    } = useAnalyticsData();
 
     const topChaptersByHours = useMemo(() =>
         [...chapterStats]
@@ -163,6 +55,8 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
             .slice(0, 5)
             .map(c => ({ label: c.name, value: c.memberCount }))
     , [chapterStats]);
+
+    if (!overviewStats) return null; // Or a loading state
 
     return (
         <div className="py-8 md:py-12">
@@ -214,7 +108,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
             <section className="mb-12">
                 <h2 className="text-2xl font-bold text-black border-b-2 border-[#d81313] pb-2 mb-4">Overview</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <StatCard icon={<UsersIcon className="w-6 h-6" />} title="Total Members" value={overviewStats.totalMembers} />
+                    <StatCard icon={<UsersIcon className="w-6 h-6" />} title="Total Members" value={overviewStats.totalMembers.toLocaleString()} />
                     <StatCard icon={<ClockIcon className="w-6 h-6" />} title="Total Hours" value={overviewStats.totalHours.toLocaleString()} />
                     <StatCard icon={<TrendingUpIcon className="w-6 h-6" />} title="Total Conversions" value={overviewStats.totalConversions.toLocaleString()} />
                     <StatCard icon={<GlobeAltIcon className="w-6 h-6" />} title="Total Events" value={overviewStats.totalEvents.toLocaleString()} />

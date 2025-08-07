@@ -19,7 +19,7 @@ const BadgeList: React.FC<BadgeListProps> = ({ badges }) => {
       <ul className="divide-y divide-black">
         {badges.map((badge) => (
           <li key={badge.id} className="p-4 flex items-center space-x-4">
-            <div className="flex-shrink-0 bg-black p-3">
+            <div className="flex-shrink-0 p-3">
               <badge.icon className="w-6 h-6 text-[#d81313]" />
             </div>
             <div>

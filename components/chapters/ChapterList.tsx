@@ -2,7 +2,6 @@ import React from 'react';
 import { type Chapter } from '../../types';
 import { getChapterStats } from '../../utils/analytics';
 import ChapterCard from './ChapterCard';
-import { BuildingOfficeIcon } from '../icons';
 import { useData } from '../../contexts/DataContext';
 
 interface ChapterListProps {
@@ -39,7 +38,6 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 </div>
             ) : (
                 <div className="border border-black p-8 text-center bg-white">
-                    <BuildingOfficeIcon className="w-12 h-12 mx-auto text-neutral-300"/>
                     <h3 className="text-xl font-bold text-black mt-4">No chapters found.</h3>
                     <p className="mt-2 text-neutral-500">This is unexpected. Please contact an administrator.</p>
                 </div>
