@@ -1,58 +1,83 @@
-/*
-  These are build-time directives for Tailwind CSS.
-  During the 'npm run build' process, Vite and PostCSS will replace these
-  with the generated CSS classes based on their usage in your .tsx files.
-  This is the correct way to include Tailwind in a project.
-*/
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
-  Global base styles are defined in a dedicated layer.
-  This ensures consistency and follows best practices.
-*/
 @layer base {
   body {
-    @apply bg-white text-black font-sans;
+    /* CHANGED: Softer base color with a subtle dot-grid pattern for texture */
+    @apply bg-neutral-100 font-sans text-neutral-800 antialiased;
+    background-image: radial-gradient(
+      theme('colors.neutral.300') 1px,
+      transparent 1px
+    );
+    background-size: 16px 16px;
+  }
+
+  /* Add default transitions to buttons for smoother interactions */
+  button,
+  a {
+    /* CHANGED: Faster, snappier transitions */
+    @apply transition-all duration-150;
   }
 }
 
-/*
-  Component-specific styles, like for third-party libraries,
-  should be defined in the components layer. This keeps them organized
-  and separate from utility classes.
-*/
 @layer components {
-  /*
-    Custom Leaflet styles now live here, not in an inline <style> tag in index.html.
-  */
   .leaflet-popup-content-wrapper,
   .leaflet-popup-tip {
     background: white;
-    box-shadow: none;
-    border-radius: 0;
-    border: 1px solid black;
+    box-shadow: 4px 4px 0px 0px theme('colors.black');
+    border-radius: 0px;
+    border: 2px solid theme('colors.black');
   }
   .leaflet-popup-content {
-    margin: 10px;
+    margin: 12px;
+  }
+
+  .react-add-to-calendar__wrapper {
+    @apply relative;
+  }
+  .react-add-to-calendar__button {
+    @apply w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white hover:bg-neutral-800 !important;
+  }
+  .react-add-to-calendar__dropdown {
+    @apply w-full border-2 border-black bg-white !important;
+  }
+  .react-add-to-calendar__dropdown a {
+    @apply block p-2 text-sm text-black hover:bg-neutral-100 !important;
+  }
+
+  /* NEW: Brutalist utility classes */
+  .border-brutal {
+    @apply border-2 border-black;
+  }
+  .shadow-brutal {
+    @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+  }
+  .card-brutal {
+    @apply border-brutal bg-white;
+  }
+  .card-brutal-hover {
+    @apply card-brutal transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
+  }
+  .h-section {
+    @apply mb-4 border-b-2 border-black pb-2 text-3xl font-extrabold tracking-tighter text-black;
   }
 }
 
-/*
-  Custom utility classes or animations are defined in the utilities layer.
-*/
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.2s ease-in-out;
+    animation: fadeIn 0.3s ease-in-out;
   }
 
   @keyframes fadeIn {
     from {
       opacity: 0;
+      transform: translateY(-5px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 }

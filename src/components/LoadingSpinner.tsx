@@ -1,23 +1,23 @@
-import React from "react";
+import React from 'react';
 
 interface LoadingSpinnerProps {
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 const sizeClasses = {
-  sm: "w-4 h-4",
-  md: "w-8 h-8",
-  lg: "w-12 h-12",
+  sm: 'w-4 h-4',
+  md: 'w-8 h-8',
+  lg: 'w-12 h-12',
 };
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  size = "md",
-  className = "",
+  size = 'md',
+  className = '',
 }) => {
   return (
     <div
-      className={`inline-block animate-spin rounded-full border-2 border-gray-300 border-t-black ${sizeClasses[size]} ${className}`}
+      className={`inline-block animate-spin rounded-none border-2 border-gray-300 border-t-black ${sizeClasses[size]} ${className}`}
       role="status"
       aria-label="Loading"
     >
@@ -32,7 +32,7 @@ export const LoadingOverlay: React.FC<{ children?: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-white bg-opacity-75">
       <div className="text-center">
         <LoadingSpinner size="lg" />
         {children && <p className="mt-4 text-gray-600">{children}</p>}
@@ -47,13 +47,13 @@ export const LoadingButton: React.FC<{
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
-}> = ({ loading, children, className = "", onClick, disabled }) => {
+}> = ({ loading, children, className = '', onClick, disabled }) => {
   return (
     <button
       onClick={onClick}
       disabled={loading || disabled}
       className={`relative ${className} ${
-        loading ? "cursor-not-allowed opacity-75" : ""
+        loading ? 'cursor-not-allowed opacity-75' : ''
       }`}
     >
       {loading && (
@@ -61,7 +61,7 @@ export const LoadingButton: React.FC<{
           <LoadingSpinner size="sm" className="text-white" />
         </div>
       )}
-      <span className={loading ? "invisible" : "visible"}>{children}</span>
+      <span className={loading ? 'invisible' : 'visible'}>{children}</span>
     </button>
   );
 };

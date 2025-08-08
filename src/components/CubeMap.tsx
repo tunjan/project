@@ -1,9 +1,9 @@
-import React, { useMemo, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-// FIX: featureGroup is no longer needed, but LatLngBounds is.
-import { divIcon, point, LatLngBounds } from "leaflet";
-import { type CubeEvent, type Chapter } from "@/types";
+import React, { useMemo, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+import { divIcon, point, LatLngBounds } from 'leaflet';
+import { type CubeEvent, type Chapter } from '@/types';
 
 const getEventCoords = (
   event: CubeEvent,
@@ -15,7 +15,7 @@ const getEventCoords = (
 
 const CustomMarkerIcon = divIcon({
   html: `<div class="w-4 h-4 bg-primary border-2 border-black"></div>`,
-  className: "",
+  className: '',
   iconSize: point(16, 16),
   iconAnchor: point(8, 8),
 });
@@ -56,22 +56,20 @@ const CubeMap: React.FC<CubeMapProps> = ({
       );
   }, [events, chapters]);
 
-  // FIX: This section is now corrected and more efficient.
   const bounds = useMemo(() => {
     if (eventMarkers.length === 0) return null;
     const allCoords = eventMarkers.map((m) => m.coords);
-    // Directly create a LatLngBounds object from the coordinates array.
-    // This avoids the problematic `new Marker()` call.
+
     return new LatLngBounds(allCoords);
   }, [eventMarkers]);
 
   return (
-    <div className="border border-black bg-white h-[600px] w-full">
+    <div className="h-[600px] w-full border border-black bg-white">
       <MapContainer
         center={[20, 0]}
         zoom={2}
         scrollWheelZoom={false}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: '100%', width: '100%' }}
       >
         <ChangeView bounds={bounds} />
         <TileLayer
@@ -82,19 +80,19 @@ const CubeMap: React.FC<CubeMapProps> = ({
           <Marker key={event.id} position={coords} icon={CustomMarkerIcon}>
             <Popup>
               <div className="font-sans">
-                <h3 className="font-extrabold text-base mb-1 text-black">
+                <h3 className="mb-1 text-base font-extrabold text-black">
                   {event.location}
                 </h3>
                 <p className="m-0 text-sm text-neutral-600">{event.city}</p>
                 <p className="m-0 my-1 text-sm text-neutral-800">
-                  {new Date(event.dateTime).toLocaleString([], {
-                    dateStyle: "medium",
-                    timeStyle: "short",
+                  {event.startDate.toLocaleString([], {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
                   })}
                 </p>
                 <button
                   onClick={() => onSelectCube(event)}
-                  className="w-full border-none cursor-pointer mt-2 p-1 bg-primary text-white font-bold hover:bg-primary-hover"
+                  className="mt-2 w-full cursor-pointer border-none bg-primary p-1 font-bold text-white hover:bg-primary-hover"
                 >
                   View Details
                 </button>

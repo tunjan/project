@@ -1,22 +1,17 @@
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# Build artifacts
+# testing
+/coverage
+
+# production
 /dist
-/dist-ssr
 /build
+/dist-ssr
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# OS-generated files
+# misc
 .DS_Store
 .DS_Store?
 ._*
@@ -24,8 +19,27 @@ lerna-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.local
 
-# IDE / Editor directories
+# log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# vitest
+.vitest-pool
+
+# vercel
+.vercel
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
 .idea
 .vscode/*
 !.vscode/extensions.json
@@ -34,13 +48,3 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
-
-# Environment variables
-# Never commit secrets!
-.env
-.env.local
-.env.*.local
-*.local
-
-# Vercel
-.vercel

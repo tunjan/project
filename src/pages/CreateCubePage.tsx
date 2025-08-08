@@ -1,34 +1,36 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import CreateCubeForm from "@/components/events/CreateCubeForm";
-import { useCurrentUser } from "@/store/auth.store";
-import { useDataActions } from "@/store/data.store";
-import { type CubeEvent } from "@/types";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import CreateEventForm from '@/components/events/CreateEventForm';
+import { useCurrentUser } from '@/store/auth.store';
+import { useAppActions } from '@/store/appStore';
+import { toast } from 'sonner';
 
 const CreateCubePage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { createEvent } = useDataActions();
+  const { createEvent } = useAppActions();
 
-  const handleCreateEvent = (
-    eventData: Omit<
-      CubeEvent,
-      "id" | "organizer" | "participants" | "status" | "report"
-    >
-  ) => {
+  const handleCreateEvent = (eventData: {
+    city: string;
+    location: string;
+    startDate: Date;
+    endDate?: Date;
+    scope: 'Chapter' | 'Regional' | 'Global';
+    targetRegion?: string;
+  }) => {
     if (!currentUser) {
-      alert("You must be logged in to create an event.");
+      toast.error('You must be logged in to create an event.');
       return;
     }
     createEvent(eventData, currentUser);
-    alert("Event created successfully!");
-    navigate("/cubes");
+    toast.success('Event created successfully!');
+    navigate('/cubes');
   };
 
   return (
-    <CreateCubeForm
+    <CreateEventForm
       onCreateEvent={handleCreateEvent}
-      onCancel={() => navigate("/cubes")}
+      onCancel={() => navigate('/cubes')}
     />
   );
 };

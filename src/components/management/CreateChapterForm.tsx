@@ -1,65 +1,21 @@
-import React, { useState, useMemo } from "react";
-import { type User, Role, type Chapter } from "@/types";
+import React, { useState, useMemo } from 'react';
+import { type User, Role, type Chapter } from '@/types';
+import { InputField } from '@/components/ui/Form';
 
-interface CreateChapterFormProps {
+const CreateChapterForm: React.FC<{
   currentUser: User;
   chapters: Chapter[];
   onCreateChapter: (chapterData: Chapter) => void;
-}
-
-const InputField: React.FC<{
-  label: string;
-  id: string;
-  type?: string;
-  value: string | number;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  step?: string;
-  disabled?: boolean;
-  list?: string;
-}> = ({
-  label,
-  id,
-  type = "text",
-  value,
-  onChange,
-  required = true,
-  step,
-  disabled = false,
-  list,
-}) => (
-  <div>
-    <label htmlFor={id} className="block text-sm font-bold text-black mb-1">
-      {label}
-    </label>
-    <input
-      type={type}
-      id={id}
-      value={value}
-      onChange={onChange}
-      required={required}
-      step={step}
-      disabled={disabled}
-      list={list}
-      className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-500 focus:ring-0 sm:text-sm disabled:bg-neutral-200 disabled:text-neutral-500"
-    />
-  </div>
-);
-
-const CreateChapterForm: React.FC<CreateChapterFormProps> = ({
-  currentUser,
-  chapters,
-  onCreateChapter,
-}) => {
-  const [name, setName] = useState("");
+}> = ({ currentUser, chapters, onCreateChapter }) => {
+  const [name, setName] = useState('');
   const [country, setCountry] = useState(
     currentUser.role === Role.REGIONAL_ORGANISER
-      ? currentUser.managedCountry || ""
-      : ""
+      ? currentUser.managedCountry || ''
+      : ''
   );
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
-  const [instagram, setInstagram] = useState("");
+  const [lat, setLat] = useState('');
+  const [lng, setLng] = useState('');
+  const [instagram, setInstagram] = useState('');
 
   const existingCountries = useMemo(
     () => [...new Set(chapters.map((c) => c.country))],
@@ -77,13 +33,13 @@ const CreateChapterForm: React.FC<CreateChapterFormProps> = ({
     };
     onCreateChapter(newChapterData);
 
-    setName("");
+    setName('');
     if (currentUser.role !== Role.REGIONAL_ORGANISER) {
-      setCountry("");
+      setCountry('');
     }
-    setLat("");
-    setLng("");
-    setInstagram("");
+    setLat('');
+    setLng('');
+    setInstagram('');
   };
 
   const isCountryLocked = currentUser.role === Role.REGIONAL_ORGANISER;
@@ -91,7 +47,7 @@ const CreateChapterForm: React.FC<CreateChapterFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 space-y-4 bg-white border border-black"
+      className="space-y-4 border border-black bg-white p-6"
     >
       <InputField
         label="Chapter Name"
@@ -99,14 +55,24 @@ const CreateChapterForm: React.FC<CreateChapterFormProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <InputField
-        label="Country"
-        id="country"
-        value={country}
-        onChange={(e) => setCountry(e.target.value)}
-        disabled={isCountryLocked}
-        list="country-list"
-      />
+      <div>
+        <label
+          htmlFor="country"
+          className="mb-1 block text-sm font-bold text-black"
+        >
+          Country
+        </label>
+        <input
+          type="text"
+          id="country"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          required
+          disabled={isCountryLocked}
+          list="country-list"
+          className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm"
+        />
+      </div>
       {!isCountryLocked && (
         <datalist id="country-list">
           {existingCountries.map((c) => (
@@ -141,7 +107,7 @@ const CreateChapterForm: React.FC<CreateChapterFormProps> = ({
       </div>
       <button
         type="submit"
-        className="w-full bg-[#d81313] text-white font-bold py-2 px-4 hover:bg-[#b81010] transition-colors duration-300"
+        className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
       >
         Create Chapter
       </button>

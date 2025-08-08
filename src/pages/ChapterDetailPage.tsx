@@ -1,30 +1,35 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   useChapterByName,
   useUsers,
   useEvents,
   useAnnouncements,
-} from "@/store/data.store";
-import { type User, AnnouncementScope, Role } from "@/types";
-import { getChapterStats } from "@/utils/analytics";
+  useAppActions,
+  useChapterJoinRequests,
+} from '@/store/appStore';
+import { useCurrentUser } from '@/store/auth.store';
+import { type User, AnnouncementScope, Role } from '@/types';
+import { getChapterStats } from '@/utils/analytics';
 import {
   UsersIcon,
   ClockIcon,
-  TrendingUpIcon,
+  ChatBubbleLeftRightIcon,
   BuildingOfficeIcon,
   ChevronLeftIcon,
   InstagramIcon,
-} from "@/icons";
-import AnnouncementCard from "@/components/announcements/AnnouncementCard";
-import PastEventsModal from "@/components/chapters/PastEventsModal";
+  PlusIcon,
+} from '@/icons';
+import AnnouncementCard from '@/components/announcements/AnnouncementCard';
+import PastEventsModal from '@/components/chapters/PastEventsModal';
+import { toast } from 'sonner';
 
 const StatCard: React.FC<{
   icon: React.ReactNode;
   title: string;
   value: string | number;
 }> = ({ icon, title, value }) => (
-  <div className="bg-white p-4 h-full border border-black">
+  <div className="h-full border border-black bg-white p-4">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
       <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
@@ -40,13 +45,13 @@ const MemberCard: React.FC<{
   onMemberClick: (member: User) => void;
 }> = ({ member, onMemberClick }) => (
   <div
-    className="flex items-center space-x-3 cursor-pointer p-2 hover:bg-neutral-100"
+    className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-neutral-100"
     onClick={() => onMemberClick(member)}
   >
     <img
       src={member.profilePictureUrl}
       alt={member.name}
-      className="w-10 h-10 object-cover"
+      className="h-10 w-10 object-cover"
     />
     <div>
       <p className="font-bold text-black">{member.name}</p>
@@ -59,11 +64,30 @@ const ChapterDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { chapterName } = useParams<{ chapterName: string }>();
 
+  const currentUser = useCurrentUser();
+  const { requestToJoinChapter } = useAppActions();
+  const chapterJoinRequests = useChapterJoinRequests();
+
   const chapter = useChapterByName(chapterName);
   const allUsers = useUsers();
   const allEvents = useEvents();
   const allAnnouncements = useAnnouncements();
   const [isPastEventsModalOpen, setIsPastEventsModalOpen] = useState(false);
+
+  const isMember = useMemo(() => {
+    if (!currentUser || !chapter) return false;
+    return currentUser.chapters.includes(chapter.name);
+  }, [currentUser, chapter]);
+
+  const hasPendingRequest = useMemo(() => {
+    if (!currentUser || !chapter) return false;
+    return chapterJoinRequests.some(
+      (req) =>
+        req.user.id === currentUser.id &&
+        req.chapterName === chapter.name &&
+        req.status === 'Pending'
+    );
+  }, [currentUser, chapter, chapterJoinRequests]);
 
   const {
     stats,
@@ -84,7 +108,7 @@ const ChapterDetailPage: React.FC = () => {
     const calculatedStats = getChapterStats(allUsers, allEvents, [chapter])[0];
     const members = allUsers.filter(
       (u) =>
-        u.chapters.includes(chapter.name) && u.onboardingStatus === "Confirmed"
+        u.chapters.includes(chapter.name) && u.onboardingStatus === 'Confirmed'
     );
     const organisers = members.filter(
       (u) =>
@@ -102,10 +126,9 @@ const ChapterDetailPage: React.FC = () => {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     const pastEvents = allEvents
       .filter(
-        (event) =>
-          event.city === chapter.name && new Date(event.dateTime) < new Date()
+        (event) => event.city === chapter.name && event.startDate < new Date()
       )
-      .sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime());
+      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
 
     return {
       stats: calculatedStats,
@@ -116,16 +139,25 @@ const ChapterDetailPage: React.FC = () => {
     };
   }, [chapter, allUsers, allEvents, allAnnouncements]);
 
-  if (!chapter || !stats) {
-    return <div className="text-center py-16">Chapter not found.</div>;
-  }
-
   const handleMemberClick = useCallback(
     (member: User) => {
       navigate(`/manage/member/${member.id}`);
     },
     [navigate]
   );
+
+  const handleRequestJoin = () => {
+    if (currentUser && chapter) {
+      requestToJoinChapter(chapter.name, currentUser);
+      toast.info('Request Sent', {
+        description: `Your request to join ${chapter.name} has been sent to the chapter organizers.`,
+      });
+    }
+  };
+
+  if (!chapter || !stats) {
+    return <div className="py-16 text-center">Chapter not found.</div>;
+  }
 
   return (
     <>
@@ -136,47 +168,60 @@ const ChapterDetailPage: React.FC = () => {
           onClose={() => setIsPastEventsModalOpen(false)}
         />
       )}
-      <div className="py-8 md:py-12 animate-fade-in">
-        <div className="mb-6 flex justify-between items-center">
+      <div className="animate-fade-in py-8 md:py-12">
+        <div className="mb-6 flex items-center justify-between">
           <button
-            onClick={() => navigate("/chapters")}
-            className="inline-flex items-center text-sm font-semibold text-primary hover:text-black transition"
+            onClick={() => navigate('/chapters')}
+            className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
           >
-            <ChevronLeftIcon className="w-5 h-5 mr-1" />
+            <ChevronLeftIcon className="mr-1 h-5 w-5" />
             Back to all chapters
           </button>
-          {chapter.instagram && (
-            <a
-              href={`https://instagram.com/${chapter.instagram.replace(
-                "@",
-                ""
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-sm font-semibold text-neutral-600 hover:text-black transition"
-            >
-              <InstagramIcon className="w-5 h-5 mr-2" />
-              {chapter.instagram}
-            </a>
-          )}
+
+          <div className="flex items-center space-x-4">
+            {currentUser && !isMember && (
+              <button
+                onClick={handleRequestJoin}
+                disabled={hasPendingRequest}
+                className="inline-flex items-center bg-primary px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-yellow-500 disabled:text-black"
+              >
+                <PlusIcon className="mr-2 h-4 w-4" />
+                {hasPendingRequest ? 'Request Pending' : 'Request to Join'}
+              </button>
+            )}
+            {chapter.instagram && (
+              <a
+                href={`https://instagram.com/${chapter.instagram.replace(
+                  '@',
+                  ''
+                )}`} // CORRECTED: Use backticks ``
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-sm font-semibold text-neutral-600 transition hover:text-black"
+              >
+                <InstagramIcon className="mr-2 h-5 w-5" />
+                {chapter.instagram}
+              </a>
+            )}
+          </div>
         </div>
 
-        <div className="bg-white mb-16 mt-8">
-          <p className="text-base font-semibold text-primary uppercase tracking-wide">
+        <div className="mb-16 mt-8 bg-white">
+          <p className="text-base font-semibold uppercase tracking-wide text-primary">
             {chapter.country}
           </p>
-          <h1 className="mt-1 text-4xl md:text-5xl font-extrabold text-black">
+          <h1 className="mt-1 text-4xl font-extrabold text-black md:text-5xl">
             {chapter.name} Chapter
           </h1>
         </div>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-black border-b-2 border-primary pb-2 mb-4">
+          <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
             Chapter Statistics
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <StatCard
-              icon={<UsersIcon className="w-6 h-6" />}
+              icon={<UsersIcon className="h-6 w-6" />}
               title="Members"
               value={stats.memberCount}
             />
@@ -185,29 +230,29 @@ const ChapterDetailPage: React.FC = () => {
               onClick={() => setIsPastEventsModalOpen(true)}
             >
               <StatCard
-                icon={<BuildingOfficeIcon className="w-6 h-6" />}
+                icon={<BuildingOfficeIcon className="h-6 w-6" />}
                 title="Events Held"
                 value={stats.eventsHeld}
               />
             </div>
             <StatCard
-              icon={<ClockIcon className="w-6 h-6" />}
+              icon={<ClockIcon className="h-6 w-6" />}
               title="Total Hours"
               value={Math.round(stats.totalHours).toLocaleString()}
             />
             <StatCard
-              icon={<TrendingUpIcon className="w-6 h-6" />}
-              title="Total Conversions"
-              value={stats.totalConversions.toLocaleString()}
+              icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
+              title="Total Conversations"
+              value={stats.totalConversations.toLocaleString()}
             />
           </div>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-1">
             <div>
-              <h2 className="text-xl font-bold text-black mb-4">Organisers</h2>
-              <div className="bg-white border border-black p-4">
+              <h2 className="mb-4 text-xl font-bold text-black">Organisers</h2>
+              <div className="border border-black bg-white p-4">
                 {chapterOrganisers.length > 0 ? (
                   <div className="space-y-2 divide-y divide-neutral-200">
                     {chapterOrganisers.map((m) => (
@@ -219,15 +264,15 @@ const ChapterDetailPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-neutral-500 p-2">
+                  <p className="p-2 text-sm text-neutral-500">
                     No organisers assigned.
                   </p>
                 )}
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-black mb-4">Members</h2>
-              <div className="bg-white border border-black p-4 max-h-96 overflow-y-auto">
+              <h2 className="mb-4 text-xl font-bold text-black">Members</h2>
+              <div className="max-h-96 overflow-y-auto border border-black bg-white p-4">
                 {regularMembers.length > 0 ? (
                   <div className="space-y-2 divide-y divide-neutral-200">
                     {regularMembers.map((m) => (
@@ -239,7 +284,7 @@ const ChapterDetailPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-neutral-500 p-2">
+                  <p className="p-2 text-sm text-neutral-500">
                     No members yet.
                   </p>
                 )}
@@ -248,7 +293,7 @@ const ChapterDetailPage: React.FC = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <h2 className="text-xl font-bold text-black mb-4">
+            <h2 className="mb-4 text-xl font-bold text-black">
               Chapter Announcements
             </h2>
             {chapterAnnouncements.length > 0 ? (
@@ -261,7 +306,7 @@ const ChapterDetailPage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="border border-black p-8 text-center bg-white">
+              <div className="border border-black bg-white p-8 text-center">
                 <h3 className="text-lg font-bold text-black">
                   No chapter-specific announcements.
                 </h3>

@@ -1,35 +1,41 @@
-import React, { Suspense } from "react";
-import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
-import ProtectedRoute from "./ProtectedRoute";
-import MainLayout from "@/layouts/MainLayout";
-import AuthLayout from "@/layouts/AuthLayout";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { useCurrentUser } from "@/store/auth.store";
+import React, { Suspense } from 'react';
+import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
+import MainLayout from '@/layouts/MainLayout';
+import AuthLayout from '@/layouts/AuthLayout';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useCurrentUser } from '@/store/auth.store';
 
-const CubeListPage = React.lazy(() => import("@/pages/CubeListPage"));
-const CubeDetailPage = React.lazy(() => import("@/pages/CubeDetailPage"));
-const CreateCubePage = React.lazy(() => import("@/pages/CreateCubePage"));
-const ManageEventPage = React.lazy(() => import("@/pages/ManageEventPage"));
-const DashboardPage = React.lazy(() => import("@/pages/DashboardPage"));
-const ManagementPage = React.lazy(() => import("@/pages/ManagementPage"));
-const MemberProfilePage = React.lazy(() => import("@/pages/MemberProfilePage"));
-const AnalyticsPage = React.lazy(() => import("@/pages/AnalyticsPage"));
-const AnnouncementsPage = React.lazy(() => import("@/pages/AnnouncementsPage"));
+const CubeListPage = React.lazy(() => import('@/pages/CubeListPage'));
+const CubeDetailPage = React.lazy(() => import('@/pages/CubeDetailPage'));
+const CreateCubePage = React.lazy(() => import('@/pages/CreateCubePage'));
+const ManageEventPage = React.lazy(() => import('@/pages/ManageEventPage'));
+const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
+const ManagementPage = React.lazy(() => import('@/pages/ManagementPage'));
+const MemberProfilePage = React.lazy(() => import('@/pages/MemberProfilePage'));
+const AnalyticsPage = React.lazy(() => import('@/pages/AnalyticsPage'));
+const AnnouncementsPage = React.lazy(() => import('@/pages/AnnouncementsPage'));
 const CreateAnnouncementPage = React.lazy(
-  () => import("@/pages/CreateAnnouncementPage")
+  () => import('@/pages/CreateAnnouncementPage')
 );
-const ResourcesPage = React.lazy(() => import("@/pages/ResourcesPage"));
-const OutreachLogPage = React.lazy(() => import("@/pages/OutreachLogPage"));
-const ChapterListPage = React.lazy(() => import("@/pages/ChapterListPage"));
-const ChapterDetailPage = React.lazy(() => import("@/pages/ChapterDetailPage"));
-const LoginPage = React.lazy(() => import("@/pages/LoginPage"));
-const SignUpPage = React.lazy(() => import("@/pages/SignUpPage"));
-const NotFoundPage = React.lazy(() => import("@/pages/NotFoundPage"));
+const ResourcesPage = React.lazy(() => import('@/pages/ResourcesPage'));
+const OutreachLogPage = React.lazy(() => import('@/pages/OutreachLogPage'));
+const ChapterListPage = React.lazy(() => import('@/pages/ChapterListPage'));
+const ChapterDetailPage = React.lazy(() => import('@/pages/ChapterDetailPage'));
+const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
+const SignUpPage = React.lazy(() => import('@/pages/SignUpPage'));
+const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
+const VerificationPage = React.lazy(() => import('@/pages/VerificationPage'));
+const LeaderboardPage = React.lazy(() => import('@/pages/LeaderboardPage'));
+const PublicProfilePage = React.lazy(() => import('@/pages/PublicProfilePage'));
+const ApplicantStatusPage = React.lazy(
+  () => import('@/pages/ApplicantStatusPage')
+); // NEW
 
 const RootSuspense = () => (
   <Suspense
     fallback={
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex h-screen items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     }
@@ -40,24 +46,24 @@ const RootSuspense = () => (
 
 const IndexRedirect = () => {
   const currentUser = useCurrentUser();
-  return <Navigate to={currentUser ? "/dashboard" : "/cubes"} replace />;
+  return <Navigate to={currentUser ? '/dashboard' : '/cubes'} replace />;
 };
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <RootSuspense />,
     children: [
       {
         element: <MainLayout />,
         children: [
           { index: true, element: <IndexRedirect /> },
-          { path: "cubes", element: <CubeListPage /> },
-          { path: "cubes/:eventId", element: <CubeDetailPage /> },
-          { path: "chapters", element: <ChapterListPage /> },
-          { path: "chapters/:chapterName", element: <ChapterDetailPage /> },
+          { path: 'cubes', element: <CubeListPage /> },
+          { path: 'cubes/:eventId', element: <CubeDetailPage /> },
+          { path: 'chapters', element: <ChapterListPage /> },
+          { path: 'chapters/:chapterName', element: <ChapterDetailPage /> },
           {
-            path: "dashboard",
+            path: 'dashboard',
             element: (
               <ProtectedRoute>
                 <DashboardPage />
@@ -65,7 +71,32 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "announcements",
+            path: 'onboarding-status', // NEW ROUTE
+            element: (
+              <ProtectedRoute>
+                <ApplicantStatusPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'leaderboard',
+            element: (
+              <ProtectedRoute>
+                <LeaderboardPage />
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: 'members/:userId',
+            element: (
+              <ProtectedRoute>
+                <PublicProfilePage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'announcements',
             element: (
               <ProtectedRoute>
                 <AnnouncementsPage />
@@ -73,7 +104,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "resources",
+            path: 'resources',
             element: (
               <ProtectedRoute>
                 <ResourcesPage />
@@ -81,7 +112,15 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "outreach",
+            path: 'verify/:userId',
+            element: (
+              <ProtectedRoute requiredRole="organizer">
+                <VerificationPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'outreach',
             element: (
               <ProtectedRoute>
                 <OutreachLogPage />
@@ -89,7 +128,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "cubes/create",
+            path: 'cubes/create',
             element: (
               <ProtectedRoute requiredRole="organizer">
                 <CreateCubePage />
@@ -97,7 +136,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "announcements/create",
+            path: 'announcements/create',
             element: (
               <ProtectedRoute requiredRole="organizer">
                 <CreateAnnouncementPage />
@@ -105,7 +144,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "manage",
+            path: 'manage',
             element: (
               <ProtectedRoute requiredRole="organizer">
                 <ManagementPage />
@@ -113,7 +152,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "manage/member/:userId",
+            path: 'manage/member/:userId',
             element: (
               <ProtectedRoute requiredRole="organizer">
                 <MemberProfilePage />
@@ -121,7 +160,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "manage/event/:eventId",
+            path: 'manage/event/:eventId',
             element: (
               <ProtectedRoute requiredRole="organizer">
                 <ManageEventPage />
@@ -129,7 +168,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "analytics",
+            path: 'analytics',
             element: (
               <ProtectedRoute requiredRole="organizer">
                 <AnalyticsPage />
@@ -137,7 +176,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: "*",
+            path: '*',
             element: <NotFoundPage />,
           },
         ],
@@ -145,8 +184,8 @@ export const router = createBrowserRouter([
       {
         element: <AuthLayout />,
         children: [
-          { path: "login", element: <LoginPage /> },
-          { path: "signup", element: <SignUpPage /> },
+          { path: 'login', element: <LoginPage /> },
+          { path: 'signup', element: <SignUpPage /> },
         ],
       },
     ],

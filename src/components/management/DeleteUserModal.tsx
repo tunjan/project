@@ -1,6 +1,7 @@
-import React from "react";
-import { type User } from "@/types";
-import { TrashIcon } from "@/icons";
+import React from 'react';
+import { type User } from '@/types';
+import { TrashIcon } from '@/icons';
+import Modal from '@/components/ui/Modal';
 
 interface DeleteUserModalProps {
   user: User;
@@ -14,44 +15,33 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   onConfirm,
 }) => {
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center animate-fade-in"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white border-4 border-black p-8 relative w-full max-w-lg m-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-[#d81313]">
-            <TrashIcon className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="mt-4 text-2xl font-extrabold text-black">
-            Delete User
-          </h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            Are you sure you want to delete{" "}
-            <span className="font-bold">{user.name}</span>? This action is
-            permanent and cannot be undone.
-          </p>
+    <Modal title="Delete User" onClose={onClose}>
+      <div className="text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center bg-primary">
+          <TrashIcon className="h-6 w-6 text-white" />
         </div>
-
-        <div className="mt-6 flex items-center space-x-4">
-          <button
-            onClick={onClose}
-            className="w-full bg-black text-white font-bold py-2 px-4 hover:bg-neutral-800 transition-colors duration-300"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="w-full bg-[#d81313] text-white font-bold py-2 px-4 hover:bg-[#b81010] transition-colors duration-300"
-          >
-            Confirm Deletion
-          </button>
-        </div>
+        <p className="mt-4 text-sm text-neutral-600">
+          Are you sure you want to delete{' '}
+          <span className="font-bold">{user.name}</span>? This action is
+          permanent and cannot be undone. All associated data will be removed.
+        </p>
       </div>
-    </div>
+
+      <div className="mt-6 flex items-center space-x-4">
+        <button
+          onClick={onClose}
+          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={onConfirm}
+          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+        >
+          Confirm Deletion
+        </button>
+      </div>
+    </Modal>
   );
 };
 

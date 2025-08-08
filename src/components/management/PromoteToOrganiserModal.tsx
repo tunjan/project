@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from "react";
-import { type User, Role } from "@/types";
-import { useCurrentUser } from "@/store/auth.store";
-import { useChapters } from "@/store/data.store";
+import React, { useState, useMemo } from 'react';
+import { type User, Role } from '@/types';
+import { useCurrentUser } from '@/store/auth.store';
+import { useChapters } from '@/store/appStore';
+import { toast } from 'sonner';
+import Modal from '@/components/ui/Modal';
 
 interface PromoteToOrganiserModalProps {
   userToManage: User;
@@ -16,16 +18,13 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
 }) => {
   const currentUser = useCurrentUser();
   const allChapters = useChapters();
-
   const isEditing = userToManage.role === Role.CHAPTER_ORGANISER;
-
   const [selectedChapters, setSelectedChapters] = useState<string[]>(
     isEditing ? userToManage.organiserOf || [] : []
   );
 
   const promotableChapters = useMemo(() => {
     if (!currentUser) return [];
-
     if (
       currentUser.role === Role.REGIONAL_ORGANISER &&
       currentUser.managedCountry
@@ -56,89 +55,76 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
 
   const handleSubmit = () => {
     if (selectedChapters.length === 0) {
-      alert("An organiser must be assigned to at least one chapter.");
+      toast.error('An organiser must be assigned to at least one chapter.');
       return;
     }
     onConfirm(selectedChapters);
   };
 
   const modalTitle = isEditing
-    ? "Edit Organised Chapters"
-    : "Promote to Chapter Organiser";
-  const buttonText = isEditing ? "Save Changes" : "Promote User";
+    ? 'Edit Organised Chapters'
+    : 'Promote to Chapter Organiser';
+  const buttonText = isEditing ? 'Save Changes' : 'Promote User';
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center animate-fade-in"
-      onClick={onClose}
+    <Modal
+      title={modalTitle}
+      onClose={onClose}
+      description={`Select which chapter(s) ${userToManage.name} will organize.`}
     >
-      <div
-        className="bg-white border-4 border-black p-8 relative w-full max-w-lg m-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-center">
-          <h2 className="text-2xl font-extrabold text-black">{modalTitle}</h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            Select which chapter(s){" "}
-            <span className="font-bold">{userToManage.name}</span> will be
-            responsible for organizing.
-          </p>
-        </div>
-
-        <div className="my-6">
-          {promotableChapters.length > 0 ? (
-            <div className="space-y-2 border border-black p-4 max-h-64 overflow-y-auto">
-              {promotableChapters.map((chapter) => (
-                <label
-                  key={chapter.name}
-                  className="flex items-center space-x-3 p-2 hover:bg-neutral-100 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedChapters.includes(chapter.name)}
-                    onChange={() => handleCheckboxChange(chapter.name)}
-                    className="h-5 w-5 accent-[#d81313]"
-                  />
-                  <span className="font-bold text-black">{chapter.name}</span>
-                  <span className="text-sm text-neutral-500">
-                    ({chapter.country})
-                  </span>
-                </label>
-              ))}
-            </div>
-          ) : (
-            <div className="border border-black p-4 text-center bg-neutral-100">
-              <p className="font-bold text-black">
-                No promotable chapters found.
-              </p>
-              <p className="text-sm text-neutral-600 mt-1">
-                {currentUser?.role === Role.REGIONAL_ORGANISER
-                  ? `This user is not a member of any chapters within your managed region (${currentUser.managedCountry}).`
-                  : "This user is not a member of any chapters."}
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={onClose}
-            className="w-full bg-black text-white font-bold py-2 px-4 hover:bg-neutral-800 transition-colors duration-300"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={
-              promotableChapters.length === 0 || selectedChapters.length === 0
-            }
-            className="w-full bg-[#d81313] text-white font-bold py-2 px-4 hover:bg-[#b81010] transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {buttonText}
-          </button>
-        </div>
+      <div className="my-6">
+        {promotableChapters.length > 0 ? (
+          <div className="max-h-64 space-y-2 overflow-y-auto border border-black p-4">
+            {promotableChapters.map((chapter) => (
+              <label
+                key={chapter.name}
+                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-neutral-100"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedChapters.includes(chapter.name)}
+                  onChange={() => handleCheckboxChange(chapter.name)}
+                  className="h-5 w-5 accent-primary"
+                />
+                <span className="font-bold text-black">{chapter.name}</span>
+                <span className="text-sm text-neutral-500">
+                  ({chapter.country})
+                </span>
+              </label>
+            ))}
+          </div>
+        ) : (
+          <div className="border border-black bg-neutral-100 p-4 text-center">
+            <p className="font-bold text-black">
+              No promotable chapters found.
+            </p>
+            <p className="mt-1 text-sm text-neutral-600">
+              {currentUser?.role === Role.REGIONAL_ORGANISER
+                ? `This user is not a member of any chapters within your managed region (${currentUser.managedCountry}).`
+                : 'This user is not a member of any chapters.'}
+            </p>
+          </div>
+        )}
       </div>
-    </div>
+
+      <div className="flex items-center space-x-4">
+        <button
+          onClick={onClose}
+          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={
+            promotableChapters.length === 0 || selectedChapters.length === 0
+          }
+          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {buttonText}
+        </button>
+      </div>
+    </Modal>
   );
 };
 

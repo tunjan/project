@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Dashboard from "@/components/dashboard/Dashboard";
-import { useCurrentUser } from "@/store/auth.store";
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import UserProfile from '@/components/profile/UserProfile';
+import { useCurrentUser } from '@/store/auth.store';
+import { OnboardingStatus } from '@/types';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -9,19 +10,24 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      navigate("/login", { replace: true });
+      navigate('/login', { replace: true });
+    } else if (currentUser.onboardingStatus !== OnboardingStatus.CONFIRMED) {
+      navigate('/onboarding-status', { replace: true });
     }
   }, [currentUser, navigate]);
 
-  if (!currentUser) {
+  if (
+    !currentUser ||
+    currentUser.onboardingStatus !== OnboardingStatus.CONFIRMED
+  ) {
     return (
-      <div className="text-center py-16">
-        <p>Redirecting to login...</p>
+      <div className="py-16 text-center">
+        <p>Loading...</p>
       </div>
     );
   }
 
-  return <Dashboard user={currentUser} />;
+  return <UserProfile user={currentUser} />;
 };
 
 export default DashboardPage;

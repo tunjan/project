@@ -1,11 +1,38 @@
-import React, { useState } from "react";
-import { type OnboardingAnswers, type Chapter } from "@/types";
-import { InputField, TextAreaField } from "@/components/ui/Form";
+import React, { useReducer } from 'react';
+import { type OnboardingAnswers, type Chapter } from '@/types';
+import { InputField, TextAreaField, SelectField } from '@/components/ui/Form';
+
+// --- Form State Management ---
+interface FormState {
+  name: string;
+  email: string;
+  instagram: string;
+  chapter: string;
+  veganReason: string;
+  abolitionistAlignment: boolean;
+  customAnswer: string;
+}
+
+type FormAction =
+  | { type: 'SET_FIELD'; field: keyof FormState; value: any }
+  | { type: 'RESET' };
+
+const formReducer = (state: FormState, action: FormAction): FormState => {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'RESET':
+      return { ...action.value }; // expects a full initial state object
+    default:
+      return state;
+  }
+};
 
 interface SignUpProps {
   chapters: Chapter[];
   onRegister: (formData: {
     name: string;
+    email: string;
     instagram: string;
     chapter: string;
     answers: OnboardingAnswers;
@@ -18,27 +45,44 @@ const SignUp: React.FC<SignUpProps> = ({
   onRegister,
   onNavigateLogin,
 }) => {
-  const [name, setName] = useState("");
-  const [instagram, setInstagram] = useState("");
-  const [chapter, setChapter] = useState(chapters[0]?.name || "");
-  const [veganReason, setVeganReason] = useState("");
-  const [abolitionistAlignment, setAbolitionistAlignment] = useState(false);
-  const [customAnswer, setCustomAnswer] = useState("");
+  const initialState: FormState = {
+    name: '',
+    email: '',
+    instagram: '',
+    chapter: chapters[0]?.name || '',
+    veganReason: '',
+    abolitionistAlignment: false,
+    customAnswer: '',
+  };
+
+  const [state, dispatch] = useReducer(formReducer, initialState);
+
+  const handleFieldChange = (
+    field: keyof FormState,
+    value: string | boolean
+  ) => {
+    dispatch({ type: 'SET_FIELD', field, value });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onRegister({
-      name,
-      instagram,
-      chapter,
-      answers: { veganReason, abolitionistAlignment, customAnswer },
+      name: state.name,
+      email: state.email,
+      instagram: state.instagram,
+      chapter: state.chapter,
+      answers: {
+        veganReason: state.veganReason,
+        abolitionistAlignment: state.abolitionistAlignment,
+        customAnswer: state.customAnswer,
+      },
     });
   };
 
   return (
     <div className="py-8 md:py-16">
-      <div className="max-w-2xl mx-auto bg-white border border-black">
-        <div className="p-8 border-b border-black">
+      <div className="mx-auto max-w-2xl border border-black bg-white">
+        <div className="border-b border-black p-8">
           <h1 className="text-3xl font-extrabold text-black">
             Join the Movement
           </h1>
@@ -47,55 +91,55 @@ const SignUp: React.FC<SignUpProps> = ({
             chapter will review it.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-8">
           <InputField
             label="Full Name"
             id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={state.name}
+            onChange={(e) => handleFieldChange('name', e.target.value)}
+            required
+          />
+          <InputField
+            label="Email Address"
+            id="email"
+            type="email"
+            value={state.email}
+            onChange={(e) => handleFieldChange('email', e.target.value)}
             required
           />
           <InputField
             label="Instagram Handle (Optional)"
             id="instagram"
-            value={instagram}
-            onChange={(e) => setInstagram(e.target.value)}
-            required={false}
+            value={state.instagram}
+            onChange={(e) => handleFieldChange('instagram', e.target.value)}
           />
 
-          <div>
-            <label
-              htmlFor="chapter"
-              className="block text-sm font-bold text-black mb-1"
-            >
-              Local Chapter
-            </label>
-            <select
-              id="chapter"
-              value={chapter}
-              onChange={(e) => setChapter(e.target.value)}
-              className="block w-full border border-black bg-white p-2 text-black focus:ring-0 sm:text-sm"
-            >
-              {chapters.map((ch) => (
-                <option key={ch.name} value={ch.name}>
-                  {ch.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Local Chapter"
+            id="chapter"
+            value={state.chapter}
+            onChange={(e) => handleFieldChange('chapter', e.target.value)}
+          >
+            {chapters.map((ch) => (
+              <option key={ch.name} value={ch.name}>
+                {ch.name}
+              </option>
+            ))}
+          </SelectField>
 
           <hr className="border-black" />
 
           <TextAreaField
             label="Why did you go vegan?"
             id="veganReason"
-            value={veganReason}
-            onChange={(e) => setVeganReason(e.target.value)}
+            value={state.veganReason}
+            onChange={(e) => handleFieldChange('veganReason', e.target.value)}
             rows={3}
+            required
           />
 
           <fieldset>
-            <legend className="text-sm font-bold text-black mb-2">
+            <legend className="mb-2 text-sm font-bold text-black">
               Are you aligned with our abolitionist values (a consistent
               anti-oppression stance)?
             </legend>
@@ -104,7 +148,10 @@ const SignUp: React.FC<SignUpProps> = ({
                 <input
                   type="radio"
                   name="abolitionist"
-                  onChange={() => setAbolitionistAlignment(true)}
+                  checked={state.abolitionistAlignment === true}
+                  onChange={() =>
+                    handleFieldChange('abolitionistAlignment', true)
+                  }
                   className="accent-primary"
                 />
                 <span>Yes</span>
@@ -113,8 +160,10 @@ const SignUp: React.FC<SignUpProps> = ({
                 <input
                   type="radio"
                   name="abolitionist"
-                  defaultChecked
-                  onChange={() => setAbolitionistAlignment(false)}
+                  checked={state.abolitionistAlignment === false}
+                  onChange={() =>
+                    handleFieldChange('abolitionistAlignment', false)
+                  }
                   className="accent-primary"
                 />
                 <span>No / Unsure</span>
@@ -125,22 +174,23 @@ const SignUp: React.FC<SignUpProps> = ({
           <TextAreaField
             label="How can you best contribute to your local chapter? (e.g., skills, availability)"
             id="customAnswer"
-            value={customAnswer}
-            onChange={(e) => setCustomAnswer(e.target.value)}
+            value={state.customAnswer}
+            onChange={(e) => handleFieldChange('customAnswer', e.target.value)}
             rows={3}
+            required
           />
 
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full bg-primary text-white font-bold py-3 px-4 hover:bg-primary-hover transition-colors duration-300"
+              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
             >
               Submit Application
             </button>
           </div>
 
           <p className="text-center text-sm text-neutral-600">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <button
               type="button"
               onClick={onNavigateLogin}

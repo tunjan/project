@@ -1,5 +1,5 @@
-import React from "react";
-import { BaseChart } from "./BaseChart";
+import React from 'react';
+import { BaseChart } from './BaseChart';
 
 export interface BarChartData {
   label: string;
@@ -16,7 +16,7 @@ interface BarChartProps {
 const BarChart: React.FC<BarChartProps> = ({
   data,
   title,
-  barColor = "#d81313",
+  barColor = '#c70f0f',
 }) => {
   const barXScale = (index: number, chartWidth: number, padding: number) => {
     const barWidth = chartWidth / data.length;
@@ -24,9 +24,9 @@ const BarChart: React.FC<BarChartProps> = ({
   };
 
   return (
-    <div className="bg-white border border-black p-4 md:p-6">
-      <h3 className="text-lg font-bold text-black mb-4">{title}</h3>
-      <div className="w-full h-full">
+    <div className="border border-black bg-white p-4 md:p-6">
+      <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
+      <div className="h-full w-full">
         <BaseChart data={data} padding={40}>
           {({ yScale, chartWidth, chartHeight, maxValue }) => {
             const barWidth = chartWidth / data.length;

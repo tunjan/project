@@ -1,5 +1,5 @@
-import React from "react";
-import { BaseChart } from "./BaseChart";
+import React from 'react';
+import { BaseChart } from './BaseChart';
 
 export interface LineChartData {
   label: string;
@@ -15,13 +15,13 @@ interface LineChartProps {
 const LineChart: React.FC<LineChartProps> = ({
   data,
   title,
-  lineColor = "#c70f0f",
+  lineColor = '#c70f0f',
 }) => {
   if (data.length === 0) {
     return (
-      <div className="bg-white border border-black p-4 md:p-6">
-        <h3 className="text-lg font-bold text-black mb-4">{title}</h3>
-        <div className="flex items-center justify-center h-[300px] text-neutral-500">
+      <div className="border border-black bg-white p-4 md:p-6">
+        <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
+        <div className="flex h-[300px] items-center justify-center text-neutral-500">
           Not enough data to display chart.
         </div>
       </div>
@@ -30,18 +30,18 @@ const LineChart: React.FC<LineChartProps> = ({
 
   const points = data
     .map((item, index, arr) => {
-      if (arr.length < 2) return "";
+      if (arr.length < 2) return '';
       const x = 40 + (index / (arr.length - 1)) * (500 - 40 * 2);
       const maxValue = Math.max(...arr.map((d) => d.value), 0);
       const y = 40 + (300 - 40) - (item.value / (maxValue || 1)) * (300 - 40);
       return `${x},${y}`;
     })
-    .join(" ");
+    .join(' ');
 
   return (
-    <div className="bg-white border border-black p-4 md:p-6">
-      <h3 className="text-lg font-bold text-black mb-4">{title}</h3>
-      <div className="w-full h-full">
+    <div className="border border-black bg-white p-4 md:p-6">
+      <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
+      <div className="h-full w-full">
         <BaseChart data={data} width={500} height={300} padding={40}>
           {({ xScale, yScale }) => (
             <g>
@@ -51,7 +51,7 @@ const LineChart: React.FC<LineChartProps> = ({
                 strokeWidth="2"
                 points={data
                   .map((d, i) => `${xScale(i)},${yScale(d.value)}`)
-                  .join(" ")}
+                  .join(' ')}
               />
               {data.map((d, i) => (
                 <circle

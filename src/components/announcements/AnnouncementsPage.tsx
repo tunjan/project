@@ -1,24 +1,21 @@
-import React from "react";
+import React from 'react';
 import {
-  type View,
   type Announcement,
   Role,
   AnnouncementScope,
-  Chapter,
-} from "@/types";
-import { PlusIcon, MegaphoneIcon } from "@/icons";
-import AnnouncementCard from "./AnnouncementCard";
-import { useCurrentUser } from "@/store/auth.store";
-import { useAnnouncements, useChapters } from "@/store/data.store";
-import { hasOrganizerRole } from "@/utils/auth";
+  type Chapter,
+} from '@/types';
+import { PlusIcon, MegaphoneIcon } from '@/icons';
+import AnnouncementCard from './AnnouncementCard';
+import { useCurrentUser } from '@/store/auth.store';
+import { useAnnouncements, useChapters } from '@/store/appStore';
+import { hasOrganizerRole } from '@/utils/auth';
 
 interface AnnouncementsPageProps {
-  onNavigate: (view: View) => void;
+  onCreate: () => void;
 }
 
-const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({
-  onNavigate,
-}) => {
+const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
   const currentUser = useCurrentUser();
   const allAnnouncements = useAnnouncements();
   const chapters = useChapters();
@@ -70,27 +67,26 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({
 
   return (
     <div className="py-8 md:py-12">
-      <div className="mb-8 md:mb-12 text-center flex flex-col items-center">
-        <div className="w-full flex justify-center items-center relative">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight">
+      <div className="mb-8 flex flex-col items-center justify-between gap-4 md:mb-12 md:flex-row">
+        <div className="text-center md:text-left">
+          <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             Announcements
           </h1>
-          {hasOrganizerRole(currentUser) && (
-            <button
-              onClick={() => onNavigate("createAnnouncement")}
-              className="absolute right-0 flex items-center bg-primary text-white font-bold py-2 px-4 hover:bg-primary-hover transition-colors duration-300"
-            >
-              <PlusIcon className="w-5 h-5 mr-2" />
-              Create Announcement
-            </button>
-          )}
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600">
+            Stay up to date with the latest news and updates.
+          </p>
         </div>
-        <p className="mt-3 max-w-2xl mx-auto text-lg text-neutral-600">
-          Stay up to date with the latest news and updates from your
-          organization.
-        </p>
+        {hasOrganizerRole(currentUser) && (
+          <button
+            onClick={onCreate}
+            className="flex flex-shrink-0 items-center bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+          >
+            <PlusIcon className="mr-2 h-5 w-5" />
+            Create Announcement
+          </button>
+        )}
       </div>
-
+      <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600"></p>
       {filteredAnnouncements.length > 0 ? (
         <div className="space-y-6">
           {filteredAnnouncements.map((announcement: Announcement) => (
@@ -101,9 +97,9 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({
           ))}
         </div>
       ) : (
-        <div className="border border-black p-8 text-center bg-white">
-          <MegaphoneIcon className="w-12 h-12 mx-auto text-neutral-300" />
-          <h3 className="text-xl font-bold text-black mt-4">
+        <div className="border border-black bg-white p-8 text-center">
+          <MegaphoneIcon className="mx-auto h-12 w-12 text-neutral-300" />
+          <h3 className="mt-4 text-xl font-bold text-black">
             No announcements yet.
           </h3>
           <p className="mt-2 text-neutral-500">Check back later for updates.</p>

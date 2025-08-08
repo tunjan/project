@@ -1,11 +1,16 @@
-import React, { useState, useMemo, memo } from "react";
+import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   type CubeEvent,
   type EventParticipant,
   type User,
   EventStatus,
   type AccommodationRequest,
-} from "@/types";
+  Role,
+  Chapter,
+  TourDuty,
+  ParticipantStatus,
+} from '@/types';
 import {
   CalendarIcon,
   ClockIcon,
@@ -13,24 +18,32 @@ import {
   ChevronLeftIcon,
   ClipboardCheckIcon,
   HomeIcon,
-} from "@/icons";
-import RequestAccommodationModal from "@/components/events/RequestAccommodationModal";
-import EventDiscussion from "@/components/events/EventDiscussion";
-import { useCurrentUser } from "@/store/auth.store";
-import { useDataActions, useUsers } from "@/store/data.store";
-import { AddToCalendarButton } from "add-to-calendar-button-react";
+  PencilIcon,
+  XCircleIcon,
+  TrashIcon,
+} from '@/icons';
+import RequestAccommodationModal from '@/components/events/RequestAccommodationModal';
+import EditEventModal from '@/components/events/EditEventModal';
+import EventDiscussion from '@/components/events/EventDiscussion';
+import EventRoster from './events/EventRoster';
+import TourOfDutyModal from './events/TourOfDutyModal';
+import { useCurrentUser } from '@/store/auth.store';
+import { useAppActions, useUsers, useChapters } from '@/store/appStore';
+import { AddToCalendarButton } from 'add-to-calendar-button-react';
+import { toast } from 'sonner';
+import CancelEventModal from './events/CancelEventModal';
 
 interface CubeDetailProps {
   event: CubeEvent;
   onBack: () => void;
-  onRsvp: (eventId: string) => void;
+  onRsvp: (eventId: string, duties?: TourDuty[]) => void;
   onCancelRsvp: (eventId: string) => void;
   onManageEvent: (event: CubeEvent) => void;
 }
 
 const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
   const roleClasses =
-    role === "Organizer" ? "bg-primary text-white" : "bg-black text-white";
+    role === 'Organizer' ? 'bg-primary text-white' : 'bg-black text-white';
 
   return (
     <span className={`px-2 py-1 text-xs font-medium ${roleClasses}`}>
@@ -39,52 +52,112 @@ const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
   );
 };
 
-const ParticipantCard: React.FC<{ participant: EventParticipant }> = memo(
-  ({ participant }) => (
-    <li className="flex items-center justify-between py-3">
-      <div className="flex items-center">
+const ParticipantCard: React.FC<{
+  participant: EventParticipant;
+  isOrganizerView: boolean;
+  onRemove: (userId: string) => void;
+}> = ({ participant, isOrganizerView, onRemove }) => (
+  <li>
+    <div className="flex items-center justify-between p-3 transition-colors hover:bg-neutral-100">
+      <Link
+        to={`/members/${participant.user.id}`}
+        className="flex min-w-0 items-center"
+      >
         <img
-          className="h-10 w-10 object-cover"
+          className="h-10 w-10 flex-shrink-0 object-cover"
           src={participant.user.profilePictureUrl}
           alt={participant.user.name}
         />
-        <div className="ml-4">
-          <p className="text-sm font-semibold text-black">
+        <div className="ml-4 min-w-0">
+          <p className="truncate text-sm font-semibold text-black">
             {participant.user.name}
           </p>
-          <p className="text-sm text-neutral-500">{participant.user.role}</p>
-        </div>
-      </div>
-      <RoleBadge role={participant.eventRole} />
-    </li>
-  )
-);
-
-const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> =
-  memo(({ host, onRequest }) => (
-    <li className="flex items-center justify-between py-3">
-      <div className="flex items-center">
-        <img
-          className="h-10 w-10 object-cover"
-          src={host.profilePictureUrl}
-          alt={host.name}
-        />
-        <div className="ml-4">
-          <p className="text-sm font-semibold text-black">{host.name}</p>
-          <p className="text-sm text-neutral-500">
-            Can host {host.hostingCapacity}{" "}
-            {host.hostingCapacity === 1 ? "person" : "people"}
+          <p className="truncate text-sm text-neutral-500">
+            {participant.user.role}
           </p>
         </div>
+      </Link>
+      <div className="flex flex-shrink-0 items-center space-x-2">
+        <RoleBadge role={participant.eventRole} />
+        {isOrganizerView && (
+          <button
+            onClick={() => onRemove(participant.user.id)}
+            className="p-1 text-neutral-400 hover:text-primary"
+            aria-label={`Remove ${participant.user.name}`}
+          >
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        )}
       </div>
+    </div>
+  </li>
+);
+
+const PendingRequestCard: React.FC<{
+  participant: EventParticipant;
+  onAccept: () => void;
+  onDeny: () => void;
+}> = ({ participant, onAccept, onDeny }) => (
+  <li className="flex items-center justify-between p-3">
+    <div className="flex items-center">
+      <img
+        className="h-10 w-10 object-cover"
+        src={participant.user.profilePictureUrl}
+        alt={participant.user.name}
+      />
+      <div className="ml-4">
+        <p className="text-sm font-semibold text-black">
+          {participant.user.name}
+        </p>
+        <p className="text-sm text-neutral-500">
+          {participant.user.chapters.join(', ')}
+        </p>
+      </div>
+    </div>
+    <div className="flex items-center space-x-2">
       <button
-        onClick={() => onRequest(host)}
-        className="text-sm font-semibold bg-primary text-white px-3 py-2 hover:bg-primary-hover"
+        onClick={onDeny}
+        className="bg-black px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-800"
       >
-        Request Stay
+        Deny
       </button>
-    </li>
-  ));
+      <button
+        onClick={onAccept}
+        className="bg-primary px-3 py-1 text-xs font-semibold text-white hover:bg-primary-hover"
+      >
+        Accept
+      </button>
+    </div>
+  </li>
+);
+
+const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> = ({
+  host,
+  onRequest,
+}) => (
+  <li className="flex items-center justify-between py-3">
+    <div className="flex items-center">
+      <img
+        className="h-10 w-10 object-cover"
+        src={host.profilePictureUrl}
+        alt={host.name}
+      />
+      <div className="ml-4">
+        <p className="text-sm font-semibold text-black">{host.name}</p>
+        <p className="text-sm text-neutral-500">
+          Can host {host.hostingCapacity}{' '}
+          {host.hostingCapacity === 1 ? 'person' : 'people'}
+        </p>
+      </div>
+    </div>
+    <button
+      onClick={() => onRequest(host)}
+      className="bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
+    >
+      Request Stay
+    </button>
+  </li>
+);
 
 const CubeDetail: React.FC<CubeDetailProps> = ({
   event,
@@ -95,32 +168,83 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 }) => {
   const currentUser = useCurrentUser();
   const allUsers = useUsers();
-  const { createAccommodationRequest } = useDataActions();
+  const allChapters = useChapters();
+  const {
+    createAccommodationRequest,
+    cancelEvent,
+    approveRsvp,
+    denyRsvp,
+    removeParticipant,
+  } = useAppActions();
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isTourModalOpen, setIsTourModalOpen] = useState(false);
   const [selectedHost, setSelectedHost] = useState<User | null>(null);
 
-  const formattedDate = new Date(event.dateTime).toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-  const formattedTime = new Date(event.dateTime).toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+  const formattedDate = new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(event.startDate);
 
-  const isAttending = currentUser
-    ? event.participants.some(
-        (p: EventParticipant) => p.user.id === currentUser.id
-      )
-    : false;
-  const isPastEvent = new Date() > new Date(event.dateTime);
+  const formattedTime = new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  }).format(event.startDate);
+
+  const formattedDateRange = event.endDate
+    ? `${new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'full',
+      }).format(event.startDate)} to ${new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'full',
+      }).format(event.endDate)}`
+    : formattedDate;
+
+  const currentUserParticipant = useMemo(
+    () =>
+      currentUser
+        ? event.participants.find((p) => p.user.id === currentUser.id)
+        : undefined,
+    [currentUser, event.participants]
+  );
+
+  const isAttending =
+    currentUserParticipant?.status === ParticipantStatus.ATTENDING;
+  const isPending =
+    currentUserParticipant?.status === ParticipantStatus.PENDING;
+  const isGuest = currentUser
+    ? !currentUser.chapters.includes(event.city)
+    : true;
+
+  const isPastEvent = new Date() > event.startDate;
+  const isCancelled = event.status === EventStatus.CANCELLED;
   const isOrganizer = currentUser?.id === event.organizer.id;
   const canManageEvent =
-    isOrganizer && isPastEvent && event.status !== EventStatus.FINISHED;
+    isOrganizer &&
+    isPastEvent &&
+    event.status !== EventStatus.FINISHED &&
+    !isCancelled;
   const canParticipateInDiscussion = currentUser && isAttending;
+  const canEditEvent = isOrganizer && !isPastEvent && !isCancelled;
+  const canCancelEvent = isOrganizer && !isPastEvent && !isCancelled;
+  const isRegionalEvent = event.scope === 'Regional' && event.endDate;
+
+  const attendingParticipants = useMemo(
+    () =>
+      event.participants.filter(
+        (p) => p.status === ParticipantStatus.ATTENDING
+      ),
+    [event.participants]
+  );
+
+  const pendingParticipants = useMemo(
+    () =>
+      event.participants.filter((p) => p.status === ParticipantStatus.PENDING),
+    [event.participants]
+  );
 
   const availableHosts = useMemo(() => {
     return allUsers.filter(
@@ -133,12 +257,41 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     );
   }, [allUsers, event.city, currentUser]);
 
+  const organizableChapters = useMemo((): Chapter[] => {
+    if (!currentUser) return [];
+
+    switch (currentUser.role) {
+      case Role.GODMODE:
+      case Role.GLOBAL_ADMIN:
+        return allChapters;
+      case Role.REGIONAL_ORGANISER:
+        if (!currentUser.managedCountry) return [];
+        return allChapters.filter(
+          (c) => c.country === currentUser.managedCountry
+        );
+      case Role.CHAPTER_ORGANISER:
+        return (
+          allChapters.filter((c) =>
+            currentUser.organiserOf?.includes(c.name)
+          ) || []
+        );
+      default:
+        return [];
+    }
+  }, [currentUser, allChapters]);
+
   const handleRsvpClick = () => {
-    if (isAttending) {
-      onCancelRsvp(event.id);
+    if (isRegionalEvent) {
+      setIsTourModalOpen(true);
     } else {
       onRsvp(event.id);
     }
+  };
+
+  const handleTourConfirm = (duties: TourDuty[]) => {
+    onRsvp(event.id, duties);
+    setIsTourModalOpen(false);
+    toast.success('Your duties have been registered!');
   };
 
   const handleRequestStay = (host: User) => {
@@ -149,7 +302,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   const handleCreateRequest = (
     requestData: Omit<
       AccommodationRequest,
-      "id" | "requester" | "host" | "event" | "status"
+      'id' | 'requester' | 'host' | 'event' | 'status'
     >
   ) => {
     if (!selectedHost || !currentUser) return;
@@ -163,9 +316,37 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     );
     setIsRequestModalOpen(false);
     setSelectedHost(null);
-    alert(
-      `Accommodation request sent to ${selectedHost.name}. You can track its status on your dashboard.`
-    );
+    toast.success('Accommodation request sent', {
+      description: `Your request was sent to ${selectedHost.name}. Track its status on your dashboard.`,
+    });
+  };
+
+  const handleConfirmCancel = (reason: string) => {
+    if (!currentUser) return;
+    cancelEvent(event.id, reason, currentUser);
+    setIsCancelModalOpen(false);
+    toast.error('Event has been cancelled. Participants will be notified.');
+  };
+
+  const handleAcceptRsvp = (guestId: string) => {
+    if (!currentUser) return;
+    approveRsvp(event.id, guestId, currentUser);
+    toast.success('Guest approved and added to the event.');
+  };
+
+  const handleDenyRsvp = (guestId: string) => {
+    if (!currentUser) return;
+    denyRsvp(event.id, guestId, currentUser);
+    toast.error('Guest request has been denied.');
+  };
+
+  const handleRemoveParticipant = (participantUserId: string) => {
+    if (
+      !currentUser ||
+      window.confirm('Are you sure you want to remove this participant?')
+    ) {
+      removeParticipant(event.id, participantUserId, currentUser!);
+    }
   };
 
   return (
@@ -178,78 +359,102 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           onCreateRequest={handleCreateRequest}
         />
       )}
-      <div className="py-8 md:py-12 animate-fade-in">
+      {isCancelModalOpen && canCancelEvent && (
+        <CancelEventModal
+          event={event}
+          onClose={() => setIsCancelModalOpen(false)}
+          onConfirm={handleConfirmCancel}
+        />
+      )}
+      {isTourModalOpen && isRegionalEvent && (
+        <TourOfDutyModal
+          event={event}
+          existingDuties={currentUserParticipant?.tourDuties || []}
+          onClose={() => setIsTourModalOpen(false)}
+          onConfirm={handleTourConfirm}
+        />
+      )}
+      {isEditModalOpen && canEditEvent && (
+        <EditEventModal
+          event={event}
+          organizableChapters={organizableChapters}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
+      <div className="animate-fade-in py-8 md:py-12">
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="inline-flex items-center text-sm font-semibold text-primary hover:text-black transition"
+            className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
           >
-            <ChevronLeftIcon className="w-5 h-5 mr-1" />
+            <ChevronLeftIcon className="mr-1 h-5 w-5" />
             Back to all cubes
           </button>
         </div>
 
+        {isCancelled && (
+          <div
+            className="mb-8 flex items-center border-2 border-red-500 bg-red-100 p-4 text-red-800"
+            role="alert"
+          >
+            <XCircleIcon className="h-6 w-6" />
+            <div className="ml-3">
+              <p className="font-bold">This event has been cancelled.</p>
+              {event.cancellationReason && (
+                <p className="text-sm">Reason: {event.cancellationReason}</p>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white border border-black overflow-hidden">
+          <div className="space-y-8 lg:col-span-2">
+            <div className="overflow-hidden border border-black bg-white">
               <img
                 src={`https://picsum.photos/seed/${event.id}/1200/400`}
                 alt="Event location photo"
-                className="w-full h-64 object-cover"
+                className="h-64 w-full object-cover"
               />
               <div className="p-6 md:p-8">
-                <div className="flex justify-between items-start">
-                  <p className="text-base font-semibold text-primary uppercase tracking-wide">
+                {event.scope === 'Regional' && (
+                  <div className="mb-2 inline-block bg-black px-3 py-1 text-sm font-bold uppercase tracking-wider text-white">
+                    {event.targetRegion} Regional Event
+                  </div>
+                )}
+                <div className="flex items-start justify-between">
+                  <p className="text-base font-semibold uppercase tracking-wide text-primary">
                     {event.city}
                   </p>
                   {event.status === EventStatus.FINISHED && (
-                    <span className="text-sm font-bold bg-black text-white px-3 py-1">
+                    <span className="bg-black px-3 py-1 text-sm font-bold text-white">
                       Finished
                     </span>
                   )}
+                  {event.status === EventStatus.CANCELLED && (
+                    <span className="bg-red-600 px-3 py-1 text-sm font-bold text-white">
+                      Cancelled
+                    </span>
+                  )}
                 </div>
-                <h1 className="mt-1 text-3xl md:text-4xl font-extrabold text-black">
+                <h1 className="mt-1 text-3xl font-extrabold text-black md:text-4xl">
                   {event.location}
                 </h1>
 
                 <div className="mt-6 space-y-4 text-neutral-700">
-                  <div className="flex items-center">
-                    <CalendarIcon className="w-6 h-6 mr-4 text-neutral-400" />
-                    <span className="text-lg">{formattedDate}</span>
+                  <div className="flex items-start">
+                    <CalendarIcon className="mr-4 mt-1 h-6 w-6 flex-shrink-0 text-neutral-400" />
+                    <span className="text-lg">{formattedDateRange}</span>
                   </div>
                   <div className="flex items-center">
-                    <ClockIcon className="w-6 h-6 mr-4 text-neutral-400" />
-                    <span className="text-lg">{formattedTime}</span>
-                  </div>
-
-                  <div className="mt-4">
-                    <AddToCalendarButton
-                      name={event.location}
-                      startDate={
-                        new Date(event.dateTime).toISOString().split("T")[0]
-                      }
-                      startTime={
-                        new Date(event.dateTime).toTimeString().split(" ")[0]
-                      }
-                      endTime={
-                        new Date(
-                          new Date(event.dateTime).getTime() +
-                            2 * 60 * 60 * 1000
-                        )
-                          .toTimeString()
-                          .split(" ")[0]
-                      }
-                      timeZone="currentBrowser"
-                      location={event.location}
-                      options={["Apple", "Google", "Outlook.com"]}
-                      buttonStyle="date"
-                      size="3"
-                    />
+                    <ClockIcon className="mr-4 h-6 w-6 text-neutral-400" />
+                    <span className="text-lg">
+                      {formattedTime} (Start time)
+                    </span>
                   </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-neutral-200">
-                  <h3 className="text-lg font-bold text-black mb-2">
+                <div className="mt-8 border-t border-neutral-200 pt-6">
+                  <h3 className="mb-2 text-lg font-bold text-black">
                     Organizer
                   </h3>
                   <div className="flex items-center">
@@ -270,11 +475,35 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 </div>
               </div>
             </div>
-            {!isPastEvent && currentUser && (
-              <div className="bg-white border border-black">
+            {isRegionalEvent && <EventRoster event={event} />}
+            {isOrganizer && pendingParticipants.length > 0 && (
+              <div className="border border-yellow-500 bg-yellow-50">
+                <div className="border-b border-yellow-400 p-6 md:p-8">
+                  <h2 className="text-xl font-bold text-black">
+                    Pending Join Requests ({pendingParticipants.length})
+                  </h2>
+                  <p className="mt-1 text-sm text-yellow-800">
+                    These activists are not from your chapter and require your
+                    approval to attend.
+                  </p>
+                </div>
+                <ul className="divide-y divide-yellow-300 px-6">
+                  {pendingParticipants.map((p) => (
+                    <PendingRequestCard
+                      key={p.user.id}
+                      participant={p}
+                      onAccept={() => handleAcceptRsvp(p.user.id)}
+                      onDeny={() => handleDenyRsvp(p.user.id)}
+                    />
+                  ))}
+                </ul>
+              </div>
+            )}
+            {!isPastEvent && currentUser && !isRegionalEvent && (
+              <div className="border border-black bg-white">
                 <div className="p-6 md:p-8">
-                  <div className="flex items-center border-b border-black pb-4 mb-2">
-                    <HomeIcon className="w-6 h-6 mr-3 text-black" />
+                  <div className="mb-2 flex items-center border-b border-black pb-4">
+                    <HomeIcon className="mr-3 h-6 w-6 text-black" />
                     <h2 className="text-xl font-bold text-black">
                       Available Hosts
                     </h2>
@@ -290,7 +519,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-center text-sm text-neutral-500 py-4">
+                    <p className="py-4 text-center text-sm text-neutral-500">
                       No hosts are available for this event yet. Check back
                       later!
                     </p>
@@ -304,49 +533,112 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           </div>
 
           <div className="mt-8 lg:mt-0">
-            <div className="bg-white border border-black p-6 md:p-8">
-              <div className="flex items-center justify-between mb-4">
+            <div className="border border-black bg-white p-6 md:p-8">
+              <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-black">Participants</h2>
-                <div className="flex items-center bg-black text-white text-sm font-semibold px-3 py-1">
-                  <UsersIcon className="w-5 h-5 mr-1.5" />
-                  {event.participants.length}
+                <div className="flex items-center bg-black px-3 py-1 text-sm font-semibold text-white">
+                  <UsersIcon className="mr-1.5 h-5 w-5" />
+                  {attendingParticipants.length}
                 </div>
               </div>
-              <ul className="divide-y divide-neutral-200">
-                {event.participants.map((p: EventParticipant) => (
-                  <ParticipantCard key={p.user.id} participant={p} />
+              <ul className="-mx-3 divide-y divide-neutral-200">
+                {attendingParticipants.map((p: EventParticipant) => (
+                  <ParticipantCard
+                    key={p.user.id}
+                    participant={p}
+                    isOrganizerView={isOrganizer && !isPastEvent}
+                    onRemove={handleRemoveParticipant}
+                  />
                 ))}
               </ul>
-
-              {canManageEvent ? (
-                <button
-                  onClick={() => onManageEvent(event)}
-                  className="w-full mt-6 font-bold py-3 px-4 transition-colors duration-300 bg-black text-white hover:bg-neutral-800 flex items-center justify-center"
-                >
-                  <ClipboardCheckIcon className="w-5 h-5 mr-2" />
-                  Log Event Report
-                </button>
-              ) : (
-                <button
-                  onClick={handleRsvpClick}
-                  disabled={
-                    isPastEvent || event.status === EventStatus.FINISHED
-                  }
-                  className={`w-full mt-6 font-bold py-3 px-4 transition-colors duration-300 ${
-                    isAttending
-                      ? "bg-black text-white hover:bg-neutral-800"
-                      : "bg-primary text-white hover:bg-primary-hover"
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  {isPastEvent || event.status === EventStatus.FINISHED
-                    ? "Event has ended"
-                    : isAttending
-                    ? "Cancel RSVP"
-                    : currentUser
-                    ? "RSVP to this Cube"
-                    : "Log in to RSVP"}
-                </button>
-              )}
+              <div className="mt-6 space-y-2">
+                {canManageEvent ? (
+                  <button
+                    onClick={() => onManageEvent(event)}
+                    className="flex w-full items-center justify-center bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+                  >
+                    <ClipboardCheckIcon className="mr-2 h-5 w-5" />
+                    Log Event Report
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleRsvpClick}
+                    disabled={
+                      isPastEvent ||
+                      event.status === EventStatus.FINISHED ||
+                      isCancelled ||
+                      (isAttending && !isRegionalEvent) ||
+                      isPending
+                    }
+                    className={`w-full px-4 py-3 font-bold transition-colors duration-300 ${
+                      isAttending
+                        ? 'bg-green-600 text-white'
+                        : isPending
+                          ? 'bg-yellow-500 text-black'
+                          : 'bg-primary text-white hover:bg-primary-hover'
+                    } disabled:cursor-not-allowed disabled:opacity-50`}
+                  >
+                    {(() => {
+                      if (isPastEvent || event.status === EventStatus.FINISHED)
+                        return 'Event has ended';
+                      if (isCancelled) return 'Event Cancelled';
+                      if (isPending) return 'Request Pending';
+                      if (isAttending)
+                        return isRegionalEvent
+                          ? 'Update Duties'
+                          : 'You are attending';
+                      if (!currentUser) return 'Log in to RSVP';
+                      if (isRegionalEvent) return 'Sign Up for Duties';
+                      return isGuest ? 'Request to Join' : 'RSVP to this Cube';
+                    })()}
+                  </button>
+                )}
+                {(isAttending || isPending) && !isPastEvent && !isCancelled && (
+                  <button
+                    onClick={() => onCancelRsvp(event.id)}
+                    className="flex w-full items-center justify-center bg-black px-4 py-3 font-bold text-white transition-colors hover:bg-neutral-800"
+                  >
+                    Cancel RSVP
+                  </button>
+                )}
+                {canEditEvent && (
+                  <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="flex w-full items-center justify-center border border-black bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+                  >
+                    <PencilIcon className="mr-2 h-5 w-5" />
+                    Edit Event
+                  </button>
+                )}
+                {canCancelEvent && (
+                  <button
+                    onClick={() => setIsCancelModalOpen(true)}
+                    className="flex w-full items-center justify-center border border-red-600 bg-red-600 px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-red-700"
+                  >
+                    <XCircleIcon className="mr-2 h-5 w-5" />
+                    Cancel Event
+                  </button>
+                )}
+                {isAttending && !isPastEvent && !isCancelled && (
+                  <AddToCalendarButton
+                    name={event.location}
+                    startDate={event.startDate.toISOString().split('T')[0]}
+                    endDate={
+                      (event.endDate || event.startDate)
+                        .toISOString()
+                        .split('T')[0]
+                    }
+                    startTime={event.startDate.toTimeString().slice(0, 5)}
+                    endTime={(event.endDate || event.startDate)
+                      .toTimeString()
+                      .slice(0, 5)}
+                    timeZone="currentBrowser"
+                    location={event.location}
+                    options={['Apple', 'Google', 'Outlook.com']}
+                    listStyle="modal"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

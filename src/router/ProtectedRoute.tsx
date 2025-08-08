@@ -1,11 +1,12 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { useCurrentUser } from "@/store/auth.store";
-import { hasOrganizerRole } from "@/utils/auth";
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useCurrentUser } from '@/store/auth.store';
+import { hasOrganizerRole } from '@/utils/auth';
+import { type ProtectedRole } from '@/types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: "organizer";
+  requiredRole?: ProtectedRole;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
@@ -19,7 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requiredRole === "organizer" && !hasOrganizerRole(currentUser)) {
+  if (requiredRole === 'organizer' && !hasOrganizerRole(currentUser)) {
     return <Navigate to="/dashboard" replace />;
   }
 

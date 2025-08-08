@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { type User } from "@/types";
+import React, { useState } from 'react';
+import { type User } from '@/types';
 
 interface OnboardingQueueProps {
   pendingUsers: User[];
@@ -15,17 +15,17 @@ const ApplicantCard: React.FC<{
   const [isExpanded, setIsExpanded] = useState(false);
   const chapterText =
     user.chapters.length > 0
-      ? `${user.chapters.join(", ")} Chapter`
-      : "No chapter";
+      ? `${user.chapters.join(', ')} Chapter`
+      : 'No chapter';
 
   return (
-    <div className="bg-white border border-black">
-      <div className="p-4 flex items-center justify-between">
+    <div className="border border-black bg-white">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-4">
           <img
             src={user.profilePictureUrl}
             alt={user.name}
-            className="w-12 h-12 object-cover"
+            className="h-12 w-12 object-cover"
           />
           <div>
             <p className="font-bold text-black">{user.name}</p>
@@ -36,27 +36,27 @@ const ApplicantCard: React.FC<{
           {user.onboardingAnswers && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-sm font-semibold text-black p-2 hover:bg-neutral-100"
+              className="p-2 text-sm font-semibold text-black hover:bg-neutral-100"
             >
-              {isExpanded ? "Hide" : "Review"} Answers
+              {isExpanded ? 'Hide' : 'Review'} Answers
             </button>
           )}
           <button
             onClick={onDeny}
-            className="text-sm font-semibold bg-black text-white px-3 py-2 hover:bg-neutral-800"
+            className="bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
           >
             Deny
           </button>
           <button
             onClick={onApprove}
-            className="text-sm font-semibold bg-[#d81313] text-white px-3 py-2 hover:bg-[#b81010]"
+            className="bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
           >
             Approve
           </button>
         </div>
       </div>
       {isExpanded && user.onboardingAnswers && (
-        <div className="border-t border-black bg-neutral-50 p-4 space-y-3">
+        <div className="space-y-3 border-t border-black bg-neutral-50 p-4">
           <div>
             <p className="text-xs font-bold uppercase text-neutral-500">
               Why did you go vegan?
@@ -70,7 +70,7 @@ const ApplicantCard: React.FC<{
               Are you aligned with our abolitionist values?
             </p>
             <p className="text-sm text-black">
-              {user.onboardingAnswers.abolitionistAlignment ? "Yes" : "No"}
+              {user.onboardingAnswers.abolitionistAlignment ? 'Yes' : 'No'}
             </p>
           </div>
           <div>
@@ -94,7 +94,7 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
 }) => {
   if (pendingUsers.length === 0) {
     return (
-      <div className="border border-black p-8 text-center bg-white">
+      <div className="border border-black bg-white p-8 text-center">
         <h3 className="text-xl font-bold text-black">The queue is empty.</h3>
         <p className="mt-2 text-neutral-500">
           There are no new applicants to review at this time.

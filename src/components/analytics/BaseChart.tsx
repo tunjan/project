@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface BaseChartProps {
   data: { label: string; value: number }[];
@@ -44,7 +44,7 @@ export const BaseChart: React.FC<BaseChartProps> = ({
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full font-sans">
-      {/* Y-axis and grid lines */}
+      {}
       {yAxisTicks.map((tickValue) => {
         const y = yScale(tickValue);
         return (
@@ -63,15 +63,15 @@ export const BaseChart: React.FC<BaseChartProps> = ({
               y1={y}
               x2={width - padding}
               y2={y}
-              stroke={tickValue === 0 ? "#111827" : "#e5e7eb"}
+              stroke={tickValue === 0 ? '#111827' : '#e5e7eb'}
               strokeWidth="1"
-              strokeDasharray={tickValue === 0 ? undefined : "2,2"}
+              strokeDasharray={tickValue === 0 ? undefined : '2,2'}
             />
           </g>
         );
       })}
 
-      {/* X-axis labels */}
+      {}
       {data.map((item, index) => (
         <text
           key={`label-${item.label}`}
@@ -85,7 +85,7 @@ export const BaseChart: React.FC<BaseChartProps> = ({
         </text>
       ))}
 
-      {/* Render the actual chart content (lines, bars, etc.) */}
+      {}
       {children({
         xScale,
         yScale,

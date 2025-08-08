@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { type CubeEvent, type EventReport } from "@/types";
-import { ChevronLeftIcon, CheckCircleIcon, XCircleIcon } from "@/icons";
+import React, { useState } from 'react';
+import { type CubeEvent, type EventReport, type OutreachLog } from '@/types';
+import { ChevronLeftIcon, CheckCircleIcon, XCircleIcon } from '@/icons';
+import { toast } from 'sonner';
+import { useOutreachLogs } from '@/store/appStore';
 
 interface ManageEventFormProps {
   event: CubeEvent;
@@ -8,28 +10,31 @@ interface ManageEventFormProps {
   onCancel: () => void;
 }
 
-type AttendanceStatus = "Attended" | "Absent";
+type AttendanceStatus = 'Attended' | 'Absent';
 
 const ManageEventForm: React.FC<ManageEventFormProps> = ({
   event,
   onLogReport,
   onCancel,
 }) => {
-  const [hours, setHours] = useState<number | "">("");
+  const [hours, setHours] = useState<number | ''>('');
   const [attendance, setAttendance] = useState<
     Record<string, AttendanceStatus>
   >(() => {
     const initialAttendance: Record<string, AttendanceStatus> = {};
     event.participants.forEach((p) => {
-      initialAttendance[p.user.id] = "Attended";
+      initialAttendance[p.user.id] = 'Attended';
     });
     return initialAttendance;
   });
 
+  const allLogs = useOutreachLogs();
+  const eventLogs = allLogs.filter((log) => log.eventId === event.id);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (hours === "" || hours <= 0) {
-      alert("Please enter a valid duration in hours.");
+    if (hours === '' || hours <= 0) {
+      toast.error('Please enter a valid duration in hours.');
       return;
     }
     const reportData: EventReport = {
@@ -39,47 +44,47 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
     onLogReport(event.id, reportData);
   };
 
-  const toggleAttendance = (userId: string) => {
+  const handleAttendanceChange = (userId: string, status: AttendanceStatus) => {
     setAttendance((prev) => ({
       ...prev,
-      [userId]: prev[userId] === "Attended" ? "Absent" : "Attended",
+      [userId]: status,
     }));
   };
 
   return (
-    <div className="py-8 md:py-12 animate-fade-in">
+    <div className="animate-fade-in py-8 md:py-12">
       <div className="mb-6">
         <button
           onClick={onCancel}
-          className="inline-flex items-center text-sm font-semibold text-[#d81313] hover:text-black transition"
+          className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
         >
-          <ChevronLeftIcon className="w-5 h-5 mr-1" />
+          <ChevronLeftIcon className="mr-1 h-5 w-5" />
           Back to Event
         </button>
       </div>
-      <div className="max-w-4xl mx-auto bg-white border border-black">
-        <div className="p-8 border-b border-black">
+      <div className="mx-auto max-w-4xl border border-black bg-white">
+        <div className="border-b border-black p-8">
           <h1 className="text-3xl font-extrabold text-black">
             Log Event Report
           </h1>
           <p className="mt-2 text-neutral-600">
-            Submit the final details for{" "}
-            <span className="font-bold">{event.location}</span> in{" "}
+            Submit the final details for{' '}
+            <span className="font-bold">{event.location}</span> in{' '}
             <span className="font-bold">{event.city}</span>. This will update
             stats for all attendees.
           </p>
         </div>
         <form onSubmit={handleSubmit}>
-          {/* Impact Stats */}
-          <div className="p-8 border-b border-black">
-            <h2 className="text-xl font-bold text-black mb-4">
+          {}
+          <div className="border-b border-black p-8">
+            <h2 className="mb-4 text-xl font-bold text-black">
               Impact Metrics
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
                 <label
                   htmlFor="hours"
-                  className="block text-sm font-bold text-black mb-1"
+                  className="mb-1 block text-sm font-bold text-black"
                 >
                   Event Duration (Hours)
                 </label>
@@ -89,24 +94,55 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   value={hours}
                   onChange={(e) =>
                     setHours(
-                      e.target.value === "" ? "" : parseFloat(e.target.value)
+                      e.target.value === '' ? '' : parseFloat(e.target.value)
                     )
                   }
                   required
                   min="0.1"
                   step="0.1"
-                  className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-500 focus:ring-0 sm:text-sm"
+                  className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                   placeholder="e.g., 4.5"
                 />
               </div>
-              <div>{/* Conversion input removed to centralize tracking */}</div>
+              <div>{}</div>
             </div>
           </div>
 
-          {/* Attendance */}
+          {}
+          <div className="border-b border-black p-8">
+            <h2 className="mb-4 text-xl font-bold text-black">
+              Outreach Log for This Event
+            </h2>
+            {eventLogs.length > 0 ? (
+              <div className="max-h-60 space-y-2 overflow-y-auto pr-2">
+                {eventLogs.map((log: OutreachLog) => (
+                  <div
+                    key={log.id}
+                    className="border border-neutral-200 bg-neutral-50 p-3"
+                  >
+                    <p className="font-semibold">{log.outcome}</p>
+                    {log.notes && (
+                      <p className="text-sm text-neutral-600">{log.notes}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-neutral-500">
+                No outreach outcomes have been logged for this event by
+                participants yet.
+              </p>
+            )}
+            <p className="mt-4 text-sm text-neutral-600">
+              Note: Individual activists log their own outreach outcomes from
+              the 'Outreach' page. This is a summary.
+            </p>
+          </div>
+
+          {}
           <div className="p-8">
-            <h2 className="text-xl font-bold text-black mb-4">Attendance</h2>
-            <ul className="divide-y divide-black border-t border-b border-black">
+            <h2 className="mb-4 text-xl font-bold text-black">Attendance</h2>
+            <ul className="divide-y divide-black border-b border-t border-black">
               {event.participants.map(({ user }) => (
                 <li
                   key={user.id}
@@ -116,7 +152,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                     <img
                       src={user.profilePictureUrl}
                       alt={user.name}
-                      className="w-10 h-10 object-cover"
+                      className="h-10 w-10 object-cover"
                     />
                     <div>
                       <p className="font-bold text-black">{user.name}</p>
@@ -126,26 +162,28 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   <div className="flex items-center space-x-2">
                     <button
                       type="button"
-                      onClick={() => toggleAttendance(user.id)}
-                      className={`flex items-center justify-center w-28 text-sm font-semibold px-3 py-2 transition-colors ${
-                        attendance[user.id] === "Attended"
-                          ? "bg-[#d81313] text-white"
-                          : "bg-neutral-200 text-black hover:bg-neutral-300"
+                      onClick={() =>
+                        handleAttendanceChange(user.id, 'Attended')
+                      }
+                      className={`flex w-28 items-center justify-center px-3 py-2 text-sm font-semibold transition-colors ${
+                        attendance[user.id] === 'Attended'
+                          ? 'bg-primary text-white'
+                          : 'bg-neutral-200 text-black hover:bg-neutral-300'
                       }`}
                     >
-                      <CheckCircleIcon className="w-5 h-5 mr-1.5" />
+                      <CheckCircleIcon className="mr-1.5 h-5 w-5" />
                       Attended
                     </button>
                     <button
                       type="button"
-                      onClick={() => toggleAttendance(user.id)}
-                      className={`flex items-center justify-center w-28 text-sm font-semibold px-3 py-2 transition-colors ${
-                        attendance[user.id] === "Absent"
-                          ? "bg-black text-white"
-                          : "bg-neutral-200 text-black hover:bg-neutral-300"
+                      onClick={() => handleAttendanceChange(user.id, 'Absent')}
+                      className={`flex w-28 items-center justify-center px-3 py-2 text-sm font-semibold transition-colors ${
+                        attendance[user.id] === 'Absent'
+                          ? 'bg-black text-white'
+                          : 'bg-neutral-200 text-black hover:bg-neutral-300'
                       }`}
                     >
-                      <XCircleIcon className="w-5 h-5 mr-1.5" />
+                      <XCircleIcon className="mr-1.5 h-5 w-5" />
                       Absent
                     </button>
                   </div>
@@ -154,10 +192,10 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
             </ul>
           </div>
 
-          <div className="p-8 border-t border-black">
+          <div className="border-t border-black p-8">
             <button
               type="submit"
-              className="w-full bg-[#d81313] text-white font-bold py-3 px-4 hover:bg-[#b81010] transition-colors duration-300"
+              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
             >
               Submit Final Report
             </button>

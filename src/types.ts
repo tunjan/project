@@ -1,5 +1,3 @@
-import React from 'react';
-
 export enum Role {
   ACTIVIST = 'Activist',
   CONFIRMED_ACTIVIST = 'Activist (Confirmed)',
@@ -9,20 +7,79 @@ export enum Role {
   GODMODE = 'Godmode',
 }
 
-export enum EventRole {
-  ORGANIZER = 'Organizer',
-  VOLUNTEER = 'Volunteer',
-  OUTREACH = 'Outreach',
-  SECURITY = 'Security',
-}
+export type ProtectedRole = 'organizer';
 
-export type View = 'cubes' | 'dashboard' | 'management' | 'login' | 'signup' | 'createCube' | 'memberProfile' | 'manageEvent' | 'announcements' | 'createAnnouncement' | 'resources' | 'security' | 'analytics' | 'outreach' | 'chapters' | 'chapterDetail';
-
-export interface Badge {
+export interface ChallengeParticipant {
   id: string;
   name: string;
+  progress: number;
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
   description: string;
-  icon: React.FC<{ className?: string }>;
+  metric: string;
+  goal: number;
+  participants: ChallengeParticipant[];
+  endDate: Date;
+}
+
+export enum NotificationType {
+  NEW_ANNOUNCEMENT = 'New Announcement',
+  ACCOMMODATION_REQUEST = 'Accommodation Request',
+  REQUEST_ACCEPTED = 'Request Accepted',
+  REQUEST_DENIED = 'Request Denied',
+  INACTIVITY_ALERT = 'Inactivity Alert',
+  EVENT_CANCELLED = 'Event Cancelled',
+  EVENT_UPDATED = 'Event Updated',
+  RSVP_REQUEST = 'RSVP Request',
+  RSVP_APPROVED = 'RSVP Approved',
+  RSVP_DENIED = 'RSVP Denied',
+  CHAPTER_JOIN_REQUEST = 'Chapter Join Request',
+  CHAPTER_JOIN_APPROVED = 'Chapter Join Approved',
+  BADGE_AWARDED = 'Badge Awarded',
+  BADGE_AWARD_ACCEPTED = 'Badge Award Accepted',
+  BADGE_AWARD_REJECTED = 'Badge Award Rejected',
+  NEW_APPLICANT = 'New Applicant', // NEW
+}
+
+export enum EventRole {
+  ORGANIZER = 'Organizer',
+  ACTIVIST = 'Activist',
+  VOLUNTEER = 'Volunteer',
+  OUTREACH = 'Outreach',
+  TRANSPORT = 'Transport',
+  EQUIPMENT = 'Equipment',
+}
+
+export type View =
+  | 'cubes'
+  | 'dashboard'
+  | 'management'
+  | 'login'
+  | 'signup'
+  | 'createCube'
+  | 'memberProfile'
+  | 'manageEvent'
+  | 'announcements'
+  | 'createAnnouncement'
+  | 'resources'
+  | 'security'
+  | 'analytics'
+  | 'outreach'
+  | 'chapters'
+  | 'chapterDetail';
+
+export interface BadgeTemplate {
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface EarnedBadge extends BadgeTemplate {
+  id: string;
+  awardedAt: Date;
 }
 
 export enum DiscountTierLevel {
@@ -36,14 +93,17 @@ export interface UserStats {
   totalHours: number;
   cubesAttended: number;
   veganConversions: number;
+  totalConversations: number;
   cities: string[];
 }
 
 export enum OnboardingStatus {
-  PENDING = 'Pending',
+  PENDING_APPLICATION_REVIEW = 'Pending Application Review',
+  // REMOVED: PENDING_ONBOARDING_CALL = 'Pending Onboarding Call',
   AWAITING_VERIFICATION = 'Awaiting Verification',
   CONFIRMED = 'Confirmed',
-  DENIED = 'Denied'
+  DENIED = 'Denied',
+  INACTIVE = 'Inactive',
 }
 export interface OnboardingAnswers {
   veganReason: string;
@@ -59,23 +119,18 @@ export interface Chapter {
   instagram?: string;
 }
 
-export interface IdentityTokenPayload {
-  userId: string;
-  name: string;
-  role: Role;
-  chapters: string[];
-  issuedAt: string;
-}
-
-export interface SignedIdentityToken {
-  payload: IdentityTokenPayload;
-  signature: string;
-  publicKey: string;
+export interface OrganizerNote {
+  id: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: Date;
 }
 
 export interface User {
   id: string;
   name: string;
+  email: string; // NEW
   role: Role;
   instagram?: string;
   chapters: string[];
@@ -83,24 +138,41 @@ export interface User {
   managedCountry?: string;
   stats: UserStats;
   profilePictureUrl: string;
-  badges: Badge[];
+  badges: EarnedBadge[];
   hostingAvailability: boolean;
   hostingCapacity?: number;
   onboardingStatus: OnboardingStatus;
   onboardingAnswers?: OnboardingAnswers;
-  identityToken?: SignedIdentityToken;
   joinDate?: Date;
+  cryptoId?: {
+    publicKey: string;
+    secretKey: string;
+  };
+  organizerNotes?: OrganizerNote[];
+}
+
+export interface TourDuty {
+  date: string; // YYYY-MM-DD format
+  role: EventRole;
+}
+
+export enum ParticipantStatus {
+  PENDING = 'Pending',
+  ATTENDING = 'Attending',
 }
 
 export interface EventParticipant {
   user: User;
   eventRole: EventRole;
+  status: ParticipantStatus;
+  tourDuties?: TourDuty[];
 }
 
 export enum EventStatus {
   UPCOMING = 'Upcoming',
   ONGOING = 'Ongoing',
   FINISHED = 'Finished',
+  CANCELLED = 'Cancelled',
 }
 
 export interface EventReport {
@@ -112,11 +184,15 @@ export interface CubeEvent {
   id: string;
   city: string;
   location: string;
-  dateTime: Date;
+  startDate: Date;
+  endDate?: Date;
+  scope: 'Chapter' | 'Regional' | 'Global';
+  targetRegion?: string;
   organizer: User;
   participants: EventParticipant[];
   status: EventStatus;
   report?: EventReport;
+  cancellationReason?: string;
 }
 
 export enum AnnouncementScope {
@@ -156,19 +232,7 @@ export interface Resource {
   skillLevel: SkillLevel;
   language: string;
   url: string;
-  icon: React.FC<{ className?: string }>;
-}
-
-export interface AccommodationRequest {
-  id: string;
-  requester: User;
-  host: User;
-  event: CubeEvent;
-  startDate: Date;
-  endDate: Date;
-  message: string;
-  status: 'Pending' | 'Accepted' | 'Denied';
-  hostReply?: string;
+  icon: string;
 }
 
 export enum OutreachOutcome {
@@ -198,20 +262,43 @@ export interface EventComment {
   parentId?: string;
 }
 
-export enum NotificationType {
-  NEW_ANNOUNCEMENT = 'New Announcement',
-  ACCOMMODATION_REQUEST = 'Accommodation Request',
-  REQUEST_ACCEPTED = 'Request Accepted',
-  REQUEST_DENIED = 'Request Denied',
-}
-
 export interface Notification {
   id: string;
   userId: string;
   type: NotificationType;
   message: string;
-  linkTo: View;
+  linkTo: string;
   isRead: boolean;
   createdAt: Date;
   relatedUser?: User;
+}
+
+export interface ChapterJoinRequest {
+  id: string;
+  user: User;
+  chapterName: string;
+  status: 'Pending' | 'Approved' | 'Denied';
+  createdAt: Date;
+}
+
+export interface AccommodationRequest {
+  id: string;
+  requester: User;
+  host: User;
+  event: CubeEvent;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  message: string;
+  status: 'Pending' | 'Accepted' | 'Denied';
+  hostReply?: string;
+}
+
+export interface BadgeAward {
+  id: string;
+  awarder: User;
+  recipient: User;
+  badge: BadgeTemplate;
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  createdAt: Date;
 }

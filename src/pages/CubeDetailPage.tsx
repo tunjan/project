@@ -1,28 +1,28 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import CubeDetail from "@/components/CubeDetail";
-import { useEventById, useDataActions } from "@/store/data.store";
-import { useCurrentUser } from "@/store/auth.store";
-import { type CubeEvent } from "@/types";
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import CubeDetail from '@/components/CubeDetail';
+import { useEventById, useAppActions } from '@/store/appStore';
+import { useCurrentUser } from '@/store/auth.store';
+import { type CubeEvent, type TourDuty } from '@/types';
 
 const CubeDetailPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { rsvp, cancelRsvp } = useDataActions();
+  const { rsvp, cancelRsvp } = useAppActions();
 
   const event = useEventById(eventId!);
 
   if (!event) {
     return (
-      <div className="text-center py-16">
+      <div className="py-16 text-center">
         <h1 className="text-2xl font-bold">Event Not Found</h1>
-        <p className="text-neutral-600 mt-2">
+        <p className="mt-2 text-neutral-600">
           The event you are looking for does not exist.
         </p>
         <button
-          onClick={() => navigate("/cubes")}
-          className="mt-4 bg-[#d81313] text-white font-bold py-2 px-4"
+          onClick={() => navigate('/cubes')}
+          className="mt-4 bg-primary px-4 py-2 font-bold text-white"
         >
           Back to All Cubes
         </button>
@@ -30,12 +30,13 @@ const CubeDetailPage: React.FC = () => {
     );
   }
 
-  const handleRsvp = () => {
+  const handleRsvp = (id: string, duties?: TourDuty[]) => {
     if (!currentUser) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
-    rsvp(event.id, currentUser);
+    const isGuest = !currentUser.chapters.includes(event.city);
+    rsvp(id, currentUser, isGuest, duties);
   };
 
   const handleCancelRsvp = () => {
@@ -50,7 +51,7 @@ const CubeDetailPage: React.FC = () => {
   return (
     <CubeDetail
       event={event}
-      onBack={() => navigate("/cubes")}
+      onBack={() => navigate('/cubes')}
       onRsvp={handleRsvp}
       onCancelRsvp={handleCancelRsvp}
       onManageEvent={handleManageEvent}

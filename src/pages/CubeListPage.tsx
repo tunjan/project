@@ -1,14 +1,15 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { hasOrganizerRole } from "@/utils/auth";
-import { useEvents, useChapters } from "@/store/data.store";
-import { useCurrentUser } from "@/store/auth.store";
-import CubeCard from "@/components/CubeCard";
-import CubeMap from "@/components/CubeMap";
-import { PlusIcon, ListBulletIcon, MapIcon } from "@/icons";
-import { CubeEvent } from "@/types";
+import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { hasOrganizerRole } from '@/utils/auth';
+import { useEvents, useChapters } from '@/store/appStore';
+import { useCurrentUser } from '@/store/auth.store';
+import CubeCard from '@/components/CubeCard';
+import CubeMap from '@/components/CubeMap';
+import { PlusIcon, ListBulletIcon, MapIcon, SearchIcon } from '@/icons';
+import { type CubeEvent, type Chapter } from '@/types';
 
-type CubesView = "list" | "map";
+type CubesView = 'list' | 'map';
+type EventTimeView = 'upcoming' | 'past';
 
 const ViewToggleButton: React.FC<{
   onClick: () => void;
@@ -17,10 +18,10 @@ const ViewToggleButton: React.FC<{
 }> = ({ onClick, isActive, children }) => (
   <button
     onClick={onClick}
-    className={`flex items-center space-x-2 px-3 py-1.5 text-sm font-semibold border ${
+    className={`flex items-center space-x-2 border px-3 py-1.5 text-sm font-semibold ${
       isActive
-        ? "bg-black text-white border-black"
-        : "bg-white text-black border-black hover:bg-neutral-100"
+        ? 'border-black bg-black text-white'
+        : 'border-black bg-white text-black hover:bg-neutral-100'
     } transition-colors duration-200`}
   >
     {children}
@@ -32,18 +33,57 @@ const CubeListPage: React.FC = () => {
   const currentUser = useCurrentUser();
   const allEvents = useEvents();
   const chapters = useChapters();
-  const [view, setView] = useState<CubesView>("list");
 
-  const upcomingEvents = useMemo(
-    () =>
-      allEvents
-        .filter((e) => new Date(e.dateTime) >= new Date())
-        .sort(
-          (a, b) =>
-            new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
-        ),
-    [allEvents]
-  );
+  const [cubesView, setCubesView] = useState<CubesView>('list');
+  const [eventTimeView, setEventTimeView] = useState<EventTimeView>('upcoming');
+  const [selectedRegion] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const eventsToDisplay = useMemo(() => {
+    const now = new Date();
+    const userChapterNames = new Set(currentUser?.chapters || []);
+    const userOrganiserOf = new Set(currentUser?.organiserOf || []);
+
+    const isUserAffiliated = (city: string) => {
+      return userChapterNames.has(city) || userOrganiserOf.has(city);
+    };
+
+    return allEvents
+      .filter((e: CubeEvent) => {
+        const isEventInPast = e.startDate < now;
+        const timeMatch =
+          eventTimeView === 'past' ? isEventInPast : !isEventInPast;
+
+        const chapterOfEvent = chapters.find((c: Chapter) => c.name === e.city);
+        const regionMatch =
+          selectedRegion === 'all' ||
+          chapterOfEvent?.country === selectedRegion;
+
+        const searchMatch =
+          searchTerm === '' ||
+          e.city.toLowerCase().includes(searchTerm.toLowerCase());
+
+        return timeMatch && regionMatch && searchMatch;
+      })
+      .sort((a: CubeEvent, b: CubeEvent) => {
+        const aAffiliated = isUserAffiliated(a.city);
+        const bAffiliated = isUserAffiliated(b.city);
+
+        if (aAffiliated && !bAffiliated) return -1;
+        if (!aAffiliated && bAffiliated) return 1;
+
+        return eventTimeView === 'past'
+          ? b.startDate.getTime() - a.startDate.getTime()
+          : a.startDate.getTime() - b.startDate.getTime();
+      });
+  }, [
+    allEvents,
+    chapters,
+    eventTimeView,
+    selectedRegion,
+    searchTerm,
+    currentUser,
+  ]);
 
   const handleSelectCube = useCallback(
     (event: CubeEvent) => {
@@ -53,63 +93,117 @@ const CubeListPage: React.FC = () => {
   );
 
   const handleCreateCube = useCallback(() => {
-    navigate("/cubes/create");
+    navigate('/cubes/create');
   }, [navigate]);
 
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
-        <div className="w-full flex justify-center items-center relative mb-2">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight">
-            Upcoming Cubes
+        <div className="relative mb-2 flex w-full items-center justify-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
+            {eventTimeView === 'upcoming' ? 'Upcoming Cubes' : 'Past Cubes'}
           </h1>
           {currentUser && hasOrganizerRole(currentUser) && (
             <button
               onClick={handleCreateCube}
-              className="absolute right-0 flex items-center bg-primary text-white font-bold py-2 px-4 hover:bg-primary-hover transition-colors duration-300"
+              className="absolute right-0 flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
             >
-              <PlusIcon className="w-5 h-5 mr-2" />
+              <PlusIcon className="mr-2 h-5 w-5" />
               Create Cube
             </button>
           )}
         </div>
+        <p className="mx-auto mt-3 max-w-2xl text-center text-lg text-neutral-600">
+          {eventTimeView === 'upcoming'
+            ? 'Find an event near you and join the movement.'
+            : 'A history of our actions. Organizers can select an event to log reports.'}
+        </p>
       </div>
 
-      <div className="flex justify-end items-center mb-6">
+      <div className="mb-6 flex flex-col items-center justify-between gap-4 md:flex-row">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {}
+          <div className="flex items-center border border-black">
+            <ViewToggleButton
+              onClick={() => setEventTimeView('upcoming')}
+              isActive={eventTimeView === 'upcoming'}
+            >
+              <span>Upcoming</span>
+            </ViewToggleButton>
+            <ViewToggleButton
+              onClick={() => setEventTimeView('past')}
+              isActive={eventTimeView === 'past'}
+            >
+              <span>Past</span>
+            </ViewToggleButton>
+          </div>
+        </div>
+        {}
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <SearchIcon className="h-5 w-5 text-neutral-600" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search by city..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+        {}
         <div className="flex items-center space-x-0 border border-black">
           <ViewToggleButton
-            onClick={() => setView("list")}
-            isActive={view === "list"}
+            onClick={() => setCubesView('list')}
+            isActive={cubesView === 'list'}
           >
-            <ListBulletIcon className="w-5 h-5" />
+            <ListBulletIcon className="h-5 w-5" />
             <span>List</span>
           </ViewToggleButton>
           <ViewToggleButton
-            onClick={() => setView("map")}
-            isActive={view === "map"}
+            onClick={() => setCubesView('map')}
+            isActive={cubesView === 'map'}
           >
-            <MapIcon className="w-5 h-5" />
+            <MapIcon className="h-5 w-5" />
             <span>Map</span>
           </ViewToggleButton>
         </div>
       </div>
 
-      {view === "list" ? (
-        <div className="grid gap-6 md:gap-8 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {upcomingEvents.map((event) => (
-            <CubeCard
-              key={event.id}
-              event={event}
-              onSelect={handleSelectCube}
-            />
-          ))}
-        </div>
+      {eventsToDisplay.length > 0 ? (
+        cubesView === 'list' ? (
+          <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-2">
+            {eventsToDisplay.map((event) => {
+              const isAffiliated =
+                !!currentUser &&
+                (currentUser.chapters.includes(event.city) ||
+                  currentUser.organiserOf?.includes(event.city));
+              return (
+                <CubeCard
+                  key={event.id}
+                  event={event}
+                  onSelect={handleSelectCube}
+                  isUserAffiliated={isAffiliated}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <CubeMap
+            events={eventsToDisplay}
+            onSelectCube={handleSelectCube}
+            chapters={chapters}
+          />
+        )
       ) : (
-        <CubeMap
-          events={upcomingEvents}
-          onSelectCube={handleSelectCube}
-          chapters={chapters}
-        />
+        <div className="border border-black bg-white py-16 text-center">
+          <h3 className="text-xl font-bold">
+            No {eventTimeView} events found for this region.
+          </h3>
+          <p className="mt-2 text-neutral-500">
+            Check back later or change your filter selection.
+          </p>
+        </div>
       )}
     </div>
   );

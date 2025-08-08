@@ -1,7 +1,7 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import MemberProfile from "@/components/management/MemberProfile";
-import { useUsers } from "@/store/data.store";
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import MemberProfile from '@/components/management/MemberProfile';
+import { useUsers } from '@/store/appStore';
 
 const MemberProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -9,10 +9,10 @@ const MemberProfilePage: React.FC = () => {
   const user = useUsers().find((u) => u.id === userId);
 
   if (!user) {
-    return <div className="text-center py-16">User not found.</div>;
+    return <div className="py-16 text-center">User not found.</div>;
   }
 
-  return <MemberProfile user={user} onBack={() => navigate("/manage")} />;
+  return <MemberProfile user={user} onBack={() => navigate('/manage')} />;
 };
 
 export default MemberProfilePage;

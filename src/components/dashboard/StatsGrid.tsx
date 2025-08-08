@@ -1,50 +1,82 @@
-import React from "react";
-import { type UserStats } from "@/types";
-import { ClockIcon, UsersIcon, TrendingUpIcon, GlobeAltIcon } from "@/icons";
+import React from 'react';
+import { type UserStats } from '@/types';
+import {
+  ClockIcon,
+  UsersIcon,
+  TrendingUpIcon,
+  GlobeAltIcon,
+  ChatBubbleLeftRightIcon,
+} from '@/icons';
 
 interface StatsGridProps {
   stats: UserStats;
+  showPrivateStats?: boolean;
+  onCityClick?: () => void;
 }
 
 const StatCard: React.FC<{
   icon: React.ReactNode;
   title: string;
   value: string | number;
-}> = ({ icon, title, value }) => (
-  <div className="bg-white border border-black p-4">
+  onClick?: () => void;
+}> = ({ icon, title, value, onClick }) => (
+  <div
+    className={`card-brutal group p-4 transition-colors duration-150 ${
+      onClick
+        ? 'cursor-pointer hover:bg-black hover:text-white'
+        : 'cursor-default'
+    }`}
+    onClick={onClick}
+  >
     <div className="flex items-center">
-      <div className="text-[#d81313]">{icon}</div>
-      <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
+      <div className="text-primary transition-colors group-hover:text-white">
+        {icon}
+      </div>
+      <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600 transition-colors group-hover:text-neutral-300">
         {title}
       </p>
     </div>
-    <p className="mt-2 text-4xl font-extrabold text-black">{value}</p>
+    <p className="mt-2 text-5xl font-extrabold text-black transition-colors group-hover:text-white">
+      {value}
+    </p>
   </div>
 );
 
-const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
+const StatsGrid: React.FC<StatsGridProps> = ({
+  stats,
+  showPrivateStats = false,
+  onCityClick,
+}) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 gap-4">
       <StatCard
-        icon={<ClockIcon className="w-6 h-6" />}
+        icon={<ClockIcon className="h-6 w-6" />}
         title="Hours"
-        value={stats.totalHours}
+        value={Math.round(stats.totalHours)}
       />
       <StatCard
-        icon={<UsersIcon className="w-6 h-6" />}
+        icon={<UsersIcon className="h-6 w-6" />}
         title="Cubes"
         value={stats.cubesAttended}
       />
       <StatCard
-        icon={<TrendingUpIcon className="w-6 h-6" />}
-        title="Conversions"
-        value={stats.veganConversions}
+        icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
+        title="Conversations"
+        value={stats.totalConversations}
       />
       <StatCard
-        icon={<GlobeAltIcon className="w-6 h-6" />}
+        icon={<GlobeAltIcon className="h-6 w-6" />}
         title="Cities"
         value={stats.cities.length}
+        onClick={onCityClick}
       />
+      {showPrivateStats && (
+        <StatCard
+          icon={<TrendingUpIcon className="h-6 w-6" />}
+          title="Conversions"
+          value={stats.veganConversions}
+        />
+      )}
     </div>
   );
 };

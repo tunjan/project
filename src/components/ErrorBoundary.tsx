@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -21,26 +21,26 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center p-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <div className="flex min-h-screen items-center justify-center bg-gray-50">
+            <div className="p-8 text-center">
+              <h1 className="mb-4 text-2xl font-bold text-gray-900">
                 Something went wrong
               </h1>
-              <p className="text-gray-600 mb-6">
+              <p className="mb-6 text-gray-600">
                 We're sorry, but something unexpected happened.
               </p>
               <button
                 onClick={() =>
                   this.setState({ hasError: false, error: undefined })
                 }
-                className="bg-black text-white px-6 py-2 hover:bg-gray-800"
+                className="bg-black px-6 py-2 text-white hover:bg-gray-800"
               >
                 Try again
               </button>

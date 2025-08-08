@@ -1,16 +1,17 @@
-import React, { useMemo } from "react";
-import { useAnalyticsData } from "@/hooks/useAnalyticsData";
-import BarChart from "./BarChart";
-import LineChart from "./LineChart";
+import React, { useMemo } from 'react';
+import { useAnalyticsData } from '@/hooks/useAnalyticsData';
+import BarChart from './BarChart';
+import LineChart from './LineChart';
+import ScatterPlot from './ScatterPlot';
+import ChapterScorecard from './ChapterScorecard';
 import {
   ClockIcon,
   UsersIcon,
-  TrendingUpIcon,
+  ChatBubbleLeftRightIcon,
   GlobeAltIcon,
-  SparklesIcon,
   UserGroupIcon,
-} from "@/icons";
-import Challenges from "@/components/challenges/Challenges";
+} from '@/icons';
+import Challenges from '@/components/challenges/Challenges';
 
 interface AnalyticsDashboardProps {}
 
@@ -20,16 +21,16 @@ const StatCard: React.FC<{
   value: string | number;
   tooltip?: string;
 }> = ({ icon, title, value, tooltip }) => (
-  <div className="bg-white border border-black p-4 relative group">
+  <div className="group relative border border-black bg-white p-4">
     <div className="flex items-center">
-      <div className="text-[#d81313]">{icon}</div>
+      <div className="text-primary">{icon}</div>
       <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
         {title}
       </p>
     </div>
     <p className="mt-2 text-4xl font-extrabold text-black">{value}</p>
     {tooltip && (
-      <div className="absolute bottom-full mb-2 w-max px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+      <div className="absolute bottom-full z-10 mb-2 w-max rounded bg-black px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         {tooltip}
       </div>
     )}
@@ -50,10 +51,11 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
     chapterStats,
     eventTrends,
     memberGrowth,
-    conversionRate,
+    conversationTrends,
     activistRetention,
     avgActivistsPerEvent,
     topActivists,
+    chapterOutreachStats,
   } = useAnalyticsData();
 
   const topChaptersByHours = useMemo(
@@ -79,7 +81,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight">
+        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Analytics: {viewTitle}
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-neutral-600">
@@ -88,13 +90,13 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         </p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white border border-black p-4 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {}
+      <div className="mb-8 border border-black bg-white p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label
               htmlFor="country-filter"
-              className="block text-sm font-bold text-black mb-1"
+              className="mb-1 block text-sm font-bold text-black"
             >
               View
             </label>
@@ -103,11 +105,11 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedCountry}
               onChange={handleCountryChange}
               disabled={availableCountries.length <= 1}
-              className="w-full border border-black bg-white p-2 text-black focus:ring-0 sm:text-sm disabled:bg-neutral-200"
+              className="w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm"
             >
               {availableCountries.map((country) => (
                 <option key={country} value={country}>
-                  {country === "global" ? "Global" : `${country} Region`}
+                  {country === 'global' ? 'Global' : `${country} Region`}
                 </option>
               ))}
             </select>
@@ -115,7 +117,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
           <div>
             <label
               htmlFor="chapter-filter"
-              className="block text-sm font-bold text-black mb-1"
+              className="mb-1 block text-sm font-bold text-black"
             >
               Chapter
             </label>
@@ -124,7 +126,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedChapter}
               onChange={handleChapterChange}
               disabled={chaptersInSelectedCountry.length === 0}
-              className="w-full border border-black bg-white p-2 text-black focus:ring-0 sm:text-sm disabled:bg-neutral-200"
+              className="w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm"
             >
               <option value="all">All Chapters</option>
               {chaptersInSelectedCountry.map((chapter) => (
@@ -137,55 +139,51 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         </div>
       </div>
 
-      {/* Global Stats */}
+      {!isChapterView && <ChapterScorecard />}
+
+      {}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-black border-b-2 border-[#d81313] pb-2 mb-4">
+        <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Overview
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-2">
           <StatCard
-            icon={<UsersIcon className="w-6 h-6" />}
+            icon={<UsersIcon className="h-6 w-6" />}
             title="Total Members"
             value={overviewStats.totalMembers.toLocaleString()}
           />
           <StatCard
-            icon={<ClockIcon className="w-6 h-6" />}
+            icon={<ClockIcon className="h-6 w-6" />}
             title="Total Hours"
             value={overviewStats.totalHours.toLocaleString()}
           />
           <StatCard
-            icon={<TrendingUpIcon className="w-6 h-6" />}
-            title="Total Conversions"
-            value={overviewStats.totalConversions.toLocaleString()}
+            icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
+            title="Total Conversations"
+            value={overviewStats.totalConversations.toLocaleString()}
           />
           <StatCard
-            icon={<GlobeAltIcon className="w-6 h-6" />}
+            icon={<GlobeAltIcon className="h-6 w-6" />}
             title="Total Events"
             value={overviewStats.totalEvents.toLocaleString()}
           />
         </div>
       </section>
 
-      {/* Advanced Analytics */}
+      {}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-black border-b-2 border-[#d81313] pb-2 mb-4">
+        <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Key Metrics
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatCard
-            icon={<SparklesIcon className="w-6 h-6" />}
-            title="Conversion Rate"
-            value={`${conversionRate.toFixed(2)}/hr`}
-            tooltip="Vegans converted per hour of outreach"
-          />
-          <StatCard
-            icon={<UsersIcon className="w-6 h-6" />}
+            icon={<UsersIcon className="h-6 w-6" />}
             title="Activist Retention"
             value={`${(activistRetention.rate * 100).toFixed(0)}%`}
             tooltip="Members active in the last 3 months"
           />
           <StatCard
-            icon={<UserGroupIcon className="w-6 h-6" />}
+            icon={<UserGroupIcon className="h-6 w-6" />}
             title="Avg. Activists/Event"
             value={avgActivistsPerEvent.toFixed(1)}
             tooltip="Average number of activists per event"
@@ -193,34 +191,48 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         </div>
       </section>
 
-      {/* Charts */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {}
+      <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <LineChart
           data={eventTrends.map((t) => ({
-            label: t.month.split(" ")[0],
+            label: t.month.split(' ')[0],
             value: t.count,
           }))}
           title="Events per Month"
         />
         <LineChart
           data={memberGrowth.map((t) => ({
-            label: t.month.split(" ")[0],
+            label: t.month.split(' ')[0],
             value: t.count,
           }))}
           title="New Members per Month"
           lineColor="#000000"
         />
-
+        {}
+        <LineChart
+          data={conversationTrends.map((t) => ({
+            label: t.month.split(' ')[0],
+            value: t.count,
+          }))}
+          title="Conversations per Month"
+          lineColor="#16a34a"
+        />
         {!isChapterView && (
           <>
             <BarChart
               data={topChaptersByHours}
               title="Top 5 Chapters by Activist Hours"
             />
-            <BarChart
-              data={topChaptersByMembers}
-              title="Top 5 Chapters by Member Count"
-              barColor="#000000"
+            {}
+            <ScatterPlot
+              data={chapterOutreachStats.map((s) => ({
+                label: s.name,
+                x: s.totalHours,
+                y: s.totalConversations,
+              }))}
+              title="Chapter Efficiency"
+              xAxisLabel="Total Activist Hours"
+              yAxisLabel="Total Conversations Logged"
             />
           </>
         )}

@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from "react";
-import { type CubeEvent, type OutreachLog, OutreachOutcome } from "@/types";
-import OutreachTally from "./OutreachTally";
-import { useCurrentUser } from "@/store/auth.store";
-import { useEvents, useOutreachLogs, useDataActions } from "@/store/data.store";
-
+import React, { useState, useMemo } from 'react';
+import { type CubeEvent, type OutreachLog, OutreachOutcome } from '@/types';
+import OutreachTally from './OutreachTally';
+import { useCurrentUser } from '@/store/auth.store';
+import { useEvents, useOutreachLogs, useAppActions } from '@/store/appStore';
+import { toast } from 'sonner';
 interface OutreachLogPageProps {}
 
 const LogHistoryItem: React.FC<{ log: OutreachLog; event?: CubeEvent }> = ({
@@ -11,27 +11,27 @@ const LogHistoryItem: React.FC<{ log: OutreachLog; event?: CubeEvent }> = ({
   event,
 }) => {
   const formattedDate = log.createdAt.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
   const eventName = event
     ? `${event.location}, ${event.city}`
-    : "Unknown Event";
+    : 'Unknown Event';
 
   return (
-    <div className="bg-white border border-black p-4">
-      <div className="flex justify-between items-start mb-2">
+    <div className="border border-black bg-white p-4">
+      <div className="mb-2 flex items-start justify-between">
         <div>
           <p className="font-bold text-black">{eventName}</p>
           <p className="text-sm text-neutral-500">{formattedDate}</p>
         </div>
-        <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-neutral-200 text-black">
+        <span className="rounded-none bg-neutral-200 px-2 py-0.5 text-xs font-bold text-black">
           {log.outcome}
         </span>
       </div>
       {log.notes && (
-        <p className="text-sm text-neutral-700 bg-neutral-50 p-2 border border-neutral-200">
+        <p className="border border-neutral-200 bg-neutral-50 p-2 text-sm text-neutral-700">
           {log.notes}
         </p>
       )}
@@ -43,7 +43,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
   const currentUser = useCurrentUser();
   const allOutreachLogs = useOutreachLogs();
   const allEvents = useEvents();
-  const { logOutreach } = useDataActions();
+  const { logOutreach } = useAppActions();
 
   if (!currentUser) return null;
 
@@ -52,17 +52,17 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
   );
   const userEvents = allEvents.filter(
     (event) =>
-      new Date(event.dateTime) < new Date() &&
+      new Date(event.startDate) < new Date() &&
       event.participants.some((p) => p.user.id === currentUser.id)
   );
 
   const [selectedEvent, setSelectedEvent] = useState<string>(
-    userEvents[0]?.id || ""
+    userEvents[0]?.id || ''
   );
   const [selectedOutcome, setSelectedOutcome] = useState<OutreachOutcome>(
     OutreachOutcome.NOT_SURE
   );
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState('');
 
   const sortedUserLogs = useMemo(() => {
     return [...userLogs].sort(
@@ -73,7 +73,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEvent) {
-      alert("Please select an event.");
+      alert('Please select an event.');
       return;
     }
     logOutreach(
@@ -85,15 +85,15 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
       currentUser
     );
 
-    setNotes("");
+    setNotes('');
     setSelectedOutcome(OutreachOutcome.NOT_SURE);
-    alert("Outreach logged successfully!");
+    toast.success('Outreach logged successfully!');
   };
 
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight">
+        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Outreach Log
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-neutral-600">
@@ -106,19 +106,19 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
         <OutreachTally logs={userLogs} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <h2 className="text-xl font-bold text-black border-b-2 border-[#d81313] pb-2 mb-4">
+          <h2 className="mb-4 border-b-2 border-primary pb-2 text-xl font-bold text-black">
             Log a Conversation
           </h2>
           <form
             onSubmit={handleSubmit}
-            className="p-6 space-y-4 bg-white border border-black"
+            className="space-y-4 border border-black bg-white p-6"
           >
             <div>
               <label
                 htmlFor="event-select"
-                className="block text-sm font-bold text-black mb-1"
+                className="mb-1 block text-sm font-bold text-black"
               >
                 Event
               </label>
@@ -127,14 +127,14 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
                 value={selectedEvent}
                 onChange={(e) => setSelectedEvent(e.target.value)}
                 required
-                className="block w-full border border-black bg-white p-2 text-black focus:ring-0 sm:text-sm"
+                className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                 disabled={userEvents.length === 0}
               >
                 {userEvents.length > 0 ? (
                   userEvents.map((event) => (
                     <option key={event.id} value={event.id}>
-                      {event.location} -{" "}
-                      {new Date(event.dateTime).toLocaleDateString()}
+                      {event.location} -{' '}
+                      {new Date(event.startDate).toLocaleDateString()}
                     </option>
                   ))
                 ) : (
@@ -146,7 +146,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
             <div>
               <label
                 htmlFor="outcome-select"
-                className="block text-sm font-bold text-black mb-1"
+                className="mb-1 block text-sm font-bold text-black"
               >
                 Outcome
               </label>
@@ -157,7 +157,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
                   setSelectedOutcome(e.target.value as OutreachOutcome)
                 }
                 required
-                className="block w-full border border-black bg-white p-2 text-black focus:ring-0 sm:text-sm"
+                className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               >
                 {Object.values(OutreachOutcome).map((outcome) => (
                   <option key={outcome} value={outcome}>
@@ -170,7 +170,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
             <div>
               <label
                 htmlFor="notes"
-                className="block text-sm font-bold text-black mb-1"
+                className="mb-1 block text-sm font-bold text-black"
               >
                 Notes (Optional)
               </label>
@@ -180,14 +180,14 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
                 placeholder="e.g., A couple took a card and said they would watch Dominion."
-                className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-500 focus:ring-0 sm:text-sm"
+                className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               />
             </div>
 
             <button
               type="submit"
               disabled={userEvents.length === 0}
-              className="w-full bg-[#d81313] text-white font-bold py-3 px-4 hover:bg-[#b81010] transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               Log Outcome
             </button>
@@ -195,11 +195,11 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
         </div>
 
         <div className="lg:col-span-2">
-          <h2 className="text-xl font-bold text-black border-b-2 border-[#d81313] pb-2 mb-4">
+          <h2 className="mb-4 border-b-2 border-primary pb-2 text-xl font-bold text-black">
             Log History
           </h2>
           {sortedUserLogs.length > 0 ? (
-            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+            <div className="max-h-[600px] space-y-4 overflow-y-auto pr-2">
               {sortedUserLogs.map((log) => (
                 <LogHistoryItem
                   key={log.id}
@@ -209,7 +209,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
               ))}
             </div>
           ) : (
-            <div className="border border-black p-8 text-center bg-white h-full flex flex-col justify-center">
+            <div className="flex h-full flex-col justify-center border border-black bg-white p-8 text-center">
               <h3 className="text-xl font-bold text-black">No logs yet.</h3>
               <p className="mt-2 text-neutral-500">
                 Use the form to add your first outreach outcome.

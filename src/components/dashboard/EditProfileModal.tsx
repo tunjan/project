@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { type User } from "@/types";
+import React, { useState } from 'react';
+import { type User } from '@/types';
+import { InputField } from '@/components/ui/Form';
+import Modal from '@/components/ui/Modal';
+import DeactivateAccountModal from './DeactivateAccountModal';
+import { useAppActions } from '@/store/appStore';
+import { useAuthActions } from '@/store/auth.store';
+import { toast } from 'sonner';
+import { UsersIcon } from '@/icons';
 
 interface EditProfileModalProps {
   user: User;
@@ -9,31 +16,9 @@ interface EditProfileModalProps {
     instagram: string;
     hostingAvailability: boolean;
     hostingCapacity: number;
+    profilePictureUrl: string;
   }) => void;
 }
-
-const InputField: React.FC<{
-  label: string;
-  id: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-}> = ({ label, id, value, onChange, required = true }) => (
-  <div>
-    <label htmlFor={id} className="block text-sm font-bold text-black mb-1">
-      {label}
-    </label>
-    <input
-      type="text"
-      id={id}
-      value={value}
-      onChange={onChange}
-      required={required}
-      className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-500 focus:ring-0 sm:text-sm"
-    />
-  </div>
-);
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({
   user,
@@ -41,13 +26,24 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onSave,
 }) => {
   const [name, setName] = useState(user.name);
-  const [instagram, setInstagram] = useState(user.instagram || "");
+  const [instagram, setInstagram] = useState(user.instagram || '');
   const [hostingAvailability, setHostingAvailability] = useState(
     user.hostingAvailability
   );
   const [hostingCapacity, setHostingCapacity] = useState(
     user.hostingCapacity || 1
   );
+  const [profilePictureUrl, setProfilePictureUrl] = useState(
+    user.profilePictureUrl
+  );
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
+  const { deleteUser } = useAppActions();
+  const { logout } = useAuthActions();
+
+  const handleGenerateAvatar = () => {
+    const newUrl = `https://i.pravatar.cc/150?u=${Date.now()}`;
+    setProfilePictureUrl(newUrl);
+  };
 
   const handleSubmit = () => {
     onSave({
@@ -55,26 +51,48 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       instagram,
       hostingAvailability,
       hostingCapacity: Number(hostingCapacity) || 0,
+      profilePictureUrl,
     });
   };
 
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center animate-fade-in"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white border-4 border-black p-8 relative w-full max-w-lg m-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-center">
-          <h2 className="text-2xl font-extrabold text-black">Edit Profile</h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            Update your personal and hosting information.
-          </p>
-        </div>
+  const handleDeactivate = () => {
+    deleteUser(user.id);
+    setIsDeactivateModalOpen(false);
+    toast.error('Your account has been permanently deleted.');
+    logout();
+  };
 
+  return (
+    <>
+      {isDeactivateModalOpen && (
+        <DeactivateAccountModal
+          user={user}
+          onClose={() => setIsDeactivateModalOpen(false)}
+          onConfirm={handleDeactivate}
+        />
+      )}
+      <Modal
+        title="Edit Profile"
+        onClose={onClose}
+        description="Update your personal and hosting information."
+      >
         <div className="my-6 space-y-4">
+          <div className="flex items-center space-x-4">
+            <img
+              src={profilePictureUrl}
+              alt="Profile avatar"
+              className="h-20 w-20 object-cover"
+            />
+            <button
+              type="button"
+              onClick={handleGenerateAvatar}
+              className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+            >
+              <UsersIcon className="h-4 w-4" />
+              <span>New Avatar</span>
+            </button>
+          </div>
+
           <InputField
             label="Full Name"
             id="edit-name"
@@ -88,14 +106,13 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             onChange={(e) => setInstagram(e.target.value)}
             required={false}
           />
-
           <div className="border-t border-black pt-4">
-            <label className="flex items-center space-x-3 cursor-pointer">
+            <label className="flex cursor-pointer items-center space-x-3">
               <input
                 type="checkbox"
                 checked={hostingAvailability}
                 onChange={(e) => setHostingAvailability(e.target.checked)}
-                className="h-5 w-5 accent-[#d81313]"
+                className="h-5 w-5 accent-primary"
               />
               <span className="font-bold text-black">
                 I am available to host other activists
@@ -105,7 +122,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               <div className="mt-3 pl-8">
                 <label
                   htmlFor="hosting-capacity"
-                  className="block text-sm font-bold text-black mb-1"
+                  className="mb-1 block text-sm font-bold text-black"
                 >
                   How many people can you host?
                 </label>
@@ -115,29 +132,47 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   value={hostingCapacity}
                   onChange={(e) => setHostingCapacity(Number(e.target.value))}
                   min="1"
-                  className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-500 focus:ring-0 sm:text-sm"
+                  className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                 />
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {}
+        <div className="mt-8 space-y-4 border-t-4 border-primary pt-4">
+          <h3 className="font-extrabold text-black">Danger Zone</h3>
+          <div>
+            <p className="text-sm font-bold text-black">Deactivate Account</p>
+            <p className="mb-2 text-sm text-neutral-600">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <button
+              onClick={() => setIsDeactivateModalOpen(true)}
+              className="w-full bg-primary px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-red-700"
+            >
+              Delete My Account
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-8 flex items-center space-x-4">
           <button
             onClick={onClose}
-            className="w-full bg-black text-white font-bold py-2 px-4 hover:bg-neutral-800 transition-colors duration-300"
+            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="w-full bg-[#d81313] text-white font-bold py-2 px-4 hover:bg-[#b81010] transition-colors duration-300"
+            className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
           >
             Save Changes
           </button>
         </div>
-      </div>
-    </div>
+      </Modal>
+    </>
   );
 };
 

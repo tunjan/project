@@ -1,24 +1,24 @@
-import React, { useState } from "react";
-import { type AccommodationRequest } from "@/types";
-import { CheckCircleIcon, XCircleIcon } from "@/icons";
-import { useCurrentUser } from "@/store/auth.store";
-import { useDataActions } from "@/store/data.store";
+import React, { useState } from 'react';
+import { type AccommodationRequest } from '@/types';
+import { CheckCircleIcon, XCircleIcon } from '@/icons';
+import { useCurrentUser } from '@/store/auth.store';
+import { useAppActions } from '@/store/appStore';
 
 interface RequestCardProps {
   request: AccommodationRequest;
 }
 
-const StatusBadge: React.FC<{ status: AccommodationRequest["status"] }> = ({
+const StatusBadge: React.FC<{ status: AccommodationRequest['status'] }> = ({
   status,
 }) => {
   const styles = {
-    Pending: "bg-yellow-100 text-yellow-800",
-    Accepted: "bg-green-100 text-green-800",
-    Denied: "bg-red-100 text-red-800",
+    Pending: 'bg-yellow-100 text-yellow-800',
+    Accepted: 'bg-green-100 text-green-800',
+    Denied: 'bg-red-100 text-red-800',
   };
   return (
     <span
-      className={`px-2 py-0.5 text-xs font-bold rounded-full ${styles[status]}`}
+      className={`rounded-none px-2 py-0.5 text-xs font-bold ${styles[status]}`}
     >
       {status.toUpperCase()}
     </span>
@@ -27,23 +27,23 @@ const StatusBadge: React.FC<{ status: AccommodationRequest["status"] }> = ({
 
 const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   const currentUser = useCurrentUser();
-  const { respondToAccommodationRequest } = useDataActions();
+  const { respondToAccommodationRequest } = useAppActions();
 
-  const [reply, setReply] = useState("");
+  const [reply, setReply] = useState('');
 
   if (!currentUser) return null;
 
   const isHostView = request.host.id === currentUser.id;
   const otherUser = isHostView ? request.requester : request.host;
 
-  const handleRespond = (response: "Accepted" | "Denied") => {
+  const handleRespond = (response: 'Accepted' | 'Denied') => {
     respondToAccommodationRequest(request.id, response, currentUser, reply);
   };
 
   const formatDateRange = (start: Date, end: Date) => {
     const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
+      month: 'short',
+      day: 'numeric',
     };
     return `${start.toLocaleDateString(
       undefined,
@@ -52,17 +52,17 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   };
 
   return (
-    <div className="bg-white border border-black p-4">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-black pb-3 mb-3">
+    <div className="border border-black bg-white p-4">
+      <div className="mb-3 flex flex-col justify-between border-b border-black pb-3 sm:flex-row sm:items-center">
         <div className="mb-2 sm:mb-0">
           <p className="text-sm text-neutral-500">
-            {isHostView ? "Request From" : "Request To"}
+            {isHostView ? 'Request From' : 'Request To'}
           </p>
           <div className="flex items-center space-x-2">
             <img
               src={otherUser.profilePictureUrl}
               alt={otherUser.name}
-              className="w-8 h-8 object-cover"
+              className="h-8 w-8 object-cover"
             />
             <p className="font-bold text-black">{otherUser.name}</p>
           </div>
@@ -75,19 +75,19 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2">
-          <p className="text-sm font-semibold text-black mb-1">Message:</p>
-          <p className="text-sm bg-neutral-100 border border-neutral-300 p-2 text-neutral-700">
+          <p className="mb-1 text-sm font-semibold text-black">Message:</p>
+          <p className="border border-neutral-300 bg-neutral-100 p-2 text-sm text-neutral-700">
             {request.message}
           </p>
 
           {request.hostReply && (
             <div className="mt-2">
-              <p className="text-sm font-semibold text-black mb-1">
+              <p className="mb-1 text-sm font-semibold text-black">
                 Host's Reply:
               </p>
-              <p className="text-sm bg-blue-100 border border-blue-300 p-2 text-blue-800">
+              <p className="border border-blue-300 bg-blue-100 p-2 text-sm text-blue-800">
                 {request.hostReply}
               </p>
             </div>
@@ -107,27 +107,27 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
         </div>
       </div>
 
-      {isHostView && request.status === "Pending" && (
-        <div className="border-t border-black mt-4 pt-4 space-y-3">
+      {isHostView && request.status === 'Pending' && (
+        <div className="mt-4 space-y-3 border-t border-black pt-4">
           <textarea
             value={reply}
             onChange={(e) => setReply(e.target.value)}
             placeholder="Optional: Reply with a message..."
             rows={2}
-            className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-500 focus:ring-0 sm:text-sm"
+            className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
           />
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => handleRespond("Denied")}
-              className="w-full flex items-center justify-center text-sm font-semibold bg-black text-white px-3 py-2 hover:bg-neutral-800"
+              onClick={() => handleRespond('Denied')}
+              className="flex w-full items-center justify-center bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
             >
-              <XCircleIcon className="w-5 h-5 mr-1.5" /> Deny
+              <XCircleIcon className="mr-1.5 h-5 w-5" /> Deny
             </button>
             <button
-              onClick={() => handleRespond("Accepted")}
-              className="w-full flex items-center justify-center text-sm font-semibold bg-[#d81313] text-white px-3 py-2 hover:bg-[#b81010]"
+              onClick={() => handleRespond('Accepted')}
+              className="flex w-full items-center justify-center bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
             >
-              <CheckCircleIcon className="w-5 h-5 mr-1.5" /> Accept
+              <CheckCircleIcon className="mr-1.5 h-5 w-5" /> Accept
             </button>
           </div>
         </div>

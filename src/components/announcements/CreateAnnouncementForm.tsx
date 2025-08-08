@@ -1,33 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { AnnouncementScope, Role, Chapter } from "@/types";
-import { useCurrentUser } from "@/store/auth.store";
-import { useChapters } from "@/store/data.store";
-import { getPostableScopes } from "@/utils/auth";
-import { InputField, TextAreaField } from "@/components/ui/Form";
-
-const SelectField: React.FC<{
-  label: string;
-  id: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  children: React.ReactNode;
-  disabled?: boolean;
-}> = ({ label, id, value, onChange, children, disabled = false }) => (
-  <div>
-    <label htmlFor={id} className="block text-sm font-bold text-black mb-1">
-      {label}
-    </label>
-    <select
-      id={id}
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      className="block w-full border border-black bg-white p-2 text-black focus:ring-0 sm:text-sm disabled:bg-neutral-200"
-    >
-      {children}
-    </select>
-  </div>
-);
+import React, { useState, useEffect } from 'react';
+import { AnnouncementScope, Role, Chapter } from '@/types';
+import { useCurrentUser } from '@/store/auth.store';
+import { useChapters } from '@/store/appStore';
+import { getPostableScopes } from '@/utils/auth';
+import { InputField, TextAreaField, SelectField } from '@/components/ui/Form';
 
 interface CreateAnnouncementFormProps {
   onCreate: (data: {
@@ -55,21 +31,21 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
       : chapters.map((c: Chapter) => c.name);
   const availableCountries =
     currentUser.role === Role.REGIONAL_ORGANISER
-      ? [currentUser.managedCountry || ""]
+      ? [currentUser.managedCountry || '']
       : [...new Set(chapters.map((c: Chapter) => c.country))];
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [scope, setScope] = useState<AnnouncementScope>(postableScopes[0]);
-  const [target, setTarget] = useState("");
+  const [target, setTarget] = useState('');
 
   useEffect(() => {
     if (scope === AnnouncementScope.CHAPTER) {
-      setTarget(availableChapters[0] || "");
+      setTarget(availableChapters[0] || '');
     } else if (scope === AnnouncementScope.REGIONAL) {
-      setTarget(availableCountries[0] || "");
+      setTarget(availableCountries[0] || '');
     } else {
-      setTarget("");
+      setTarget('');
     }
   }, [scope, availableChapters, availableCountries]);
 
@@ -88,8 +64,8 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
 
   return (
     <div className="py-8 md:py-16">
-      <div className="max-w-3xl mx-auto bg-white border border-black">
-        <div className="p-8 border-b border-black">
+      <div className="mx-auto max-w-3xl border border-black bg-white">
+        <div className="border-b border-black p-8">
           <h1 className="text-3xl font-extrabold text-black">
             Create Announcement
           </h1>
@@ -98,7 +74,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             scope.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-8">
           <InputField
             label="Title"
             id="title"
@@ -113,7 +89,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             rows={8}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <SelectField
               label="Scope"
               id="scope"
@@ -160,17 +136,17 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             )}
           </div>
 
-          <div className="pt-4 flex items-center space-x-4">
+          <div className="flex items-center space-x-4 pt-4">
             <button
               type="button"
               onClick={onCancel}
-              className="w-full bg-black text-white font-bold py-3 px-4 hover:bg-neutral-800 transition-colors duration-300"
+              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="w-full bg-primary text-white font-bold py-3 px-4 hover:bg-primary-hover transition-colors duration-300"
+              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
             >
               Publish Announcement
             </button>
