@@ -19,8 +19,8 @@ const LineChart: React.FC<LineChartProps> = ({
 }) => {
   if (data.length === 0) {
     return (
-      <div className="border-2 border-black bg-white p-2 md:p-6">
-        <h3 className="mb-2 text-lg font-bold text-black">{title}</h3>
+      <div className="border-2 border-black bg-white p-4 md:p-6">
+        <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
         <div className="flex h-[300px] items-center justify-center text-neutral-500">
           Not enough data to display chart.
         </div>
@@ -29,16 +29,16 @@ const LineChart: React.FC<LineChartProps> = ({
   }
 
   return (
-    <div className="border-2 border-black bg-white p-2 md:p-6">
-      <h3 className="mb-2 text-lg font-bold text-black">{title}</h3>
+    <div className="border-2 border-black bg-white p-4 md:p-6">
+      <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
       <div className="h-full w-full">
-        <BaseChart data={data} width={250} height={150} padding={20}>
+        <BaseChart data={data} width={500} height={300} padding={40}>
           {({ xScale, yScale }) => (
             <g>
               <polyline
                 fill="none"
                 stroke={lineColor}
-                strokeWidth="3"
+                strokeWidth="2"
                 points={data
                   .map((d, i) => `${xScale(i)},${yScale(d.value)}`)
                   .join(' ')}
@@ -58,6 +58,7 @@ const LineChart: React.FC<LineChartProps> = ({
       </div>
     </div>
   );
+  
 };
 
 export default LineChart;

@@ -51,13 +51,13 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-black bg-black">
                     <BuildingOfficeIcon className="h-6 w-6 text-white" />
                   </div>
-                  <div className="ml-4 flex-grow">
-                    <p className="font-bold text-black">{chapter.name}</p>
+                  <div className="ml-4 flex-grow lg:max-w-none">
+                    <p className="font-bold truncate text-black max-w-20 ">{chapter.name}</p>
                     <p className="text-sm text-neutral-500">
                       {chapter.country}
                     </p>
                   </div>
-                  <div className="ml-4 flex-shrink-0 text-right">
+                  <div className="ml-2 flex-shrink-0 text-right">
                     <p className="text-2xl font-extrabold text-black">
                       {value.toLocaleString()}
                     </p>

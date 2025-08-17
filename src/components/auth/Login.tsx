@@ -29,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
                 alt={user.name}
                 className="h-12 w-12 object-cover"
               />
-              <div className="flex-grow text-left">
+              <div className="flex-grow truncate text-left">
                 <p className="font-bold text-black">{user.name}</p>
                 <p className="text-sm text-neutral-500">{user.role}</p>
               </div>
@@ -40,7 +40,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
                   </span>
                 )}
                 {user.onboardingStatus === 'Awaiting Verification' && (
-                  <span className="bg-yellow-400 px-2 py-1 text-xs font-bold text-black">
+                  <span className="whitespace-normal bg-yellow-400 px-2 py-1 text-right text-xs font-bold text-black">
                     PENDING VERIFICATION
                   </span>
                 )}
