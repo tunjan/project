@@ -5,6 +5,7 @@ import { useCurrentUser } from '@/store/auth.store';
 import { useEvents, useOutreachLogs, useAppActions } from '@/store/appStore';
 import { toast } from 'sonner';
 import { PencilIcon, ChevronDownIcon } from '@/icons';
+import { InputField } from '@/components/ui/Form';
 
 const OutreachLogPage: React.FC = () => {
   const currentUser = useCurrentUser();
@@ -22,6 +23,10 @@ const OutreachLogPage: React.FC = () => {
   );
   const [advancedNotes, setAdvancedNotes] = useState('');
 
+  // NEW: State for date range filtering
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   const { userLogs, pastEvents } = useMemo(() => {
     if (!currentUser) return { userLogs: [], pastEvents: [] };
 
@@ -38,7 +43,7 @@ const OutreachLogPage: React.FC = () => {
       userLogs: logs,
       pastEvents: events,
     };
-  }, [allOutreachLogs, allEvents, currentUser]);
+  }, [currentUser, allOutreachLogs, allEvents]);
 
   useEffect(() => {
     if (pastEvents.length > 0 && !quickLogEventId) {
@@ -50,6 +55,22 @@ const OutreachLogPage: React.FC = () => {
     () => pastEvents.find((e) => e.id === quickLogEventId),
     [pastEvents, quickLogEventId]
   );
+
+  // NEW: Memoized log filtering based on the selected date range
+  const filteredUserLogs = useMemo(() => {
+    if (!startDate && !endDate) {
+      return userLogs;
+    }
+    const start = startDate ? new Date(`${startDate}T00:00:00`) : null;
+    const end = endDate ? new Date(`${endDate}T23:59:59`) : null;
+
+    return userLogs.filter((log) => {
+      const logDate = new Date(log.createdAt);
+      if (start && logDate < start) return false;
+      if (end && logDate > end) return false;
+      return true;
+    });
+  }, [userLogs, startDate, endDate]);
 
   const sortedUserLogs = useMemo(() => {
     return [...userLogs].sort(
@@ -93,19 +114,9 @@ const OutreachLogPage: React.FC = () => {
   if (!currentUser) return null;
 
   return (
-    <div className="py-8 md:py-12">
-      <div className="mb-8 md:mb-12">
-        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          Outreach Log
-        </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
-          Track the outcomes of your conversations to see your personal impact
-          grow over time.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-12">
-        {}
+    <div className="space-y-12">
+      {/* RESTRUCTURED: Switched to a more logical 2-column grid layout */}
+      <div className="grid grid-cols-1 gap-12 my-8 lg:grid-cols-3">
         <div className="space-y-12 lg:col-span-2">
           <section>
             <h2 className="h-section mb-4">Quick Log</h2>
@@ -211,11 +222,47 @@ const OutreachLogPage: React.FC = () => {
             )}
           </section>
 
-          <div className="space-y-12 lg:col-span-1">
-            <section>
-              <OutreachTally logs={userLogs} />
-            </section>
-          </div>
+          <section>
+            <div className="card-brutal">
+              <div className="border-b-2 border-black p-4">
+                <div className="flex flex-col gap-4">
+                  <h2 className="h-section mb-0 flex-shrink-0 border-b-0 pb-0">
+                    Your Tally
+                  </h2>
+                  <div className="flex flex-wrap items-end gap-2">
+                    <InputField
+                      label="Start Date"
+                      id="start-date"
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full sm:w-auto"
+                    />
+                    <InputField
+                      label="End Date"
+                      id="end-date"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full sm:w-auto"
+                    />
+                    <button
+                      onClick={() => {
+                        setStartDate('');
+                        setEndDate('');
+                      }}
+                      className="h-[38px] border-2 border-black bg-black px-4 text-sm font-bold text-white hover:bg-neutral-800"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <OutreachTally logs={filteredUserLogs} />
+              </div>
+            </div>
+          </section>
 
           <section>
             <h2 className="h-section mb-4">Log History</h2>
@@ -282,7 +329,7 @@ const OutreachLogPage: React.FC = () => {
           </section>
         </div>
 
-        {}
+      
       </div>
     </div>
   );

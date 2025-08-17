@@ -52,8 +52,7 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
   }, [logs]);
 
   return (
-    <div className="card-brutal p-6">
-      <h2 className="h-section mb-4">Your Tally</h2>
+    <div className="card-brutal border-none">
       <ul className="space-y-3">
         {Object.entries(tally).map(([outcome, count]) => {
           const { icon: Icon, color } = outcomeMeta[outcome as OutreachOutcome];
