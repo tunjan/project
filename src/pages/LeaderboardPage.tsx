@@ -55,8 +55,8 @@ const LeaderboardPage: React.FC = () => {
         </p>
       </div>
 
-      <div className="mb-8 inline-block border-4 border-black bg-white">
-        <div className="flex flex-col md:flex-row">
+      <div className="mb-8 inline-block border-2 border-black bg-white">
+        <div className="flex flex-row">
           <TabButton
             onClick={() => setTimeframe('week')}
             isActive={timeframe === 'week'}

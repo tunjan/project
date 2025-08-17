@@ -99,14 +99,14 @@ const CubeListPage: React.FC = () => {
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
-        <div className="relative mb-2 flex w-full items-center justify-center">
+        <div className="relative mb-2 flex w-full flex-col items-center justify-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             {eventTimeView === 'upcoming' ? 'Upcoming Cubes' : 'Past Cubes'}
           </h1>
           {currentUser && hasOrganizerRole(currentUser) && (
             <button
               onClick={handleCreateCube}
-              className="absolute right-0 flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
+              className="m-3 flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover lg:absolute lg:right-0 lg:m-0"
             >
               <PlusIcon className="mr-2 h-5 w-5" />
               Create Cube
@@ -121,7 +121,7 @@ const CubeListPage: React.FC = () => {
       </div>
 
       <div className="mb-6 flex flex-col items-center justify-between gap-4 md:flex-row">
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex w-full flex-wrap items-center justify-center gap-2 md:w-auto">
           {}
           <div className="flex items-center border border-black">
             <ViewToggleButton
@@ -139,13 +139,13 @@ const CubeListPage: React.FC = () => {
           </div>
         </div>
         {}
-        <div className="relative">
+        <div className="relative w-full md:w-auto">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <SearchIcon className="h-5 w-5 text-neutral-600" />
           </div>
           <input
             type="text"
-            placeholder="Search by city..."
+            placeholder="Search by chapter..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-primary"

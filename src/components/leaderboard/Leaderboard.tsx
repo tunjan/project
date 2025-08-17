@@ -24,12 +24,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   currentUser,
 }) => {
   return (
-    <div className="border-4 border-black bg-white">
-      <h2 className="border-b-4 border-black p-4 text-xl font-bold text-black">
+    <div className="border-2 border-black bg-white">
+      <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
       {data.length > 0 ? (
-        <ul className="divide-y-4 divide-black">
+        <ul className="divide-y-2 divide-black">
           {data.map(({ user, value }, index) => {
             const rank = index + 1;
             const isCurrentUser = currentUser && user.id === currentUser.id;
@@ -43,7 +43,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 }`}
               >
                 <div
-                  className={`flex w-16 flex-shrink-0 items-center justify-center border-r-4 border-black text-2xl font-black ${rankBG}`}
+                  className={`flex w-16 flex-shrink-0 items-center justify-center border-r-2 border-black text-2xl font-black ${rankBG}`}
                 >
                   {rank}
                 </div>
@@ -56,8 +56,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     alt={user.name}
                     className="h-12 w-12 flex-shrink-0 border-2 border-black object-cover"
                   />
-                  <div className="ml-4 flex-grow">
-                    <p className="font-bold text-black">{user.name}</p>
+                  <div className="ml-4 min-w-0 flex-grow">
+                    <p className="truncate font-bold text-black">{user.name}</p>
                   </div>
                   <div className="ml-4 flex-shrink-0 text-right">
                     <p className="text-2xl font-extrabold text-black">

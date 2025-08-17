@@ -55,7 +55,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
   if (data.length === 0) {
     return (
-      <div className="border border-black bg-white p-4 md:p-6">
+      <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
         <div className="flex h-[350px] items-center justify-center text-neutral-500">
           Not enough data to display chart.
@@ -65,7 +65,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   }
 
   return (
-    <div className="relative border border-black bg-white p-4 md:p-6">
+    <div className="relative border-2 border-black bg-white p-4 md:p-6">
       <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full font-sans">
         <g transform={`translate(${padding.left}, ${padding.top})`}>
@@ -158,7 +158,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       </svg>
       {tooltip && (
         <div
-          className="pointer-events-none absolute rounded bg-black px-3 py-1.5 text-sm text-white shadow-lg"
+          className="shadow-brutal pointer-events-none absolute bg-black px-3 py-1.5 text-sm text-white"
           style={{
             left: tooltip.x,
             top: tooltip.y,

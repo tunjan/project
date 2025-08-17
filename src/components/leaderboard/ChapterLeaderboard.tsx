@@ -27,12 +27,12 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
   };
 
   return (
-    <div className="border-4 border-black bg-white">
-      <h2 className="border-b-4 border-black p-4 text-xl font-bold text-black">
+    <div className="border-2 border-black bg-white">
+      <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
       {data.length > 0 ? (
-        <ul className="divide-y-4 divide-black">
+        <ul className="divide-y-2 divide-black">
           {data.map(({ chapter, value }, index) => {
             const rank = index + 1;
             const rankBG = rankClasses[rank] || 'bg-white text-black';
@@ -43,7 +43,7 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
                 className="flex cursor-pointer items-stretch"
               >
                 <div
-                  className={`flex w-16 flex-shrink-0 items-center justify-center border-r-4 border-black text-2xl font-black ${rankBG}`}
+                  className={`flex w-16 flex-shrink-0 items-center justify-center border-r-2 border-black text-2xl font-black ${rankBG}`}
                 >
                   {rank}
                 </div>

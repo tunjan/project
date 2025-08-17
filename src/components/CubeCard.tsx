@@ -42,7 +42,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
     <button
       type="button"
       onClick={handleSelect}
-      className={`relative w-full transform cursor-pointer overflow-hidden border border-black bg-white text-left transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+      className={`relative w-full transform cursor-pointer overflow-hidden border-2 border-black bg-white text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
         isCancelled ? 'cursor-not-allowed opacity-60' : 'hover:-translate-y-1'
       }`}
       disabled={isCancelled}

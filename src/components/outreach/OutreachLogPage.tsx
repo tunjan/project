@@ -20,7 +20,7 @@ const LogHistoryItem: React.FC<{ log: OutreachLog; event?: CubeEvent }> = ({
     : 'Unknown Event';
 
   return (
-    <div className="border border-black bg-white p-4">
+    <div className="border-2 border-black bg-white p-4">
       <div className="mb-2 flex items-start justify-between">
         <div>
           <p className="font-bold text-black">{eventName}</p>
@@ -113,7 +113,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
           </h2>
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 border border-black bg-white p-6"
+            className="space-y-4 border-2 border-black bg-white p-6"
           >
             <div>
               <label
@@ -209,7 +209,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
               ))}
             </div>
           ) : (
-            <div className="flex h-full flex-col justify-center border border-black bg-white p-8 text-center">
+            <div className="flex h-full flex-col justify-center border-2 border-black bg-white p-8 text-center">
               <h3 className="text-xl font-bold text-black">No logs yet.</h3>
               <p className="mt-2 text-neutral-500">
                 Use the form to add your first outreach outcome.

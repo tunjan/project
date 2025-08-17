@@ -129,7 +129,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           </button>
         )}
 
-        <div className="card-brutal mb-12 flex items-center gap-6 p-6 md:gap-8">
+        <div className="card-brutal mb-12 flex flex-col gap-6 border-none bg-transparent p-6 md:gap-8 lg:flex-row lg:items-center lg:border-solid">
           <img
             src={user.profilePictureUrl}
             alt={user.name}

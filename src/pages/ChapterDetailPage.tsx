@@ -4,10 +4,10 @@ import {
   useChapterByName,
   useUsers,
   useEvents,
-  useAnnouncements,
   useAppActions,
   useChapterJoinRequests,
 } from '@/store/appStore';
+import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type User, AnnouncementScope, Role } from '@/types';
 import { getChapterStats } from '@/utils/analytics';
@@ -29,10 +29,10 @@ const StatCard: React.FC<{
   title: string;
   value: string | number;
 }> = ({ icon, title, value }) => (
-  <div className="h-full border border-black bg-white p-4">
+  <div className="h-full border-2 border-black bg-white p-4">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
-      <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
+      <p className="ml-3 truncate text-sm font-semibold uppercase tracking-wider text-neutral-600">
         {title}
       </p>
     </div>
@@ -141,7 +141,7 @@ const ChapterDetailPage: React.FC = () => {
 
   const handleMemberClick = useCallback(
     (member: User) => {
-      navigate(`/manage/member/${member.id}`);
+      navigate(`/members/${member.id}`);
     },
     [navigate]
   );
@@ -169,7 +169,7 @@ const ChapterDetailPage: React.FC = () => {
         />
       )}
       <div className="animate-fade-in py-8 md:py-12">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
           <button
             onClick={() => navigate('/chapters')}
             className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
@@ -189,30 +189,31 @@ const ChapterDetailPage: React.FC = () => {
                 {hasPendingRequest ? 'Request Pending' : 'Request to Join'}
               </button>
             )}
-            {chapter.instagram && (
-              <a
-                href={`https://instagram.com/${chapter.instagram.replace(
-                  '@',
-                  ''
-                )}`} // CORRECTED: Use backticks ``
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-sm font-semibold text-neutral-600 transition hover:text-black"
-              >
-                <InstagramIcon className="mr-2 h-5 w-5" />
-                {chapter.instagram}
-              </a>
-            )}
           </div>
         </div>
 
-        <div className="mb-16 mt-8 bg-white">
+        <div className="mb-8 mt-8">
           <p className="text-base font-semibold uppercase tracking-wide text-primary">
             {chapter.country}
           </p>
           <h1 className="mt-1 text-4xl font-extrabold text-black md:text-5xl">
             {chapter.name} Chapter
           </h1>
+
+          {chapter.instagram && (
+            <a
+              href={`https://instagram.com/${chapter.instagram.replace(
+                '@',
+                ''
+              )}`} // CORRECTED: Use backticks ``
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center text-sm font-semibold text-neutral-600 transition hover:text-black"
+            >
+              <InstagramIcon className="mr-2 h-5 w-5" />
+              {chapter.instagram}
+            </a>
+          )}
         </div>
 
         <section className="mb-12">
@@ -252,7 +253,7 @@ const ChapterDetailPage: React.FC = () => {
           <div className="space-y-6 lg:col-span-1">
             <div>
               <h2 className="mb-4 text-xl font-bold text-black">Organisers</h2>
-              <div className="border border-black bg-white p-4">
+              <div className="border-2 border-black bg-white p-4">
                 {chapterOrganisers.length > 0 ? (
                   <div className="space-y-2 divide-y divide-neutral-200">
                     {chapterOrganisers.map((m) => (
@@ -272,7 +273,7 @@ const ChapterDetailPage: React.FC = () => {
             </div>
             <div>
               <h2 className="mb-4 text-xl font-bold text-black">Members</h2>
-              <div className="max-h-96 overflow-y-auto border border-black bg-white p-4">
+              <div className="max-h-96 overflow-y-auto border-2 border-black bg-white p-4">
                 {regularMembers.length > 0 ? (
                   <div className="space-y-2 divide-y divide-neutral-200">
                     {regularMembers.map((m) => (
@@ -306,7 +307,7 @@ const ChapterDetailPage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="border border-black bg-white p-8 text-center">
+              <div className="border-2 border-black bg-white p-8 text-center">
                 <h3 className="text-lg font-bold text-black">
                   No chapter-specific announcements.
                 </h3>

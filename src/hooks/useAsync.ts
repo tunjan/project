@@ -26,7 +26,7 @@ export function useAsync<T>(
     } catch (error) {
       setState({ data: null, loading: false, error: error as Error });
     }
-  }, dependencies);
+  }, [asyncFunction, ...dependencies]); 
 
   useEffect(() => {
     execute();

@@ -17,7 +17,7 @@ interface ResourceFiltersProps {
 
 const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
   return (
-    <div className="border border-black bg-white p-4">
+    <div className="card-brutal p-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="md:col-span-4">
           <label htmlFor="keyword-search" className="sr-only">
@@ -33,7 +33,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               placeholder="Search by keyword..."
               value={props.searchTerm}
               onChange={(e) => props.setSearchTerm(e.target.value)}
-              className="block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full rounded-none border border-neutral-300 bg-white py-2 pl-10 pr-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             />
           </div>
         </div>
@@ -93,7 +93,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               props.setSelectedLevel('all');
               props.setSelectedLang('all');
             }}
-            className="h-full w-full border border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+            className="h-full w-full border-2 border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
           >
             Reset
           </button>

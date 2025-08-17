@@ -14,7 +14,7 @@ const Challenges = () => {
         <h2 className="mb-6 border-b-2 border-primary pb-3 text-3xl font-extrabold tracking-tight text-black">
           Team-Based Challenges
         </h2>
-        <div className="border border-black bg-white p-8 text-center">
+        <div className="border-2 border-black bg-white p-8 text-center">
           <TrophyIcon className="mx-auto h-12 w-12" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No Active Challenges

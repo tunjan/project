@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type Announcement, type User } from '@/types';
@@ -23,13 +24,32 @@ export const useAnnouncementsStore = create<AnnouncementsState & AnnouncementsAc
   persist(
     (set) => ({
       announcements: processedAnnouncements,
-      createAnnouncement: (data, author) =>
+      createAnnouncement: (data, author) => {
+        const newAnnouncement: Omit<Announcement, 'chapter' | 'country'> & {
+          chapter?: string;
+          country?: string;
+        } = {
+          id: `ann_${Date.now()}`,
+          createdAt: new Date(),
+          author,
+          title: data.title,
+          content: data.content,
+          scope: data.scope,
+        };
+
+        if (data.scope === 'Chapter' && data.target) {
+          newAnnouncement.chapter = data.target;
+        } else if (data.scope === 'Regional' && data.target) {
+          newAnnouncement.country = data.target;
+        }
+
         set((state) => ({
           announcements: [
-            { id: `ann_${Date.now()}`, createdAt: new Date(), author, ...data },
+            newAnnouncement as Announcement,
             ...state.announcements,
           ],
-        })),
+        }));
+      },
       updateAnnouncement: (announcementId, updateData) =>
         set((state) => ({
           announcements: state.announcements.map((a) =>

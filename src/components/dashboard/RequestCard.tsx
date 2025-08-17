@@ -52,8 +52,8 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   };
 
   return (
-    <div className="border border-black bg-white p-4">
-      <div className="mb-3 flex flex-col justify-between border-b border-black pb-3 sm:flex-row sm:items-center">
+    <div className="border-2 border-black bg-white p-4">
+      <div className="mb-3 flex flex-col justify-between border-b-2 border-black pb-3 sm:flex-row sm:items-center">
         <div className="mb-2 sm:mb-0">
           <p className="text-sm text-neutral-500">
             {isHostView ? 'Request From' : 'Request To'}
@@ -78,7 +78,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2">
           <p className="mb-1 text-sm font-semibold text-black">Message:</p>
-          <p className="border border-neutral-300 bg-neutral-100 p-2 text-sm text-neutral-700">
+          <p className="border-2 border-black bg-white p-2 text-sm text-neutral-700">
             {request.message}
           </p>
 
@@ -87,7 +87,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
               <p className="mb-1 text-sm font-semibold text-black">
                 Host's Reply:
               </p>
-              <p className="border border-blue-300 bg-blue-100 p-2 text-sm text-blue-800">
+              <p className="border-2 border-primary bg-primary/10 p-2 text-sm text-black">
                 {request.hostReply}
               </p>
             </div>
@@ -108,7 +108,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
       </div>
 
       {isHostView && request.status === 'Pending' && (
-        <div className="mt-4 space-y-3 border-t border-black pt-4">
+        <div className="mt-4 space-y-3 border-t-2 border-black pt-4">
           <textarea
             value={reply}
             onChange={(e) => setReply(e.target.value)}

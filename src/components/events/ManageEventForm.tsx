@@ -118,7 +118,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                 {eventLogs.map((log: OutreachLog) => (
                   <div
                     key={log.id}
-                    className="border border-neutral-200 bg-neutral-50 p-3"
+                    className="border-2 border-black bg-white p-3"
                   >
                     <p className="font-semibold">{log.outcome}</p>
                     {log.notes && (
@@ -142,7 +142,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
           {}
           <div className="p-8">
             <h2 className="mb-4 text-xl font-bold text-black">Attendance</h2>
-            <ul className="divide-y divide-black border-b border-t border-black">
+            <ul className="divide-y-2 divide-black border-b-2 border-t-2 border-black">
               {event.participants.map(({ user }) => (
                 <li
                   key={user.id}
@@ -159,13 +159,13 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                       <p className="text-sm text-neutral-500">{user.role}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
                     <button
                       type="button"
                       onClick={() =>
                         handleAttendanceChange(user.id, 'Attended')
                       }
-                      className={`flex w-28 items-center justify-center px-3 py-2 text-sm font-semibold transition-colors ${
+                      className={`flex w-full items-center justify-center px-3 py-2 text-sm font-semibold transition-colors sm:w-28 ${
                         attendance[user.id] === 'Attended'
                           ? 'bg-primary text-white'
                           : 'bg-neutral-200 text-black hover:bg-neutral-300'
@@ -177,7 +177,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                     <button
                       type="button"
                       onClick={() => handleAttendanceChange(user.id, 'Absent')}
-                      className={`flex w-28 items-center justify-center px-3 py-2 text-sm font-semibold transition-colors ${
+                      className={`flex w-full items-center justify-center px-3 py-2 text-sm font-semibold transition-colors sm:w-28 ${
                         attendance[user.id] === 'Absent'
                           ? 'bg-black text-white'
                           : 'bg-neutral-200 text-black hover:bg-neutral-300'

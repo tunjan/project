@@ -63,7 +63,7 @@ const ResourcesPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="border border-black bg-white p-8 text-center">
+          <div className="border-2 border-black bg-white p-8 text-center">
             <BookOpenIcon className="mx-auto h-12 w-12 text-neutral-300" />
             <h3 className="mt-4 text-xl font-bold text-black">
               No resources found.

@@ -43,7 +43,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ user }) => {
           <ChevronLeftIcon className="mr-1 h-5 w-5" /> Back
         </button>
 
-        <div className="mb-8 flex flex-col items-center space-y-4 border border-black bg-white p-6 sm:flex-row sm:space-x-8 sm:space-y-0 md:p-8">
+        <div className="mb-8 flex flex-col items-center space-y-4 border-2 border-black bg-white p-6 sm:flex-row sm:space-x-8 sm:space-y-0 md:p-8">
           <img
             src={user.profilePictureUrl}
             alt={user.name}

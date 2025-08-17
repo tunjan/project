@@ -24,11 +24,11 @@ const BarChart: React.FC<BarChartProps> = ({
   };
 
   return (
-    <div className="border border-black bg-white p-4 md:p-6">
+    <div className="border-2 border-black bg-white p-4 md:p-6">
       <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
       <div className="h-full w-full">
         <BaseChart data={data} padding={40}>
-          {({ yScale, chartWidth, chartHeight, maxValue }) => {
+          {({ yScale, chartWidth }) => {
             const barWidth = chartWidth / data.length;
             const barMargin = barWidth * 0.2;
             const effectiveBarWidth = barWidth - barMargin;
@@ -38,10 +38,8 @@ const BarChart: React.FC<BarChartProps> = ({
                 {data.map((item, index) => {
                   const x = barXScale(index, chartWidth, 40);
                   const y = yScale(item.value);
-                  const barHeight =
-                    item.value === 0
-                      ? 0
-                      : (item.value / maxValue) * chartHeight;
+                  // Corrected: Calculate height based on the y-scale function
+                  const barHeight = yScale(0) - yScale(item.value);
 
                   return (
                     <g key={item.label}>

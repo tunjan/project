@@ -131,8 +131,8 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
 
   return (
     <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-2xl border border-black bg-white">
-        <div className="border-b border-black p-8">
+      <div className="mx-auto max-w-2xl border-2 border-black bg-white">
+        <div className="border-b-2 border-black p-8">
           <h1 className="text-3xl font-extrabold text-black">
             Create New Event
           </h1>

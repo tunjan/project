@@ -5,7 +5,6 @@ import {
   User,
   CubeEvent,
   Chapter,
-  Announcement,
   Resource,
   AccommodationRequest,
   OutreachLog,
@@ -17,7 +16,6 @@ import {
   EventRole,
   EventStatus,
   EventReport,
-  AnnouncementScope,
   Notification,
   NotificationType,
   OutreachOutcome,
@@ -33,7 +31,6 @@ import {
   MOCK_USERS,
   MOCK_CUBE_EVENTS,
   MOCK_CHAPTERS,
-  MOCK_ANNOUNCEMENTS,
   MOCK_RESOURCES,
   MOCK_ACCOMMODATION_REQUESTS,
   MOCK_OUTREACH_LOGS,
@@ -71,12 +68,7 @@ const processedEvents: CubeEvent[] = MOCK_CUBE_EVENTS.map((event: any) => ({
   })),
 }));
 
-const processedAnnouncements: Announcement[] = MOCK_ANNOUNCEMENTS.map(
-  (ann: any) => ({
-    ...ann,
-    createdAt: new Date(ann.createdAt),
-  })
-);
+
 
 const processedAccommodationRequests: AccommodationRequest[] =
   MOCK_ACCOMMODATION_REQUESTS.map((req: any) => ({
@@ -131,7 +123,6 @@ export interface AppState {
   users: User[];
   events: CubeEvent[];
   chapters: Chapter[];
-  announcements: Announcement[];
   resources: Resource[];
   accommodationRequests: AccommodationRequest[];
   outreachLogs: OutreachLog[];
@@ -147,6 +138,7 @@ export interface AppState {
   // Actions
   register: (formData: {
     name: string;
+    email: string; // Add email to the signature
     instagram: string;
     chapter: string;
     answers: OnboardingAnswers;
@@ -195,7 +187,7 @@ export interface AppState {
         | 'instagram'
         | 'hostingAvailability'
         | 'hostingCapacity'
-        | 'profilePictureUrl' // Add this
+        | 'profilePictureUrl'
       >
     >
   ) => void;
@@ -206,7 +198,6 @@ export interface AppState {
     author: User
   ) => void;
   editOrganizerNote: (
-    // Add this new action
     targetUserId: string,
     noteId: string,
     newContent: string
@@ -218,25 +209,12 @@ export interface AppState {
   requestToJoinChapter: (chapterName: string, user: User) => void;
   approveChapterJoinRequest: (requestId: string, approver: User) => void;
   denyChapterJoinRequest: (requestId: string) => void;
-  createAnnouncement: (
-    data: {
-      title: string;
-      content: string;
-      scope: AnnouncementScope;
-      target?: string;
-    },
-    author: User
-  ) => void;
-  updateAnnouncement: (
-    announcementId: string,
-    updateData: Partial<Pick<Announcement, 'title' | 'content'>>
-  ) => void;
-  deleteAnnouncement: (announcementId: string) => void;
+
   createAccommodationRequest: (
     requestData: Omit<AccommodationRequest, 'id' | 'requester' | 'status'>,
     requester: User
   ) => void;
-  removeParticipant: ( // Add this new action
+  removeParticipant: (
     eventId: string,
     participantUserId: string,
     currentUser: User
@@ -277,7 +255,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   users: processedUsers,
   events: processedEvents,
   chapters: MOCK_CHAPTERS,
-  announcements: processedAnnouncements,
   resources: MOCK_RESOURCES,
   accommodationRequests: processedAccommodationRequests,
   outreachLogs: processedOutreachLogs,
@@ -299,6 +276,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newUser: User = {
       id: `user_${Date.now()}`,
       name: formData.name,
+      email: formData.email, // Add email field
       instagram: formData.instagram || undefined,
       chapters: [formData.chapter],
       onboardingAnswers: formData.answers,
@@ -317,6 +295,21 @@ export const useAppStore = create<AppState>((set, get) => ({
       joinDate: new Date(),
     };
     set((state) => ({ users: [...state.users, newUser] }));
+    // Find organizers of the chapter and notify them
+    const chapterOrganizers = get().users.filter(
+      (u) =>
+        u.role === Role.CHAPTER_ORGANISER &&
+        u.organiserOf?.includes(formData.chapter)
+    );
+
+    const notificationsToCreate = chapterOrganizers.map((org) => ({
+      userId: org.id,
+      type: NotificationType.NEW_APPLICANT,
+      message: `${formData.name} has applied to join the ${formData.chapter} chapter.`,
+      linkTo: '/manage',
+      relatedUser: newUser,
+    }));
+    get().addNotifications(notificationsToCreate);
   },
 
   updateUserStatus: (userId, status, approver) => {
@@ -328,7 +321,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     const user = get().users.find((u) => u.id === userId);
     if (user && approver) {
-      if (status === OnboardingStatus.PENDING_ONBOARDING_CALL) {
+      if (status === OnboardingStatus.AWAITING_VERIFICATION) {
         get().addNotification({
           userId: user.id,
           type: NotificationType.REQUEST_ACCEPTED,
@@ -344,9 +337,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       users: state.users.map((user) =>
         user.id === userId
           ? {
-              ...user,
-              onboardingStatus: OnboardingStatus.AWAITING_VERIFICATION,
-            }
+            ...user,
+            onboardingStatus: OnboardingStatus.AWAITING_VERIFICATION,
+          }
           : user
       ),
     }));
@@ -361,11 +354,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       users: state.users.map((user) =>
         user.id === userId
           ? {
-              ...user,
-              onboardingStatus: OnboardingStatus.CONFIRMED,
-              role: Role.CONFIRMED_ACTIVIST,
-              cryptoId: { publicKey, secretKey },
-            }
+            ...user,
+            onboardingStatus: OnboardingStatus.CONFIRMED,
+            role: Role.CONFIRMED_ACTIVIST,
+            cryptoId: { publicKey, secretKey },
+          }
           : user
       ),
     }));
@@ -380,7 +373,12 @@ export const useAppStore = create<AppState>((set, get) => ({
           changes.organiserOf = [];
         if (ROLE_HIERARCHY[role] < ROLE_HIERARCHY[Role.REGIONAL_ORGANISER])
           delete changes.managedCountry;
-        return { ...user, ...changes };
+        const updatedUser = { ...user, ...changes };
+        // If the updated user is the current logged-in user, update auth store as well
+        if (useAuthStore.getState().currentUser?.id === updatedUser.id) {
+          useAuthStore.getState().updateCurrentUser(updatedUser);
+        }
+        return updatedUser;
       }),
     })),
 
@@ -389,10 +387,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       users: state.users.map((user) =>
         user.id === userId
           ? {
-              ...user,
-              role: Role.CHAPTER_ORGANISER,
-              organiserOf: [...new Set(chaptersToOrganise)],
-            }
+            ...user,
+            role: Role.CHAPTER_ORGANISER,
+            organiserOf: [...new Set(chaptersToOrganise)],
+          }
           : user
       ),
     })),
@@ -498,10 +496,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       events: state.events.map((event) =>
         event.id === eventId
           ? {
-              ...event,
-              status: EventStatus.CANCELLED,
-              cancellationReason: reason,
-            }
+            ...event,
+            status: EventStatus.CANCELLED,
+            cancellationReason: reason,
+          }
           : event
       ),
     }));
@@ -571,67 +569,65 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   editOrganizerNote: (targetUserId, noteId, newContent) => {
-  set((state) => ({
-    users: state.users.map((user) => {
-      if (user.id === targetUserId) {
-        const updatedNotes = user.organizerNotes?.map((note) =>
-          note.id === noteId ? { ...note, content: newContent } : note
-        );
-        return { ...user, organizerNotes: updatedNotes };
-      }
-      return user;
-    }),
-  }));
-},
-
-deleteOrganizerNote: (targetUserId, noteId) => {
-  set((state) => ({
-    users: state.users.map((user) => {
-      if (user.id === targetUserId) {
-        const updatedNotes = user.organizerNotes?.filter(
-          (note) => note.id !== noteId
-        );
-        return { ...user, organizerNotes: updatedNotes };
-      }
-      return user;
-    }),
-  }));
-},
-
-// ADD this new action after `cancelRsvp`
-removeParticipant: (eventId, participantUserId, currentUser) => {
-  set((state) => ({
-    events: state.events.map((event) => {
-      if (event.id === eventId) {
-        // Ensure the organizer isn't removing themselves
-        if (event.organizer.id === participantUserId) {
-          toast.error('The event organizer cannot be removed.');
-          return event;
+    set((state) => ({
+      users: state.users.map((user) => {
+        if (user.id === targetUserId) {
+          const updatedNotes = user.organizerNotes?.map((note) =>
+            note.id === noteId ? { ...note, content: newContent } : note
+          );
+          return { ...user, organizerNotes: updatedNotes };
         }
-        return {
-          ...event,
-          participants: event.participants.filter(
-            (p) => p.user.id !== participantUserId
-          ),
-        };
-      }
-      return event;
-    }),
-  }));
+        return user;
+      }),
+    }));
+  },
 
-  const event = get().events.find((e) => e.id === eventId);
-  const removedUser = get().users.find((u) => u.id === participantUserId);
-  if (event && removedUser) {
-    get().addNotification({
-      userId: participantUserId,
-      type: NotificationType.EVENT_UPDATED, // Re-using a generic type
-      message: `You have been removed from the event "${event.location}" by the organizer.`,
-      linkTo: `/cubes/${event.id}`,
-      relatedUser: currentUser,
-    });
-    toast.warning(`${removedUser.name} has been removed from the event.`);
-  }
-},
+  deleteOrganizerNote: (targetUserId, noteId) => {
+    set((state) => ({
+      users: state.users.map((user) => {
+        if (user.id === targetUserId) {
+          const updatedNotes = user.organizerNotes?.filter(
+            (note) => note.id !== noteId
+          );
+          return { ...user, organizerNotes: updatedNotes };
+        }
+        return user;
+      }),
+    }));
+  },
+
+  removeParticipant: (eventId, participantUserId, currentUser) => {
+    set((state) => ({
+      events: state.events.map((event) => {
+        if (event.id === eventId) {
+          if (event.organizer.id === participantUserId) {
+            toast.error('The event organizer cannot be removed.');
+            return event;
+          }
+          return {
+            ...event,
+            participants: event.participants.filter(
+              (p) => p.user.id !== participantUserId
+            ),
+          };
+        }
+        return event;
+      }),
+    }));
+
+    const event = get().events.find((e) => e.id === eventId);
+    const removedUser = get().users.find((u) => u.id === participantUserId);
+    if (event && removedUser) {
+      get().addNotification({
+        userId: participantUserId,
+        type: NotificationType.EVENT_UPDATED,
+        message: `You have been removed from the event "${event.location}" by the organizer.`,
+        linkTo: `/cubes/${event.id}`,
+        relatedUser: currentUser,
+      });
+      toast.warning(`${removedUser.name} has been removed from the event.`);
+    }
+  },
 
   approveRsvp: (eventId, guestId, currentUser) => {
     const event = get().events.find((e) => e.id === eventId);
@@ -698,11 +694,11 @@ removeParticipant: (eventId, participantUserId, currentUser) => {
       events: state.events.map((event) =>
         event.id === eventId
           ? {
-              ...event,
-              participants: event.participants.filter(
-                (p) => p.user.id !== currentUser.id
-              ),
-            }
+            ...event,
+            participants: event.participants.filter(
+              (p) => p.user.id !== currentUser.id
+            ),
+          }
           : event
       ),
     })),
@@ -846,34 +842,7 @@ removeParticipant: (eventId, participantUserId, currentUser) => {
     }));
   },
 
-  // ANNOUNCEMENT ACTIONS
-  createAnnouncement: (data, author) => {
-    const newAnnouncement: Announcement = {
-      id: `ann_${Date.now()}`,
-      createdAt: new Date(),
-      author,
-      ...data,
-    };
-    set((state) => ({
-      announcements: [newAnnouncement, ...state.announcements],
-    }));
-  },
 
-  updateAnnouncement: (announcementId, updateData) => {
-    set((state) => ({
-      announcements: state.announcements.map((ann) =>
-        ann.id === announcementId ? { ...ann, ...updateData } : ann
-      ),
-    }));
-  },
-
-  deleteAnnouncement: (announcementId) => {
-    set((state) => ({
-      announcements: state.announcements.filter(
-        (ann) => ann.id !== announcementId
-      ),
-    }));
-  },
 
   // ACCOMMODATION ACTIONS
   createAccommodationRequest: (requestData, requester) => {
@@ -912,11 +881,9 @@ removeParticipant: (eventId, participantUserId, currentUser) => {
       get().addNotification({
         userId: request.requester.id,
         type: notifType,
-        message: `${
-          host.name
-        } ${response.toLowerCase()} your accommodation request for ${
-          request.event.location
-        }.`,
+        message: `${host.name
+          } ${response.toLowerCase()} your accommodation request for ${request.event.location
+          }.`,
         linkTo: '/dashboard',
         relatedUser: host,
       });
@@ -1032,9 +999,8 @@ removeParticipant: (eventId, participantUserId, currentUser) => {
           response === 'Accepted'
             ? NotificationType.BADGE_AWARD_ACCEPTED
             : NotificationType.BADGE_AWARD_REJECTED,
-        message: `${award.recipient.name} has ${response.toLowerCase()} the "${
-          award.badge.name
-        }" badge.`,
+        message: `${award.recipient.name} has ${response.toLowerCase()} the "${award.badge.name
+          }" badge.`,
         linkTo: `/members/${award.recipient.id}`,
         relatedUser: award.recipient,
       });
@@ -1091,8 +1057,7 @@ removeParticipant: (eventId, participantUserId, currentUser) => {
 export const useUsers = () => useAppStore((state) => state.users);
 export const useEvents = () => useAppStore((state) => state.events);
 export const useChapters = () => useAppStore((state) => state.chapters);
-export const useAnnouncements = () =>
-  useAppStore((state) => state.announcements);
+
 export const useResources = () => useAppStore((state) => state.resources);
 export const useOutreachLogs = () => useAppStore((state) => state.outreachLogs);
 export const useEventComments = () =>
@@ -1118,8 +1083,8 @@ export const useChapterByName = (chapterName?: string) =>
   useAppStore((state) =>
     chapterName
       ? state.chapters.find(
-          (c) => c.name.toLowerCase() === chapterName.toLowerCase()
-        )
+        (c) => c.name.toLowerCase() === chapterName.toLowerCase()
+      )
       : undefined
   );
 export const useUserById = (userId?: string) =>

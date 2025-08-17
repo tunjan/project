@@ -50,8 +50,8 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
   if (!event.endDate || event.scope !== 'Regional') return null;
 
   return (
-    <div className="border border-black bg-white">
-      <div className="border-b border-black p-6">
+    <div className="border-2 border-black bg-white">
+      <div className="border-b-2 border-black p-6">
         <h2 className="text-xl font-bold text-black">Event Roster</h2>
         <p className="text-sm text-neutral-600">
           Daily breakdown of activist duties.
@@ -63,7 +63,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
           const dailyRoster = rosterByDay[dateString];
 
           return (
-            <div key={dateString} className="border border-black p-4">
+            <div key={dateString} className="border-2 border-black p-4">
               <h3 className="font-bold">
                 {day.toLocaleDateString(undefined, {
                   weekday: 'long',

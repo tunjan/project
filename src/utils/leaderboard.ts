@@ -103,15 +103,15 @@ export const calculateLeaderboards = (
         );
 
         for (const event of relevantEvents) {
-            if (event.report) {
-                for (const [userId, status] of Object.entries(
+            const chapterName = eventToCityMap.get(event.id);
+            if (chapterName && chapterMap.has(chapterName) && event.report) {
+                const attendeeCount = Object.values(
                     event.report.attendance
-                )) {
-                    if (status === 'Attended' && userMap.has(userId)) {
-                        hourCounts[userId] =
-                            (hourCounts[userId] || 0) + event.report.hours;
-                    }
-                }
+                ).filter((s) => s === 'Attended').length;
+                const totalHoursContributedInEvent = event.report.hours * attendeeCount;
+
+                hourCounts[chapterName] =
+                    (hourCounts[chapterName] || 0) + totalHoursContributedInEvent;
             }
         }
 

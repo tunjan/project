@@ -18,7 +18,7 @@ const BadgeList: React.FC<BadgeListProps> = ({ badges }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-1 gap-2">
       {badges.map((badge) => {
         const IconComponent =
           Icons[badge.icon as keyof typeof Icons] || Icons.TrophyIcon;

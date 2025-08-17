@@ -5,7 +5,7 @@ import {
   LoginIcon,
   UserAddIcon,
   MenuIcon,
-  XIcon,
+  XIcon, // Add useEffect to the import list
   LogoutIcon,
   BellIcon,
 } from '@/icons';
@@ -27,7 +27,7 @@ const NavLinkStyled: React.FC<{
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `relative flex h-full items-center px-4 text-sm font-bold transition-colors duration-200 ${
+      `text-md relative flex h-full items-center p-2 font-bold transition-colors duration-200 ${
         isActive
           ? 'text-black'
           : 'text-neutral-500 hover:text-black focus:text-black'
@@ -73,8 +73,18 @@ const navItems = [
     requiresAuth: true,
     requiresConfirmed: true,
   },
-  { to: '/manage', label: 'Management', requiresOrganizer: true },
-  { to: '/analytics', label: 'Analytics', requiresOrganizer: true },
+  {
+    to: '/manage',
+    label: 'Management',
+    requiresAuth: true,
+    requiresOrganizer: true,
+  },
+  {
+    to: '/analytics',
+    label: 'Analytics',
+    requiresAuth: true,
+    requiresOrganizer: true,
+  },
   {
     to: '/onboarding-status',
     label: 'My Application',
@@ -96,6 +106,19 @@ const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    // Cleanup function
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -140,10 +163,22 @@ const Header: React.FC = () => {
 
     return navItems
       .filter((item) => {
-        if (!item.requiresAuth) return true;
-        if (item.requiresOrganizer) return hasOrganizerRole(currentUser);
-        if (item.requiresConfirmed) return isConfirmed;
-        if (item.requiresPending) return !isConfirmed;
+        if (!item.requiresAuth) {
+          return true;
+        }
+
+        // Management/Analytics tabs require a confirmed organizer
+        if (item.requiresOrganizer) {
+          return hasOrganizerRole(currentUser) && isConfirmed;
+        }
+        if (item.requiresConfirmed) {
+          return isConfirmed;
+        }
+        if (item.requiresPending) {
+          return !isConfirmed;
+        }
+
+        // Default for items that only require authentication
         return true;
       })
       .map((item) => (
@@ -158,9 +193,9 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b-2 border-black bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-20 border-b-2 border-black bg-white lg:hidden">
+      <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
           <Link
             to="/"
             className="text-2xl font-extrabold tracking-tighter text-black"
@@ -168,12 +203,6 @@ const Header: React.FC = () => {
           >
             AV<span className="text-primary">.</span>
           </Link>
-
-          {currentUser && (
-            <nav className="hidden h-full items-center lg:flex">
-              {renderNavLinks()}
-            </nav>
-          )}
 
           <div className="flex items-center space-x-2">
             {currentUser ? (
@@ -210,7 +239,7 @@ const Header: React.FC = () => {
                       ? '/dashboard'
                       : '/onboarding-status'
                   }
-                  className="hidden items-center space-x-2 border-2 border-transparent p-1 hover:border-black focus:border-black sm:flex"
+                  className="flex items-center space-x-2 border-2 border-transparent p-1 hover:border-black focus:border-black"
                   onClick={closeMenus}
                 >
                   <img
@@ -220,28 +249,24 @@ const Header: React.FC = () => {
                   />
                 </Link>
 
-                <div className="hidden sm:block">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
-                  >
-                    <LogoutIcon className="h-4 w-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+                >
+                  <LogoutIcon className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
 
-                <div className="lg:hidden">
-                  <button
-                    onClick={() => setIsMobileMenuOpen((p) => !p)}
-                    className="-mr-2 p-2"
-                  >
-                    {isMobileMenuOpen ? (
-                      <XIcon className="h-6 w-6" />
-                    ) : (
-                      <MenuIcon className="h-6 w-6" />
-                    )}
-                  </button>
-                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen((p) => !p)}
+                  className="-mr-2 p-2"
+                >
+                  {isMobileMenuOpen ? (
+                    <XIcon className="h-6 w-6" />
+                  ) : (
+                    <MenuIcon className="h-6 w-6" />
+                  )}
+                </button>
               </>
             ) : (
               <div className="flex items-center space-x-2">
@@ -266,7 +291,7 @@ const Header: React.FC = () => {
       </div>
 
       {isMobileMenuOpen && currentUser && (
-        <div className="absolute left-0 top-16 w-full border-b-2 border-black bg-white shadow-lg lg:hidden">
+        <div className="shadow-brutal absolute left-0 top-16 w-full border-b-2 border-black bg-white lg:hidden">
           <nav className="space-y-1 px-2 pb-3 pt-2">
             {renderNavLinks(true)}
             <div className="my-2 border-t border-neutral-200 pt-2">

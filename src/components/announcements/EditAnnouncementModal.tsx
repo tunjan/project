@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { type Announcement } from '@/types';
-import { useAppActions } from '@/store/appStore';
+import { useAnnouncementsActions } from '@/store/announcements.store';
 import { InputField, TextAreaField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
   announcement,
   onClose,
 }) => {
-  const { updateAnnouncement } = useAppActions();
+  const { updateAnnouncement } = useAnnouncementsActions();
   const [title, setTitle] = useState(announcement.title);
   const [content, setContent] = useState(announcement.content);
 

@@ -19,7 +19,7 @@ const LineChart: React.FC<LineChartProps> = ({
 }) => {
   if (data.length === 0) {
     return (
-      <div className="border border-black bg-white p-4 md:p-6">
+      <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
         <div className="flex h-[300px] items-center justify-center text-neutral-500">
           Not enough data to display chart.
@@ -28,18 +28,8 @@ const LineChart: React.FC<LineChartProps> = ({
     );
   }
 
-  const points = data
-    .map((item, index, arr) => {
-      if (arr.length < 2) return '';
-      const x = 40 + (index / (arr.length - 1)) * (500 - 40 * 2);
-      const maxValue = Math.max(...arr.map((d) => d.value), 0);
-      const y = 40 + (300 - 40) - (item.value / (maxValue || 1)) * (300 - 40);
-      return `${x},${y}`;
-    })
-    .join(' ');
-
   return (
-    <div className="border border-black bg-white p-4 md:p-6">
+    <div className="border-2 border-black bg-white p-4 md:p-6">
       <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
       <div className="h-full w-full">
         <BaseChart data={data} width={500} height={300} padding={40}>

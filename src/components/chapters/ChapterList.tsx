@@ -4,27 +4,56 @@ import { getChapterStats, ChapterStats } from '@/utils/analytics';
 import { useUsers, useEvents, useChapters } from '@/store/appStore';
 import { SearchIcon } from '@/icons';
 
+// A small helper component for stats on mobile
+const Stat: React.FC<{ label: string; value: string | number }> = ({
+  label,
+  value,
+}) => (
+  <div className="text-center">
+    <p className="font-mono text-xl font-bold">{value}</p>
+    <p className="text-xs font-semibold uppercase text-neutral-500">{label}</p>
+  </div>
+);
+
 const ChapterRow: React.FC<{
   chapterStats: ChapterStats;
   onSelect: () => void;
-}> = ({ chapterStats, onSelect }) => {
+  isEven: boolean;
+}> = ({ chapterStats, onSelect, isEven }) => {
   return (
     <button
       onClick={onSelect}
-      className="group grid w-full cursor-pointer grid-cols-6 items-center border-t border-black p-4 text-left transition-colors duration-200 hover:bg-neutral-100"
+      className={`group w-full cursor-pointer border-t border-black p-4 text-left transition-all duration-150 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:grid md:grid-cols-6 md:items-center md:border-none ${
+        isEven ? 'bg-white' : 'bg-neutral-50'
+      }`}
     >
-      <div className="col-span-2">
+      {/* --- Mobile & Desktop: Chapter Name --- */}
+      <div className="md:col-span-2">
         <p className="font-bold text-black group-hover:text-primary">
           {chapterStats.name}
         </p>
         <p className="text-sm text-neutral-500">{chapterStats.country}</p>
       </div>
-      <p className="font-mono text-lg font-bold">{chapterStats.memberCount}</p>
-      <p className="font-mono text-lg font-bold">{chapterStats.eventsHeld}</p>
-      <p className="font-mono text-lg font-bold">
+
+      {/* --- Mobile View: Stats Grid --- */}
+      <div className="mt-4 grid grid-cols-2 gap-4 border-t border-dashed border-neutral-300 pt-4 md:hidden">
+        <Stat label="Members" value={chapterStats.memberCount} />
+        <Stat label="Events" value={chapterStats.eventsHeld} />
+        <Stat label="Hours" value={Math.round(chapterStats.totalHours)} />
+        <Stat label="Convos" value={chapterStats.totalConversations} />
+      </div>
+
+      {/* --- Desktop View: Stats in Grid Columns --- */}
+      <p className="hidden font-mono text-lg font-bold md:block">
+        {chapterStats.memberCount}
+      </p>
+      <p className="hidden font-mono text-lg font-bold md:block">
+        {chapterStats.eventsHeld}
+      </p>
+      <p className="hidden font-mono text-lg font-bold md:block">
         {Math.round(chapterStats.totalHours)}
       </p>
-      <p className="flex items-center justify-between font-mono text-lg font-bold">
+      <p className="hidden items-center justify-between font-mono text-lg font-bold md:flex">
         {chapterStats.totalConversations}
         <span className="text-2xl text-neutral-400 transition-transform duration-300 group-hover:translate-x-2 group-hover:text-black">
           →
@@ -81,13 +110,13 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
         </p>
       </div>
 
-      {}
-      <div className="mb-8 border border-black bg-white p-4">
+      {/* Search and Filter Controls */}
+      <div className="card-brutal mb-8 p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="md:col-span-1">
             <label
               htmlFor="search-filter"
-              className="mb-1 block text-sm font-bold"
+              className="mb-1 block text-sm font-bold text-neutral-700"
             >
               Search by Name or Country
             </label>
@@ -101,14 +130,14 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="e.g. Berlin or USA"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="block w-full rounded-none border border-neutral-300 bg-white py-2 pl-10 pr-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               />
             </div>
           </div>
           <div className="md:col-span-1">
             <label
               htmlFor="region-filter"
-              className="mb-1 block text-sm font-bold"
+              className="mb-1 block text-sm font-bold text-neutral-700"
             >
               Filter by Region
             </label>
@@ -117,7 +146,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               name="region-filter"
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block w-full rounded-none border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             >
               {availableRegions.map((region) => (
                 <option key={region} value={region}>
@@ -129,10 +158,10 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
         </div>
       </div>
 
-      {}
-      <div className="border-x border-b border-black bg-white">
-        {}
-        <div className="grid-cols-6 items-center border-b border-t border-black bg-neutral-50 p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
+      {/* Chapters Table */}
+      <div className="card-brutal">
+        {/* Desktop Header */}
+        <div className="hidden grid-cols-6 items-center border-b border-black bg-neutral-50 p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
           <p className="col-span-2">Chapter</p>
           <p>Members</p>
           <p>Events</p>
@@ -141,13 +170,14 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
         </div>
         {filteredAndSortedStats.length > 0 ? (
           <div>
-            {filteredAndSortedStats.map((stat) => {
+            {filteredAndSortedStats.map((stat, index) => {
               const chapter = allChapters.find((c) => c.name === stat.name)!;
               return (
                 <ChapterRow
                   key={stat.name}
                   chapterStats={stat}
                   onSelect={() => onNavigateToChapter(chapter)}
+                  isEven={index % 2 === 0}
                 />
               );
             })}

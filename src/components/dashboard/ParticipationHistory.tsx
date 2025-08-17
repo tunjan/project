@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEvents } from '@/store/appStore';
+import { useNavigate } from 'react-router-dom';
 
 interface ParticipationHistoryProps {
   userId: string;
@@ -8,6 +9,7 @@ interface ParticipationHistoryProps {
 const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
   userId,
 }) => {
+  const navigate = useNavigate();
   const allEvents = useEvents();
 
   const userHistory = allEvents
@@ -39,22 +41,24 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
           });
 
           return (
-            <li
-              key={event.id}
-              className="flex items-center justify-between space-x-4 p-4 transition-colors hover:bg-neutral-100"
-            >
-              <div>
-                <p className="font-bold text-black">{event.location}</p>
-                <p className="text-sm text-neutral-500">{event.city}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-mono text-sm font-medium text-black">
-                  {formattedDate}
-                </p>
-                <p className="text-xs font-semibold text-neutral-500">
-                  {participation.eventRole}
-                </p>
-              </div>
+            <li key={event.id}>
+              <button
+                onClick={() => navigate(`/cubes/${event.id}`)}
+                className="flex w-full items-center justify-between space-x-4 p-4 text-left transition-colors hover:bg-neutral-100"
+              >
+                <div>
+                  <p className="font-bold text-black">{event.location}</p>
+                  <p className="text-sm text-neutral-500">{event.city}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-mono text-sm font-medium text-black">
+                    {formattedDate}
+                  </p>
+                  <p className="text-xs font-semibold text-neutral-500">
+                    {participation.eventRole}
+                  </p>
+                </div>
+              </button>
             </li>
           );
         })}

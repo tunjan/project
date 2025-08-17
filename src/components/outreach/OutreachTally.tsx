@@ -26,7 +26,7 @@ const outcomeMeta: Record<
   },
   [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: {
     icon: UserAddIcon,
-    color: 'text-blue-500',
+    color: 'text-blue-600',
   },
   [OutreachOutcome.MOSTLY_SURE]: {
     icon: TrendingUpIcon,

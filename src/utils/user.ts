@@ -29,17 +29,13 @@ export const getUserRoleDisplay = (user: User): string => {
   if (user.role === Role.CHAPTER_ORGANISER) {
     const organiserOf = user.organiserOf || [];
     const organisedLabel = organiserOf.length
-      ? `Chapter Organiser — ${organiserOf.join(', ')}`
-      : 'Chapter Organiser';
+      ? `Chapter Organiser of ${organiserOf.join(', ')}`
+      : 'Chapter Organiser —';
 
     const organisedSet = new Set(organiserOf);
     const memberOnly = (user.chapters || []).filter((c) => !organisedSet.has(c));
     if (memberOnly.length === 0) return organisedLabel;
-
-    const memberAffiliation =
-      memberOnly.length === 1
-        ? `${memberOnly[0]} Chapter`
-        : `${memberOnly.length} Chapters`;
+    const memberAffiliation = `Member of ${memberOnly.join(', ')}`;
 
     return `${organisedLabel} · ${memberAffiliation}`;
   }
@@ -50,7 +46,7 @@ export const getUserRoleDisplay = (user: User): string => {
     const affiliation =
       chapters.length === 1
         ? `${chapters[0]} Chapter`
-        : `${chapters.length} Chapters`;
+        : chapters.join(', ');
     return `${roleLabel} · ${affiliation}`;
   }
 

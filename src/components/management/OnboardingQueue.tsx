@@ -19,7 +19,7 @@ const ApplicantCard: React.FC<{
       : 'No chapter';
 
   return (
-    <div className="border border-black bg-white">
+    <div className="border-2 border-black bg-white">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-4">
           <img
@@ -56,7 +56,7 @@ const ApplicantCard: React.FC<{
         </div>
       </div>
       {isExpanded && user.onboardingAnswers && (
-        <div className="space-y-3 border-t border-black bg-neutral-50 p-4">
+        <div className="space-y-3 border-t-2 border-black bg-neutral-50 p-4">
           <div>
             <p className="text-xs font-bold uppercase text-neutral-500">
               Why did you go vegan?
@@ -94,7 +94,7 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
 }) => {
   if (pendingUsers.length === 0) {
     return (
-      <div className="border border-black bg-white p-8 text-center">
+      <div className="border-2 border-black bg-white p-8 text-center">
         <h3 className="text-xl font-bold text-black">The queue is empty.</h3>
         <p className="mt-2 text-neutral-500">
           There are no new applicants to review at this time.

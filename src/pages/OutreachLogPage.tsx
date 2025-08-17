@@ -16,16 +16,15 @@ const OutreachLogPage: React.FC = () => {
   const [quickLogEventId, setQuickLogEventId] = useState<string>('');
   const [showEventSelector, setShowEventSelector] = useState(false);
 
-  const [advancedSelectedEvent, setAdvancedSelectedEvent] =
-    useState<string>('');
+  const [advancedSelectedEvent] = useState<string>('');
   const [selectedOutcome, setSelectedOutcome] = useState<OutreachOutcome>(
     OutreachOutcome.NOT_SURE
   );
   const [advancedNotes, setAdvancedNotes] = useState('');
 
-  if (!currentUser) return null;
-
   const { userLogs, pastEvents } = useMemo(() => {
+    if (!currentUser) return { userLogs: [], pastEvents: [] };
+
     const logs = allOutreachLogs.filter((log) => log.userId === currentUser.id);
     const events = allEvents
       .filter(
@@ -39,7 +38,7 @@ const OutreachLogPage: React.FC = () => {
       userLogs: logs,
       pastEvents: events,
     };
-  }, [allOutreachLogs, allEvents, currentUser.id]);
+  }, [allOutreachLogs, allEvents, currentUser]);
 
   useEffect(() => {
     if (pastEvents.length > 0 && !quickLogEventId) {
@@ -59,7 +58,7 @@ const OutreachLogPage: React.FC = () => {
   }, [userLogs]);
 
   const handleQuickLog = (outcome: OutreachOutcome) => {
-    if (!quickLogEventId) return;
+    if (!quickLogEventId || !currentUser) return;
     logOutreach(
       {
         eventId: quickLogEventId,
@@ -74,7 +73,7 @@ const OutreachLogPage: React.FC = () => {
 
   const handleAdvancedSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!advancedSelectedEvent) {
+    if (!advancedSelectedEvent || !currentUser) {
       toast.error('Please select an event for the advanced log.');
       return;
     }
@@ -91,6 +90,8 @@ const OutreachLogPage: React.FC = () => {
     toast.success('Outreach logged successfully!');
   };
 
+  if (!currentUser) return null;
+
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
@@ -103,7 +104,7 @@ const OutreachLogPage: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-12">
         {}
         <div className="space-y-12 lg:col-span-2">
           <section>
@@ -149,15 +150,36 @@ const OutreachLogPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                  {Object.values(OutreachOutcome).map((outcome) => (
-                    <button
-                      key={outcome}
-                      onClick={() => handleQuickLog(outcome)}
-                      className="card-brutal-hover p-4 text-center font-bold"
-                    >
-                      {outcome}
-                    </button>
-                  ))}
+                  {Object.values(OutreachOutcome).map((outcome) => {
+                    const getOutcomeColor = (outcome: OutreachOutcome) => {
+                      switch (outcome) {
+                        case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
+                          return 'bg-green-600 text-white hover:bg-green-700';
+                        case OutreachOutcome.BECAME_VEGAN:
+                          return 'bg-green-500 text-white hover:bg-green-600';
+                        case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
+                          return 'bg-blue-600 text-white hover:bg-blue-700';
+                        case OutreachOutcome.MOSTLY_SURE:
+                          return 'bg-yellow-500 text-black hover:bg-yellow-600';
+                        case OutreachOutcome.NOT_SURE:
+                          return 'bg-gray-500 text-white hover:bg-gray-600';
+                        case OutreachOutcome.NO_CHANGE:
+                          return 'bg-red-600 text-white hover:bg-red-700';
+                        default:
+                          return 'bg-black text-white hover:bg-gray-800';
+                      }
+                    };
+
+                    return (
+                      <button
+                        key={outcome}
+                        onClick={() => handleQuickLog(outcome)}
+                        className={`border-2 border-black p-4 text-center font-bold transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${getOutcomeColor(outcome)}`}
+                      >
+                        {outcome}
+                      </button>
+                    );
+                  })}
                 </div>
                 <div className="mt-4">
                   <label htmlFor="quick-notes" className="sr-only">
@@ -189,6 +211,12 @@ const OutreachLogPage: React.FC = () => {
             )}
           </section>
 
+          <div className="space-y-12 lg:col-span-1">
+            <section>
+              <OutreachTally logs={userLogs} />
+            </section>
+          </div>
+
           <section>
             <h2 className="h-section mb-4">Log History</h2>
             {sortedUserLogs.length > 0 ? (
@@ -207,7 +235,27 @@ const OutreachLogPage: React.FC = () => {
                               {log.createdAt.toLocaleDateString()}
                             </p>
                           </div>
-                          <span className="shrink-0 bg-black px-2 py-0.5 text-xs font-bold text-white">
+                          <span
+                            className={`shrink-0 px-2 py-0.5 text-xs font-bold text-white ${
+                              log.outcome ===
+                              OutreachOutcome.BECAME_VEGAN_ACTIVIST
+                                ? 'bg-green-600'
+                                : log.outcome === OutreachOutcome.BECAME_VEGAN
+                                  ? 'bg-green-500'
+                                  : log.outcome ===
+                                      OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST
+                                    ? 'bg-blue-600'
+                                    : log.outcome ===
+                                        OutreachOutcome.MOSTLY_SURE
+                                      ? 'bg-yellow-500'
+                                      : log.outcome === OutreachOutcome.NOT_SURE
+                                        ? 'bg-gray-500'
+                                        : log.outcome ===
+                                            OutreachOutcome.NO_CHANGE
+                                          ? 'bg-red-600'
+                                          : 'bg-black'
+                            }`}
+                          >
                             {log.outcome}
                           </span>
                         </div>
@@ -235,98 +283,6 @@ const OutreachLogPage: React.FC = () => {
         </div>
 
         {}
-        <div className="space-y-12 lg:col-span-1">
-          <section>
-            <OutreachTally logs={userLogs} />
-          </section>
-
-          <section>
-            <details className="card-brutal group">
-              <summary className="h-section cursor-pointer list-none p-4 group-open:border-b-2 group-open:border-black">
-                Advanced Log
-              </summary>
-              <div className="p-4">
-                <p className="mb-4 text-sm text-neutral-600">
-                  Log a conversation for an older event with more detail.
-                </p>
-                <form onSubmit={handleAdvancedSubmit} className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="event-select"
-                      className="mb-1 block text-sm font-bold text-black"
-                    >
-                      Event
-                    </label>
-                    <select
-                      id="event-select"
-                      value={advancedSelectedEvent}
-                      onChange={(e) => setAdvancedSelectedEvent(e.target.value)}
-                      required
-                      className="border-brutal block w-full bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="" disabled>
-                        Select a past event
-                      </option>
-                      {pastEvents.map((event) => (
-                        <option key={event.id} value={event.id}>
-                          {event.location} -{' '}
-                          {new Date(event.startDate).toLocaleDateString()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="outcome-select"
-                      className="mb-1 block text-sm font-bold text-black"
-                    >
-                      Outcome
-                    </label>
-                    <select
-                      id="outcome-select"
-                      value={selectedOutcome}
-                      onChange={(e) =>
-                        setSelectedOutcome(e.target.value as OutreachOutcome)
-                      }
-                      required
-                      className="border-brutal block w-full bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      {Object.values(OutreachOutcome).map((outcome) => (
-                        <option key={outcome} value={outcome}>
-                          {outcome}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="advanced-notes"
-                      className="mb-1 block text-sm font-bold text-black"
-                    >
-                      Notes (Optional)
-                    </label>
-                    <textarea
-                      id="advanced-notes"
-                      value={advancedNotes}
-                      onChange={(e) => setAdvancedNotes(e.target.value)}
-                      rows={3}
-                      className="border-brutal block w-full bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="border-brutal w-full bg-black px-4 py-3 font-bold text-white hover:bg-neutral-800"
-                  >
-                    Log Outcome
-                  </button>
-                </form>
-              </div>
-            </details>
-          </section>
-        </div>
       </div>
     </div>
   );

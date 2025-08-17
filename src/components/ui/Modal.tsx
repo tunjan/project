@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({
         aria-labelledby="modal-title"
       >
         <div
-          className="relative m-4 w-full max-w-lg border-4 border-black bg-white"
+          className="relative m-4 w-full max-w-lg border-2 border-black bg-white"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start justify-between border-b border-black p-6">

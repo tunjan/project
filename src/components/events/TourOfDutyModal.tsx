@@ -68,7 +68,7 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
           return (
             <div
               key={dateString}
-              className="rounded-none border border-black bg-white p-4"
+              className="border-2 border-black bg-white p-4"
             >
               <h4 className="font-bold">
                 {day.toLocaleDateString(undefined, {
@@ -81,7 +81,7 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
                 {availableRoles.map((role) => (
                   <label
                     key={role}
-                    className="flex cursor-pointer items-center space-x-2 rounded-none border border-black p-2 text-sm transition-colors has-[:checked]:bg-primary has-[:checked]:text-white"
+                    className="flex cursor-pointer items-center space-x-2 border-2 border-black p-2 text-sm transition-colors has-[:checked]:bg-primary has-[:checked]:text-white"
                   >
                     <input
                       type="checkbox"

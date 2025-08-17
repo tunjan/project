@@ -72,7 +72,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                 return (
                   <div
                     key={note.id}
-                    className="border-b border-neutral-200 pb-3"
+                    className="border-b-2 border-black pb-3"
                   >
                     {editingNoteId === note.id ? (
                       <div>
@@ -142,7 +142,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
         </div>
         <form
           onSubmit={handleSubmitNote}
-          className="border-t border-black pt-4"
+          className="border-t-2 border-black pt-4"
         >
           <TextAreaField
             label="Add a new note (visible only to organizers)"

@@ -47,7 +47,7 @@ const ApplicantStatusPage: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const { status } = currentUser;
+  const status = currentUser.onboardingStatus;
   const isDenied = status === OnboardingStatus.DENIED;
 
   const steps = [
@@ -97,7 +97,7 @@ const ApplicantStatusPage: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="border border-black bg-white p-6 md:p-8">
+          <div className="border-2 border-black bg-white p-6 md:p-8">
             <div>
               {steps.map((step, index) => (
                 <StatusStep

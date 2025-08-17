@@ -21,7 +21,7 @@ const StatCard: React.FC<{
   value: string | number;
   tooltip?: string;
 }> = ({ icon, title, value, tooltip }) => (
-  <div className="group relative border border-black bg-white p-4">
+  <div className="group relative border-2 border-black bg-white p-4">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
       <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
@@ -90,8 +90,8 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         </p>
       </div>
 
-      {}
-      <div className="mb-8 border border-black bg-white p-4">
+      {/* Filters */}
+      <div className="card-brutal mb-8 p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label
@@ -141,12 +141,12 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
 
       {!isChapterView && <ChapterScorecard />}
 
-      {}
+      {/* Overview */}
       <section className="mb-12">
         <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Overview
         </h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatCard
             icon={<UsersIcon className="h-6 w-6" />}
             title="Total Members"
@@ -170,12 +170,12 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         </div>
       </section>
 
-      {}
+      {/* Key Metrics */}
       <section className="mb-12">
         <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Key Metrics
         </h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <StatCard
             icon={<UsersIcon className="h-6 w-6" />}
             title="Activist Retention"
@@ -191,7 +191,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         </div>
       </section>
 
-      {}
+      {/* Charts */}
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <LineChart
           data={eventTrends.map((t) => ({
@@ -208,7 +208,6 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
           title="New Members per Month"
           lineColor="#000000"
         />
-        {}
         <LineChart
           data={conversationTrends.map((t) => ({
             label: t.month.split(' ')[0],
@@ -223,7 +222,6 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               data={topChaptersByHours}
               title="Top 5 Chapters by Activist Hours"
             />
-            {}
             <ScatterPlot
               data={chapterOutreachStats.map((s) => ({
                 label: s.name,

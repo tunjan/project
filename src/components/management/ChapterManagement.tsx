@@ -57,8 +57,8 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
           <h3 className="mb-4 text-xl font-bold text-black">
             Existing Chapters ({chapters.length})
           </h3>
-          <div className="max-h-[70vh] overflow-y-auto border border-black bg-white">
-            <ul className="divide-y divide-black">
+          <div className="max-h-[70vh] overflow-y-auto border-2 border-black bg-white">
+            <ul className="divide-y-2 divide-black">
               {chapters
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((chapter) => {

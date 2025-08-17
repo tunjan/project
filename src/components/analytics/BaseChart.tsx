@@ -29,7 +29,7 @@ export const BaseChart: React.FC<BaseChartProps> = ({
   children,
 }) => {
   const chartWidth = width - padding * 2;
-  const chartHeight = height - padding;
+  const chartHeight = height - padding * 2; // Corrected: apply padding to top and bottom
 
   const dataMaxValue = Math.max(...data.map((d) => d.value), 0);
   const yAxisTicks = generateAxisTicks(dataMaxValue, 4);
@@ -44,7 +44,7 @@ export const BaseChart: React.FC<BaseChartProps> = ({
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full font-sans">
-      {}
+      {/* Y-Axis Ticks and Gridlines */}
       {yAxisTicks.map((tickValue) => {
         const y = yScale(tickValue);
         return (
@@ -71,12 +71,12 @@ export const BaseChart: React.FC<BaseChartProps> = ({
         );
       })}
 
-      {}
+      {/* X-Axis Labels */}
       {data.map((item, index) => (
         <text
           key={`label-${item.label}`}
           x={xScale(index)}
-          y={height - 5}
+          y={height - padding + 15} // Corrected: position labels within bottom padding
           textAnchor="middle"
           fontSize="10"
           fill="#111827"
@@ -85,7 +85,7 @@ export const BaseChart: React.FC<BaseChartProps> = ({
         </text>
       ))}
 
-      {}
+      {/* Chart Content */}
       {children({
         xScale,
         yScale,

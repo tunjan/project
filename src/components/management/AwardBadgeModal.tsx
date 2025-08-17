@@ -1,8 +1,51 @@
 import React, { useState } from 'react';
 import { type User, type BadgeTemplate } from '@/types';
 import Modal from '@/components/ui/Modal';
-import { BADGE_TEMPLATES } from '@/constants';
+import { InputField, TextAreaField } from '@/components/ui/Form';
 import * as Icons from '@/icons';
+
+const BADGE_TEMPLATES: BadgeTemplate[] = [
+  {
+    name: 'First Cube',
+    description: 'Attended your first Cube of Truth.',
+    icon: 'StarIcon',
+  },
+  {
+    name: 'Road Warrior',
+    description: 'Attended events in 5+ different cities.',
+    icon: 'GlobeAltIcon',
+  },
+  {
+    name: 'Top Orator',
+    description: 'Logged over 100 conversations.',
+    icon: 'SparklesIcon',
+  },
+  {
+    name: 'Veteran Activist',
+    description: 'Contributed over 100 hours of outreach.',
+    icon: 'TrophyIcon',
+  },
+  {
+    name: 'On Fire',
+    description: 'Attended 5 cubes in a single month.',
+    icon: 'FireIcon',
+  },
+  {
+    name: 'Community Pillar',
+    description: 'Attended over 25 cubes total.',
+    icon: 'UsersIcon',
+  },
+  {
+    name: 'Local Legend',
+    description: 'Recognized for exceptional contribution to a chapter.',
+    icon: 'ShieldCheckIcon',
+  },
+  {
+    name: 'Mentor',
+    description: 'Provided outstanding guidance to new activists.',
+    icon: 'AcademicCapIcon',
+  },
+];
 
 interface AwardBadgeModalProps {
   userToAward: User;
@@ -15,9 +58,13 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
   onClose,
   onConfirm,
 }) => {
+  const [awardType, setAwardType] = useState<'standard' | 'custom'>('standard');
   const [selectedBadge, setSelectedBadge] = useState<BadgeTemplate | null>(
     null
   );
+  const [customName, setCustomName] = useState('');
+  const [customDescription, setCustomDescription] = useState('');
+  const customIcon = 'SparklesIcon'; // Use an existing icon for custom prizes.
 
   const userBadgeNames = new Set(userToAward.badges.map((b) => b.name));
   const availableBadges = BADGE_TEMPLATES.filter(
@@ -25,61 +72,135 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
   );
 
   const handleConfirm = () => {
-    if (selectedBadge) {
+    if (awardType === 'standard' && selectedBadge) {
       onConfirm(selectedBadge);
+    } else if (awardType === 'custom' && customName.trim()) {
+      onConfirm({
+        name: customName.trim(),
+        description: customDescription.trim(),
+        icon: customIcon,
+      });
     }
   };
 
+  const TabButton: React.FC<{
+    isActive: boolean;
+    onClick: () => void;
+    children: React.ReactNode;
+  }> = ({ isActive, onClick, children }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`-mb-px border-b-2 px-4 py-2 text-sm font-bold ${
+        isActive
+          ? 'border-primary text-primary'
+          : 'border-transparent text-neutral-500 hover:text-black'
+      }`}
+    >
+      {children}
+    </button>
+  );
+
   return (
     <Modal
-      title={`Award Badge to ${userToAward.name}`}
-      description="Select a badge to recognize their contributions."
+      title={`Award Recognition to ${userToAward.name}`}
+      description="Select a standard recognition or create a custom prize."
       onClose={onClose}
     >
-      <div className="my-6 max-h-80 space-y-2 overflow-y-auto">
-        {availableBadges.map((badge) => {
-          const IconComponent =
-            Icons[badge.icon as keyof typeof Icons] || Icons.TrophyIcon;
-          const isSelected = selectedBadge?.name === badge.name;
-          return (
-            <button
-              key={badge.name}
-              onClick={() => setSelectedBadge(badge)}
-              className={`flex w-full items-center space-x-4 border-2 p-3 text-left transition-all ${
-                isSelected
-                  ? 'border-primary bg-primary/10'
-                  : 'border-black bg-white hover:bg-neutral-50'
-              }`}
-            >
-              <div
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center ${
-                  isSelected ? 'bg-primary text-white' : 'bg-black text-white'
+      <div className="mb-4 border-b border-black">
+        <TabButton
+          isActive={awardType === 'standard'}
+          onClick={() => {
+            setAwardType('standard');
+            setCustomName('');
+            setCustomDescription('');
+          }}
+        >
+          Standard Recognitions
+        </TabButton>
+        <TabButton
+          isActive={awardType === 'custom'}
+          onClick={() => {
+            setAwardType('custom');
+            setSelectedBadge(null);
+          }}
+        >
+          Custom Prize
+        </TabButton>
+      </div>
+
+      <div className="my-6 max-h-80 min-h-[180px] space-y-2 overflow-y-auto">
+        {awardType === 'standard' ? (
+          availableBadges.map((badge) => {
+            const IconComponent =
+              Icons[badge.icon as keyof typeof Icons] || Icons.TrophyIcon;
+            const isSelected = selectedBadge?.name === badge.name;
+            return (
+              <button
+                key={badge.name}
+                onClick={() => setSelectedBadge(badge)}
+                className={`flex w-full items-center space-x-4 border-2 p-3 text-left transition-all ${
+                  isSelected
+                    ? 'border-primary bg-primary/10'
+                    : 'border-black bg-white hover:bg-neutral-50'
                 }`}
               >
-                <IconComponent className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-bold text-black">{badge.name}</p>
-                <p className="text-sm text-neutral-600">{badge.description}</p>
-              </div>
-            </button>
-          );
-        })}
+                <div
+                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center ${
+                    isSelected ? 'bg-primary text-white' : 'bg-black text-white'
+                  }`}
+                >
+                  <IconComponent className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="font-bold text-black">{badge.name}</p>
+                  <p className="text-sm text-neutral-600">
+                    {badge.description}
+                  </p>
+                </div>
+              </button>
+            );
+          })
+        ) : (
+          <div className="space-y-4 p-1">
+            <InputField
+              id="custom-name"
+              label="Prize Name"
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
+              placeholder="e.g., 'Chapter MVP'"
+              required
+            />
+            <TextAreaField
+              id="custom-description"
+              label="Description"
+              value={customDescription}
+              onChange={(e) => setCustomDescription(e.target.value)}
+              placeholder="e.g., For outstanding contributions in Q3."
+              rows={3}
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex items-center space-x-4 pt-4">
         <button
+          type="button"
           onClick={onClose}
           className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
         >
           Cancel
         </button>
         <button
+          type="button"
           onClick={handleConfirm}
-          disabled={!selectedBadge}
+          disabled={
+            (awardType === 'standard' && !selectedBadge) ||
+            (awardType === 'custom' && !customName.trim())
+          }
           className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Award Badge
+          Award Prize
         </button>
       </div>
     </Modal>

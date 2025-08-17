@@ -47,7 +47,7 @@ const CreateChapterForm: React.FC<{
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 border border-black bg-white p-6"
+      className="space-y-4 border-2 border-black bg-white p-6"
     >
       <InputField
         label="Chapter Name"

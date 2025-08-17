@@ -8,7 +8,8 @@ import {
 import { PlusIcon, MegaphoneIcon } from '@/icons';
 import AnnouncementCard from './AnnouncementCard';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAnnouncements, useChapters } from '@/store/appStore';
+import { useChapters } from '@/store/appStore';
+import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { hasOrganizerRole } from '@/utils/auth';
 
 interface AnnouncementsPageProps {
@@ -97,7 +98,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
           ))}
         </div>
       ) : (
-        <div className="border border-black bg-white p-8 text-center">
+        <div className="border-2 border-black bg-white p-8 text-center">
           <MegaphoneIcon className="mx-auto h-12 w-12 text-neutral-300" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No announcements yet.

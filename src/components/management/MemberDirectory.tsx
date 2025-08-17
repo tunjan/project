@@ -81,8 +81,8 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
     });
 
   return (
-    <div className="border border-black bg-white">
-      <div className="border-b border-black p-4">
+    <div className="border-2 border-black bg-white">
+      <div className="border-b-2 border-black p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-4">
             <div className="relative">
@@ -145,7 +145,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       </div>
       {filteredMembers.length > 0 ? (
         <div className="max-h-[70vh] overflow-y-auto">
-          <div className="divide-y divide-black">
+          <div className="divide-y-2 divide-black">
             {filteredMembers.map((user) => (
               <MemberRow
                 key={user.id}

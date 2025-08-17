@@ -37,7 +37,7 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
   const { level, nextTier, progress } = calculateDiscountTier(user);
 
   return (
-    <div className="border border-black bg-white p-6">
+    <div className="border-2 border-black bg-white p-6">
       <div className="mb-4 flex items-center border-b border-black pb-4">
         <div className="text-black">
           <TagIcon className="h-6 w-6" />

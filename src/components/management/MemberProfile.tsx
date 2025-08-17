@@ -115,7 +115,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   const handleAwardBadge = (badge: BadgeTemplate) => {
     if (!currentUser) return;
     awardBadge(currentUser, user, badge);
-    toast.success(`"${badge.name}" badge award sent to ${user.name}.`);
+    toast.success(`Recognition "${badge.name}" sent to ${user.name}.`);
     setAwardBadgeModalOpen(false);
   };
 
@@ -206,7 +206,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           <ChevronLeftIcon className="mr-1 h-5 w-5" /> Back to Member Directory
         </button>
 
-        <div className="mb-8 flex flex-col items-center space-y-4 border border-black bg-white p-6 sm:flex-row sm:space-x-8 sm:space-y-0 md:p-8">
+        <div className="mb-8 flex flex-col items-center space-y-4 border-2 border-black bg-white p-6 sm:flex-row sm:space-x-8 sm:space-y-0 md:p-8">
           <img
             src={user.profilePictureUrl}
             alt={user.name}
@@ -302,7 +302,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                 <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
                   Manage User
                 </h2>
-                <div className="space-y-4 border border-black bg-white p-6">
+                <div className="space-y-4 border-2 border-black bg-white p-6">
                   <div className="flex items-center">
                     <PencilIcon className="mr-3 h-5 w-5 text-black" />
                     <h3 className="text-lg font-bold text-black">
@@ -313,7 +313,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                     id="role-select"
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value as Role)}
-                    className="block w-full rounded-none border border-black bg-white p-2 text-black"
+                    className="block w-full rounded-none border-2 border-black bg-white p-2 text-black"
                   >
                     <option value={user.role} disabled>
                       {user.role} (Current)
@@ -346,7 +346,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                       className="mt-2 flex w-full items-center justify-center border-2 border-yellow-500 bg-yellow-400 px-4 py-2 font-bold text-black hover:bg-yellow-500"
                     >
                       <TrophyIcon className="mr-2 h-5 w-5" />
-                      Award Badge
+                      Award Recognition
                     </button>
                   )}
                 </div>

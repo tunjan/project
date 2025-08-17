@@ -56,11 +56,11 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
   };
 
   return (
-    <div className="rounded-none border border-black bg-white">
+    <div className="border-2 border-black bg-white">
       <div className="p-6 md:p-8">
         <h2 className="mb-4 text-xl font-bold text-black">Event Discussion</h2>
 
-        <div className="divide-y divide-neutral-200">
+        <div className="divide-y-2 divide-black">
           {comments.length > 0 ? (
             comments
               .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())

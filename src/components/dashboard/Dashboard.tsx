@@ -109,7 +109,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         )}
 
         {/* User Profile Header */}
-        <div className="card-brutal mb-12 flex items-center gap-6 p-6 md:gap-8">
+        <div className="card-brutal mb-12 flex flex-col items-center gap-6 p-6 text-center sm:flex-row sm:text-left md:gap-8">
           <img
             src={user.profilePictureUrl}
             alt={user.name}

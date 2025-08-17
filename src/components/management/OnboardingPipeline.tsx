@@ -13,7 +13,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
   return (
     <div
       onClick={() => onNavigate(user)}
-      className="cursor-pointer border border-black bg-white p-3 transition-shadow hover:shadow-md"
+              className="cursor-pointer border-2 border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal"
     >
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center space-x-3">
@@ -45,7 +45,7 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
   users,
   onNavigate,
 }) => (
-  <div className="flex flex-col border border-black bg-neutral-100">
+  <div className="flex flex-col border-2 border-black bg-neutral-100">
     <h3 className="border-b-2 border-black bg-white p-3 text-sm font-extrabold uppercase tracking-wider text-black">
       {title}{' '}
       <span className="font-normal text-neutral-500">({users.length})</span>

@@ -55,7 +55,7 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="animate-fade-in shadow-brutal absolute right-0 top-14 z-30 w-80 border-2 border-black bg-white sm:w-96">
+    <div className="animate-fade-in shadow-brutal absolute right-0 top-14 z-30 w-[80vw] max-w-sm border-2 border-black bg-white sm:w-96">
       <div className="flex items-center justify-between border-b-2 border-black p-3">
         <h3 className="font-bold text-black">Notifications</h3>
         {unreadCount > 0 && (

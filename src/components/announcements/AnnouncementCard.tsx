@@ -4,7 +4,7 @@ import { useCurrentUser } from '@/store/auth.store';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { PencilIcon, TrashIcon } from '@/icons';
 import EditAnnouncementModal from './EditAnnouncementModal';
-import { useAppActions } from '@/store/appStore';
+import { useAnnouncementsActions } from '@/store/announcements.store';
 import { toast } from 'sonner';
 
 interface AnnouncementCardProps {
@@ -47,14 +47,17 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   announcement,
 }) => {
   const currentUser = useCurrentUser();
-  const { deleteAnnouncement } = useAppActions();
+  const { deleteAnnouncement } = useAnnouncementsActions();
   const [isEditing, setIsEditing] = useState(false);
 
-  const formattedDate = announcement.createdAt.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const formattedDate = new Date(announcement.createdAt).toLocaleDateString(
+    undefined,
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }
+  );
 
   if (!currentUser) return null;
 
@@ -77,7 +80,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           onClose={() => setIsEditing(false)}
         />
       )}
-      <div className="overflow-hidden border border-black bg-white">
+      <div className="overflow-hidden border-2 border-black bg-white">
         <div className="p-6">
           <div className="mb-4 flex items-start justify-between">
             <ScopeBadge

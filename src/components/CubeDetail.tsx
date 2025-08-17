@@ -29,7 +29,6 @@ import EventRoster from './events/EventRoster';
 import TourOfDutyModal from './events/TourOfDutyModal';
 import { useCurrentUser } from '@/store/auth.store';
 import { useAppActions, useUsers, useChapters } from '@/store/appStore';
-import { AddToCalendarButton } from 'add-to-calendar-button-react';
 import { toast } from 'sonner';
 import CancelEventModal from './events/CancelEventModal';
 
@@ -413,7 +412,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
               <img
                 src={`https://picsum.photos/seed/${event.id}/1200/400`}
                 alt="Event location photo"
-                className="h-64 w-full object-cover"
+                className="h-48 w-full object-cover sm:h-64"
               />
               <div className="p-6 md:p-8">
                 {event.scope === 'Regional' && (
@@ -533,7 +532,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           </div>
 
           <div className="mt-8 lg:mt-0">
-            <div className="border border-black bg-white p-6 md:p-8">
+            <div className="border-2 border-black bg-white p-6 md:p-8">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-black">Participants</h2>
                 <div className="flex items-center bg-black px-3 py-1 text-sm font-semibold text-white">
@@ -618,25 +617,6 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     <XCircleIcon className="mr-2 h-5 w-5" />
                     Cancel Event
                   </button>
-                )}
-                {isAttending && !isPastEvent && !isCancelled && (
-                  <AddToCalendarButton
-                    name={event.location}
-                    startDate={event.startDate.toISOString().split('T')[0]}
-                    endDate={
-                      (event.endDate || event.startDate)
-                        .toISOString()
-                        .split('T')[0]
-                    }
-                    startTime={event.startDate.toTimeString().slice(0, 5)}
-                    endTime={(event.endDate || event.startDate)
-                      .toTimeString()
-                      .slice(0, 5)}
-                    timeZone="currentBrowser"
-                    location={event.location}
-                    options={['Apple', 'Google', 'Outlook.com']}
-                    listStyle="modal"
-                  />
                 )}
               </div>
             </div>

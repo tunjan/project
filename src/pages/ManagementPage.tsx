@@ -119,7 +119,7 @@ const ManagementPage: React.FC = () => {
           OnboardingStatus.PENDING_APPLICATION_REVIEW,
           OnboardingStatus.AWAITING_VERIFICATION,
         ].includes(u.onboardingStatus) &&
-        u.chapters.some((c) => managedChapterNames.has(c))
+        u.chapters.some((c) => managedChapterNames.has(c))  
     );
 
     return result;

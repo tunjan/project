@@ -44,7 +44,7 @@ const ChapterScorecard: React.FC = () => {
                 <td className="p-3 text-center">
                   <div className="flex items-center justify-center">
                     <span
-                      className={`mr-2 h-3 w-3 rounded-full ${getScoreColor(
+                      className={`mr-2 h-3 w-3 ${getScoreColor(
                         data.healthScore
                       )}`}
                     ></span>

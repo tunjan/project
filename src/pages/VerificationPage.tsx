@@ -44,7 +44,7 @@ const VerificationPage: React.FC = () => {
 
   return (
     <div className="py-16">
-      <div className="mx-auto max-w-md border-4 border-black bg-white p-8 text-center">
+      <div className="mx-auto max-w-md border-2 border-black bg-white p-8 text-center">
         <h1 className="text-2xl font-bold">Confirm Identity</h1>
         <p className="my-4 text-neutral-600">
           You are about to grant full activist permissions to:
