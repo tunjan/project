@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { type AccommodationRequest } from '@/types';
 import { CheckCircleIcon, XCircleIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAppActions } from '@/store/appStore';
+import { useAccommodationsActions } from '@/store';
 
 interface RequestCardProps {
   request: AccommodationRequest;
@@ -17,9 +17,7 @@ const StatusBadge: React.FC<{ status: AccommodationRequest['status'] }> = ({
     Denied: 'bg-red-100 text-red-800',
   };
   return (
-    <span
-      className={`rounded-none px-2 py-0.5 text-xs font-bold ${styles[status]}`}
-    >
+    <span className={`px-2 py-0.5 text-xs font-bold ${styles[status]}`}>
       {status.toUpperCase()}
     </span>
   );
@@ -27,7 +25,7 @@ const StatusBadge: React.FC<{ status: AccommodationRequest['status'] }> = ({
 
 const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   const currentUser = useCurrentUser();
-  const { respondToAccommodationRequest } = useAppActions();
+  const { respondToAccommodationRequest } = useAccommodationsActions();
 
   const [reply, setReply] = useState('');
 

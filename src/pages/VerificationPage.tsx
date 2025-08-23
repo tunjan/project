@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useUserById } from '@/store/appStore';
-import { useAppActions } from '@/store/appStore';
+import { useUserById, useUsersActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { hasOrganizerRole } from '@/utils/auth';
 import { OnboardingStatus } from '@/types';
@@ -12,7 +11,7 @@ const VerificationPage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const userToVerify = useUserById(userId);
-  const { confirmUserIdentity } = useAppActions();
+  const { confirmUserIdentity } = useUsersActions();
 
   if (!currentUser || !hasOrganizerRole(currentUser)) {
     return (

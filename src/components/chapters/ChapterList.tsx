@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { type Chapter } from '@/types';
 import { getChapterStats, ChapterStats } from '@/utils/analytics';
-import { useUsers, useEvents, useChapters } from '@/store/appStore';
+import { useUsers, useEvents, useChapters } from '@/store';
 import { SearchIcon } from '@/icons';
 
 // A small helper component for stats on mobile
@@ -130,7 +130,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="e.g. Berlin or USA"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border border-neutral-300 bg-white py-2 pl-10 pr-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                className="block w-full border border-neutral-300 bg-white py-2 pl-10 pr-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               />
             </div>
           </div>
@@ -146,7 +146,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               name="region-filter"
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             >
               {availableRegions.map((region) => (
                 <option key={region} value={region}>

@@ -1,32 +1,30 @@
-import React, { useReducer } from 'react';
+import React from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { type OnboardingAnswers, type Chapter } from '@/types';
 import { InputField, TextAreaField, SelectField } from '@/components/ui/Form';
 
-// --- Form State Management ---
-interface FormState {
-  name: string;
-  email: string;
-  instagram: string;
-  chapter: string;
-  veganReason: string;
-  abolitionistAlignment: boolean;
-  customAnswer: string;
-}
+// 1. Define the validation schema with Zod
+const signUpSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  instagram: z.string().optional(),
+  chapter: z.string().min(1, 'Please select a chapter'),
+  veganReason: z.string().min(10, 'Please provide a reason (min. 10 characters)'),
+  // Radio button values are strings, so we transform them to boolean
+  abolitionistAlignment: z
+    .enum(['true', 'false'], {
+      errorMap: () => ({ message: 'Please select an option' }),
+    })
+    .transform((val) => val === 'true'),
+  customAnswer: z
+    .string()
+    .min(10, 'Please provide an answer (min. 10 characters)'),
+});
 
-type FormAction =
-  | { type: 'SET_FIELD'; field: keyof FormState; value: any }
-  | { type: 'RESET' };
-
-const formReducer = (state: FormState, action: FormAction): FormState => {
-  switch (action.type) {
-    case 'SET_FIELD':
-      return { ...state, [action.field]: action.value };
-    case 'RESET':
-      return { ...action.value }; // expects a full initial state object
-    default:
-      return state;
-  }
-};
+// 2. Infer the TypeScript type from the schema
+type SignUpFormSchema = z.infer<typeof signUpSchema>;
 
 interface SignUpProps {
   chapters: Chapter[];
@@ -45,36 +43,30 @@ const SignUp: React.FC<SignUpProps> = ({
   onRegister,
   onNavigateLogin,
 }) => {
-  const initialState: FormState = {
-    name: '',
-    email: '',
-    instagram: '',
-    chapter: chapters[0]?.name || '',
-    veganReason: '',
-    abolitionistAlignment: false,
-    customAnswer: '',
-  };
+  // 3. Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormSchema>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      chapter: chapters[0]?.name || '',
+    },
+  });
 
-  const [state, dispatch] = useReducer(formReducer, initialState);
-
-  const handleFieldChange = (
-    field: keyof FormState,
-    value: string | boolean
-  ) => {
-    dispatch({ type: 'SET_FIELD', field, value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 4. Create a submit handler that receives validated data
+  const onSubmit: SubmitHandler<SignUpFormSchema> = (data) => {
+    // Restructure the flat form data to match the expected nested structure for onRegister
     onRegister({
-      name: state.name,
-      email: state.email,
-      instagram: state.instagram,
-      chapter: state.chapter,
+      name: data.name,
+      email: data.email,
+      instagram: data.instagram || '',
+      chapter: data.chapter,
       answers: {
-        veganReason: state.veganReason,
-        abolitionistAlignment: state.abolitionistAlignment,
-        customAnswer: state.customAnswer,
+        veganReason: data.veganReason,
+        abolitionistAlignment: data.abolitionistAlignment,
+        customAnswer: data.customAnswer,
       },
     });
   };
@@ -91,34 +83,33 @@ const SignUp: React.FC<SignUpProps> = ({
             chapter will review it.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-6 p-8">
+        {/* 5. Connect handleSubmit to the form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-8">
+          {/* 6. Connect fields with `register` and pass errors */}
           <InputField
             label="Full Name"
             id="name"
-            value={state.name}
-            onChange={(e) => handleFieldChange('name', e.target.value)}
-            required
+            {...register('name')}
+            error={errors.name?.message}
           />
           <InputField
             label="Email Address"
             id="email"
             type="email"
-            value={state.email}
-            onChange={(e) => handleFieldChange('email', e.target.value)}
-            required
+            {...register('email')}
+            error={errors.email?.message}
           />
           <InputField
             label="Instagram Handle (Optional)"
             id="instagram"
-            value={state.instagram}
-            onChange={(e) => handleFieldChange('instagram', e.target.value)}
+            {...register('instagram')}
+            error={errors.instagram?.message}
           />
-
           <SelectField
             label="Local Chapter"
             id="chapter"
-            value={state.chapter}
-            onChange={(e) => handleFieldChange('chapter', e.target.value)}
+            {...register('chapter')}
+            error={errors.chapter?.message}
           >
             {chapters.map((ch) => (
               <option key={ch.name} value={ch.name}>
@@ -132,10 +123,9 @@ const SignUp: React.FC<SignUpProps> = ({
           <TextAreaField
             label="Why did you go vegan?"
             id="veganReason"
-            value={state.veganReason}
-            onChange={(e) => handleFieldChange('veganReason', e.target.value)}
+            {...register('veganReason')}
             rows={3}
-            required
+            error={errors.veganReason?.message}
           />
 
           <fieldset>
@@ -147,11 +137,8 @@ const SignUp: React.FC<SignUpProps> = ({
               <label className="flex items-center space-x-2">
                 <input
                   type="radio"
-                  name="abolitionist"
-                  checked={state.abolitionistAlignment === true}
-                  onChange={() =>
-                    handleFieldChange('abolitionistAlignment', true)
-                  }
+                  value="true"
+                  {...register('abolitionistAlignment')}
                   className="accent-primary"
                 />
                 <span>Yes</span>
@@ -159,25 +146,26 @@ const SignUp: React.FC<SignUpProps> = ({
               <label className="flex items-center space-x-2">
                 <input
                   type="radio"
-                  name="abolitionist"
-                  checked={state.abolitionistAlignment === false}
-                  onChange={() =>
-                    handleFieldChange('abolitionistAlignment', false)
-                  }
+                  value="false"
+                  {...register('abolitionistAlignment')}
                   className="accent-primary"
                 />
                 <span>No / Unsure</span>
               </label>
             </div>
+            {errors.abolitionistAlignment && (
+              <p className="mt-1 text-xs font-semibold text-primary">
+                {errors.abolitionistAlignment.message}
+              </p>
+            )}
           </fieldset>
 
           <TextAreaField
             label="How can you best contribute to your local chapter? (e.g., skills, availability)"
             id="customAnswer"
-            value={state.customAnswer}
-            onChange={(e) => handleFieldChange('customAnswer', e.target.value)}
+            {...register('customAnswer')}
             rows={3}
-            required
+            error={errors.customAnswer?.message}
           />
 
           <div className="pt-4">

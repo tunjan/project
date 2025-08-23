@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { type BadgeAward, type BadgeTemplate, type User } from '@/types';
+import { type BadgeAward, type BadgeTemplate, type User, type EarnedBadge, NotificationType } from '@/types';
 import { processedBadgeAwards } from './initialData';
+import { useNotificationsStore } from './notifications.store';
 
 export interface AwardsState {
   badgeAwards: BadgeAward[];
@@ -26,11 +27,58 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
           createdAt: new Date(),
         };
         set((state) => ({ badgeAwards: [...state.badgeAwards, newAward] }));
+
+        useNotificationsStore.getState().addNotification({
+          userId: recipient.id,
+          type: NotificationType.BADGE_AWARDED,
+          message: `${awarder.name} has awarded you the "${badgeTemplate.name}" badge!`,
+          linkTo: '/dashboard',
+          relatedUser: awarder,
+        });
       },
       respondToBadgeAward: (awardId, response) => {
-        set((state) => ({
-          badgeAwards: state.badgeAwards.map((a) => (a.id === awardId ? { ...a, status: response } : a)),
-        }));
+        let award: BadgeAward | undefined;
+
+        set((state) => {
+          award = state.badgeAwards.find((a) => a.id === awardId);
+          if (!award) return state;
+
+          const updatedAwards = state.badgeAwards.map((a) =>
+            a.id === awardId ? { ...a, status: response } : a
+          );
+
+          if (response === 'Accepted') {
+            // Add badge to user - handled via cross-store communication
+            import('./users.store').then(({ useUsersStore }) => {
+              const usersStore = useUsersStore.getState();
+              const user = usersStore.users.find(u => u.id === award!.recipient.id);
+              if (user) {
+                const newBadge: EarnedBadge = {
+                  id: `badge_${Date.now()}`,
+                  ...award!.badge,
+                  awardedAt: new Date(),
+                };
+                usersStore.updateProfile(user.id, {
+                  badges: [...user.badges, newBadge],
+                });
+              }
+            });
+          }
+
+          return { badgeAwards: updatedAwards };
+        });
+
+        if (award) {
+          useNotificationsStore.getState().addNotification({
+            userId: award.awarder.id,
+            type: response === 'Accepted'
+              ? NotificationType.BADGE_AWARD_ACCEPTED
+              : NotificationType.BADGE_AWARD_REJECTED,
+            message: `${award.recipient.name} has ${response.toLowerCase()} the "${award.badge.name}" badge.`,
+            linkTo: `/members/${award.recipient.id}`,
+            relatedUser: award.recipient,
+          });
+        }
       },
     }),
     { name: 'awards-store' }
@@ -40,5 +88,14 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
 export const useAwardsState = () => useAwardsStore((s) => s.badgeAwards);
 export const useAwardsActions = () =>
   useAwardsStore((s) => ({ awardBadge: s.awardBadge, respondToBadgeAward: s.respondToBadgeAward }));
+
+// Selectors
+export const useBadgeAwardsForUser = (userId?: string) =>
+  useAwardsStore((s) => {
+    if (!userId) return [];
+    return s.badgeAwards.filter(
+      (award) => award.recipient.id === userId && award.status === 'Pending'
+    );
+  });
 
 

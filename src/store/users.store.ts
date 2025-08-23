@@ -1,10 +1,15 @@
 import { create } from 'zustand';
-import { type User, Role, OnboardingStatus, type OrganizerNote } from '@/types';
+import { type User, Role, OnboardingStatus, type OrganizerNote, NotificationType } from '@/types';
 import { persist } from 'zustand/middleware';
+import nacl from 'tweetnacl';
+import naclUtil from 'tweetnacl-util';
 import {
   processedUsers,
-  Role as RoleEnum,
 } from './initialData';
+import { ROLE_HIERARCHY } from '@/utils/auth';
+import { type OnboardingAnswers } from '@/types';
+import { useNotificationsStore } from './notifications.store';
+import { useAuthStore } from './auth.store';
 
 export interface UsersState {
   users: User[];
@@ -16,7 +21,7 @@ export interface UsersActions {
     instagram: string;
     chapter: string;
     email: string;
-    answers: any; // keep typed through types if needed
+    answers: OnboardingAnswers;
   }) => void;
   updateUserStatus: (
     userId: string,
@@ -67,14 +72,42 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           joinDate: new Date(),
         };
         set((state) => ({ users: [...state.users, newUser] }));
+
+        // Find organizers of the chapter and notify them
+        const chapterOrganizers = get().users.filter(
+          (u) =>
+            u.role === Role.CHAPTER_ORGANISER &&
+            u.organiserOf?.includes(formData.chapter)
+        );
+
+        const notificationsToCreate = chapterOrganizers.map((org) => ({
+          userId: org.id,
+          type: NotificationType.NEW_APPLICANT,
+          message: `${formData.name} has applied to join the ${formData.chapter} chapter.`,
+          linkTo: '/manage',
+          relatedUser: newUser,
+        }));
+        useNotificationsStore.getState().addNotifications(notificationsToCreate);
       },
 
-      updateUserStatus: (userId, status) => {
+      updateUserStatus: (userId, status, approver) => {
         set((state) => ({
           users: state.users.map((u) =>
             u.id === userId ? { ...u, onboardingStatus: status } : u
           ),
         }));
+
+        const user = get().users.find((u) => u.id === userId);
+        if (user && approver) {
+          if (status === OnboardingStatus.AWAITING_VERIFICATION) {
+            useNotificationsStore.getState().addNotification({
+              userId: user.id,
+              type: NotificationType.REQUEST_ACCEPTED,
+              message: `Your application for ${user.chapters[0]} was approved by ${approver.name}! Get verified in person.`,
+              linkTo: '/dashboard',
+            });
+          }
+        }
       },
 
       completeOnboardingCall: (userId) => {
@@ -88,15 +121,19 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       },
 
       confirmUserIdentity: (userId) => {
-        // Keep behavior minimal in slice; complex logic can be handled in a service if needed
+        const keyPair = nacl.box.keyPair();
+        const secretKey = naclUtil.encodeBase64(keyPair.secretKey);
+        const publicKey = naclUtil.encodeBase64(keyPair.publicKey);
+
         set((state) => ({
           users: state.users.map((u) =>
             u.id === userId
               ? {
-                  ...u,
-                  onboardingStatus: OnboardingStatus.CONFIRMED,
-                  role: Role.CONFIRMED_ACTIVIST,
-                }
+                ...u,
+                onboardingStatus: OnboardingStatus.CONFIRMED,
+                role: Role.CONFIRMED_ACTIVIST,
+                cryptoId: { publicKey, secretKey },
+              }
               : u
           ),
         }));
@@ -107,9 +144,17 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           users: state.users.map((u) => {
             if (u.id !== userId) return u;
             const changes: Partial<User> = { role };
-            if ((RoleEnum as any)[role] < (RoleEnum as any)[Role.CHAPTER_ORGANISER])
-              (changes as any).organiserOf = [];
-            return { ...u, ...changes };
+            if (ROLE_HIERARCHY[role] < ROLE_HIERARCHY[Role.CHAPTER_ORGANISER])
+              changes.organiserOf = [];
+
+            const updatedUser = { ...u, ...changes };
+
+            // If the updated user is the current logged-in user, update auth store as well
+            if (useAuthStore.getState().currentUser?.id === updatedUser.id) {
+              useAuthStore.getState().updateCurrentUser(updatedUser);
+            }
+
+            return updatedUser;
           }),
         })),
 
@@ -118,10 +163,10 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           users: state.users.map((u) =>
             u.id === userId
               ? {
-                  ...u,
-                  role: Role.CHAPTER_ORGANISER,
-                  organiserOf: [...new Set(chaptersToOrganise)],
-                }
+                ...u,
+                role: Role.CHAPTER_ORGANISER,
+                organiserOf: [...new Set(chaptersToOrganise)],
+              }
               : u
           ),
         })),
@@ -139,6 +184,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         set((state) => ({
           users: state.users.map((u) => (u.id === userId ? { ...u, ...fullUpdate } : u)),
         }));
+        useAuthStore.getState().updateCurrentUser(fullUpdate);
       },
 
       deleteUser: (userIdToDelete) => {
@@ -207,6 +253,7 @@ export const useUsersActions = () =>
     deleteOrganizerNote: s.deleteOrganizerNote,
   }));
 
+// Selectors
 export const useUserById = (userId?: string) =>
   useUsersStore((s) => s.users.find((u) => u.id === userId));
 

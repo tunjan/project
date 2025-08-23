@@ -1,6 +1,7 @@
 import React from 'react';
 import { type Notification } from '@/types';
 import { BellIcon } from '@/icons';
+import { Link } from 'react-router-dom';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -51,6 +52,7 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
   notifications,
   onNotificationClick,
   onMarkAllRead,
+  onClose,
 }) => {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -70,13 +72,15 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
 
       <div className="max-h-96 divide-y divide-neutral-200 overflow-y-auto">
         {notifications.length > 0 ? (
-          notifications.map((n) => (
-            <NotificationItem
-              key={n.id}
-              notification={n}
-              onNotificationClick={onNotificationClick}
-            />
-          ))
+          notifications
+            .slice(0, 5)
+            .map((n) => (
+              <NotificationItem
+                key={n.id}
+                notification={n}
+                onNotificationClick={onNotificationClick}
+              />
+            ))
         ) : (
           <div className="p-8 text-center text-neutral-500">
             <BellIcon className="mx-auto h-8 w-8 text-neutral-300" />
@@ -84,6 +88,17 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
           </div>
         )}
       </div>
+      {notifications.length > 0 && (
+        <div className="border-t-2 border-black p-2 text-center">
+          <Link
+            to="/notifications"
+            onClick={onClose}
+            className="text-sm font-bold text-primary hover:underline"
+          >
+            View All Notifications
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

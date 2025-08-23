@@ -1,14 +1,21 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { hasOrganizerRole } from '@/utils/auth';
-import { useEvents, useChapters } from '@/store/appStore';
+import { useEvents, useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import CubeCard from '@/components/CubeCard';
 import CubeMap from '@/components/CubeMap';
-import { PlusIcon, ListBulletIcon, MapIcon, SearchIcon } from '@/icons';
+import CubeCalendar from '@/components/CubeCalendar';
+import {
+  PlusIcon,
+  ListBulletIcon,
+  MapIcon,
+  SearchIcon,
+  CalendarIcon,
+} from '@/icons';
 import { type CubeEvent, type Chapter } from '@/types';
 
-type CubesView = 'list' | 'map';
+type CubesView = 'list' | 'map' | 'calendar';
 type EventTimeView = 'upcoming' | 'past';
 
 const ViewToggleButton: React.FC<{
@@ -73,8 +80,8 @@ const CubeListPage: React.FC = () => {
         if (!aAffiliated && bAffiliated) return 1;
 
         return eventTimeView === 'past'
-          ? b.startDate.getTime() - a.startDate.getTime()
-          : a.startDate.getTime() - b.startDate.getTime();
+          ? new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+          : new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
       });
   }, [
     allEvents,
@@ -167,6 +174,13 @@ const CubeListPage: React.FC = () => {
             <MapIcon className="h-5 w-5" />
             <span>Map</span>
           </ViewToggleButton>
+          <ViewToggleButton
+            onClick={() => setCubesView('calendar')}
+            isActive={cubesView === 'calendar'}
+          >
+            <CalendarIcon className="h-5 w-5" />
+            <span>Calendar</span>
+          </ViewToggleButton>
         </div>
       </div>
 
@@ -188,11 +202,16 @@ const CubeListPage: React.FC = () => {
               );
             })}
           </div>
-        ) : (
+        ) : cubesView === 'map' ? (
           <CubeMap
             events={eventsToDisplay}
             onSelectCube={handleSelectCube}
             chapters={chapters}
+          />
+        ) : (
+          <CubeCalendar
+            events={eventsToDisplay}
+            onSelectEvent={handleSelectCube}
           />
         )
       ) : (

@@ -1,16 +1,17 @@
-import React, { Suspense } from 'react';
-import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom';
+import React from 'react';
+import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '@/layouts/MainLayout';
 import AuthLayout from '@/layouts/AuthLayout';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import { useCurrentUser } from '@/store/auth.store';
+import RootSuspense from './RootSuspense';
+import IndexRedirect from './IndexRedirect';
 
 const CubeListPage = React.lazy(() => import('@/pages/CubeListPage'));
 const CubeDetailPage = React.lazy(() => import('@/pages/CubeDetailPage'));
 const CreateCubePage = React.lazy(() => import('@/pages/CreateCubePage'));
 const ManageEventPage = React.lazy(() => import('@/pages/ManageEventPage'));
 const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
+
 const ManagementPage = React.lazy(() => import('@/pages/ManagementPage'));
 const MemberProfilePage = React.lazy(() => import('@/pages/MemberProfilePage'));
 const AnalyticsPage = React.lazy(() => import('@/pages/AnalyticsPage'));
@@ -31,23 +32,7 @@ const PublicProfilePage = React.lazy(() => import('@/pages/PublicProfilePage'));
 const ApplicantStatusPage = React.lazy(
   () => import('@/pages/ApplicantStatusPage')
 ); // NEW
-
-const RootSuspense = () => (
-  <Suspense
-    fallback={
-      <div className="flex h-screen items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    }
-  >
-    <Outlet />
-  </Suspense>
-);
-
-const IndexRedirect = () => {
-  const currentUser = useCurrentUser();
-  return <Navigate to={currentUser ? '/dashboard' : '/cubes'} replace />;
-};
+const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +60,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute>
                 <ApplicantStatusPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'notifications',
+            element: (
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             ),
           },
@@ -151,6 +144,7 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
+
           {
             path: 'manage/member/:userId',
             element: (

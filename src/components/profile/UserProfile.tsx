@@ -17,11 +17,7 @@ import {
   MapIcon,
   ChevronLeftIcon,
 } from '@/icons';
-import {
-  useAppActions,
-  useEvents,
-  useBadgeAwardsForUser,
-} from '@/store/appStore';
+import { useUsersActions, useEvents, useBadgeAwardsForUser } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import UserActivityChart from '@/components/profile/UserActivityChart';
 import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
@@ -49,11 +45,12 @@ const QuickActionButton: React.FC<{
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { updateProfile } = useAppActions();
+  const { updateProfile } = useUsersActions();
   const allEvents = useEvents();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
 
+  // CONSOLIDATED LOGIC: This boolean now controls all view variations.
   const isOwnProfile = currentUser?.id === user.id;
 
   const pendingAwards = useBadgeAwardsForUser(currentUser?.id);
@@ -77,6 +74,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
 
   return (
     <>
+      {/* MODAL LOGIC (OWNER ONLY) */}
       {isOwnProfile && isEditModalOpen && (
         <EditProfileModal
           user={user}
@@ -92,6 +90,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
         />
       )}
       <div className="py-8 md:py-12">
+        {/* PENDING VERIFICATION BANNER (OWNER ONLY) */}
         {isOwnProfile && user.onboardingStatus === 'Awaiting Verification' && (
           <div
             className="shadow-brutal mb-8 border-2 border-black bg-yellow-300 p-4"
@@ -120,6 +119,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           </div>
         )}
 
+        {/* BACK BUTTON (PUBLIC/MANAGEMENT VIEW ONLY) */}
         {!isOwnProfile && (
           <button
             onClick={() => navigate(-1)}
@@ -129,7 +129,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           </button>
         )}
 
-        <div className="card-brutal mb-12 flex flex-col gap-6 border-none bg-transparent p-6 md:gap-8 lg:flex-row lg:items-center lg:border-solid">
+        {/* HEADER SECTION */}
+        <div className="card-brutal mb-12 flex flex-col items-center gap-6 p-6 text-center sm:flex-row sm:text-left md:gap-8">
           <img
             src={user.profilePictureUrl}
             alt={user.name}
@@ -153,6 +154,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
               </a>
             )}
           </div>
+          {/* EDIT BUTTON (OWNER ONLY) */}
           {isOwnProfile && (
             <button
               onClick={() => setIsEditModalOpen(true)}
@@ -164,12 +166,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           )}
         </div>
 
+        {/* MAIN CONTENT GRID */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
+            {/* PENDING AWARDS (OWNER ONLY) */}
             {isOwnProfile && (
               <BadgeAwardsDashboard pendingAwards={pendingAwards} />
             )}
 
+            {/* QUICK ACTIONS (OWNER ONLY) */}
             {isOwnProfile && (
               <section>
                 <h2 className="h-section">Quick Actions</h2>
@@ -219,6 +224,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
               <DiscountTierProgress user={user} />
             </section>
 
+            {/* HOSTING DASHBOARD (OWNER ONLY) */}
             {isOwnProfile && (
               <section>
                 <h2 className="h-section">Hosting</h2>

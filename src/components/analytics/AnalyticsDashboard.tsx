@@ -79,8 +79,8 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
   if (!overviewStats) return null;
 
   return (
-    <div className="py-8 md:py-12">
-      <div className="mb-8 md:mb-12">
+    <div className="py-12">
+      <div className="mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Analytics: {viewTitle}
         </h1>
@@ -91,8 +91,8 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       </div>
 
       {/* Filters */}
-      <div className="card-brutal mb-8 p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="card-brutal mb-12 p-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label
               htmlFor="country-filter"
@@ -142,11 +142,11 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       {!isChapterView && <ChapterScorecard />}
 
       {/* Overview */}
-      <section className="mb-12">
-        <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
+      <section className="mb-16">
+        <h2 className="mb-6 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Overview
         </h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           <StatCard
             icon={<UsersIcon className="h-6 w-6" />}
             title="Total Members"
@@ -171,11 +171,11 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       </section>
 
       {/* Key Metrics */}
-      <section className="mb-12">
-        <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
+      <section className="mb-16">
+        <h2 className="mb-6 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Key Metrics
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <StatCard
             icon={<UsersIcon className="h-6 w-6" />}
             title="Activist Retention"
@@ -192,7 +192,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       </section>
 
       {/* Charts */}
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <section className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         <LineChart
           data={eventTrends.map((t) => ({
             label: t.month.split(' ')[0],
@@ -243,7 +243,9 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         )}
       </section>
 
-      <Challenges />
+      <div className="mt-16">
+        <Challenges />
+      </div>
     </div>
   );
 };

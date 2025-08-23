@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Import Link
 import { type User } from '@/types';
 import { hasOrganizerRole } from '@/utils/auth';
 
@@ -48,6 +49,16 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
             </button>
           ))}
         </div>
+        {/* NEW: Added a link to the sign-up page */}
+        <p className="mt-8 text-center text-sm text-neutral-600">
+          Don't have an account?{' '}
+          <Link
+            to="/signup"
+            className="font-bold text-primary hover:underline"
+          >
+            Sign Up
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ManageEventForm from '@/components/events/ManageEventForm';
-import { useEventById, useAppActions } from '@/store/appStore';
+import { useEventById, useEventsActions } from '@/store';
 import { type EventReport } from '@/types';
 import { toast } from 'sonner';
 
@@ -9,7 +9,7 @@ const ManageEventPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const event = useEventById(eventId!);
-  const { logEventReport } = useAppActions();
+  const { logEventReport } = useEventsActions();
 
   if (!event) {
     return <div className="py-16 text-center">Event not found.</div>;

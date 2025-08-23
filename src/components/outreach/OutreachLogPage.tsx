@@ -2,8 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { type CubeEvent, type OutreachLog, OutreachOutcome } from '@/types';
 import OutreachTally from './OutreachTally';
 import { useCurrentUser } from '@/store/auth.store';
-import { useEvents, useOutreachLogs, useAppActions } from '@/store/appStore';
+import { useEvents, useOutreachLogs, useOutreachActions } from '@/store';
 import { toast } from 'sonner';
+import { CalendarIcon, FilterIcon } from '@/icons';
+
 interface OutreachLogPageProps {}
 
 const LogHistoryItem: React.FC<{ log: OutreachLog; event?: CubeEvent }> = ({
@@ -43,7 +45,7 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
   const currentUser = useCurrentUser();
   const allOutreachLogs = useOutreachLogs();
   const allEvents = useEvents();
-  const { logOutreach } = useAppActions();
+  const { logOutreach } = useOutreachActions();
 
   if (!currentUser) return null;
 
@@ -63,17 +65,42 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
     OutreachOutcome.NOT_SURE
   );
   const [notes, setNotes] = useState('');
+  const [dateFilter, setDateFilter] = useState<string>('all');
+  const [isQuickMode, setIsQuickMode] = useState<boolean>(false);
 
-  const sortedUserLogs = useMemo(() => {
-    return [...userLogs].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+  const filteredAndSortedLogs = useMemo(() => {
+    let filtered = [...userLogs];
+
+    // Apply date filter
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const cutoffDate = new Date();
+
+      switch (dateFilter) {
+        case 'week':
+          cutoffDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          cutoffDate.setMonth(now.getMonth() - 1);
+          break;
+        case 'year':
+          cutoffDate.setFullYear(now.getFullYear() - 1);
+          break;
+      }
+
+      filtered = filtered.filter((log) => log.createdAt >= cutoffDate);
+    }
+
+    return filtered.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  }, [userLogs]);
+  }, [userLogs, dateFilter]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEvent) {
-      alert('Please select an event.');
+      toast.error('Please select an event.');
       return;
     }
     logOutreach(
@@ -87,7 +114,22 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
 
     setNotes('');
     setSelectedOutcome(OutreachOutcome.NOT_SURE);
+    setIsQuickMode(false);
     toast.success('Outreach logged successfully!');
+  };
+
+  const handleQuickLog = (outcome: OutreachOutcome) => {
+    setSelectedOutcome(outcome);
+    setIsQuickMode(true);
+    // Scroll to form or highlight it briefly
+    const form = document.getElementById('outreach-form');
+    if (form) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      form.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+      setTimeout(() => {
+        form.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+      }, 2000);
+    }
   };
 
   return (
@@ -106,14 +148,44 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
         <OutreachTally logs={userLogs} />
       </div>
 
+      {/* Quick Log Buttons */}
+      <div className="mb-8">
+        <h2 className="mb-4 text-xl font-bold text-black">Quick Log</h2>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+          {Object.values(OutreachOutcome).map((outcome) => (
+            <button
+              key={outcome}
+              onClick={() => handleQuickLog(outcome)}
+              className="border-2 border-black bg-white p-3 text-center text-sm font-semibold transition-colors duration-200 hover:bg-neutral-50"
+              disabled={userEvents.length === 0}
+            >
+              {outcome}
+            </button>
+          ))}
+        </div>
+        {userEvents.length === 0 && (
+          <p className="mt-2 text-sm text-neutral-500">
+            No past events available for logging. Attend an event first to log
+            conversations.
+          </p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <h2 className="mb-4 border-b-2 border-primary pb-2 text-xl font-bold text-black">
             Log a Conversation
           </h2>
+          {isQuickMode && (
+            <div className="bg-primary-light mb-4 rounded border border-primary p-3 text-sm">
+              <strong>Quick Mode:</strong> {selectedOutcome} selected. Fill in
+              the details below.
+            </div>
+          )}
           <form
+            id="outreach-form"
             onSubmit={handleSubmit}
-            className="space-y-4 border-2 border-black bg-white p-6"
+            className="space-y-4 border-2 border-black bg-white p-6 transition-all duration-200"
           >
             <div>
               <label
@@ -195,24 +267,53 @@ const OutreachLogPage: React.FC<OutreachLogPageProps> = () => {
         </div>
 
         <div className="lg:col-span-2">
-          <h2 className="mb-4 border-b-2 border-primary pb-2 text-xl font-bold text-black">
-            Log History
-          </h2>
-          {sortedUserLogs.length > 0 ? (
-            <div className="max-h-[600px] space-y-4 overflow-y-auto pr-2">
-              {sortedUserLogs.map((log) => (
-                <LogHistoryItem
-                  key={log.id}
-                  log={log}
-                  event={allEvents.find((e) => e.id === log.eventId)}
-                />
-              ))}
+          <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="border-b-2 border-primary pb-2 text-xl font-bold text-black sm:border-b-0 sm:pb-0">
+              Log History
+            </h2>
+            <div className="flex items-center gap-2">
+              <FilterIcon className="h-4 w-4 text-neutral-500" />
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="rounded border border-neutral-300 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="all">All Time</option>
+                <option value="week">Past Week</option>
+                <option value="month">Past Month</option>
+                <option value="year">Past Year</option>
+              </select>
             </div>
+          </div>
+
+          {filteredAndSortedLogs.length > 0 ? (
+            <>
+              <div className="mb-3 text-sm text-neutral-600">
+                Showing {filteredAndSortedLogs.length} of {userLogs.length}{' '}
+                total logs
+                {dateFilter !== 'all' && ` (${dateFilter})`}
+              </div>
+              <div className="max-h-[600px] space-y-4 overflow-y-auto pr-2">
+                {filteredAndSortedLogs.map((log) => (
+                  <LogHistoryItem
+                    key={log.id}
+                    log={log}
+                    event={allEvents.find((e) => e.id === log.eventId)}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <div className="flex h-full flex-col justify-center border-2 border-black bg-white p-8 text-center">
-              <h3 className="text-xl font-bold text-black">No logs yet.</h3>
+              <h3 className="text-xl font-bold text-black">
+                {dateFilter === 'all'
+                  ? 'No logs yet.'
+                  : `No logs found for ${dateFilter}.`}
+              </h3>
               <p className="mt-2 text-neutral-500">
-                Use the form to add your first outreach outcome.
+                {dateFilter === 'all'
+                  ? 'Use the form to add your first outreach outcome.'
+                  : 'Try adjusting the time filter or add more logs.'}
               </p>
             </div>
           )}

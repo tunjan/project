@@ -1,10 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  useUsers,
-  useChapters,
-  useOutreachLogs,
-  useEvents,
-} from '@/store/appStore';
+import { useUsers, useChapters, useOutreachLogs, useEvents } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { calculateLeaderboards, type Timeframe } from '@/utils/leaderboard';
 import Leaderboard from '@/components/leaderboard/Leaderboard';

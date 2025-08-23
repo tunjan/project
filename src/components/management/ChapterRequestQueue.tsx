@@ -1,6 +1,6 @@
 import React from 'react';
 import { type ChapterJoinRequest, type User } from '@/types';
-import { useAppActions } from '@/store/appStore';
+import { useChaptersActions } from '@/store';
 import { toast } from 'sonner';
 
 interface ChapterRequestQueueProps {
@@ -56,7 +56,8 @@ const ChapterRequestQueue: React.FC<ChapterRequestQueueProps> = ({
   requests,
   currentUser,
 }) => {
-  const { approveChapterJoinRequest, denyChapterJoinRequest } = useAppActions();
+  const { approveChapterJoinRequest, denyChapterJoinRequest } =
+    useChaptersActions();
 
   const handleApprove = (requestId: string) => {
     approveChapterJoinRequest(requestId, currentUser);

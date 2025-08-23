@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import RequestCard from './RequestCard';
 import { HomeIcon } from '@/icons';
 
-import { useAccommodationRequests } from '@/store/appStore';
+import { useAccommodationRequests } from '@/store';
 
 import { useCurrentUser } from '@/store/auth.store';
 
@@ -26,7 +26,7 @@ const TabButton: React.FC<{
   >
     {children}
     {count > 0 && (
-      <span className="ml-1 rounded-none bg-primary px-2 py-0.5 text-xs font-bold text-white">
+      <span className="ml-1 bg-primary px-2 py-0.5 text-xs font-bold text-white">
         {count}
       </span>
     )}
@@ -58,7 +58,10 @@ const HostingDashboard: React.FC<HostingDashboardProps> = () => {
     if (a.status === 'Pending' && b.status !== 'Pending') return -1;
     if (a.status !== 'Pending' && b.status === 'Pending') return 1;
 
-    return a.event.startDate.getTime() - b.event.startDate.getTime();
+    return (
+      new Date(a.event.startDate).getTime() -
+      new Date(b.event.startDate).getTime()
+    );
   });
 
   const NoRequestsMessage = () => (

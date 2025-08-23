@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Role, Chapter } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
-import { useChapters } from '@/store/appStore';
+import { useChapters } from '@/store';
 import { toast } from 'sonner';
 import { InputField, SelectField } from '@/components/ui/Form';
 

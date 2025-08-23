@@ -41,6 +41,7 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       message,
+      createdAt: new Date(),
     });
   };
 

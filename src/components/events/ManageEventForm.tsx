@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { type CubeEvent, type EventReport, type OutreachLog } from '@/types';
 import { ChevronLeftIcon, CheckCircleIcon, XCircleIcon } from '@/icons';
 import { toast } from 'sonner';
-import { useOutreachLogs } from '@/store/appStore';
+import { useOutreachLogs } from '@/store';
 
 interface ManageEventFormProps {
   event: CubeEvent;
@@ -100,7 +100,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   required
                   min="0.1"
                   step="0.1"
-                  className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                   placeholder="e.g., 4.5"
                 />
               </div>

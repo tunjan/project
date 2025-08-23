@@ -53,7 +53,7 @@ export const generateInactivityNotifications = (
             .filter((event) =>
                 event.participants.some((p) => p.user.id === member.id)
             )
-            .sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
+            .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
         const lastAttendedDate =
             attendedEvents.length > 0 ? attendedEvents[0].startDate : null;

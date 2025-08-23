@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import PublicProfile from '@/components/profile/PublicProfile';
-import { useUserById } from '@/store/appStore';
+import UserProfile from '@/components/profile/UserProfile'; // Use the consolidated component
+import { useUserById } from '@/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 const PublicProfilePage: React.FC = () => {
@@ -19,7 +19,8 @@ const PublicProfilePage: React.FC = () => {
     );
   }
 
-  return <PublicProfile user={user} />;
+  // The page now simply renders the consolidated UserProfile with the fetched user
+  return <UserProfile user={user} />;
 };
 
 export default PublicProfilePage;

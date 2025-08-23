@@ -3,7 +3,6 @@ import { type UserStats } from '@/types';
 import {
   ClockIcon,
   CubeIcon,
-  UsersIcon,
   TrendingUpIcon,
   GlobeAltIcon,
   ChatBubbleLeftRightIcon,

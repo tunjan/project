@@ -62,4 +62,20 @@ export const useNotificationsActions = () =>
     markAllNotificationsAsRead: s.markAllNotificationsAsRead,
   }));
 
+// Selectors
+export const useNotificationsForUser = (userId?: string) =>
+  useNotificationsStore((s) => {
+    if (!userId) return [];
+    return s.notifications
+      .filter((n) => n.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  });
+
+export const useUnreadNotificationCount = (userId?: string) =>
+  useNotificationsStore((s) => {
+    if (!userId) return 0;
+    return s.notifications.filter((n) => n.userId === userId && !n.isRead)
+      .length;
+  });
+
 

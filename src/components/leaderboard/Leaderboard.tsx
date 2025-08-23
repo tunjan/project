@@ -49,7 +49,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
                 <Link
                   to={`/members/${user.id}`}
-                  className="flex flex-grow wrap-normal items-center p-4 transition-colors hover:bg-neutral-100"
+                  className="wrap-normal flex flex-grow items-center p-4 transition-colors hover:bg-neutral-100"
                 >
                   <img
                     src={user.profilePictureUrl}
@@ -57,10 +57,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     className="h-12 w-12 flex-shrink-0 border-2 border-black object-cover"
                   />
                   <div className="ml-4 min-w-0 flex-grow">
-                    <p className="truncate font-bold lg:max-w-none max-w-20 text-black">{user.name}</p>
+                    <p className="truncate font-bold text-black lg:max-w-none">
+                      {user.name}
+                    </p>
                   </div>
                   <div className="ml-4 text-right">
-                    <p className="text-2xl wrap-normal font-extrabold text-black">
+                    <p className="wrap-normal text-2xl font-extrabold text-black">
                       {value.toLocaleString()}
                     </p>
                     <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">

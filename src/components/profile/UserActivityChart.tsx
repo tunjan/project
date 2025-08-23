@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useEvents, useOutreachLogs } from '@/store/appStore';
+import { useEvents, useOutreachLogs } from '@/store';
 import {
   getUserHoursByMonth,
   getUserConversationsByMonth,

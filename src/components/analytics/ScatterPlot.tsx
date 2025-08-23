@@ -1,4 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 export interface ScatterPlotData {
   label: string;
@@ -13,13 +22,26 @@ interface ScatterPlotProps {
   yAxisLabel: string;
 }
 
-const generateAxisTicks = (maxValue: number, tickCount: number): number[] => {
-  if (maxValue === 0) return [0];
-  const power = Math.pow(10, Math.floor(Math.log10(maxValue)));
-  const range = Math.ceil(maxValue / power) * power;
-  const interval = Math.ceil(range / tickCount / power) * power;
-  const niceMaxValue = interval * tickCount;
-  return Array.from({ length: tickCount + 1 }, (_, i) => i * interval);
+const CustomTooltip = ({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: ScatterPlotData }>;
+}) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="shadow-brutal border-2 border-black bg-white p-3">
+        <p className="font-bold text-black">{data.label}</p>
+        <p className="text-primary">
+          {data.y.toLocaleString()} conversations / {data.x.toLocaleString()}{' '}
+          hours
+        </p>
+      </div>
+    );
+  }
+  return null;
 };
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({
@@ -28,31 +50,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   xAxisLabel,
   yAxisLabel,
 }) => {
-  const [tooltip, setTooltip] = useState<{
-    data: ScatterPlotData;
-    x: number;
-    y: number;
-  } | null>(null);
-
-  const width = 500;
-  const height = 350;
-  const padding = { top: 20, right: 20, bottom: 60, left: 60 };
-  const chartWidth = width - padding.left - padding.right;
-  const chartHeight = height - padding.top - padding.bottom;
-
-  const xMax = Math.max(...data.map((d) => d.x), 0);
-  const yMax = Math.max(...data.map((d) => d.y), 0);
-
-  const xTicks = generateAxisTicks(xMax, 5);
-  const yTicks = generateAxisTicks(yMax, 5);
-
-  const xMaxAxis = xTicks[xTicks.length - 1] || 1;
-  const yMaxAxis = yTicks[yTicks.length - 1] || 1;
-
-  const xScale = (value: number) => (value / xMaxAxis) * chartWidth;
-  const yScale = (value: number) =>
-    chartHeight - (value / yMaxAxis) * chartHeight;
-
   if (data.length === 0) {
     return (
       <div className="border-2 border-black bg-white p-4 md:p-6">
@@ -64,114 +61,74 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     );
   }
 
+  // Transform data for Recharts format
+  const chartData = data.map((item) => ({
+    ...item,
+    name: item.label,
+  }));
+
   return (
-    <div className="relative border-2 border-black bg-white p-4 md:p-6">
+    <div className="border-2 border-black bg-white p-4 md:p-6">
       <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full font-sans">
-        <g transform={`translate(${padding.left}, ${padding.top})`}>
-          {}
-          {yTicks.map((tick) => (
-            <g key={`y-${tick}`} transform={`translate(0, ${yScale(tick)})`}>
-              <line x2={-6} stroke="#6b7280" />
-              <text
-                dy=".32em"
-                x={-9}
-                textAnchor="end"
-                fontSize="10"
-                fill="#6b7280"
-              >
-                {tick}
-              </text>
-              <line
-                x1={chartWidth}
-                x2={0}
-                stroke="#e5e7eb"
-                strokeDasharray="2,2"
-              />
-            </g>
-          ))}
-          <text
-            transform="rotate(-90)"
-            y={-padding.left + 20}
-            x={-chartHeight / 2}
-            textAnchor="middle"
-            fontSize="12"
-            fill="#111827"
+      <div className="h-80 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart
+            data={chartData}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 60,
+            }}
           >
-            {yAxisLabel}
-          </text>
-
-          {}
-          {xTicks.map((tick) => (
-            <g
-              key={`x-${tick}`}
-              transform={`translate(${xScale(tick)}, ${chartHeight})`}
-            >
-              <line y2={6} stroke="#6b7280" />
-              <text
-                y={9}
-                dy=".71em"
-                textAnchor="middle"
-                fontSize="10"
-                fill="#6b7280"
-              >
-                {tick}
-              </text>
-            </g>
-          ))}
-          <text
-            y={chartHeight + padding.bottom - 15}
-            x={chartWidth / 2}
-            textAnchor="middle"
-            fontSize="12"
-            fill="#111827"
-          >
-            {xAxisLabel}
-          </text>
-
-          {}
-          {data.map((d) => (
-            <circle
-              key={d.label}
-              cx={xScale(d.x)}
-              cy={yScale(d.y)}
-              r={5}
-              fill="#c70f0f"
-              className="cursor-pointer opacity-70 transition-opacity hover:opacity-100"
-              onMouseEnter={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const containerRect = e.currentTarget
-                  .closest('div.relative')
-                  ?.getBoundingClientRect();
-                if (!containerRect) return;
-
-                setTooltip({
-                  data: d,
-                  x: rect.left - containerRect.left + 15,
-                  y: rect.top - containerRect.top - 10,
-                });
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis
+              type="number"
+              dataKey="x"
+              name={xAxisLabel}
+              tick={{ fontSize: 12, fill: '#111827' }}
+              axisLine={{ stroke: '#111827' }}
+              tickLine={{ stroke: '#111827' }}
+              label={{
+                value: xAxisLabel,
+                position: 'insideBottom',
+                offset: -10,
+                style: {
+                  textAnchor: 'middle',
+                  fill: '#111827',
+                  fontSize: '12px',
+                },
               }}
-              onMouseLeave={() => setTooltip(null)}
             />
-          ))}
-        </g>
-      </svg>
-      {tooltip && (
-        <div
-          className="shadow-brutal pointer-events-none absolute bg-black px-3 py-1.5 text-sm text-white"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y,
-            transform: 'translateY(-100%)',
-          }}
-        >
-          <p className="font-bold">{tooltip.data.label}</p>
-          <p>
-            {tooltip.data.y.toLocaleString()} convos /{' '}
-            {tooltip.data.x.toLocaleString()} hrs
-          </p>
-        </div>
-      )}
+            <YAxis
+              type="number"
+              dataKey="y"
+              name={yAxisLabel}
+              tick={{ fontSize: 12, fill: '#6b7280' }}
+              axisLine={{ stroke: '#111827' }}
+              tickLine={{ stroke: '#111827' }}
+              label={{
+                value: yAxisLabel,
+                angle: -90,
+                position: 'insideLeft',
+                style: {
+                  textAnchor: 'middle',
+                  fill: '#111827',
+                  fontSize: '12px',
+                },
+              }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Scatter
+              dataKey="y"
+              fill="#c70f0f"
+              stroke="#000000"
+              strokeWidth={1}
+              r={6}
+            />
+          </ScatterChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

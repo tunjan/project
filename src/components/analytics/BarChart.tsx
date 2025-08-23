@@ -1,5 +1,13 @@
 import React from 'react';
-import { BaseChart } from './BaseChart';
+import {
+  BarChart as RechartsBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 export interface BarChartData {
   label: string;
@@ -13,60 +21,77 @@ interface BarChartProps {
   barColor?: string;
 }
 
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="shadow-brutal border-2 border-black bg-white p-3">
+        <p className="font-bold text-black">{label}</p>
+        <p className="text-primary">
+          Value:{' '}
+          <span className="font-bold">{payload[0].value.toLocaleString()}</span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const BarChart: React.FC<BarChartProps> = ({
   data,
   title,
   barColor = '#c70f0f',
 }) => {
-  const barXScale = (index: number, chartWidth: number, padding: number) => {
-    const barWidth = chartWidth / data.length;
-    return padding + index * barWidth;
-  };
+  // Transform data for Recharts format
+  const chartData = data.map((item) => ({
+    name: item.label,
+    value: item.value,
+    fill: item.color || barColor,
+  }));
 
   return (
     <div className="border-2 border-black bg-white p-4 md:p-6">
       <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-      <div className="h-full w-full">
-        <BaseChart data={data} padding={40}>
-          {({ yScale, chartWidth }) => {
-            const barWidth = chartWidth / data.length;
-            const barMargin = barWidth * 0.2;
-            const effectiveBarWidth = barWidth - barMargin;
-
-            return (
-              <g>
-                {data.map((item, index) => {
-                  const x = barXScale(index, chartWidth, 40);
-                  const y = yScale(item.value);
-                  // Corrected: Calculate height based on the y-scale function
-                  const barHeight = yScale(0) - yScale(item.value);
-
-                  return (
-                    <g key={item.label}>
-                      <rect
-                        x={x + barMargin / 2}
-                        y={y}
-                        width={effectiveBarWidth}
-                        height={barHeight}
-                        fill={item.color || barColor}
-                      />
-                      <text
-                        x={x + barWidth / 2}
-                        y={y - 5}
-                        textAnchor="middle"
-                        fontSize="10"
-                        fill="#111827"
-                        className="font-bold"
-                      >
-                        {item.value.toLocaleString()}
-                      </text>
-                    </g>
-                  );
-                })}
-              </g>
-            );
-          }}
-        </BaseChart>
+      <div className="h-80 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsBarChart
+            data={chartData}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 12, fill: '#111827' }}
+              axisLine={{ stroke: '#111827' }}
+              tickLine={{ stroke: '#111827' }}
+            />
+            <YAxis
+              tick={{ fontSize: 12, fill: '#6b7280' }}
+              axisLine={{ stroke: '#111827' }}
+              tickLine={{ stroke: '#111827' }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar
+              dataKey="value"
+              fill={barColor}
+              stroke="#000000"
+              strokeWidth={1}
+              radius={[2, 2, 0, 0]}
+            />
+          </RechartsBarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 // no React import needed with automatic JSX runtime
-import { useChallenges } from '@/store/appStore';
+import { useChallenges } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import ProgressBar from '@/components/ui/ProgressBar';
 import { TrophyIcon, CalendarIcon } from '@/icons';
@@ -53,7 +53,9 @@ const Challenges = () => {
                 </p>
                 <div className="flex items-center text-sm text-neutral-500">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  <span>Ends: {challenge.endDate.toLocaleDateString()}</span>
+                  <span>
+                    Ends: {new Date(challenge.endDate).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
 
@@ -67,7 +69,7 @@ const Challenges = () => {
                     return (
                       <div
                         key={p.id}
-                        className={`rounded-none p-3 transition-all ${
+                        className={`p-3 transition-all ${
                           isUserChapter
                             ? 'bg-primary/10 ring-2 ring-primary'
                             : ''

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { type CubeEvent, type Chapter } from '@/types';
-import { useAppActions } from '@/store/appStore';
+import { useEventsActions } from '@/store';
 import Modal from '@/components/ui/Modal';
 import { InputField, SelectField } from '@/components/ui/Form';
 import { toast } from 'sonner';
@@ -17,7 +17,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
   organizableChapters,
   onClose,
 }) => {
-  const { updateEvent } = useAppActions();
+  const { updateEvent } = useEventsActions();
   const currentUser = useCurrentUser();
 
   const [city, setCity] = useState(event.city);

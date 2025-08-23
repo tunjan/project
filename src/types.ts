@@ -53,23 +53,12 @@ export enum EventRole {
   EQUIPMENT = 'Equipment',
 }
 
-export type View =
-  | 'cubes'
-  | 'dashboard'
-  | 'management'
-  | 'login'
-  | 'signup'
-  | 'createCube'
-  | 'memberProfile'
-  | 'manageEvent'
-  | 'announcements'
-  | 'createAnnouncement'
-  | 'resources'
-  | 'security'
-  | 'analytics'
-  | 'outreach'
-  | 'chapters'
-  | 'chapterDetail';
+export interface EventRoleRequirement {
+  role: EventRole;
+  needed: number;
+  filled: number;
+  description?: string;
+}
 
 export interface BadgeTemplate {
   name: string;
@@ -149,6 +138,7 @@ export interface User {
     secretKey: string;
   };
   organizerNotes?: OrganizerNote[];
+  lastLogin: Date;
 }
 
 export interface TourDuty {
@@ -182,6 +172,7 @@ export interface EventReport {
 
 export interface CubeEvent {
   id: string;
+  name: string;
   city: string;
   location: string;
   startDate: Date;
@@ -193,6 +184,7 @@ export interface CubeEvent {
   status: EventStatus;
   report?: EventReport;
   cancellationReason?: string;
+  roleRequirements?: EventRoleRequirement[];
 }
 
 export enum AnnouncementScope {
@@ -301,4 +293,16 @@ export interface BadgeAward {
   badge: BadgeTemplate;
   status: 'Pending' | 'Accepted' | 'Rejected';
   createdAt: Date;
+}
+
+export interface InventoryItem {
+  id: string;
+  chapterName: string;
+  name: string;
+  category: 'Masks' | 'Laptops' | 'Signs' | 'Cameras' | 'Miscellaneous';
+  quantity: number;
+  condition: 'Excellent' | 'Good' | 'Fair' | 'Needs Repair';
+  location?: string;
+  notes?: string;
+  lastUpdated: Date;
 }

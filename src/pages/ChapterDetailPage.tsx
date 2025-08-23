@@ -4,9 +4,9 @@ import {
   useChapterByName,
   useUsers,
   useEvents,
-  useAppActions,
+  useChaptersActions,
   useChapterJoinRequests,
-} from '@/store/appStore';
+} from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type User, AnnouncementScope, Role } from '@/types';
@@ -65,7 +65,7 @@ const ChapterDetailPage: React.FC = () => {
   const { chapterName } = useParams<{ chapterName: string }>();
 
   const currentUser = useCurrentUser();
-  const { requestToJoinChapter } = useAppActions();
+  const { requestToJoinChapter } = useChaptersActions();
   const chapterJoinRequests = useChapterJoinRequests();
 
   const chapter = useChapterByName(chapterName);
@@ -123,12 +123,18 @@ const ChapterDetailPage: React.FC = () => {
         (a) =>
           a.scope === AnnouncementScope.CHAPTER && a.chapter === chapter.name
       )
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     const pastEvents = allEvents
       .filter(
         (event) => event.city === chapter.name && event.startDate < new Date()
       )
-      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
+      .sort(
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
 
     return {
       stats: calculatedStats,

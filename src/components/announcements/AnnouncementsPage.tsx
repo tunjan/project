@@ -8,7 +8,7 @@ import {
 import { PlusIcon, MegaphoneIcon } from '@/icons';
 import AnnouncementCard from './AnnouncementCard';
 import { useCurrentUser } from '@/store/auth.store';
-import { useChapters } from '@/store/appStore';
+import { useChapters } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { hasOrganizerRole } from '@/utils/auth';
 

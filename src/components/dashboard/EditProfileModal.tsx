@@ -3,7 +3,7 @@ import { type User } from '@/types';
 import { InputField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
 import DeactivateAccountModal from './DeactivateAccountModal';
-import { useAppActions } from '@/store/appStore';
+import { useUsersActions } from '@/store';
 import { useAuthActions } from '@/store/auth.store';
 import { toast } from 'sonner';
 import { UsersIcon } from '@/icons';
@@ -37,7 +37,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     user.profilePictureUrl
   );
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
-  const { deleteUser } = useAppActions();
+  const { deleteUser } = useUsersActions();
   const { logout } = useAuthActions();
 
   const handleGenerateAvatar = () => {
@@ -132,7 +132,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   value={hostingCapacity}
                   onChange={(e) => setHostingCapacity(Number(e.target.value))}
                   min="1"
-                  className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                 />
               </div>
             )}

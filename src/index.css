@@ -5,20 +5,29 @@
 
 @layer base {
   body {
-    /* CHANGED: Softer base color with a subtle dot-grid pattern for texture */
-    @apply bg-neutral-100 font-sans text-neutral-800 antialiased;
-    background-image: radial-gradient(
-      theme('colors.neutral.300') 1px,
-      transparent 1px
-    );
-    background-size: 16px 16px;
+    /* Modern Brutalism: Clean background, better typography */
+    @apply bg-neutral-50 font-sans leading-relaxed text-neutral-900 antialiased;
   }
 
-  /* Add default transitions to buttons for smoother interactions */
+  /* Enhanced typography hierarchy */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply leading-tight;
+  }
+
+  /* Enhanced transitions and spacing */
   button,
   a {
-    /* CHANGED: Faster, snappier transitions */
-    @apply transition-all duration-150;
+    @apply transition-all duration-200;
+  }
+
+  /* Better spacing for text content */
+  p {
+    @apply leading-relaxed;
   }
 }
 
@@ -47,21 +56,75 @@
     @apply block p-2 text-sm text-black hover:bg-neutral-100 !important;
   }
 
-  /* NEW: Brutalist utility classes */
-  .border-brutal {
-    @apply border-2 border-black;
+  /* Modern Brutalism: Refined utility classes */
+  .border-accent {
+    @apply border-b-4 border-black;
   }
-  .shadow-brutal {
-    @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+  .shadow-modern {
+    @apply shadow-brutal;
+  }
+  .shadow-modern-xl {
+    @apply shadow-xl;
+  }
+  .card-modern {
+    @apply border border-gray-200 bg-white shadow-lg;
+  }
+  .card-modern-hover {
+    @apply card-modern transition-all duration-200 hover:-translate-y-1 hover:shadow-xl;
   }
   .card-brutal {
-    @apply border-brutal bg-white;
+    @apply border-2 border-black bg-white;
   }
   .card-brutal-hover {
-    @apply card-brutal transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
+    @apply hover:shadow-brutal border-2 border-black bg-white transition-all;
   }
   .h-section {
-    @apply mb-4 border-b-2 border-black pb-2 text-3xl font-extrabold tracking-tighter text-black;
+    @apply mb-6 border-b-4 border-primary pb-3 text-3xl font-extrabold tracking-tight text-black;
+  }
+  .h-subsection {
+    @apply mb-4 text-xl font-bold text-black;
+  }
+  .h-card {
+    @apply mb-3 text-lg font-bold text-black;
+  }
+
+  /* Consistent spacing utilities */
+  .content-spacing {
+    @apply px-6 py-8;
+  }
+  .content-spacing-lg {
+    @apply px-8 py-12;
+  }
+  .card-padding {
+    @apply p-6;
+  }
+  .form-spacing {
+    @apply space-y-6;
+  }
+  .section-spacing {
+    @apply space-y-6;
+  }
+  .grid-spacing {
+    @apply gap-4 md:gap-6;
+  }
+
+  /* Button variants for consistency */
+  .btn-primary {
+    @apply bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover;
+  }
+  .btn-secondary {
+    @apply bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800;
+  }
+  .btn-outline {
+    @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-black hover:text-white;
+  }
+
+  /* Tag/badge variants */
+  .tag-brutal {
+    @apply border-2 border-black bg-neutral-100 px-2 py-1 text-xs font-bold uppercase tracking-wider text-black;
+  }
+  .tag-status {
+    @apply border-2 px-2 py-1 text-xs font-bold uppercase tracking-wider;
   }
 }
 

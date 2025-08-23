@@ -10,6 +10,8 @@ import {
   Chapter,
   TourDuty,
   ParticipantStatus,
+  EventRole,
+  type EventRoleRequirement,
 } from '@/types';
 import {
   CalendarIcon,
@@ -27,15 +29,22 @@ import EditEventModal from '@/components/events/EditEventModal';
 import EventDiscussion from '@/components/events/EventDiscussion';
 import EventRoster from './events/EventRoster';
 import TourOfDutyModal from './events/TourOfDutyModal';
+import EventRoleManagement from './events/EventRoleManagement';
+import RoleSignupModal from './events/RoleSignupModal';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAppActions, useUsers, useChapters } from '@/store/appStore';
+import {
+  useEventsActions,
+  useAccommodationsActions,
+  useUsers,
+  useChapters,
+} from '@/store';
 import { toast } from 'sonner';
 import CancelEventModal from './events/CancelEventModal';
 
 interface CubeDetailProps {
   event: CubeEvent;
   onBack: () => void;
-  onRsvp: (eventId: string, duties?: TourDuty[]) => void;
+  onRsvp: (eventId: string, duties?: TourDuty[], eventRole?: EventRole) => void;
   onCancelRsvp: (eventId: string) => void;
   onManageEvent: (event: CubeEvent) => void;
 }
@@ -168,17 +177,14 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   const currentUser = useCurrentUser();
   const allUsers = useUsers();
   const allChapters = useChapters();
-  const {
-    createAccommodationRequest,
-    cancelEvent,
-    approveRsvp,
-    denyRsvp,
-    removeParticipant,
-  } = useAppActions();
+  const { cancelEvent, approveRsvp, denyRsvp, removeParticipant, updateEvent } =
+    useEventsActions();
+  const { createAccommodationRequest } = useAccommodationsActions();
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isTourModalOpen, setIsTourModalOpen] = useState(false);
+  const [isRoleSignupModalOpen, setIsRoleSignupModalOpen] = useState(false);
   const [selectedHost, setSelectedHost] = useState<User | null>(null);
 
   const formattedDate = new Intl.DateTimeFormat(undefined, {
@@ -283,14 +289,31 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     if (isRegionalEvent) {
       setIsTourModalOpen(true);
     } else {
-      onRsvp(event.id);
+      // Show role selection modal for non-regional events
+      setIsRoleSignupModalOpen(true);
     }
   };
 
   const handleTourConfirm = (duties: TourDuty[]) => {
-    onRsvp(event.id, duties);
+    onRsvp(event.id, duties, EventRole.ACTIVIST);
     setIsTourModalOpen(false);
     toast.success('Your duties have been registered!');
+  };
+
+  const handleRoleSignup = (role: EventRole) => {
+    onRsvp(event.id, undefined, role);
+    setIsRoleSignupModalOpen(false);
+    toast.success(`You've signed up as ${role}!`);
+  };
+
+  const handleUpdateRoleRequirements = (
+    requirements: EventRoleRequirement[]
+  ) => {
+    updateEvent(
+      event.id,
+      { roleRequirements: requirements },
+      currentUser || undefined
+    );
   };
 
   const handleRequestStay = (host: User) => {
@@ -378,6 +401,14 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           event={event}
           organizableChapters={organizableChapters}
           onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
+      {isRoleSignupModalOpen && (
+        <RoleSignupModal
+          event={event}
+          currentRole={currentUserParticipant?.eventRole}
+          onClose={() => setIsRoleSignupModalOpen(false)}
+          onConfirm={handleRoleSignup}
         />
       )}
       <div className="animate-fade-in py-8 md:py-12">
@@ -474,6 +505,11 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 </div>
               </div>
             </div>
+            <EventRoleManagement
+              event={event}
+              onUpdateRoleRequirements={handleUpdateRoleRequirements}
+              canEdit={canEditEvent}
+            />
             {isRegionalEvent && <EventRoster event={event} />}
             {isOrganizer && pendingParticipants.length > 0 && (
               <div className="border border-yellow-500 bg-yellow-50">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { type Chapter } from '@/types';
-import { useAppActions } from '@/store/appStore';
+import { useChaptersActions } from '@/store';
 import { InputField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ const EditChapterModal: React.FC<EditChapterModalProps> = ({
   chapter,
   onClose,
 }) => {
-  const { updateChapter } = useAppActions();
+  const { updateChapter } = useChaptersActions();
   const [country, setCountry] = useState(chapter.country);
   const [lat, setLat] = useState(String(chapter.lat));
   const [lng, setLng] = useState(String(chapter.lng));

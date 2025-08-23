@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { hasOrganizerRole } from '@/utils/auth';
+import { useNavItems } from '@/hooks/useNavItems';
+import useSearch from '@/hooks/useSearch';
 import {
   LoginIcon,
   UserAddIcon,
@@ -8,14 +10,16 @@ import {
   XIcon, // Add useEffect to the import list
   LogoutIcon,
   BellIcon,
+  SearchIcon,
 } from '@/icons';
 import NotificationPopover from './NotificationPopover';
+import SearchResults from './SearchResults';
 import { useCurrentUser, useAuthActions } from '@/store/auth.store';
 import {
   useNotificationsForUser,
   useUnreadNotificationCount,
-  useAppActions,
-} from '@/store/appStore';
+  useNotificationsActions,
+} from '@/store';
 import { type Notification, OnboardingStatus } from '@/types';
 
 const NavLinkStyled: React.FC<{
@@ -45,67 +49,26 @@ const NavLinkStyled: React.FC<{
   </NavLink>
 );
 
-const navItems = [
-  {
-    to: '/dashboard',
-    label: 'Dashboard',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  { to: '/cubes', label: 'Cubes', requiresAuth: true, requiresConfirmed: true },
-  {
-    to: '/chapters',
-    label: 'Chapters',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  {
-    to: '/leaderboard',
-    label: 'Leaderboard',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  { to: '/announcements', label: 'Announcements', requiresAuth: true },
-  { to: '/resources', label: 'Resources', requiresAuth: true },
-  {
-    to: '/outreach',
-    label: 'Outreach',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  {
-    to: '/manage',
-    label: 'Management',
-    requiresAuth: true,
-    requiresOrganizer: true,
-  },
-  {
-    to: '/analytics',
-    label: 'Analytics',
-    requiresAuth: true,
-    requiresOrganizer: true,
-  },
-  {
-    to: '/onboarding-status',
-    label: 'My Application',
-    requiresAuth: true,
-    requiresPending: true,
-  },
-];
+// Navigation items now managed by useNavItems hook
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const { logout } = useAuthActions();
+  const navItems = useNavItems();
   const { markNotificationAsRead, markAllNotificationsAsRead } =
-    useAppActions();
+    useNotificationsActions();
 
   const notifications = useNotificationsForUser(currentUser?.id);
   const unreadCount = useUnreadNotificationCount(currentUser?.id);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const { users, chapters, events, loading } = useSearch(searchQuery);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -136,6 +99,23 @@ const Header: React.FC = () => {
     };
   }, [notificationRef]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchRef]);
+
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
@@ -154,6 +134,8 @@ const Header: React.FC = () => {
   const closeMenus = () => {
     setIsMobileMenuOpen(false);
     setIsNotificationsOpen(false);
+    setIsSearchOpen(false);
+    setSearchQuery('');
   };
 
   const renderNavLinks = (isMobile = false) => {
@@ -207,6 +189,16 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-2">
             {currentUser ? (
               <>
+                <button
+                  onClick={() => setIsSearchOpen((p) => !p)}
+                  className={`relative border-2 p-2 transition-colors ${
+                    isSearchOpen
+                      ? 'border-black bg-neutral-100'
+                      : 'border-transparent hover:border-black focus:border-black'
+                  }`}
+                >
+                  <SearchIcon className="h-6 w-6" />
+                </button>
                 <div className="relative" ref={notificationRef}>
                   <button
                     onClick={() => setIsNotificationsOpen((p) => !p)}
@@ -289,6 +281,32 @@ const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {isSearchOpen && (
+        <div className="border-b-2 border-black bg-white p-4" ref={searchRef}>
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <SearchIcon className="h-5 w-5 text-neutral-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search users, chapters, events..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-none border-2 border-black bg-white py-2 pl-10 pr-4 text-sm font-bold text-black placeholder-neutral-400 focus:border-primary focus:outline-none"
+            />
+            {searchQuery && (
+              <SearchResults
+                users={users}
+                chapters={chapters}
+                events={events}
+                loading={loading}
+                onClose={closeMenus}
+              />
+            )}
+          </div>
+        </div>
+      )}
 
       {isMobileMenuOpen && currentUser && (
         <div className="shadow-brutal absolute left-0 top-16 w-full border-b-2 border-black bg-white lg:hidden">

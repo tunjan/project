@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { type User } from '@/types';
+import { type User, Role } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAppActions } from '@/store/appStore';
+import { useUsersActions } from '@/store';
 import { toast } from 'sonner';
 import { PlusIcon, PencilIcon, TrashIcon } from '@/icons';
 import { TextAreaField } from '@/components/ui/Form';
@@ -14,7 +14,7 @@ interface OrganizerNotesProps {
 const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
   const currentUser = useCurrentUser();
   const { addOrganizerNote, editOrganizerNote, deleteOrganizerNote } =
-    useAppActions();
+    useUsersActions();
 
   const [noteContent, setNoteContent] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -62,7 +62,11 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
         <div className="max-h-64 space-y-4 overflow-y-auto pr-2">
           {user.organizerNotes && user.organizerNotes.length > 0 ? (
             [...user.organizerNotes]
-              .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )
               .map((note) => {
                 const canManageNote =
                   currentUser.id === note.authorId ||
@@ -70,10 +74,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                     ROLE_HIERARCHY[note.authorId as Role];
 
                 return (
-                  <div
-                    key={note.id}
-                    className="border-b-2 border-black pb-3"
-                  >
+                  <div key={note.id} className="border-b-2 border-black pb-3">
                     {editingNoteId === note.id ? (
                       <div>
                         <TextAreaField
@@ -106,7 +107,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                         <div className="mt-2 flex items-center justify-between">
                           <p className="text-xs text-neutral-500">
                             - {note.authorName} on{' '}
-                            {note.createdAt.toLocaleDateString()}
+                            {new Date(note.createdAt).toLocaleDateString()}
                           </p>
                           {canManageNote && (
                             <div className="flex items-center space-x-2">

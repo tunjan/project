@@ -1,15 +1,17 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { hasOrganizerRole } from '@/utils/auth';
-import { LogoutIcon, BellIcon } from '@/icons';
+import { LogoutIcon, BellIcon, SearchIcon } from '@/icons';
 import NotificationPopover from './NotificationPopover';
+import SearchResults from './SearchResults';
 import { useCurrentUser, useAuthActions } from '@/store/auth.store';
 import {
   useNotificationsForUser,
   useUnreadNotificationCount,
-  useAppActions,
-} from '@/store/appStore';
+  useNotificationsActions,
+} from '@/store';
 import { type Notification, OnboardingStatus } from '@/types';
+import useSearch from '@/hooks/useSearch';
 
 const NavLinkStyled: React.FC<{
   to: string;
@@ -84,13 +86,16 @@ const Sidebar: React.FC = () => {
   const currentUser = useCurrentUser();
   const { logout } = useAuthActions();
   const { markNotificationAsRead, markAllNotificationsAsRead } =
-    useAppActions();
+    useNotificationsActions();
 
   const notifications = useNotificationsForUser(currentUser?.id);
   const unreadCount = useUnreadNotificationCount(currentUser?.id);
 
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
   const notificationRef = React.useRef<HTMLDivElement>(null);
+  const searchRef = React.useRef<HTMLDivElement>(null);
+  const { users, chapters, events, loading } = useSearch(searchQuery);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -108,6 +113,22 @@ const Sidebar: React.FC = () => {
     };
   }, [notificationRef]);
 
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setSearchQuery('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchRef]);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -119,6 +140,10 @@ const Sidebar: React.FC = () => {
     }
     setIsNotificationsOpen(false);
     navigate(notification.linkTo);
+  };
+
+  const closeSearchResults = () => {
+    setSearchQuery('');
   };
 
   const renderNavLinks = () => {
@@ -168,6 +193,30 @@ const Sidebar: React.FC = () => {
           >
             AV<span className="text-primary">.</span>
           </Link>
+        </div>
+        {/* Search */}
+        <div className="mb-4 px-4" ref={searchRef}>
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <SearchIcon className="h-5 w-5 text-neutral-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-none border-2 border-black bg-white py-2 pl-10 pr-4 text-sm font-bold text-black placeholder-neutral-400 focus:border-primary focus:outline-none"
+            />
+            {searchQuery && (
+              <SearchResults
+                users={users}
+                chapters={chapters}
+                events={events}
+                loading={loading}
+                onClose={closeSearchResults}
+              />
+            )}
+          </div>
         </div>
 
         {/* Navigation */}

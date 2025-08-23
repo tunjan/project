@@ -2,7 +2,7 @@ import React from 'react';
 import { type BadgeAward } from '@/types';
 import * as Icons from '@/icons';
 import { toast } from 'sonner';
-import { useAppActions } from '@/store/appStore';
+import { useAwardsActions } from '@/store';
 import { UsersIcon, XIcon } from '@/icons';
 
 interface BadgeAwardCardProps {
@@ -57,7 +57,7 @@ interface BadgeAwardsDashboardProps {
 const BadgeAwardsDashboard: React.FC<BadgeAwardsDashboardProps> = ({
   pendingAwards,
 }) => {
-  const { respondToBadgeAward } = useAppActions();
+  const { respondToBadgeAward } = useAwardsActions();
 
   const handleRespond = (
     awardId: string,

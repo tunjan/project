@@ -1,16 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import {
-  type OutreachLog,
-  OutreachOutcome,
-  type CubeEvent,
-} from '@/types';
+import { type OutreachLog, OutreachOutcome, type CubeEvent } from '@/types';
 import OutreachTally from '@/components/outreach/OutreachTally';
 import { useCurrentUser } from '@/store/auth.store';
-import {
-  useEvents,
-  useOutreachLogsForUser,
-  useOutreachActions,
-} from '@/store';
+import { useEvents, useOutreachLogsForUser, useOutreachActions } from '@/store';
 import { toast } from 'sonner';
 import {
   PencilIcon,

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { type User, Role, OnboardingStatus, BadgeTemplate } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
-import { useChapters, useAppActions } from '@/store/appStore';
+import { useChapters, useUsersActions, useAwardsActions } from '@/store';
 import {
   getAssignableRoles,
   ROLE_HIERARCHY,
@@ -22,6 +22,7 @@ import {
   PencilIcon,
   ShieldCheckIcon,
   TrophyIcon,
+  ChatBubbleLeftRightIcon,
 } from '@/icons';
 import { toast } from 'sonner';
 
@@ -41,8 +42,8 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     updateUserChapters,
     updateUserStatus,
     confirmUserIdentity,
-    awardBadge,
-  } = useAppActions();
+  } = useUsersActions();
+  const { awardBadge } = useAwardsActions();
 
   const [selectedRole, setSelectedRole] = useState<Role>(user.role);
   const [isPromoteModalOpen, setPromoteModalOpen] = useState(false);
@@ -117,6 +118,23 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     awardBadge(currentUser, user, badge);
     toast.success(`Recognition "${badge.name}" sent to ${user.name}.`);
     setAwardBadgeModalOpen(false);
+  };
+
+  const handleSendMessage = () => {
+    // Create a pre-filled email for the organizer to send
+    const subject = encodeURIComponent(
+      `Message from ${currentUser?.name} - Chapter Update`
+    );
+    const body = encodeURIComponent(
+      `Hi ${user.name},\n\nI hope you're doing well! I wanted to reach out to you as your chapter organizer.\n\n[Your message here]\n\nBest regards,\n${currentUser?.name}\n\nP.S. We'd love to see you at our upcoming events!`
+    );
+    const mailtoLink = `mailto:${user.email || ''}?subject=${subject}&body=${body}`;
+
+    // Open the user's default email client
+    window.open(mailtoLink, '_blank');
+
+    // Show a toast for feedback
+    toast.success('Email client opened with pre-filled message');
   };
 
   const canManageRole = useMemo(() => {
@@ -303,6 +321,29 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   Manage User
                 </h2>
                 <div className="space-y-4 border-2 border-black bg-white p-6">
+                  {/* Send Message Button */}
+                  <div className="border-b border-gray-200 pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <ChatBubbleLeftRightIcon className="mr-3 h-5 w-5 text-black" />
+                        <div>
+                          <h3 className="text-lg font-bold text-black">
+                            Send Message
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Reach out to this member directly
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleSendMessage}
+                        className="bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700"
+                      >
+                        Send Email
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="flex items-center">
                     <PencilIcon className="mr-3 h-5 w-5 text-black" />
                     <h3 className="text-lg font-bold text-black">
@@ -313,7 +354,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                     id="role-select"
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value as Role)}
-                    className="block w-full rounded-none border-2 border-black bg-white p-2 text-black"
+                    className="block w-full border-2 border-black bg-white p-2 text-black"
                   >
                     <option value={user.role} disabled>
                       {user.role} (Current)

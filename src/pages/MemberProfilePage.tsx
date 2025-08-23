@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MemberProfile from '@/components/management/MemberProfile';
-import { useUsers } from '@/store/appStore';
+import { useUsers } from '@/store';
 
 const MemberProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();

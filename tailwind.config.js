@@ -20,8 +20,15 @@ export default {
       colors: {
         primary: {
           DEFAULT: '#b91c1c',
-          hover: '#b81010',
+          hover: '#991b1b',
         },
+      },
+      boxShadow: {
+        brutal: '4px 4px 0 #000',
+        'brutal-lg': '8px 8px 0 #000',
+      },
+      borderRadius: {
+        none: '0',
       },
     },
   },

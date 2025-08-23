@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Role } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAppStore } from '@/store/appStore';
+import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import {
     getGlobalStats,
@@ -17,8 +17,10 @@ import {
 
 export function useAnalyticsData() {
     const currentUser = useCurrentUser();
-    const { users: allUsers, events: allEvents, chapters, outreachLogs } =
-        useAppStore();
+    const allUsers = useUsers();
+    const allEvents = useEvents();
+    const chapters = useChapters();
+    const outreachLogs = useOutreachLogs();
 
     const { availableCountries, chaptersForFilter, defaultCountry, defaultChapter } =
         useMemo(() => {

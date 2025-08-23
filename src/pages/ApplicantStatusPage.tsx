@@ -2,40 +2,28 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus } from '@/types';
-import { CheckCircleIcon, ClockIcon, UsersIcon, UserGroupIcon } from '@/icons';
+import { UsersIcon, UserGroupIcon, CheckIcon } from '@/icons';
 import QRCode from 'qrcode.react';
 
-const StatusStep: React.FC<{
+const ChecklistItem: React.FC<{
   title: string;
   description: string;
   isComplete: boolean;
-  isActive: boolean;
-}> = ({ title, description, isComplete, isActive }) => {
-  const iconColor = isComplete
-    ? 'bg-primary'
-    : isActive
-      ? 'bg-yellow-500'
-      : 'bg-neutral-300';
-  const textColor = isActive || isComplete ? 'text-black' : 'text-neutral-500';
-
-  return (
-    <div className="flex items-start">
-      <div className="flex flex-col items-center">
-        <div
-          className={`flex h-8 w-8 items-center justify-center rounded-none text-white ${iconColor}`}
-        >
-          {isComplete && <CheckCircleIcon className="h-5 w-5" />}
-          {isActive && <ClockIcon className="h-5 w-5" />}
-        </div>
-        <div className="h-16 w-0.5 bg-neutral-300"></div>
-      </div>
-      <div className={`ml-4 pb-16 ${textColor}`}>
-        <h3 className="font-bold">{title}</h3>
-        <p className="text-sm">{description}</p>
-      </div>
+}> = ({ title, description, isComplete }) => (
+  <div className="flex items-start">
+    <div
+      className={`mr-4 mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-none border-2 border-black ${
+        isComplete ? 'bg-primary text-white' : 'bg-white'
+      }`}
+    >
+      {isComplete && <CheckIcon className="h-4 w-4" />}
     </div>
-  );
-};
+    <div>
+      <h3 className="font-bold text-black">{title}</h3>
+      <p className="text-neutral-600">{description}</p>
+    </div>
+  </div>
+);
 
 const ApplicantStatusPage: React.FC = () => {
   const currentUser = useCurrentUser();
@@ -53,23 +41,22 @@ const ApplicantStatusPage: React.FC = () => {
   const steps = [
     {
       title: 'Application Submitted',
-      description: 'We have received your application.',
-      status: OnboardingStatus.PENDING_APPLICATION_REVIEW,
+      description: 'We have received your application for review.',
+      isComplete: true, // Always complete once they are on this page
     },
     {
-      title: 'Awaiting Verification',
+      title: 'Get Verified In-Person',
       description:
-        'Your application was approved! Find an organizer in person to get verified.',
-      status: OnboardingStatus.AWAITING_VERIFICATION,
+        'Find an organizer at an event to verify your identity. Show them the QR code below.',
+      isComplete: status === OnboardingStatus.AWAITING_VERIFICATION,
     },
     {
-      title: 'Account Confirmed',
-      description: 'Welcome to the movement! You now have full access.',
-      status: OnboardingStatus.CONFIRMED,
+      title: "Join a 'Welcome' call",
+      description:
+        'Once verified, you will be invited to a welcome call to get you up to speed.',
+      isComplete: false, // This would be updated based on user data
     },
   ];
-
-  const activeStepIndex = steps.findIndex((s) => s.status === status);
 
   return (
     <div className="py-8 md:py-16">
@@ -100,12 +87,11 @@ const ApplicantStatusPage: React.FC = () => {
           <div className="border-2 border-black bg-white p-6 md:p-8">
             <div>
               {steps.map((step, index) => (
-                <StatusStep
-                  key={step.title}
+                <ChecklistItem
+                  key={index}
                   title={step.title}
                   description={step.description}
-                  isComplete={activeStepIndex > index}
-                  isActive={activeStepIndex === index}
+                  isComplete={step.isComplete}
                 />
               ))}
             </div>

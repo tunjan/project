@@ -1,14 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SignUp from '@/components/auth/SignUp';
-import { useChapters } from '@/store/appStore';
-import { useAppActions } from '@/store/appStore'; // CORRECTED IMPORT
+import { useChapters, useUsersActions } from '@/store';
 import { type OnboardingAnswers } from '@/types';
 import { toast } from 'sonner';
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAppActions(); // USE THE CORRECT HOOK
+  const { register } = useUsersActions();
   const chapters = useChapters();
 
   const handleRegister = (formData: {

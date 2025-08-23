@@ -1,15 +1,15 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import CubeDetail from '@/components/CubeDetail';
-import { useEventById, useAppActions } from '@/store/appStore';
+import { useEventById, useEventsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
-import { type CubeEvent, type TourDuty } from '@/types';
+import { type CubeEvent, type TourDuty, EventRole } from '@/types';
 
 const CubeDetailPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { rsvp, cancelRsvp } = useAppActions();
+  const { rsvp, cancelRsvp } = useEventsActions();
 
   const event = useEventById(eventId!);
 
@@ -30,13 +30,17 @@ const CubeDetailPage: React.FC = () => {
     );
   }
 
-  const handleRsvp = (id: string, duties?: TourDuty[]) => {
+  const handleRsvp = (
+    id: string,
+    duties?: TourDuty[],
+    eventRole?: EventRole
+  ) => {
     if (!currentUser) {
       navigate('/login');
       return;
     }
     const isGuest = !currentUser.chapters.includes(event.city);
-    rsvp(id, currentUser, isGuest, duties);
+    rsvp(id, currentUser, isGuest, duties, eventRole);
   };
 
   const handleCancelRsvp = () => {

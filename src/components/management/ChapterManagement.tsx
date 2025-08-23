@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { type Chapter, type User, Role } from '@/types';
 import CreateChapterForm from './CreateChapterForm';
 import { PencilIcon, TrashIcon } from '@/icons';
-import { useAppActions, useUsers } from '@/store/appStore';
+import { useChaptersActions, useUsers } from '@/store';
 import EditChapterModal from './EditChapterModal';
 
 interface ChapterManagementProps {
@@ -14,7 +14,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
   chapters,
   currentUser,
 }) => {
-  const { createChapter, deleteChapter } = useAppActions();
+  const { createChapter, deleteChapter } = useChaptersActions();
   const allUsers = useUsers();
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
 
@@ -99,7 +99,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                             {organizers.map((org) => (
                               <div
                                 key={org.id}
-                                className="flex items-center space-x-2 rounded-none bg-neutral-100 p-1 pr-2"
+                                className="flex items-center space-x-2 bg-neutral-100 p-1 pr-2"
                               >
                                 <img
                                   src={org.profilePictureUrl}

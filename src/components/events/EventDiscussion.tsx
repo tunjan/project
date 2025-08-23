@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { type EventComment } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAppActions, useEventComments } from '@/store/appStore';
+import { useCommentsActions, useEventComments } from '@/store';
 
 interface EventCommentCardProps {
   comment: EventComment;
@@ -39,7 +39,7 @@ interface EventDiscussionProps {
 
 const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
   const currentUser = useCurrentUser();
-  const { postComment } = useAppActions();
+  const { postComment } = useCommentsActions();
   const allEventComments = useEventComments();
   const [newComment, setNewComment] = useState('');
 
@@ -63,7 +63,11 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
         <div className="divide-y-2 divide-black">
           {comments.length > 0 ? (
             comments
-              .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+              .sort(
+                (a, b) =>
+                  new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              )
               .map((comment) => (
                 <EventCommentCard key={comment.id} comment={comment} />
               ))
@@ -89,7 +93,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add to the discussion..."
               rows={2}
-              className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               required
             />
             <button

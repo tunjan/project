@@ -2,13 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CreateEventForm from '@/components/events/CreateEventForm';
 import { useCurrentUser } from '@/store/auth.store';
-import { useAppActions } from '@/store/appStore';
+import { useEventsActions } from '@/store';
 import { toast } from 'sonner';
 
 const CreateCubePage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { createEvent } = useAppActions();
+  const { createEvent } = useEventsActions();
 
   const handleCreateEvent = (eventData: {
     city: string;

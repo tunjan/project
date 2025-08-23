@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEvents } from '@/store/appStore';
+import { useEvents } from '@/store';
 import { useNavigate } from 'react-router-dom';
 
 interface ParticipationHistoryProps {
@@ -14,7 +14,10 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
 
   const userHistory = allEvents
     .filter((event) => event.participants.some((p) => p.user.id === userId))
-    .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    )
     .slice(0, 10);
 
   if (userHistory.length === 0) {

@@ -96,22 +96,20 @@ export const calculateLeaderboards = (
         period: 'week' | 'month' | 'year'
     ): UserLeaderboardEntry[] => {
         const startDate = getStartDate(period);
-        const hourCounts: Record<string, number> = {};
+        const hourCounts: Record<string, number> = {}; // Key: userId
 
         const relevantEvents = events.filter(
             (e) => new Date(e.startDate) >= startDate && e.report
         );
 
         for (const event of relevantEvents) {
-            const chapterName = eventToCityMap.get(event.id);
-            if (chapterName && chapterMap.has(chapterName) && event.report) {
-                const attendeeCount = Object.values(
-                    event.report.attendance
-                ).filter((s) => s === 'Attended').length;
-                const totalHoursContributedInEvent = event.report.hours * attendeeCount;
-
-                hourCounts[chapterName] =
-                    (hourCounts[chapterName] || 0) + totalHoursContributedInEvent;
+            if (event.report) {
+                // Calculate hours per user based on attendance
+                for (const [userId, status] of Object.entries(event.report.attendance)) {
+                    if (status === 'Attended' && userMap.has(userId)) {
+                        hourCounts[userId] = (hourCounts[userId] || 0) + event.report.hours;
+                    }
+                }
             }
         }
 

@@ -3,7 +3,7 @@ import { type Resource, type ResourceType, type SkillLevel } from '@/types';
 import ResourceCard from './ResourceCard';
 import ResourceFilters from './ResourceFilters';
 import { BookOpenIcon } from '@/icons';
-import { useResources } from '@/store/appStore';
+import { useResources } from '@/store';
 
 const ResourcesPage: React.FC = () => {
   const allResources = useResources();

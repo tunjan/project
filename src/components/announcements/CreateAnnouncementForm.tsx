@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AnnouncementScope, Role, Chapter } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
-import { useChapters } from '@/store/appStore';
+import { useChapters } from '@/store';
 import { getPostableScopes } from '@/utils/auth';
 import { InputField, TextAreaField, SelectField } from '@/components/ui/Form';
 
