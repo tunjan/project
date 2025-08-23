@@ -33,6 +33,7 @@ export interface UsersActions {
   updateUserRole: (userId: string, role: Role) => void;
   setChapterOrganiser: (userId: string, chaptersToOrganise: string[]) => void;
   updateUserChapters: (userId: string, newChapters: string[]) => void;
+  updateUserOrganiserOf: (userId: string, newOrganiserOf: string[]) => void;
   updateProfile: (userId: string, updatedData: Partial<User>) => void;
   deleteUser: (userIdToDelete: string) => void;
   addOrganizerNote: (targetUserId: string, noteContent: string, author: User) => void;
@@ -42,6 +43,9 @@ export interface UsersActions {
     newContent: string
   ) => void;
   deleteOrganizerNote: (targetUserId: string, noteId: string) => void;
+  batchUpdateUserStats: (
+    updates: { userId: string; newStats: Partial<User['stats']> }[]
+  ) => void;
 }
 
 export const useUsersStore = create<UsersState & UsersActions>()(
@@ -70,6 +74,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           badges: [],
           hostingAvailability: false,
           joinDate: new Date(),
+          lastLogin: new Date(),
         };
         set((state) => ({ users: [...state.users, newUser] }));
 
@@ -172,8 +177,20 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         })),
 
       updateUserChapters: (userId, newChapters) =>
+        set((state) => {
+          const updatedUsers = state.users.map((u) =>
+            u.id === userId ? { ...u, chapters: newChapters } : u
+          );
+          // If this is the current user, also update the auth store
+          if (useAuthStore.getState().currentUser?.id === userId) {
+            useAuthStore.getState().updateCurrentUser({ chapters: newChapters });
+          }
+          return { users: updatedUsers };
+        }),
+
+      updateUserOrganiserOf: (userId, newOrganiserOf) =>
         set((state) => ({
-          users: state.users.map((u) => (u.id === userId ? { ...u, chapters: newChapters } : u)),
+          users: state.users.map((u) => (u.id === userId ? { ...u, organiserOf: newOrganiserOf } : u)),
         })),
 
       updateProfile: (userId, updatedData) => {
@@ -191,6 +208,10 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         set((state) => ({
           users: state.users.filter((u) => u.id !== userIdToDelete),
         }));
+        // Log out the user if they delete their own account
+        if (useAuthStore.getState().currentUser?.id === userIdToDelete) {
+          useAuthStore.getState().logout();
+        }
       },
 
       addOrganizerNote: (targetUserId, noteContent, author) => {
@@ -231,6 +252,20 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           }),
         }));
       },
+      batchUpdateUserStats: (updates) => {
+        set((state) => ({
+          users: state.users.map((user) => {
+            const update = updates.find((u) => u.userId === user.id);
+            if (update) {
+              return {
+                ...user,
+                stats: { ...user.stats, ...update.newStats },
+              };
+            }
+            return user;
+          }),
+        }));
+      },
     }),
     { name: 'users-store' }
   )
@@ -246,11 +281,13 @@ export const useUsersActions = () =>
     updateUserRole: s.updateUserRole,
     setChapterOrganiser: s.setChapterOrganiser,
     updateUserChapters: s.updateUserChapters,
+    updateUserOrganiserOf: s.updateUserOrganiserOf,
     updateProfile: s.updateProfile,
     deleteUser: s.deleteUser,
     addOrganizerNote: s.addOrganizerNote,
     editOrganizerNote: s.editOrganizerNote,
     deleteOrganizerNote: s.deleteOrganizerNote,
+    batchUpdateUserStats: s.batchUpdateUserStats,
   }));
 
 // Selectors

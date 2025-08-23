@@ -48,7 +48,7 @@ const ApplicantStatusPage: React.FC = () => {
       title: 'Get Verified In-Person',
       description:
         'Find an organizer at an event to verify your identity. Show them the QR code below.',
-      isComplete: status === OnboardingStatus.AWAITING_VERIFICATION,
+      isComplete: false, // This step is never complete for applicants on this page
     },
     {
       title: "Join a 'Welcome' call",

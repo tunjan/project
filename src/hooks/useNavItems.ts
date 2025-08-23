@@ -58,12 +58,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
         label: 'Management',
         requiresAuth: true,
         requiresOrganizer: true,
+        requiresConfirmed: true, // FIX: Added this line
     },
     {
         to: '/analytics',
         label: 'Analytics',
         requiresAuth: true,
         requiresOrganizer: true,
+        requiresConfirmed: true, // FIX: Added this line
     },
     {
         to: '/onboarding-status',
@@ -82,9 +84,11 @@ export const useNavItems = () => {
             return ALL_NAV_ITEMS.filter(item => !item.requiresAuth);
         }
 
-        const isOrganizer = hasOrganizerRole(currentUser.role);
+        const isOrganizer = hasOrganizerRole(currentUser);
         const isConfirmed = currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
-        const isPending = currentUser.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION;
+        const isPending =
+            currentUser.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION ||
+            currentUser.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW;
 
         return ALL_NAV_ITEMS.filter(item => {
             // Skip items that require auth when user is not authenticated

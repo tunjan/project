@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom'; // Import Link
 import { type User } from '@/types';
 import { hasOrganizerRole } from '@/utils/auth';
+import Tag from '@/components/ui/Tag';
 
 interface LoginProps {
   users: User[];
@@ -11,7 +12,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
   return (
     <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-md border border-black bg-white p-8">
+      <div className="mx-auto max-w-md border-2 border-black bg-white p-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-extrabold text-black">Log In As</h1>
           <p className="mt-2 text-neutral-600">
@@ -23,7 +24,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
             <button
               key={user.id}
               onClick={() => onLogin(user)}
-              className="flex w-full items-center space-x-4 border border-black p-3 transition-colors duration-200 hover:bg-neutral-100"
+              className="flex w-full items-center space-x-4 border-2 border-black p-3 transition-colors duration-200 hover:bg-neutral-100"
             >
               <img
                 src={user.profilePictureUrl}
@@ -36,14 +37,14 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
               </div>
               <div className="flex flex-shrink-0 flex-col items-end space-y-1">
                 {hasOrganizerRole(user) && (
-                  <span className="bg-primary px-2 py-1 text-xs font-bold text-white">
+                  <Tag variant="primary" size="sm">
                     ORGANIZER
-                  </span>
+                  </Tag>
                 )}
                 {user.onboardingStatus === 'Awaiting Verification' && (
-                  <span className="whitespace-normal bg-yellow-400 px-2 py-1 text-right text-xs font-bold text-black">
+                  <Tag variant="warning" size="sm">
                     PENDING VERIFICATION
-                  </span>
+                  </Tag>
                 )}
               </div>
             </button>
@@ -52,10 +53,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
         {/* NEW: Added a link to the sign-up page */}
         <p className="mt-8 text-center text-sm text-neutral-600">
           Don't have an account?{' '}
-          <Link
-            to="/signup"
-            className="font-bold text-primary hover:underline"
-          >
+          <Link to="/signup" className="font-bold text-primary hover:underline">
             Sign Up
           </Link>
         </p>

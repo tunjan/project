@@ -1,16 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import {
-  type OutreachLog,
-  OutreachOutcome,
-  type CubeEvent,
-} from '@/types';
+import { type OutreachLog, OutreachOutcome, type CubeEvent } from '@/types';
 import OutreachTally from '@/components/outreach/OutreachTally';
 import { useCurrentUser } from '@/store/auth.store';
-import {
-  useEvents,
-  useOutreachLogsForUser,
-  useOutreachActions,
-} from '@/store';
+import { useEvents, useOutreachLogsForUser, useOutreachActions } from '@/store';
 import { toast } from 'sonner';
 import {
   PencilIcon,
@@ -36,7 +28,7 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
   onDelete,
   onAddNotes,
 }) => {
-  const [showNotesInput, setShowNotesInput] = useState(false);
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
   const [newNotes, setNewNotes] = useState('');
 
   const getOutcomeColor = (outcome: OutreachOutcome) => {
@@ -62,100 +54,119 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
     if (!newNotes.trim()) return;
     onAddNotes(log, newNotes);
     setNewNotes('');
-    setShowNotesInput(false);
+    setIsNotesModalOpen(false);
+  };
+
+  const openNotesModal = () => {
+    setNewNotes(log.notes || '');
+    setIsNotesModalOpen(true);
   };
 
   return (
-    <div className="p-4 hover:bg-neutral-50">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="mb-2 flex items-center gap-3">
-            <p className="font-bold text-black">
-              {event?.location || 'Unknown Event'}
+    <>
+      <div className="p-4 hover:bg-neutral-50">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="mb-2 flex items-center gap-3">
+              <p className="font-bold text-black">
+                {event?.location || 'Unknown Event'}
+              </p>
+              <span
+                className={`tag-status text-white ${getOutcomeColor(log.outcome)}`}
+              >
+                {log.outcome}
+              </span>
+            </div>
+            <p className="mb-2 font-mono text-xs text-neutral-500">
+              {new Date(log.createdAt).toLocaleDateString()}
             </p>
-            <span
-              className={`tag-status text-white ${getOutcomeColor(log.outcome)}`}
-            >
-              {log.outcome}
-            </span>
           </div>
-          <p className="mb-2 font-mono text-xs text-neutral-500">
-            {new Date(log.createdAt).toLocaleDateString()}
-          </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={openNotesModal}
+              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              title={
+                log.notes
+                  ? 'Edit notes for this log entry'
+                  : 'Add notes to this log entry'
+              }
+            >
+              {log.notes ? (
+                <PencilIcon className="h-3 w-3" />
+              ) : (
+                <PlusIcon className="h-3 w-3" />
+              )}
+              {log.notes ? 'Edit Notes' : 'Add Notes'}
+            </button>
+            <button
+              onClick={() => onEdit(log)}
+              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              title="Edit this log entry"
+            >
+              <PencilIcon className="h-3 w-3" />
+            </button>
+            <button
+              onClick={() => onDelete(log)}
+              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-red-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              title="Delete this log entry"
+            >
+              <XIcon className="h-3 w-3" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {!log.notes && !showNotesInput && (
-            <button
-              onClick={() => setShowNotesInput(true)}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
-              title="Add notes to this log entry"
-            >
-              <PlusIcon className="h-3 w-3" />
-              Add Notes
-            </button>
-          )}
-          <button
-            onClick={() => onEdit(log)}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
-            title="Edit this log entry"
-          >
-            <PencilIcon className="h-3 w-3" />
-          </button>
-          <button
-            onClick={() => onDelete(log)}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-red-600 transition-colors duration-300 hover:bg-black hover:text-white"
-            title="Delete this log entry"
-          >
-            <XIcon className="h-3 w-3" />
-          </button>
-        </div>
+        {log.notes && (
+          <div className="card-brutal card-padding mt-2 bg-neutral-50">
+            <p className="text-sm text-neutral-700">{log.notes}</p>
+          </div>
+        )}
       </div>
 
-      {log.notes && (
-        <div className="card-brutal card-padding mt-2 bg-neutral-50">
-          <p className="text-sm text-neutral-700">{log.notes}</p>
-        </div>
-      )}
-
-      {showNotesInput && (
-        <div className="card-brutal card-padding mt-3 bg-blue-50">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newNotes}
-              onChange={(e) => setNewNotes(e.target.value)}
-              placeholder="Add notes about this conversation..."
-              className="flex-1 border-2 border-black bg-white p-2 text-sm"
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddNotes();
-                if (e.key === 'Escape') {
-                  setShowNotesInput(false);
-                  setNewNotes('');
-                }
-              }}
-            />
-            <button
-              onClick={handleAddNotes}
-              className="btn-primary px-3 text-sm"
-              disabled={!newNotes.trim()}
-            >
-              Add
-            </button>
-            <button
-              onClick={() => {
-                setShowNotesInput(false);
-                setNewNotes('');
-              }}
-              className="btn-secondary px-3 text-sm"
-            >
-              Cancel
-            </button>
+      {/* Notes Modal */}
+      {isNotesModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md border-2 border-black bg-white p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-black">
+                {log.notes ? 'Edit Notes' : 'Add Notes'}
+              </h3>
+              <button
+                onClick={() => setIsNotesModalOpen(false)}
+                className="text-neutral-500 hover:text-black"
+              >
+                <XIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mb-4">
+              <textarea
+                value={newNotes}
+                onChange={(e) => setNewNotes(e.target.value)}
+                placeholder="Add notes about this conversation..."
+                className="w-full resize-none border-2 border-black bg-white p-3 text-sm"
+                rows={4}
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddNotes}
+                className="flex-1 bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
+                disabled={!newNotes.trim()}
+              >
+                {log.notes ? 'Update Notes' : 'Add Notes'}
+              </button>
+              <button
+                onClick={() => setIsNotesModalOpen(false)}
+                className="flex-1 border-2 border-black bg-white px-4 py-2 font-bold text-black hover:bg-neutral-100"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -312,7 +323,7 @@ const OutreachLogPage: React.FC = () => {
                       />
                     </button>
                     {showEventSelector && (
-                      <div className="shadow-brutal absolute z-10 mt-1 w-full border-2 border-black bg-white">
+                      <div className="absolute z-10 mt-1 w-full border-2 border-black bg-white shadow-brutal">
                         {pastEvents.map((event) => (
                           <button
                             key={event.id}
@@ -335,17 +346,17 @@ const OutreachLogPage: React.FC = () => {
                     const getOutcomeColor = (outcome: OutreachOutcome) => {
                       switch (outcome) {
                         case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
-                          return 'bg-green-600 text-white hover:bg-green-700';
+                          return 'btn-success';
                         case OutreachOutcome.BECAME_VEGAN:
-                          return 'bg-green-500 text-white hover:bg-green-600';
+                          return 'btn-success';
                         case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
-                          return 'bg-blue-600 text-white hover:bg-blue-700';
+                          return 'btn-info';
                         case OutreachOutcome.MOSTLY_SURE:
-                          return 'bg-yellow-500 text-black hover:bg-yellow-600';
+                          return 'btn-warning';
                         case OutreachOutcome.NOT_SURE:
-                          return 'bg-gray-500 text-white hover:bg-gray-600';
+                          return 'btn-gray';
                         case OutreachOutcome.NO_CHANGE:
-                          return 'bg-red-600 text-white hover:bg-red-700';
+                          return 'btn-danger';
                         default:
                           return 'bg-black text-white hover:bg-gray-800';
                       }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { type User } from '@/types';
-import { type UserLeaderboardEntry } from '@/utils/leaderboard';
+import { type UserLeaderboardEntry, calculateRanks } from '@/utils/leaderboard';
 import { UsersIcon } from '@/icons';
 
 interface LeaderboardProps {
@@ -23,15 +23,17 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   unit,
   currentUser,
 }) => {
+  // Calculate proper ranks that handle ties
+  const rankedData = calculateRanks(data);
+
   return (
     <div className="border-2 border-black bg-white">
       <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
-      {data.length > 0 ? (
+      {rankedData.length > 0 ? (
         <ul className="divide-y-2 divide-black">
-          {data.map(({ user, value }, index) => {
-            const rank = index + 1;
+          {rankedData.map(({ user, value, rank }) => {
             const isCurrentUser = currentUser && user.id === currentUser.id;
             const rankBG = rankClasses[rank] || 'bg-white text-black';
 
@@ -49,7 +51,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
                 <Link
                   to={`/members/${user.id}`}
-                  className="wrap-normal flex flex-grow items-center p-4 transition-colors hover:bg-neutral-100"
+                  className="flex flex-grow items-center p-4 transition-colors hover:bg-neutral-100"
                 >
                   <img
                     src={user.profilePictureUrl}
@@ -62,7 +64,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     </p>
                   </div>
                   <div className="ml-4 text-right">
-                    <p className="wrap-normal text-2xl font-extrabold text-black">
+                    <p className="text-2xl font-extrabold text-black">
                       {value.toLocaleString()}
                     </p>
                     <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">

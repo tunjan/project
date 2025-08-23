@@ -12,8 +12,8 @@ interface TourOfDutyModalProps {
 
 const getDatesBetween = (start: Date, end: Date): Date[] => {
   const dates = [];
-  let currentDate = new Date(start.toISOString().split('T')[0]);
-  const lastDate = new Date(end.toISOString().split('T')[0]);
+  let currentDate = new Date(new Date(start).toISOString().split('T')[0]);
+  const lastDate = new Date(new Date(end).toISOString().split('T')[0]);
 
   while (currentDate <= lastDate) {
     dates.push(new Date(currentDate));
@@ -64,14 +64,14 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
     >
       <div className="my-6 max-h-[60vh] space-y-4 overflow-y-auto pr-2">
         {eventDays.map((day) => {
-          const dateString = day.toISOString().split('T')[0];
+          const dateString = new Date(day).toISOString().split('T')[0];
           return (
             <div
               key={dateString}
               className="border-2 border-black bg-white p-4"
             >
               <h4 className="font-bold">
-                {day.toLocaleDateString(undefined, {
+                {new Date(day).toLocaleDateString(undefined, {
                   weekday: 'long',
                   month: 'long',
                   day: 'numeric',

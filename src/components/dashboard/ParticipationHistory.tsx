@@ -13,7 +13,11 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
   const allEvents = useEvents();
 
   const userHistory = allEvents
-    .filter((event) => event.participants.some((p) => p.user.id === userId))
+    .filter(
+      (event) =>
+        event.participants.some((p) => p.user.id === userId) &&
+        new Date(event.startDate) < new Date()
+    )
     .sort(
       (a, b) =>
         new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
@@ -37,11 +41,14 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
           const participation = event.participants.find(
             (p) => p.user.id === userId
           )!;
-          const formattedDate = event.startDate.toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          });
+          const formattedDate = new Date(event.startDate).toLocaleDateString(
+            undefined,
+            {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }
+          );
 
           return (
             <li key={event.id}>

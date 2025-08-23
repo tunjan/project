@@ -57,7 +57,7 @@ const CubeListPage: React.FC = () => {
 
     return allEvents
       .filter((e: CubeEvent) => {
-        const isEventInPast = e.startDate < now;
+        const isEventInPast = new Date(e.startDate) < now;
         const timeMatch =
           eventTimeView === 'past' ? isEventInPast : !isEventInPast;
 
@@ -68,7 +68,8 @@ const CubeListPage: React.FC = () => {
 
         const searchMatch =
           searchTerm === '' ||
-          e.city.toLowerCase().includes(searchTerm.toLowerCase());
+          e.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          e.location.toLowerCase().includes(searchTerm.toLowerCase());
 
         return timeMatch && regionMatch && searchMatch;
       })
@@ -106,21 +107,21 @@ const CubeListPage: React.FC = () => {
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
-        <div className="relative mb-2 flex w-full flex-col items-center justify-center">
+        <div className="mb-2 flex w-full flex-col items-center justify-between gap-4 lg:flex-row">
           <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             {eventTimeView === 'upcoming' ? 'Upcoming Cubes' : 'Past Cubes'}
           </h1>
           {currentUser && hasOrganizerRole(currentUser) && (
             <button
               onClick={handleCreateCube}
-              className="m-3 flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover lg:absolute lg:right-0 lg:m-0"
+              className="flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
             >
               <PlusIcon className="mr-2 h-5 w-5" />
               Create Cube
             </button>
           )}
         </div>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-lg text-neutral-600">
+        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
           {eventTimeView === 'upcoming'
             ? 'Find an event near you and join the movement.'
             : 'A history of our actions. Organizers can select an event to log reports.'}

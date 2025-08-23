@@ -8,8 +8,8 @@ interface EventRosterProps {
 
 const getDatesBetween = (start: Date, end: Date): Date[] => {
   const dates = [];
-  let currentDate = new Date(start.toISOString().split('T')[0]);
-  const lastDate = new Date(end.toISOString().split('T')[0]);
+  let currentDate = new Date(new Date(start).toISOString().split('T')[0]);
+  const lastDate = new Date(new Date(end).toISOString().split('T')[0]);
   while (currentDate <= lastDate) {
     dates.push(new Date(currentDate));
     currentDate.setDate(currentDate.getDate() + 1);
@@ -27,7 +27,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
     const roster: Record<string, Record<EventRole, any[]>> = {};
 
     for (const day of eventDays) {
-      const dateString = day.toISOString().split('T')[0];
+      const dateString = new Date(day).toISOString().split('T')[0];
       roster[dateString] = {
         [EventRole.OUTREACH]: [],
         [EventRole.EQUIPMENT]: [],
@@ -59,13 +59,13 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
       </div>
       <div className="space-y-4 p-6">
         {eventDays.map((day) => {
-          const dateString = day.toISOString().split('T')[0];
+          const dateString = new Date(day).toISOString().split('T')[0];
           const dailyRoster = rosterByDay[dateString];
 
           return (
             <div key={dateString} className="border-2 border-black p-4">
               <h3 className="font-bold">
-                {day.toLocaleDateString(undefined, {
+                {new Date(day).toLocaleDateString(undefined, {
                   weekday: 'long',
                   month: 'long',
                   day: 'numeric',

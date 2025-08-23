@@ -1,14 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { type User, Role, OnboardingStatus, BadgeTemplate } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
-import { useChapters, useUsersActions, useAwardsActions } from '@/store';
-import {
-  getAssignableRoles,
-  ROLE_HIERARCHY,
-  canVerifyUser,
-} from '@/utils/auth';
-import { getUserRoleDisplay } from '@/utils/user';
+import { useCurrentUser, useChapters } from '@/store';
+import { useUsersActions } from '@/store/users.store';
+import { useAwardsActions } from '@/store/awards.store';
+import { ROLE_HIERARCHY, canVerifyUser } from '@/utils/auth';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import BadgeList from '@/components/dashboard/BadgeList';
 import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
@@ -17,14 +13,13 @@ import EditChaptersModal from './EditChaptersModal';
 import DeleteUserModal from './DeleteUserModal';
 import OrganizerNotes from './OrganizerNotes';
 import AwardBadgeModal from './AwardBadgeModal';
-import {
-  ChevronLeftIcon,
-  PencilIcon,
-  ShieldCheckIcon,
-  TrophyIcon,
-  ChatBubbleLeftRightIcon,
-} from '@/icons';
+// --- NEW COMPONENT IMPORTS ---
+import MemberProfileHeader from './MemberProfileHeader';
+import UserManagementPanel from './UserManagementPanel';
+import UserDangerZone from './UserDangerZone';
+import { ChevronLeftIcon } from '@/icons';
 import { toast } from 'sonner';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 interface MemberProfileProps {
   user: User;
@@ -37,19 +32,19 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   const allChapters = useChapters();
   const {
     updateUserRole,
-    setChapterOrganiser,
-    deleteUser,
     updateUserChapters,
+    deleteUser,
     updateUserStatus,
     confirmUserIdentity,
+    setChapterOrganiser,
   } = useUsersActions();
   const { awardBadge } = useAwardsActions();
 
-  const [selectedRole, setSelectedRole] = useState<Role>(user.role);
-  const [isPromoteModalOpen, setPromoteModalOpen] = useState(false);
-  const [isEditChaptersModalOpen, setEditChaptersModalOpen] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isAwardBadgeModalOpen, setAwardBadgeModalOpen] = useState(false);
+  const [promoteModalOpen, setPromoteModalOpen] = useState(false);
+  const [editChaptersModalOpen, setEditChaptersModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [awardBadgeModalOpen, setAwardBadgeModalOpen] = useState(false);
+  const [manualVerifyModalOpen, setManualVerifyModalOpen] = useState(false);
 
   const handleApprove = () => {
     if (!currentUser) return;
@@ -70,31 +65,10 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   };
 
   const handleManualVerify = () => {
-    if (
-      window.confirm(
-        `Are you sure you want to manually verify ${user.name}? This will grant them full activist permissions.`
-      )
-    ) {
-      confirmUserIdentity(user.id);
-      toast.success(
-        `${user.name} has been manually verified and now has full access.`
-      );
-    }
-  };
-
-  const assignableRoles = currentUser ? getAssignableRoles(currentUser) : [];
-
-  const handleSaveRole = () => {
-    if (selectedRole === user.role) return;
-    if (
-      selectedRole === Role.CHAPTER_ORGANISER &&
-      ROLE_HIERARCHY[user.role] < ROLE_HIERARCHY[Role.CHAPTER_ORGANISER]
-    ) {
-      setPromoteModalOpen(true);
-    } else {
-      updateUserRole(user.id, selectedRole);
-      toast.success(`${user.name}'s role has been updated to ${selectedRole}.`);
-    }
+    confirmUserIdentity(user.id);
+    toast.success(
+      `${user.name} has been manually verified and now has full access.`
+    );
   };
 
   const handleConfirmOrganiserUpdate = (chaptersToOrganise: string[]) => {
@@ -175,7 +149,8 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     !!currentUser &&
     ROLE_HIERARCHY[currentUser.role] > ROLE_HIERARCHY[user.role];
   const canManuallyVerify = currentUser
-    ? canVerifyUser(currentUser, user)
+    ? canVerifyUser(currentUser, user) &&
+      user.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION
     : false;
   const canAwardBadges =
     !!currentUser &&
@@ -187,14 +162,14 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
 
   return (
     <>
-      {isPromoteModalOpen && (
+      {promoteModalOpen && (
         <PromoteToOrganiserModal
           userToManage={user}
           onClose={() => setPromoteModalOpen(false)}
           onConfirm={handleConfirmOrganiserUpdate}
         />
       )}
-      {isEditChaptersModalOpen && (
+      {editChaptersModalOpen && (
         <EditChaptersModal
           user={user}
           allChapters={allChapters}
@@ -202,14 +177,14 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           onSave={handleConfirmChapterUpdate}
         />
       )}
-      {isDeleteModalOpen && (
+      {deleteModalOpen && (
         <DeleteUserModal
           user={user}
           onClose={() => setDeleteModalOpen(false)}
           onConfirm={handleConfirmDelete}
         />
       )}
-      {isAwardBadgeModalOpen && (
+      {awardBadgeModalOpen && (
         <AwardBadgeModal
           userToAward={user}
           onClose={() => setAwardBadgeModalOpen(false)}
@@ -224,21 +199,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           <ChevronLeftIcon className="mr-1 h-5 w-5" /> Back to Member Directory
         </button>
 
-        <div className="mb-8 flex flex-col items-center space-y-4 border-2 border-black bg-white p-6 sm:flex-row sm:space-x-8 sm:space-y-0 md:p-8">
-          <img
-            src={user.profilePictureUrl}
-            alt={user.name}
-            className="h-24 w-24 border-2 border-black object-cover md:h-32 md:w-32"
-          />
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl font-extrabold text-black md:text-4xl">
-              {user.name}
-            </h1>
-            <p className="text-lg text-neutral-600">
-              {getUserRoleDisplay(user)}
-            </p>
-          </div>
-        </div>
+        <MemberProfileHeader user={user} />
 
         {user.onboardingStatus ===
           OnboardingStatus.PENDING_APPLICATION_REVIEW &&
@@ -278,13 +239,13 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               <div className="mt-6 flex space-x-4 border-t border-yellow-400 pt-4">
                 <button
                   onClick={handleDeny}
-                  className="w-full bg-black px-4 py-2 font-bold text-white hover:bg-neutral-800"
+                  className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-neutral-800"
                 >
                   Deny
                 </button>
                 <button
                   onClick={handleApprove}
-                  className="w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
+                  className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
                 >
                   Approve Application
                 </button>
@@ -316,125 +277,40 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               <DiscountTierProgress user={user} />
             </section>
             {canManageRole && (
-              <section>
-                <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                  Manage User
-                </h2>
-                <div className="space-y-4 border-2 border-black bg-white p-6">
-                  {/* Send Message Button */}
-                  <div className="border-b border-gray-200 pb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <ChatBubbleLeftRightIcon className="mr-3 h-5 w-5 text-black" />
-                        <div>
-                          <h3 className="text-lg font-bold text-black">
-                            Send Message
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            Reach out to this member directly
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleSendMessage}
-                        className="bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700"
-                      >
-                        Send Email
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center">
-                    <PencilIcon className="mr-3 h-5 w-5 text-black" />
-                    <h3 className="text-lg font-bold text-black">
-                      Assign Role
-                    </h3>
-                  </div>
-                  <select
-                    id="role-select"
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value as Role)}
-                    className="block w-full border-2 border-black bg-white p-2 text-black"
-                  >
-                    <option value={user.role} disabled>
-                      {user.role} (Current)
-                    </option>
-                    {assignableRoles.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={handleSaveRole}
-                    disabled={selectedRole === user.role}
-                    className="w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Save Role
-                  </button>
-
-                  {canEditChapters && (
-                    <button
-                      onClick={() => setEditChaptersModalOpen(true)}
-                      className="mt-2 w-full border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
-                    >
-                      Edit Chapter Memberships
-                    </button>
-                  )}
-                  {canAwardBadges && (
-                    <button
-                      onClick={() => setAwardBadgeModalOpen(true)}
-                      className="mt-2 flex w-full items-center justify-center border-2 border-yellow-500 bg-yellow-400 px-4 py-2 font-bold text-black hover:bg-yellow-500"
-                    >
-                      <TrophyIcon className="mr-2 h-5 w-5" />
-                      Award Recognition
-                    </button>
-                  )}
-                </div>
-              </section>
+              <UserManagementPanel
+                user={user}
+                currentUser={currentUser}
+                canEditChapters={canEditChapters}
+                canAwardBadges={canAwardBadges}
+                onUpdateRole={updateUserRole}
+                onSetChapterOrganiser={setChapterOrganiser}
+                onOpenPromoteModal={() => setPromoteModalOpen(true)}
+                onOpenEditChaptersModal={() => setEditChaptersModalOpen(true)}
+                onOpenAwardBadgeModal={() => setAwardBadgeModalOpen(true)}
+                onSendMessage={handleSendMessage}
+              />
             )}
-            <section>
-              <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                Danger Zone
-              </h2>
-              <div className="space-y-4 border-2 border-primary bg-white p-6">
-                {user.onboardingStatus ===
-                  OnboardingStatus.AWAITING_VERIFICATION &&
-                  canManuallyVerify && (
-                    <div className="border-b border-primary pb-4">
-                      <h3 className="text-lg font-bold text-black">
-                        Manual Verification
-                      </h3>
-                      <p className="mt-1 text-sm text-neutral-600">
-                        Force-verify this user and grant them full access.
-                      </p>
-                      <button
-                        onClick={handleManualVerify}
-                        className="mt-2 flex w-full items-center justify-center bg-yellow-500 px-4 py-2 font-bold text-black hover:bg-yellow-600"
-                      >
-                        <ShieldCheckIcon className="mr-2 h-5 w-5" />
-                        Manually Verify User
-                      </button>
-                    </div>
-                  )}
-                <div>
-                  <h3 className="text-lg font-bold text-black">Delete User</h3>
-                  <p className="mt-1 text-sm text-neutral-600">
-                    This action is permanent and cannot be undone.
-                  </p>
-                  <button
-                    onClick={() => setDeleteModalOpen(true)}
-                    disabled={!canDeleteUser}
-                    className="mt-4 w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Delete User
-                  </button>
-                </div>
-              </div>
-            </section>
+            <UserDangerZone
+              user={user}
+              canManuallyVerify={canManuallyVerify}
+              canDeleteUser={canDeleteUser}
+              onManualVerify={() => setManualVerifyModalOpen(true)}
+              onOpenDeleteModal={() => setDeleteModalOpen(true)}
+            />
           </div>
         </div>
       </div>
+
+      {/* Manual Verification Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={manualVerifyModalOpen}
+        onClose={() => setManualVerifyModalOpen(false)}
+        onConfirm={handleManualVerify}
+        title="Manual Verification"
+        message={`Are you sure you want to manually verify ${user.name}? This will grant them full activist permissions.`}
+        confirmText="Verify User"
+        variant="warning"
+      />
     </>
   );
 };

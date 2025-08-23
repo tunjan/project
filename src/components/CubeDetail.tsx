@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   type CubeEvent,
@@ -40,6 +40,8 @@ import {
 } from '@/store';
 import { toast } from 'sonner';
 import CancelEventModal from './events/CancelEventModal';
+import { safeFormatDate, safeParseDate } from '@/utils/date';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 interface CubeDetailProps {
   event: CubeEvent;
@@ -186,27 +188,33 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   const [isTourModalOpen, setIsTourModalOpen] = useState(false);
   const [isRoleSignupModalOpen, setIsRoleSignupModalOpen] = useState(false);
   const [selectedHost, setSelectedHost] = useState<User | null>(null);
+  const [removeParticipantModalOpen, setRemoveParticipantModalOpen] =
+    useState(false);
+  const [participantToRemove, setParticipantToRemove] = useState<string | null>(
+    null
+  );
 
-  const formattedDate = new Intl.DateTimeFormat(undefined, {
+  // Ensure dates are valid Date objects
+  const startDate = safeParseDate(event.startDate);
+  const endDate = safeParseDate(event.endDate);
+
+  const formattedDate = safeFormatDate(startDate, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
     year: 'numeric',
-  }).format(event.startDate);
+  });
 
-  const formattedTime = new Intl.DateTimeFormat(undefined, {
+  const formattedTime = safeFormatDate(startDate, {
     hour: '2-digit',
     minute: '2-digit',
     timeZoneName: 'short',
-  }).format(event.startDate);
+  });
 
-  const formattedDateRange = event.endDate
-    ? `${new Intl.DateTimeFormat(undefined, {
-        dateStyle: 'full',
-      }).format(event.startDate)} to ${new Intl.DateTimeFormat(undefined, {
-        dateStyle: 'full',
-      }).format(event.endDate)}`
-    : formattedDate;
+  const formattedDateRange =
+    startDate && endDate
+      ? `${safeFormatDate(startDate, { dateStyle: 'full' })} to ${safeFormatDate(endDate, { dateStyle: 'full' })}`
+      : formattedDate;
 
   const currentUserParticipant = useMemo(
     () =>
@@ -224,7 +232,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     ? !currentUser.chapters.includes(event.city)
     : true;
 
-  const isPastEvent = new Date() > event.startDate;
+  const isPastEvent = startDate ? new Date() > startDate : false;
   const isCancelled = event.status === EventStatus.CANCELLED;
   const isOrganizer = currentUser?.id === event.organizer.id;
   const canManageEvent =
@@ -235,7 +243,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   const canParticipateInDiscussion = currentUser && isAttending;
   const canEditEvent = isOrganizer && !isPastEvent && !isCancelled;
   const canCancelEvent = isOrganizer && !isPastEvent && !isCancelled;
-  const isRegionalEvent = event.scope === 'Regional' && event.endDate;
+  const isRegionalEvent = event.scope === 'Regional' && endDate !== null;
 
   const attendingParticipants = useMemo(
     () =>
@@ -363,16 +371,30 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   };
 
   const handleRemoveParticipant = (participantUserId: string) => {
-    if (
-      !currentUser ||
-      window.confirm('Are you sure you want to remove this participant?')
-    ) {
-      removeParticipant(event.id, participantUserId, currentUser!);
-    }
+    if (!currentUser) return;
+    removeParticipant(event.id, participantUserId, currentUser);
+  };
+
+  const openRemoveParticipantModal = (participantUserId: string) => {
+    setParticipantToRemove(participantUserId);
+    setRemoveParticipantModalOpen(true);
   };
 
   return (
     <>
+      <ConfirmationModal
+        isOpen={removeParticipantModalOpen}
+        onClose={() => setRemoveParticipantModalOpen(false)}
+        onConfirm={() => {
+          if (participantToRemove) {
+            handleRemoveParticipant(participantToRemove);
+          }
+        }}
+        title="Remove Participant"
+        message="Are you sure you want to remove this participant?"
+        confirmText="Remove"
+        variant="danger"
+      />
       {isRequestModalOpen && selectedHost && (
         <RequestAccommodationModal
           host={selectedHost}
@@ -582,11 +604,35 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     key={p.user.id}
                     participant={p}
                     isOrganizerView={isOrganizer && !isPastEvent}
-                    onRemove={handleRemoveParticipant}
+                    onRemove={openRemoveParticipantModal}
                   />
                 ))}
               </ul>
               <div className="mt-6 space-y-2">
+                {/* Status Display */}
+                {isAttending && (
+                  <div className="flex items-center justify-center border-2 border-green-600 bg-green-100 px-4 py-3 font-semibold text-green-800">
+                    <ClipboardCheckIcon className="mr-2 h-5 w-5" />
+                    Status: Attending
+                  </div>
+                )}
+                {isPending && (
+                  <div className="flex items-center justify-center border-2 border-yellow-600 bg-yellow-100 px-4 py-3 font-semibold text-yellow-800">
+                    <ClockIcon className="mr-2 h-5 w-5" />
+                    Status: Request Pending
+                  </div>
+                )}
+                {isPastEvent || event.status === EventStatus.FINISHED ? (
+                  <div className="flex items-center justify-center border-2 border-neutral-600 bg-neutral-100 px-4 py-3 font-semibold text-neutral-800">
+                    Event has ended
+                  </div>
+                ) : isCancelled ? (
+                  <div className="flex items-center justify-center border-2 border-red-600 bg-red-100 px-4 py-3 font-semibold text-red-800">
+                    Event Cancelled
+                  </div>
+                ) : null}
+
+                {/* Action Buttons */}
                 {canManageEvent ? (
                   <button
                     onClick={() => onManageEvent(event)}
@@ -596,38 +642,35 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     Log Event Report
                   </button>
                 ) : (
-                  <button
-                    onClick={handleRsvpClick}
-                    disabled={
-                      isPastEvent ||
-                      event.status === EventStatus.FINISHED ||
-                      isCancelled ||
-                      (isAttending && !isRegionalEvent) ||
-                      isPending
-                    }
-                    className={`w-full px-4 py-3 font-bold transition-colors duration-300 ${
-                      isAttending
-                        ? 'bg-green-600 text-white'
-                        : isPending
-                          ? 'bg-yellow-500 text-black'
-                          : 'bg-primary text-white hover:bg-primary-hover'
-                    } disabled:cursor-not-allowed disabled:opacity-50`}
-                  >
-                    {(() => {
-                      if (isPastEvent || event.status === EventStatus.FINISHED)
-                        return 'Event has ended';
-                      if (isCancelled) return 'Event Cancelled';
-                      if (isPending) return 'Request Pending';
-                      if (isAttending)
-                        return isRegionalEvent
-                          ? 'Update Duties'
-                          : 'You are attending';
-                      if (!currentUser) return 'Log in to RSVP';
-                      if (isRegionalEvent) return 'Sign Up for Duties';
-                      return isGuest ? 'Request to Join' : 'RSVP to this Cube';
-                    })()}
-                  </button>
+                  !isPastEvent &&
+                  !isCancelled &&
+                  currentUser && (
+                    <>
+                      {!isAttending && !isPending && (
+                        <button
+                          onClick={handleRsvpClick}
+                          className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+                        >
+                          {isRegionalEvent
+                            ? 'Sign Up for Duties'
+                            : isGuest
+                              ? 'Request to Join'
+                              : 'RSVP to this Cube'}
+                        </button>
+                      )}
+                      {isAttending && isRegionalEvent && (
+                        <button
+                          onClick={handleRsvpClick}
+                          className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+                        >
+                          Update Duties
+                        </button>
+                      )}
+                    </>
+                  )
                 )}
+
+                {/* Cancel RSVP Button */}
                 {(isAttending || isPending) && !isPastEvent && !isCancelled && (
                   <button
                     onClick={() => onCancelRsvp(event.id)}
@@ -636,6 +679,8 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     Cancel RSVP
                   </button>
                 )}
+
+                {/* Event Management Buttons */}
                 {canEditEvent && (
                   <button
                     onClick={() => setIsEditModalOpen(true)}
@@ -648,7 +693,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 {canCancelEvent && (
                   <button
                     onClick={() => setIsCancelModalOpen(true)}
-                    className="flex w-full items-center justify-center border border-red-600 bg-red-600 px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-red-700"
+                    className="btn-danger flex w-full items-center justify-center"
                   >
                     <XCircleIcon className="mr-2 h-5 w-5" />
                     Cancel Event

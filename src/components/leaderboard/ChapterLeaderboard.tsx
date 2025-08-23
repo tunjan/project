@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type ChapterLeaderboardEntry } from '@/utils/leaderboard';
+import { type ChapterLeaderboardEntry, calculateRanks } from '@/utils/leaderboard';
 import { BuildingOfficeIcon } from '@/icons';
 
 interface ChapterLeaderboardProps {
@@ -21,6 +21,9 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
   unit,
 }) => {
   const navigate = useNavigate();
+  
+  // Calculate proper ranks that handle ties
+  const rankedData = calculateRanks(data);
 
   const handleChapterClick = (chapterName: string) => {
     navigate(`/chapters/${chapterName}`);
@@ -31,10 +34,9 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
       <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
-      {data.length > 0 ? (
+      {rankedData.length > 0 ? (
         <ul className="divide-y-2 divide-black">
-          {data.map(({ chapter, value }, index) => {
-            const rank = index + 1;
+          {rankedData.map(({ chapter, value, rank }) => {
             const rankBG = rankClasses[rank] || 'bg-white text-black';
             return (
               <li
@@ -52,7 +54,9 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
                     <BuildingOfficeIcon className="h-6 w-6 text-white" />
                   </div>
                   <div className="ml-4 flex-grow lg:max-w-none">
-                    <p className="font-bold truncate text-black max-w-20 ">{chapter.name}</p>
+                    <p className="truncate font-bold text-black sm:max-w-xs">
+                      {chapter.name}
+                    </p>
                     <p className="text-sm text-neutral-500">
                       {chapter.country}
                     </p>

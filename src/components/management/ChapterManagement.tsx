@@ -4,6 +4,7 @@ import CreateChapterForm from './CreateChapterForm';
 import { PencilIcon, TrashIcon } from '@/icons';
 import { useChaptersActions, useUsers } from '@/store';
 import EditChapterModal from './EditChapterModal';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 interface ChapterManagementProps {
   chapters: Chapter[];
@@ -17,15 +18,16 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
   const { createChapter, deleteChapter } = useChaptersActions();
   const allUsers = useUsers();
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
 
   const handleDelete = (chapterName: string) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the ${chapterName} chapter? This cannot be undone.`
-      )
-    ) {
-      deleteChapter(chapterName);
-    }
+    deleteChapter(chapterName);
+  };
+
+  const openDeleteModal = (chapterName: string) => {
+    setChapterToDelete(chapterName);
+    setDeleteModalOpen(true);
   };
 
   const chapterOrganizersMap = useMemo(() => {
@@ -46,6 +48,20 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
 
   return (
     <>
+      <ConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (chapterToDelete) {
+            handleDelete(chapterToDelete);
+          }
+        }}
+        title="Delete Chapter"
+        message={`Are you sure you want to delete the ${chapterToDelete} chapter? This cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
+
       {editingChapter && (
         <EditChapterModal
           chapter={editingChapter}
@@ -82,7 +98,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(chapter.name)}
+                            onClick={() => openDeleteModal(chapter.name)}
                             className="p-1 text-neutral-500 hover:text-red-600"
                             aria-label="Delete Chapter"
                           >

@@ -22,9 +22,19 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
   onClose,
   onCreateRequest,
 }) => {
-  const today = new Date().toISOString().split('T')[0];
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(today);
+  // Set default dates to be more logical - arrival day before event, departure day after
+  const eventStartDate = new Date(event.startDate);
+  const arrivalDate = new Date(eventStartDate);
+  arrivalDate.setDate(eventStartDate.getDate() - 1);
+  const departureDate = new Date(eventStartDate);
+  departureDate.setDate(eventStartDate.getDate() + 1);
+
+  const [startDate, setStartDate] = useState(
+    arrivalDate.toISOString().split('T')[0]
+  );
+  const [endDate, setEndDate] = useState(
+    departureDate.toISOString().split('T')[0]
+  );
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {

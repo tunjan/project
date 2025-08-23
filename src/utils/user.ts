@@ -1,4 +1,4 @@
-import { User, Role } from '@/types';
+import { User, Role, OnboardingStatus, CubeEvent } from '@/types';
 
 /**
  * Generates a clean, human-friendly display string for a user's role and affiliations.
@@ -51,4 +51,29 @@ export const getUserRoleDisplay = (user: User): string => {
   }
 
   return roleLabel;
+};
+
+/**
+ * Checks if a user is considered inactive.
+ * Inactive means they haven't logged in for 3 months AND haven't attended an event in 3 months.
+ * @param user The user to check.
+ * @param allEvents The list of all events to check against for attendance.
+ * @returns True if the user is inactive, false otherwise.
+ */
+export const isUserInactive = (user: User, allEvents: CubeEvent[]): boolean => {
+  if (user.onboardingStatus !== OnboardingStatus.CONFIRMED) return false;
+
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+  const hasRecentLogin = user.lastLogin && new Date(user.lastLogin) > threeMonthsAgo;
+
+  const hasRecentAttendance = allEvents.some(
+    (event) =>
+      new Date(event.startDate) > threeMonthsAgo &&
+      event.report?.attendance[user.id] === 'Attended'
+  );
+
+  // User is inactive ONLY if both conditions are false
+  return !hasRecentLogin && !hasRecentAttendance;
 };

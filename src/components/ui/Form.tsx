@@ -20,13 +20,13 @@ export const InputField = React.forwardRef<HTMLInputElement, InputProps>(
         id={id}
         ref={ref}
         {...props}
-        className={`block w-full border bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm ${
-          error ? 'border-primary' : 'border-neutral-300'
+        className={`block w-full border-2 bg-white p-2 text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm ${
+          error ? 'border-danger' : 'border-black'
         } ${className}`}
         aria-invalid={!!error}
       />
       {error && (
-        <p className="mt-1 text-xs font-semibold text-primary">{error}</p>
+        <p className="text-danger mt-1 text-xs font-semibold">{error}</p>
       )}
     </div>
   )
@@ -56,14 +56,12 @@ export const TextAreaField = React.forwardRef<
       id={id}
       ref={ref}
       {...props}
-      className={`block w-full border bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm ${
-        error ? 'border-primary' : 'border-neutral-300'
+      className={`block w-full border-2 bg-white p-2 text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm ${
+        error ? 'border-danger' : 'border-black'
       } ${className}`}
       aria-invalid={!!error}
     />
-    {error && (
-      <p className="mt-1 text-xs font-semibold text-primary">{error}</p>
-    )}
+    {error && <p className="text-danger mt-1 text-xs font-semibold">{error}</p>}
   </div>
 ));
 TextAreaField.displayName = 'TextAreaField';
@@ -91,16 +89,14 @@ export const SelectField = React.forwardRef<
       id={id}
       ref={ref}
       {...props}
-      className={`block w-full border bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm ${
-        error ? 'border-primary' : 'border-neutral-300'
+      className={`block w-full border-2 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm ${
+        error ? 'border-danger' : 'border-black'
       } ${className}`}
       aria-invalid={!!error}
     >
       {children}
     </select>
-    {error && (
-      <p className="mt-1 text-xs font-semibold text-primary">{error}</p>
-    )}
+    {error && <p className="text-danger mt-1 text-xs font-semibold">{error}</p>}
   </div>
 ));
 SelectField.displayName = 'SelectField';

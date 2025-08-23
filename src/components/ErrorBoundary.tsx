@@ -28,19 +28,19 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="flex min-h-screen items-center justify-center bg-gray-50">
-            <div className="p-8 text-center">
-              <h1 className="mb-4 text-2xl font-bold text-gray-900">
+          <div className="flex min-h-screen items-center justify-center bg-neutral-50">
+            <div className="card-brutal card-padding text-center">
+              <h1 className="mb-4 text-2xl font-bold text-black">
                 Something went wrong
               </h1>
-              <p className="mb-6 text-gray-600">
+              <p className="mb-6 text-neutral-600">
                 We're sorry, but something unexpected happened.
               </p>
               <button
                 onClick={() =>
                   this.setState({ hasError: false, error: undefined })
                 }
-                className="bg-black px-6 py-2 text-white hover:bg-gray-800"
+                className="btn-secondary"
               >
                 Try again
               </button>

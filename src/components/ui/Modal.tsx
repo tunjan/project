@@ -8,6 +8,7 @@ interface ModalProps {
   title: string;
   description?: string;
   showCloseButton?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -16,6 +17,7 @@ const Modal: React.FC<ModalProps> = ({
   title,
   description,
   showCloseButton = true,
+  size = 'md',
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -32,14 +34,26 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <FocusTrap>
       <div
-        className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        className="animate-fade-in fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4"
         onClick={onClose}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
         <div
-          className="relative m-4 w-full max-w-lg border-2 border-black bg-white"
+          className={`relative my-4 w-full border-2 border-black bg-white ${
+            size === 'sm'
+              ? 'max-w-sm'
+              : size === 'md'
+                ? 'max-w-lg'
+                : size === 'lg'
+                  ? 'max-w-2xl'
+                  : size === 'xl'
+                    ? 'max-w-4xl'
+                    : size === '2xl'
+                      ? 'max-w-6xl'
+                      : 'max-w-lg'
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start justify-between border-b border-black p-6">
@@ -64,7 +78,9 @@ const Modal: React.FC<ModalProps> = ({
               </button>
             )}
           </div>
-          <div className="p-6">{children}</div>
+          <div className="max-h-[calc(90vh-120px)] overflow-y-auto p-6">
+            {children}
+          </div>
         </div>
       </div>
     </FocusTrap>

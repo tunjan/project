@@ -48,6 +48,39 @@ export interface LeaderboardData {
     };
 }
 
+/**
+ * Calculates proper ranks for leaderboard entries, handling ties correctly.
+ * Entries with the same value get the same rank, and subsequent ranks are adjusted accordingly.
+ * @param entries - Array of leaderboard entries sorted by value (descending)
+ * @returns Array of entries with calculated ranks
+ */
+export const calculateRanks = <T extends { value: number }>(
+    entries: T[]
+): (T & { rank: number })[] => {
+    if (entries.length === 0) return [];
+
+    const rankedEntries: (T & { rank: number })[] = [];
+    let currentRank = 1;
+    let currentValue = entries[0]?.value;
+
+    for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+
+        // If this entry has a different value than the previous, update the rank
+        if (entry.value !== currentValue) {
+            currentRank = i + 1;
+            currentValue = entry.value;
+        }
+
+        rankedEntries.push({
+            ...entry,
+            rank: currentRank
+        });
+    }
+
+    return rankedEntries;
+};
+
 const getStartDate = (period: 'week' | 'month' | 'year'): Date => {
     const date = new Date();
     switch (period) {
@@ -181,18 +214,19 @@ export const calculateLeaderboards = (
         );
 
         for (const event of relevantEvents) {
-            const chapterName = eventToCityMap.get(event.id);
-            if (chapterName && chapterMap.has(chapterName) && event.report) {
-                let totalHoursContributedInEvent = 0;
-                for (const [userId, status] of Object.entries(
-                    event.report.attendance
-                )) {
-                    if (status === 'Attended' && userMap.has(userId)) {
-                        totalHoursContributedInEvent += event.report.hours;
-                    }
+            if (event.report) {
+                // Only credit hours to the chapter that hosted the event (event.city)
+                const hostingChapterName = event.city;
+                if (chapterMap.has(hostingChapterName)) {
+                    // Add the event's hours to the hosting chapter's total.
+                    // This credits the chapter for the event duration itself, not per attendee.
+                    // NOTE: This logic credits the hosting chapter for the full event duration,
+                    // regardless of which chapters the attendees belong to. If the business
+                    // requirement is to credit chapters based on attendee contributions, this
+                    // would need to be refactored to sum individual member hours across all events.
+                    hourCounts[hostingChapterName] =
+                        (hourCounts[hostingChapterName] || 0) + event.report.hours;
                 }
-                hourCounts[chapterName] =
-                    (hourCounts[chapterName] || 0) + totalHoursContributedInEvent;
             }
         }
 

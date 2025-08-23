@@ -75,6 +75,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         title="Edit Profile"
         onClose={onClose}
         description="Update your personal and hosting information."
+        size="lg"
       >
         <div className="my-6 space-y-4">
           <div className="flex items-center space-x-4">
@@ -132,7 +133,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   value={hostingCapacity}
                   onChange={(e) => setHostingCapacity(Number(e.target.value))}
                   min="1"
-                  className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border-2 border-black bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                 />
               </div>
             )}
@@ -150,7 +151,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             </p>
             <button
               onClick={() => setIsDeactivateModalOpen(true)}
-              className="w-full bg-primary px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-red-700"
+              className="btn-danger w-full"
             >
               Delete My Account
             </button>
@@ -158,16 +159,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         </div>
 
         <div className="mt-8 flex items-center space-x-4">
-          <button
-            onClick={onClose}
-            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
-          >
+          <button onClick={onClose} className="btn-secondary w-full">
             Cancel
           </button>
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-          >
+          <button onClick={handleSubmit} className="btn-primary w-full">
             Save Changes
           </button>
         </div>

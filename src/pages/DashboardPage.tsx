@@ -11,6 +11,7 @@ import {
   useEvents,
   useAnnouncementsState,
   useNotificationsState,
+  useChapters,
 } from '@/store';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import {
@@ -23,6 +24,8 @@ import {
   UsersIcon,
   PencilIcon,
 } from '@/icons';
+import DashboardSearch from '@/components/dashboard/DashboardSearch';
+import { safeFormatLocaleDate } from '@/utils/date';
 
 interface TaskItemProps {
   icon: React.ReactNode;
@@ -87,6 +90,7 @@ const DashboardPage: React.FC = () => {
   const allEvents = useEvents();
   const announcements = useAnnouncementsState();
   const notifications = useNotificationsState();
+  const allChapters = useChapters();
 
   useEffect(() => {
     if (!currentUser) {
@@ -184,6 +188,12 @@ const DashboardPage: React.FC = () => {
       });
     }
 
+    const userCountries = new Set(
+      currentUser.chapters
+        .map((chName) => allChapters.find((c) => c.name === chName)?.country)
+        .filter(Boolean)
+    );
+
     // Get recent announcements relevant to user
     const relevantAnnouncements = announcements
       .filter((ann) => {
@@ -191,13 +201,10 @@ const DashboardPage: React.FC = () => {
         if (
           ann.scope === 'Regional' &&
           ann.country &&
-          currentUser.chapters.some(
-            () =>
-              // You'd need to match chapter to country - simplified here
-              true
-          )
-        )
+          userCountries.has(ann.country)
+        ) {
           return true;
+        }
         if (
           ann.scope === 'Chapter' &&
           ann.chapter &&
@@ -213,7 +220,14 @@ const DashboardPage: React.FC = () => {
       tasks,
       relevantAnnouncements,
     };
-  }, [currentUser, allEvents, announcements, notifications, navigate]);
+  }, [
+    currentUser,
+    allEvents,
+    announcements,
+    notifications,
+    navigate,
+    allChapters,
+  ]);
 
   if (!currentUser) {
     return (
@@ -240,9 +254,13 @@ const DashboardPage: React.FC = () => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Welcome back, {currentUser.name.split(' ')[0]}!
         </h1>
-        <p className="mt-2 text-lg text-neutral-600">
-          Here's what needs your attention today.
+        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+          Here's what needs your attention today. Use the search bar below to
+          find anything on the platform.
         </p>
+        <div className="mt-6">
+          <DashboardSearch />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -265,7 +283,7 @@ const DashboardPage: React.FC = () => {
                       <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
                         <span className="flex items-center gap-1">
                           <ClockIcon className="h-4 w-4" />
-                          {new Date(nextEvent.startDate).toLocaleDateString()}
+                          {safeFormatLocaleDate(nextEvent.startDate)}
                         </span>
                         <span className="flex items-center gap-1">
                           <MapPinIcon className="h-4 w-4" />
@@ -331,7 +349,7 @@ const DashboardPage: React.FC = () => {
             <StatsGrid
               stats={currentUser.stats}
               showPrivateStats={true}
-              onCityClick={() => navigate('/profile')}
+              onCityClick={() => navigate(`/members/${currentUser.id}`)}
             />
           </section>
         </div>
@@ -361,9 +379,7 @@ const DashboardPage: React.FC = () => {
                         </p>
                         <div className="mt-2 flex items-center justify-between">
                           <span className="text-xs text-neutral-500">
-                            {new Date(
-                              announcement.createdAt
-                            ).toLocaleDateString()}
+                            {safeFormatLocaleDate(announcement.createdAt)}
                           </span>
                           <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium">
                             {announcement.scope}
@@ -415,7 +431,7 @@ const DashboardPage: React.FC = () => {
                 </div>
               </button>
               <button
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate(`/members/${currentUser.id}`)}
                 className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-neutral-50"
               >
                 <div className="flex items-center gap-3">

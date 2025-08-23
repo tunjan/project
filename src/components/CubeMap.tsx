@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 
 import { divIcon, point, LatLngBounds } from 'leaflet';
 import { type CubeEvent, type Chapter } from '@/types';
+import { safeFormatLocaleString } from '@/utils/date';
 
 const getEventCoords = (
   event: CubeEvent,
@@ -85,7 +86,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
                 </h3>
                 <p className="m-0 text-sm text-neutral-600">{event.city}</p>
                 <p className="m-0 my-1 text-sm text-neutral-800">
-                  {event.startDate.toLocaleString([], {
+                  {safeFormatLocaleString(event.startDate, {
                     dateStyle: 'medium',
                     timeStyle: 'short',
                   })}

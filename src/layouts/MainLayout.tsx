@@ -32,11 +32,11 @@ const MainLayout: React.FC = () => {
       <main className="max-w-7xl flex-1 px-4 sm:px-6 lg:ml-64 lg:px-8">
         <Outlet />
       </main>
-      <footer className="bg-neutral-900 py-8 lg:ml-64">
+      <footer className="bg-neutral-900 py-6 lg:ml-64">
         <div className="mx-auto max-w-7xl px-4 text-center text-sm text-neutral-400 sm:px-6 lg:px-8">
           <p>
-            &copy; {new Date().getFullYear()} Vegan Action Hub. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} Anonymous for the Voiceless hub.
+            Powered by respect for animals.
           </p>
         </div>
       </footer>

@@ -74,6 +74,9 @@ const RoleSignupModal: React.FC<RoleSignupModalProps> = ({
       return;
     }
 
+    // NOTE: This client-side check prevents basic over-filling, but there's still a race condition
+    // where two users could sign up for the last available spot simultaneously. The parent component
+    // should re-validate role availability just before calling the RSVP action to minimize this window.
     onConfirm(selectedRole);
   };
 

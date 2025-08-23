@@ -176,14 +176,14 @@ export function useAnalyticsData() {
         [filteredUsers, filteredEvents, filteredChapters]
     );
     const chapterStats = useMemo(
-        () => getChapterStats(filteredUsers, filteredEvents, filteredChapters),
-        [filteredUsers, filteredEvents, filteredChapters]
+        () => getChapterStats(filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs),
+        [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
     );
     const eventTrends = useMemo(
         () => getEventTrendsByMonth(filteredEvents, 12),
         [filteredEvents]
     );
-    const memberGrowth = useMemo(() => getMemberGrowth(allUsers, 12), [allUsers]);
+    const memberGrowth = useMemo(() => getMemberGrowth(filteredUsers, 12), [filteredUsers]); // FIX: Member growth should also be filtered
 
     // NEW: Calculate conversation trends
     const conversationTrends = useMemo(

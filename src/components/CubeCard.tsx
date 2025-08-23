@@ -2,6 +2,7 @@ import React from 'react';
 import { type CubeEvent, EventStatus } from '@/types';
 
 import { CalendarIcon, ClockIcon, UsersIcon } from '@/icons';
+import { safeFormatDate, safeParseDate } from '@/utils/date';
 
 interface CubeCardProps {
   event: CubeEvent;
@@ -10,26 +11,24 @@ interface CubeCardProps {
 }
 
 const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
-  const formattedDate = new Intl.DateTimeFormat(undefined, {
+  // Ensure dates are valid Date objects
+  const startDate = safeParseDate(event.startDate);
+  const endDate = safeParseDate(event.endDate);
+
+  const formattedDate = safeFormatDate(startDate, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  }).format(new Date(event.startDate));
+  });
 
-  const formattedTime = new Intl.DateTimeFormat(undefined, {
+  const formattedTime = safeFormatDate(startDate, {
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(event.startDate));
+  });
 
-  const formattedDateRange = event.endDate
-    ? `${new Intl.DateTimeFormat(undefined, {
-        month: 'short',
-        day: 'numeric',
-      }).format(new Date(event.startDate))} - ${new Intl.DateTimeFormat(
-        undefined,
-        { month: 'short', day: 'numeric', year: 'numeric' }
-      ).format(new Date(event.endDate))}`
+  const formattedDateRange = startDate && endDate
+    ? `${safeFormatDate(startDate, { month: 'short', day: 'numeric' })} - ${safeFormatDate(endDate, { month: 'short', day: 'numeric', year: 'numeric' })}`
     : formattedDate;
 
   const handleSelect = () => {

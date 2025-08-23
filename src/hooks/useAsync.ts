@@ -23,10 +23,11 @@ export function useAsync<T>(
     try {
       const result = await asyncFunction();
       setState({ data: result, loading: false, error: null });
-    } catch (error) {
+    } catch (error) { // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       setState({ data: null, loading: false, error: error as Error });
     }
-  }, [asyncFunction, ...dependencies]); 
+  }, [asyncFunction, ...dependencies]);
 
   useEffect(() => {
     execute();
@@ -49,6 +50,8 @@ export function useAsyncCallback<T>(asyncFunction: AsyncFunction<T>) {
       setState({ data: result, loading: false, error: null });
       return result;
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       setState({ data: null, loading: false, error: error as Error });
       throw error;
     }

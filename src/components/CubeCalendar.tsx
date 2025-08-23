@@ -1,10 +1,10 @@
 import React from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import momentPlugin from '@fullcalendar/moment';
 import { CubeEvent } from '@/types';
-
-const localizer = momentLocalizer(moment);
 
 interface CubeCalendarProps {
   events: CubeEvent[];
@@ -16,39 +16,44 @@ const CubeCalendar: React.FC<CubeCalendarProps> = ({
   onSelectEvent,
 }) => {
   const calendarEvents = events.map((event) => ({
-    ...event,
-    start: new Date(event.startDate),
-    end: new Date(event.endDate),
-    title: event.name,
+    id: event.id,
+    title: event.location,
+    start: event.startDate,
+    end: event.endDate,
+    extendedProps: { originalEvent: event },
+    backgroundColor: '#b91c1c',
+    borderColor: '#000000',
+    textColor: '#ffffff',
   }));
 
-  const eventStyleGetter = () => {
-    const style = {
-      backgroundColor: '#FF6B6B',
-      borderRadius: '0px',
-      opacity: 0.8,
-      color: 'black',
-      border: '2px solid black',
-      display: 'block',
-    };
-    return {
-      style,
-    };
+  const handleEventClick = (clickInfo: any) => {
+    onSelectEvent(clickInfo.event.extendedProps.originalEvent);
   };
 
   return (
-    <div
-      className="border-2 border-black bg-white p-4"
-      style={{ height: '700px' }}
-    >
-      <Calendar
-        localizer={localizer}
+    <div className="card-brutal p-4">
+      <FullCalendar
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          momentPlugin,
+        ]}
+        initialView="dayGridMonth"
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay',
+        }}
         events={calendarEvents}
-        startAccessor="start"
-        endAccessor="end"
-        onSelectEvent={onSelectEvent}
-        eventPropGetter={eventStyleGetter}
-        views={['month', 'week', 'day']}
+        eventClick={handleEventClick}
+        height="700px"
+        eventDisplay="block"
+        eventTimeFormat={{
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: 'short',
+        }}
       />
     </div>
   );

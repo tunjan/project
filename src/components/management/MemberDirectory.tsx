@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { type User, type Chapter, Role, OnboardingStatus } from '@/types';
+import {
+  type User,
+  type Chapter,
+  Role,
+  OnboardingStatus,
+  type ChapterJoinRequest,
+} from '@/types';
 import { SearchIcon, ChevronRightIcon } from '@/icons';
 import { SelectField } from '@/components/ui/Form';
 
@@ -7,12 +13,14 @@ interface MemberDirectoryProps {
   members: User[];
   onSelectUser: (user: User) => void;
   filterableChapters: Chapter[];
+  pendingRequests?: ChapterJoinRequest[]; // New prop for pending chapter join requests
 }
 
 const MemberRow: React.FC<{
   user: User;
   onSelectUser: (user: User) => void;
-}> = ({ user, onSelectUser }) => {
+  isPendingForCurrentChapter?: boolean; // New prop to show pending status
+}> = ({ user, onSelectUser, isPendingForCurrentChapter }) => {
   const chapterText =
     user.chapters.length > 0
       ? `${user.chapters.join(', ')} Chapter(s)`
@@ -34,6 +42,11 @@ const MemberRow: React.FC<{
             {user.name}
           </p>
           <p className="text-sm text-neutral-500">{chapterText}</p>
+          {isPendingForCurrentChapter && (
+            <p className="text-xs font-medium text-orange-600">
+              ⏳ Pending Chapter Join Request
+            </p>
+          )}
         </div>
       </div>
       <div className="flex items-center space-x-4">
@@ -55,6 +68,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
   members,
   onSelectUser,
   filterableChapters,
+  pendingRequests = [], // Default to empty array
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('all');
@@ -69,7 +83,19 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
     )
     .filter((member) => {
       if (selectedChapter === 'all') return true;
-      return member.chapters.includes(selectedChapter);
+
+      // Check if user is already a member of the selected chapter
+      const isAlreadyMember = member.chapters.includes(selectedChapter);
+
+      // Check if there's a pending request for this member and chapter
+      const hasPendingRequestForChapter = pendingRequests.some(
+        (req) =>
+          req.user.id === member.id &&
+          req.chapterName === selectedChapter &&
+          req.status === 'Pending'
+      );
+
+      return isAlreadyMember || hasPendingRequestForChapter;
     })
     .filter((member) => {
       if (selectedRole === 'all') return true;
@@ -94,7 +120,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
                 placeholder="Search members by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border border-neutral-300 bg-white p-2 pl-10 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                className="block w-full rounded-none border border-neutral-300 bg-white p-2 pl-10 text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               />
             </div>
           </div>
@@ -146,13 +172,22 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       {filteredMembers.length > 0 ? (
         <div className="max-h-[70vh] overflow-y-auto">
           <div className="divide-y-2 divide-black">
-            {filteredMembers.map((user) => (
-              <MemberRow
-                key={user.id}
-                user={user}
-                onSelectUser={onSelectUser}
-              />
-            ))}
+            {filteredMembers.map((user) => {
+              const isPendingForCurrentChapter = pendingRequests.some(
+                (req) =>
+                  req.user.id === user.id &&
+                  req.chapterName === selectedChapter &&
+                  req.status === 'Pending'
+              );
+              return (
+                <MemberRow
+                  key={user.id}
+                  user={user}
+                  onSelectUser={onSelectUser}
+                  isPendingForCurrentChapter={isPendingForCurrentChapter}
+                />
+              );
+            })}
           </div>
         </div>
       ) : (

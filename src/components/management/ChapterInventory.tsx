@@ -3,6 +3,8 @@ import { PlusIcon, PencilIcon, TrashIcon } from '@/icons';
 import { toast } from 'sonner';
 import { type InventoryItem } from '@/types';
 import { InputField, SelectField, TextAreaField } from '@/components/ui/Form';
+import { safeFormatLocaleDate } from '@/utils/date';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 interface ChapterInventoryProps {
   chapterName: string;
@@ -171,7 +173,7 @@ const InventoryItemCard: React.FC<{
             <p className="mb-2 text-sm text-neutral-700">{item.notes}</p>
           )}
           <p className="font-mono text-xs text-neutral-500">
-            Last updated: {new Date(item.lastUpdated).toLocaleDateString()}
+            Last updated: {safeFormatLocaleDate(item.lastUpdated)}
           </p>
         </div>
         <div className="flex gap-2">
@@ -245,12 +247,18 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
     setEditingItem(null);
   };
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+
   const handleDeleteItem = (itemId: string) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      const updatedInventory = inventory.filter((item) => item.id !== itemId);
-      onUpdateInventory(updatedInventory);
-      toast.success('Item deleted successfully');
-    }
+    const updatedInventory = inventory.filter((item) => item.id !== itemId);
+    onUpdateInventory(updatedInventory);
+    toast.success('Item deleted successfully');
+  };
+
+  const openDeleteModal = (itemId: string) => {
+    setItemToDelete(itemId);
+    setDeleteModalOpen(true);
   };
 
   const handleEdit = (item: InventoryItem) => {
@@ -265,6 +273,20 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
 
   return (
     <div className="section-spacing">
+      <ConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (itemToDelete) {
+            handleDeleteItem(itemToDelete);
+          }
+        }}
+        title="Delete Item"
+        message="Are you sure you want to delete this item? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="h-section">{chapterName} Inventory</h2>
@@ -322,7 +344,7 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
               key={item.id}
               item={item}
               onEdit={() => handleEdit(item)}
-              onDelete={() => handleDeleteItem(item.id)}
+              onDelete={() => openDeleteModal(item.id)}
             />
           ))}
         </div>

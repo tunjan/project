@@ -31,9 +31,10 @@ export const calculateChapterScorecard = (
         // Normalize each metric to a 0-1 scale
         const eventScore = Math.min(stat.eventsHeld / (TARGETS.EVENTS_PER_MONTH * 3), 1); // Assuming 3 months
         const memberScore = Math.min(stat.memberCount / TARGETS.MEMBER_COUNT, 1);
-        // This is a simplified, placeholder calculation for retention
+        // This is a simplified, placeholder calculation for retention.
+        // A real implementation would need to track active members over time.
         const retentionScore = Math.min(
-            stat.memberCount > 0 ? (stat.memberCount * 0.5) / TARGETS.RETENTION_RATE : 0,
+            stat.memberCount > 0 ? (stat.memberCount * 0.75) / (TARGETS.MEMBER_COUNT * TARGETS.RETENTION_RATE) : 0,
             1
         );
 
@@ -49,9 +50,10 @@ export const calculateChapterScorecard = (
             healthScore,
             metrics: {
                 eventFrequency: stat.eventsHeld,
-                // This is a simplified, placeholder calculation for average turnout
+                // This is a simplified, placeholder calculation for average turnout.
+                // A real implementation would require actual attendance data per event.
                 avgTurnout:
-                    stat.eventsHeld > 0 ? stat.totalHours / 3 / stat.eventsHeld : 0,
+                    stat.eventsHeld > 0 ? stat.memberCount * 0.5 : 0, // Placeholder
                 retention: retentionScore * 100,
             },
         };

@@ -60,23 +60,14 @@
   .border-accent {
     @apply border-b-4 border-black;
   }
-  .shadow-modern {
-    @apply shadow-brutal;
-  }
-  .shadow-modern-xl {
-    @apply shadow-xl;
-  }
-  .card-modern {
-    @apply border border-gray-200 bg-white shadow-lg;
-  }
-  .card-modern-hover {
-    @apply card-modern transition-all duration-200 hover:-translate-y-1 hover:shadow-xl;
+  .shadow-brutal-xl {
+    @apply shadow-brutal-lg;
   }
   .card-brutal {
     @apply border-2 border-black bg-white;
   }
   .card-brutal-hover {
-    @apply hover:shadow-brutal border-2 border-black bg-white transition-all;
+    @apply border-2 border-black bg-white transition-all hover:shadow-brutal;
   }
   .h-section {
     @apply mb-6 border-b-4 border-primary pb-3 text-3xl font-extrabold tracking-tight text-black;
@@ -117,6 +108,21 @@
   }
   .btn-outline {
     @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-black hover:text-white;
+  }
+  .btn-danger {
+    @apply bg-danger hover:bg-danger-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+  }
+  .btn-warning {
+    @apply bg-warning hover:bg-warning-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+  }
+  .btn-success {
+    @apply bg-success hover:bg-success-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+  }
+  .btn-info {
+    @apply bg-info hover:bg-info-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+  }
+  .btn-gray {
+    @apply bg-gray-500 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-600;
   }
 
   /* Tag/badge variants */

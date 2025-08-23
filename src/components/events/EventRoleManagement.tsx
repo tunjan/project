@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { EventRole, type EventRoleRequirement, type CubeEvent } from '@/types';
-import { PlusIcon, PencilIcon, TrashIcon, UsersIcon } from '@/icons';
-import { SelectField, InputField } from '@/components/ui/Form';
+import { type EventRoleRequirement, EventRole, type CubeEvent } from '@/types';
+import { UsersIcon, PlusIcon, PencilIcon, TrashIcon } from '@/icons';
 import { toast } from 'sonner';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { InputField, SelectField } from '@/components/ui/Form';
 
 interface EventRoleManagementProps {
   event: CubeEvent;
@@ -189,6 +190,8 @@ const EventRoleManagement: React.FC<EventRoleManagementProps> = ({
   const [showForm, setShowForm] = useState(false);
   const [editingRequirement, setEditingRequirement] =
     useState<EventRoleRequirement | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<EventRole | null>(null);
 
   const roleRequirements = event.roleRequirements || [];
 
@@ -230,15 +233,16 @@ const EventRoleManagement: React.FC<EventRoleManagementProps> = ({
   };
 
   const handleDeleteRequirement = (role: EventRole) => {
-    if (
-      window.confirm(`Are you sure you want to delete the ${role} requirement?`)
-    ) {
-      const updatedRequirements = roleRequirements.filter(
-        (req) => req.role !== role
-      );
-      onUpdateRoleRequirements(updatedRequirements);
-      toast.success('Role requirement deleted successfully');
-    }
+    const updatedRequirements = roleRequirements.filter(
+      (req) => req.role !== role
+    );
+    onUpdateRoleRequirements(updatedRequirements);
+    toast.success('Role requirement deleted successfully');
+  };
+
+  const openDeleteModal = (role: EventRole) => {
+    setRoleToDelete(role);
+    setDeleteModalOpen(true);
   };
 
   const handleEdit = (requirement: EventRoleRequirement) => {
@@ -250,6 +254,20 @@ const EventRoleManagement: React.FC<EventRoleManagementProps> = ({
 
   return (
     <div className="section-spacing">
+      <ConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (roleToDelete) {
+            handleDeleteRequirement(roleToDelete);
+          }
+        }}
+        title="Delete Role Requirement"
+        message={`Are you sure you want to delete the ${roleToDelete} requirement?`}
+        confirmText="Delete"
+        variant="danger"
+      />
+
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="h-subsection">Event Roles</h3>
@@ -289,7 +307,7 @@ const EventRoleManagement: React.FC<EventRoleManagementProps> = ({
               key={requirement.role}
               requirement={requirement}
               onEdit={() => handleEdit(requirement)}
-              onDelete={() => handleDeleteRequirement(requirement.role)}
+              onDelete={() => openDeleteModal(requirement.role)}
               canEdit={canEdit}
             />
           ))}

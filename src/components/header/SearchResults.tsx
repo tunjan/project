@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, Chapter, Event } from '@/types';
+import { type User, type Chapter, type CubeEvent } from '@/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface SearchResultsProps {
   users: User[];
   chapters: Chapter[];
-  events: Event[];
+  events: CubeEvent[];
   loading: boolean;
   onClose: () => void;
 }
@@ -41,7 +41,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                   {users.map((user) => (
                     <li key={user.id}>
                       <Link
-                        to={`/users/${user.id}`}
+                        to={`/members/${user.id}`}
                         onClick={onClose}
                         className="block rounded-none p-2 font-bold hover:bg-neutral-100"
                       >
@@ -59,9 +59,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                 </h3>
                 <ul className="mt-2 space-y-1">
                   {chapters.map((chapter) => (
-                    <li key={chapter.id}>
+                    <li key={chapter.name}>
                       <Link
-                        to={`/chapters/${chapter.id}`}
+                        to={`/chapters/${chapter.name}`}
                         onClick={onClose}
                         className="block rounded-none p-2 font-bold hover:bg-neutral-100"
                       >
@@ -81,11 +81,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                   {events.map((event) => (
                     <li key={event.id}>
                       <Link
-                        to={`/events/${event.id}`}
+                        to={`/cubes/${event.id}`}
                         onClick={onClose}
                         className="block rounded-none p-2 font-bold hover:bg-neutral-100"
                       >
-                        {event.name}
+                        {event.location}
                       </Link>
                     </li>
                   ))}

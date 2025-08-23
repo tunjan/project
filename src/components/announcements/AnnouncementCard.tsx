@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { type Announcement, AnnouncementScope, Role } from '@/types';
+import { type Announcement, Role, AnnouncementScope } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
+import { useAnnouncementsActions } from '@/store/announcements.store';
 import { ROLE_HIERARCHY } from '@/utils/auth';
+import { safeFormatLocaleDate } from '@/utils/date';
+import { toast } from 'sonner';
 import { PencilIcon, TrashIcon } from '@/icons';
 import EditAnnouncementModal from './EditAnnouncementModal';
-import { useAnnouncementsActions } from '@/store/announcements.store';
-import { toast } from 'sonner';
-
-interface AnnouncementCardProps {
-  announcement: Announcement;
-}
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
   scope,
@@ -43,21 +41,23 @@ const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
   );
 };
 
+interface AnnouncementCardProps {
+  announcement: Announcement;
+}
+
 const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   announcement,
 }) => {
   const currentUser = useCurrentUser();
   const { deleteAnnouncement } = useAnnouncementsActions();
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const formattedDate = new Date(announcement.createdAt).toLocaleDateString(
-    undefined,
-    {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }
-  );
+  const formattedDate = safeFormatLocaleDate(announcement.createdAt, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   if (!currentUser) return null;
 
@@ -66,10 +66,8 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
     ROLE_HIERARCHY[currentUser.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this announcement?')) {
-      deleteAnnouncement(announcement.id);
-      toast.success('Announcement deleted.');
-    }
+    deleteAnnouncement(announcement.id);
+    toast.success('Announcement deleted.');
   };
 
   return (
@@ -80,6 +78,17 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           onClose={() => setIsEditing(false)}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Announcement"
+        message="Are you sure you want to delete this announcement? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
+
       <div className="overflow-hidden border-2 border-black bg-white">
         <div className="p-6">
           <div className="mb-4 flex items-start justify-between">
@@ -99,7 +108,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                     <PencilIcon className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={handleDelete}
+                    onClick={() => setIsDeleteModalOpen(true)}
                     className="p-1 text-neutral-500 hover:text-primary"
                     aria-label="Delete announcement"
                   >

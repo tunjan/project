@@ -62,9 +62,9 @@ const Header: React.FC = () => {
   const notifications = useNotificationsForUser(currentUser?.id);
   const unreadCount = useUnreadNotificationCount(currentUser?.id);
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [activePopover, setActivePopover] = useState<
+    'menu' | 'search' | 'notifications' | null
+  >(null);
   const [searchQuery, setSearchQuery] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ const Header: React.FC = () => {
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
-    if (isMobileMenuOpen) {
+    if (activePopover === 'menu') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -81,7 +81,7 @@ const Header: React.FC = () => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isMobileMenuOpen]);
+  }, [activePopover]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -89,7 +89,7 @@ const Header: React.FC = () => {
         notificationRef.current &&
         !notificationRef.current.contains(event.target as Node)
       ) {
-        setIsNotificationsOpen(false);
+        setActivePopover(null);
       }
     };
 
@@ -105,7 +105,7 @@ const Header: React.FC = () => {
         searchRef.current &&
         !searchRef.current.contains(event.target as Node)
       ) {
-        setIsSearchOpen(false);
+        setActivePopover(null);
         setSearchQuery('');
       }
     };
@@ -118,7 +118,7 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    setIsMobileMenuOpen(false);
+    setActivePopover(null);
     navigate('/login');
   };
 
@@ -126,52 +126,33 @@ const Header: React.FC = () => {
     if (!notification.isRead) {
       markNotificationAsRead(notification.id);
     }
-    setIsNotificationsOpen(false);
-    setIsMobileMenuOpen(false);
+    setActivePopover(null);
     navigate(notification.linkTo);
   };
 
   const closeMenus = () => {
-    setIsMobileMenuOpen(false);
-    setIsNotificationsOpen(false);
-    setIsSearchOpen(false);
+    setActivePopover(null);
     setSearchQuery('');
   };
 
+  const togglePopover = (popover: 'menu' | 'search' | 'notifications') => {
+    if (activePopover === popover) {
+      setActivePopover(null);
+    } else {
+      setActivePopover(popover);
+    }
+  };
+
   const renderNavLinks = (isMobile = false) => {
-    if (!currentUser) return null;
-    const isConfirmed =
-      currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
-
-    return navItems
-      .filter((item) => {
-        if (!item.requiresAuth) {
-          return true;
-        }
-
-        // Management/Analytics tabs require a confirmed organizer
-        if (item.requiresOrganizer) {
-          return hasOrganizerRole(currentUser) && isConfirmed;
-        }
-        if (item.requiresConfirmed) {
-          return isConfirmed;
-        }
-        if (item.requiresPending) {
-          return !isConfirmed;
-        }
-
-        // Default for items that only require authentication
-        return true;
-      })
-      .map((item) => (
-        <NavLinkStyled
-          key={item.to}
-          to={item.to}
-          onClick={isMobile ? closeMenus : undefined}
-        >
-          {item.label}
-        </NavLinkStyled>
-      ));
+    return navItems.map((item) => (
+      <NavLinkStyled
+        key={item.to}
+        to={item.to}
+        onClick={isMobile ? closeMenus : undefined}
+      >
+        {item.label}
+      </NavLinkStyled>
+    ));
   };
 
   return (
@@ -180,7 +161,7 @@ const Header: React.FC = () => {
         <div className="flex h-16 items-center justify-between gap-4">
           <Link
             to="/"
-            className="text-2xl font-extrabold tracking-tighter text-black"
+            className="text-2xl font-extrabold tracking-tighter text-black lg:hidden"
             onClick={closeMenus}
           >
             AV<span className="text-primary">.</span>
@@ -190,9 +171,9 @@ const Header: React.FC = () => {
             {currentUser ? (
               <>
                 <button
-                  onClick={() => setIsSearchOpen((p) => !p)}
-                  className={`relative border-2 p-2 transition-colors ${
-                    isSearchOpen
+                  onClick={() => togglePopover('search')}
+                  className={`relative border-2 p-2 transition-colors lg:hidden ${
+                    activePopover === 'search'
                       ? 'border-black bg-neutral-100'
                       : 'border-transparent hover:border-black focus:border-black'
                   }`}
@@ -201,9 +182,9 @@ const Header: React.FC = () => {
                 </button>
                 <div className="relative" ref={notificationRef}>
                   <button
-                    onClick={() => setIsNotificationsOpen((p) => !p)}
+                    onClick={() => togglePopover('notifications')}
                     className={`relative border-2 p-2 transition-colors ${
-                      isNotificationsOpen
+                      activePopover === 'notifications'
                         ? 'border-black bg-neutral-100'
                         : 'border-transparent hover:border-black focus:border-black'
                     }`}
@@ -213,14 +194,14 @@ const Header: React.FC = () => {
                       <div className="absolute right-1.5 top-1.5 h-2.5 w-2.5 border-2 border-white bg-primary"></div>
                     )}
                   </button>
-                  {isNotificationsOpen && (
+                  {activePopover === 'notifications' && (
                     <NotificationPopover
                       notifications={notifications}
                       onNotificationClick={handleNotificationClick}
                       onMarkAllRead={() =>
                         markAllNotificationsAsRead(currentUser.id)
                       }
-                      onClose={() => setIsNotificationsOpen(false)}
+                      onClose={() => setActivePopover(null)}
                     />
                   )}
                 </div>
@@ -243,17 +224,17 @@ const Header: React.FC = () => {
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+                  className="hidden items-center space-x-2 border-2 border-black bg-white px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white sm:flex"
                 >
                   <LogoutIcon className="h-4 w-4" />
                   <span>Logout</span>
                 </button>
 
                 <button
-                  onClick={() => setIsMobileMenuOpen((p) => !p)}
-                  className="-mr-2 p-2"
+                  onClick={() => togglePopover('menu')}
+                  className="-mr-2 p-2 lg:hidden"
                 >
-                  {isMobileMenuOpen ? (
+                  {activePopover === 'menu' ? (
                     <XIcon className="h-6 w-6" />
                   ) : (
                     <MenuIcon className="h-6 w-6" />
@@ -282,8 +263,11 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {isSearchOpen && (
-        <div className="border-b-2 border-black bg-white p-4" ref={searchRef}>
+      {activePopover === 'search' && (
+        <div
+          className="border-b-2 border-black bg-white p-4 lg:hidden"
+          ref={searchRef}
+        >
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <SearchIcon className="h-5 w-5 text-neutral-400" />
@@ -308,14 +292,14 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      {isMobileMenuOpen && currentUser && (
-        <div className="shadow-brutal absolute left-0 top-16 w-full border-b-2 border-black bg-white lg:hidden">
+      {activePopover === 'menu' && currentUser && (
+        <div className="absolute left-0 top-16 w-full border-b-2 border-black bg-white shadow-brutal lg:hidden">
           <nav className="space-y-1 px-2 pb-3 pt-2">
             {renderNavLinks(true)}
-            <div className="my-2 border-t border-neutral-200 pt-2">
+            <div className="my-2 border-t border-neutral-200 pt-2 sm:hidden">
               <button
                 onClick={handleLogout}
-                className="flex w-full items-center space-x-2 px-3 py-2 text-left text-sm font-semibold text-neutral-500 hover:text-neutral-900"
+                className="flex w-full items-center space-x-2 px-3 py-2 text-left text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
               >
                 <LogoutIcon className="h-4 w-4" />
                 <span>Logout</span>

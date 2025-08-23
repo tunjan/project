@@ -62,7 +62,8 @@ export const getGlobalStats = (
 export const getChapterStats = (
     users: User[],
     events: CubeEvent[],
-    chapters: Chapter[]
+    chapters: Chapter[],
+    outreachLogs: OutreachLog[] // Add outreachLogs as a parameter
 ): ChapterStats[] => {
     const confirmedUsers = getConfirmedUsers(users);
     return chapters.map((chapter) => {
@@ -70,15 +71,16 @@ export const getChapterStats = (
             u.chapters.includes(chapter.name)
         );
         const chapterEvents = events.filter((e) => e.city === chapter.name);
+        const chapterEventIds = new Set(chapterEvents.map((e) => e.id));
 
         const totalHours = chapterUsers.reduce(
             (sum, user) => sum + user.stats.totalHours,
             0
         );
-        const totalConversations = chapterUsers.reduce(
-            (sum, user) => sum + user.stats.totalConversations,
-            0
-        );
+        // Calculate from the source of truth (outreachLogs) instead of denormalized user stats
+        const totalConversations = outreachLogs.filter((log) =>
+            chapterEventIds.has(log.eventId)
+        ).length;
 
         return {
             name: chapter.name,
@@ -131,19 +133,13 @@ export const getEventTrendsByMonth = (
 
     for (let i = 0; i < months; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = d.toLocaleString('default', {
-            month: 'short',
-            year: 'numeric',
-        });
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         trends[key] = 0;
     }
 
     events.forEach((event) => {
-        const eventDate = event.startDate;
-        const key = eventDate.toLocaleString('default', {
-            month: 'short',
-            year: 'numeric',
-        });
+        const eventDate = new Date(event.startDate);
+        const key = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}`;
         if (Object.prototype.hasOwnProperty.call(trends, key)) {
             trends[key]++;
         }
@@ -166,19 +162,13 @@ export const getConversationTrendsByMonth = (
 
     for (let i = 0; i < months; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = d.toLocaleString('default', {
-            month: 'short',
-            year: 'numeric',
-        });
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         trends[key] = 0;
     }
 
     outreachLogs.forEach((log) => {
-        const logDate = log.createdAt;
-        const key = logDate.toLocaleString('default', {
-            month: 'short',
-            year: 'numeric',
-        });
+        const logDate = new Date(log.createdAt);
+        const key = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
         if (Object.prototype.hasOwnProperty.call(trends, key)) {
             trends[key]++;
         }
@@ -231,20 +221,14 @@ export const getMemberGrowth = (
 
     for (let i = 0; i < months; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = d.toLocaleString('default', {
-            month: 'short',
-            year: 'numeric',
-        });
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         trends[key] = 0;
     }
 
     users.forEach((user) => {
         if (user.joinDate) {
-            const joinDate = user.joinDate;
-            const key = joinDate.toLocaleString('default', {
-                month: 'short',
-                year: 'numeric',
-            });
+            const joinDate = new Date(user.joinDate);
+            const key = `${joinDate.getFullYear()}-${String(joinDate.getMonth() + 1).padStart(2, '0')}`;
             if (Object.prototype.hasOwnProperty.call(trends, key)) {
                 trends[key]++;
             }

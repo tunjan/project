@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { type Chapter } from '@/types';
 import { getChapterStats, ChapterStats } from '@/utils/analytics';
-import { useUsers, useEvents, useChapters } from '@/store';
+import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
 import { SearchIcon } from '@/icons';
 
 // A small helper component for stats on mobile
@@ -18,25 +19,28 @@ const Stat: React.FC<{ label: string; value: string | number }> = ({
 const ChapterRow: React.FC<{
   chapterStats: ChapterStats;
   onSelect: () => void;
-  isEven: boolean;
-}> = ({ chapterStats, onSelect, isEven }) => {
+}> = ({ chapterStats, onSelect }) => {
   return (
-    <button
+    <div
+      className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-neutral-50 hover:bg-neutral-100 hover:shadow-md md:grid md:grid-cols-6 md:items-center"
       onClick={onSelect}
-      className={`group w-full cursor-pointer border-t border-black p-4 text-left transition-all duration-150 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:grid md:grid-cols-6 md:items-center md:border-none ${
-        isEven ? 'bg-white' : 'bg-neutral-50'
-      }`}
     >
       {/* --- Mobile & Desktop: Chapter Name --- */}
       <div className="md:col-span-2">
-        <p className="font-bold text-black group-hover:text-primary">
+        <Link
+          to={`/chapters/${chapterStats.name}`}
+          className="block font-bold text-black transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 group-hover:text-primary"
+          onClick={(e) => e.stopPropagation()}
+        >
           {chapterStats.name}
+        </Link>
+        <p className="text-sm text-neutral-500 transition-colors duration-300 group-hover:text-neutral-700">
+          {chapterStats.country}
         </p>
-        <p className="text-sm text-neutral-500">{chapterStats.country}</p>
       </div>
 
       {/* --- Mobile View: Stats Grid --- */}
-      <div className="mt-4 grid grid-cols-2 gap-4 border-t border-dashed border-neutral-300 pt-4 md:hidden">
+      <div className="mt-4 grid grid-cols-2 gap-4 border-t-2 border-black pt-4 md:hidden">
         <Stat label="Members" value={chapterStats.memberCount} />
         <Stat label="Events" value={chapterStats.eventsHeld} />
         <Stat label="Hours" value={Math.round(chapterStats.totalHours)} />
@@ -44,22 +48,22 @@ const ChapterRow: React.FC<{
       </div>
 
       {/* --- Desktop View: Stats in Grid Columns --- */}
-      <p className="hidden font-mono text-lg font-bold md:block">
+      <p className="hidden font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:block">
         {chapterStats.memberCount}
       </p>
-      <p className="hidden font-mono text-lg font-bold md:block">
+      <p className="hidden font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:block">
         {chapterStats.eventsHeld}
       </p>
-      <p className="hidden font-mono text-lg font-bold md:block">
+      <p className="hidden font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:block">
         {Math.round(chapterStats.totalHours)}
       </p>
-      <p className="hidden items-center justify-between font-mono text-lg font-bold md:flex">
+      <p className="hidden items-center justify-between font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:flex">
         {chapterStats.totalConversations}
-        <span className="text-2xl text-neutral-400 transition-transform duration-300 group-hover:translate-x-2 group-hover:text-black">
+        <span className="text-2xl text-neutral-400 transition-all duration-300 group-hover:translate-x-2 group-hover:text-primary">
           →
         </span>
       </p>
-    </button>
+    </div>
   );
 };
 
@@ -71,13 +75,14 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
   const allUsers = useUsers();
   const allEvents = useEvents();
   const allChapters = useChapters();
+  const allOutreachLogs = useOutreachLogs();
 
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   const chapterStats = useMemo(
-    () => getChapterStats(allUsers, allEvents, allChapters),
-    [allUsers, allEvents, allChapters]
+    () => getChapterStats(allUsers, allEvents, allChapters, allOutreachLogs),
+    [allUsers, allEvents, allChapters, allOutreachLogs]
   );
 
   const availableRegions = useMemo(() => {
@@ -127,10 +132,10 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               <input
                 id="search-filter"
                 type="text"
-                placeholder="e.g. Berlin or USA"
+                placeholder="Search by chapter..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full border border-neutral-300 bg-white py-2 pl-10 pr-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -146,7 +151,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               name="region-filter"
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full border-2 border-black bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             >
               {availableRegions.map((region) => (
                 <option key={region} value={region}>
@@ -161,7 +166,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
       {/* Chapters Table */}
       <div className="card-brutal">
         {/* Desktop Header */}
-        <div className="hidden grid-cols-6 items-center border-b border-black bg-neutral-50 p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
+        <div className="hidden grid-cols-6 items-center border-b-2 border-black bg-neutral-50 p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
           <p className="col-span-2">Chapter</p>
           <p>Members</p>
           <p>Events</p>
@@ -169,15 +174,14 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
           <p>Conversations</p>
         </div>
         {filteredAndSortedStats.length > 0 ? (
-          <div>
-            {filteredAndSortedStats.map((stat, index) => {
+          <div className="divide-y-2 divide-black">
+            {filteredAndSortedStats.map((stat) => {
               const chapter = allChapters.find((c) => c.name === stat.name)!;
               return (
                 <ChapterRow
                   key={stat.name}
                   chapterStats={stat}
                   onSelect={() => onNavigateToChapter(chapter)}
-                  isEven={index % 2 === 0}
                 />
               );
             })}

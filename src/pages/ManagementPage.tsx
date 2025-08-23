@@ -1,7 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
-import { useUsers, useChapters, useEvents, useNotifications } from '@/store';
+import {
+  useUsers,
+  useChapters,
+  useEvents,
+  useChapterJoinRequests,
+} from '@/store';
 import OnboardingPipeline from '@/components/management/OnboardingPipeline';
 import MemberDirectory from '@/components/management/MemberDirectory';
 import ChapterManagement from '@/components/management/ChapterManagement';
@@ -9,7 +14,6 @@ import ChapterInventory from '@/components/management/ChapterInventory';
 import {
   BuildingOfficeIcon,
   ClipboardCheckIcon,
-  ShieldExclamationIcon,
   CalendarIcon,
   ClockIcon,
   MapPinIcon,
@@ -25,10 +29,11 @@ import {
   OnboardingStatus,
   type Chapter,
   EventStatus,
-  NotificationType,
   type CubeEvent,
+  type ChapterJoinRequest,
 } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
+import { isUserInactive } from '@/utils/user';
 
 type ManagementView =
   | 'dashboard'
@@ -36,6 +41,11 @@ type ManagementView =
   | 'members'
   | 'chapters'
   | 'inventory';
+
+interface MemberFilter {
+  status?: OnboardingStatus;
+  showInactiveOnly?: boolean;
+}
 
 interface ManagementTaskProps {
   icon: React.ReactNode;
@@ -62,7 +72,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
 
   return (
     <div
-      className={`card-brutal card-padding ${priorityStyles[priority]} hover:shadow-brutal-lg cursor-pointer transition-all hover:scale-[1.02]`}
+      className={`card-brutal card-padding ${priorityStyles[priority]} cursor-pointer transition-all hover:scale-[1.02] hover:shadow-brutal-lg`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between">
@@ -141,16 +151,36 @@ const ManagementPage: React.FC = () => {
   const allUsers = useUsers();
   const allChapters = useChapters();
   const allEvents = useEvents();
-  const notifications = useNotifications();
+  const chapterJoinRequests = useChapterJoinRequests();
   const { updateChapterInventory } = useInventoryActions();
 
   const [view, setView] = useState<ManagementView>('dashboard');
   const [selectedChapterForInventory, setSelectedChapterForInventory] =
     useState<string>('');
+  const [memberFilter, setMemberFilter] = useState<MemberFilter>({});
 
   const manageableChapters = useMemo(() => {
     if (!currentUser) return [];
     if (currentUser.role === 'Global Admin') return allChapters;
+
+    // For Chapter Organisers, they can manage chapters they organize
+    if (currentUser.role === 'Chapter Organiser') {
+      return allChapters.filter((c) =>
+        currentUser.organiserOf?.includes(c.name)
+      );
+    }
+
+    // For Regional Organisers, they can manage chapters in their region
+    if (
+      currentUser.role === 'Regional Organiser' &&
+      currentUser.managedCountry
+    ) {
+      return allChapters.filter(
+        (c) => c.country === currentUser.managedCountry
+      );
+    }
+
+    // For other roles, they can only manage chapters they organize
     return allChapters.filter((c) => currentUser.organiserOf?.includes(c.name));
   }, [currentUser, allChapters]);
 
@@ -177,56 +207,20 @@ const ManagementPage: React.FC = () => {
       (u) => u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
     ).length;
 
-    const accommodationRequests = notifications.filter(
-      (n) => n.type === NotificationType.ACCOMMODATION_REQUEST
-    ).length;
-
-    const inactiveMembers = allUsers.filter((user) => {
-      if (user.onboardingStatus !== OnboardingStatus.CONFIRMED) return false;
-      const lastLogin = new Date(user.lastLogin);
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      if (lastLogin < threeMonthsAgo) return true;
-
-      const recentEvents = allEvents.filter(
-        (event) =>
-          new Date(event.startDate) > threeMonthsAgo &&
-          event.participants.some((p) => p.user.id === user.id)
-      );
-
-      return recentEvents.length === 0;
-    }).length;
-
     return [
       {
         icon: <UserGroupIcon className="h-8 w-8" />,
         title: 'New Applicants to Review',
         count: newApplicants,
         description: 'Review and approve new applicants to the platform.',
-        onClick: () => setView('pipeline'),
+        onClick: () => {
+          handleViewChange('pipeline');
+          // The OnboardingPipeline already filters to show only PENDING_APPLICATION_REVIEW users
+        },
         priority: 'high',
       },
-      {
-        icon: <ShieldExclamationIcon className="h-8 w-8" />,
-        title: 'Pending Accommodation Requests',
-        count: accommodationRequests,
-        description: 'Address accessibility needs for upcoming events.',
-        onClick: () => {
-          /* This should ideally link to a pre-filtered view */
-        },
-        priority: 'medium',
-      },
-      {
-        icon: <TrendingUpIcon className="h-8 w-8" />,
-        title: 'Inactive Members to Re-engage',
-        count: inactiveMembers,
-        description:
-          'Reach out to members who have been inactive for over 3 months.',
-        onClick: () => setView('members'),
-        priority: 'low',
-      },
     ];
-  }, [currentUser, allUsers, notifications, allEvents]);
+  }, [currentUser, allUsers]);
 
   const upcomingEvents = useMemo(() => {
     const now = new Date();
@@ -244,12 +238,14 @@ const ManagementPage: React.FC = () => {
     filterableChaptersForDirectory,
     onboardingUsers,
     canManageChapters,
+    visibleChapterJoinRequests,
   } = useMemo<{
     visibleMembers: User[];
     manageableChapters: Chapter[];
     filterableChaptersForDirectory: Chapter[];
     onboardingUsers: User[];
     canManageChapters: boolean;
+    visibleChapterJoinRequests: ChapterJoinRequest[];
   }>(() => {
     if (!currentUser) {
       return {
@@ -258,6 +254,7 @@ const ManagementPage: React.FC = () => {
         filterableChaptersForDirectory: [],
         onboardingUsers: [],
         canManageChapters: false,
+        visibleChapterJoinRequests: [],
       };
     }
 
@@ -271,12 +268,33 @@ const ManagementPage: React.FC = () => {
         : currentUser.organiserOf || []
     );
 
-    const visibleMembers: User[] =
-      currentUser.role === 'Global Admin'
-        ? allUsers
-        : allUsers.filter((u) =>
-            u.chapters.some((c) => managedChapterNames.has(c))
-          );
+    // Add chapters from managed country for Regional Organisers
+    if (
+      currentUser.role === Role.REGIONAL_ORGANISER &&
+      currentUser.managedCountry
+    ) {
+      allChapters
+        .filter((c) => c.country === currentUser.managedCountry)
+        .forEach((c) => managedChapterNames.add(c.name));
+    }
+
+    const visibleMembers: User[] = (() => {
+      let members =
+        currentUser.role === 'Global Admin'
+          ? allUsers
+          : allUsers.filter((u) =>
+              u.chapters.some((c) => managedChapterNames.has(c))
+            );
+
+      // Apply member filter if set
+      if (memberFilter.status) {
+        members = members.filter(
+          (u) => u.onboardingStatus === memberFilter.status
+        );
+      }
+
+      return members;
+    })();
 
     const filterableChaptersForDirectory: Chapter[] =
       currentUser.role === 'Global Admin'
@@ -289,19 +307,73 @@ const ManagementPage: React.FC = () => {
         u.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION
     );
 
+    // Filter chapter join requests to only show requests for chapters the current user can manage
+    const visibleChapterJoinRequests = chapterJoinRequests.filter((req) =>
+      managedChapterNames.has(req.chapterName)
+    );
+
     return {
       visibleMembers,
       manageableChapters,
       filterableChaptersForDirectory,
       onboardingUsers,
       canManageChapters,
+      visibleChapterJoinRequests,
     };
-  }, [currentUser, allUsers, allChapters, manageableChapters]);
+  }, [
+    currentUser,
+    allUsers,
+    allChapters,
+    manageableChapters,
+    memberFilter,
+    allEvents,
+    chapterJoinRequests,
+  ]);
+
+  // Calculate inactive count based on the members the organizer can actually see
+  const inactiveMembersCount = useMemo(() => {
+    return visibleMembers.filter((user) => isUserInactive(user, allEvents))
+      .length;
+  }, [visibleMembers, allEvents]);
+
+  // Add inactive members task if there are any inactive members
+  const dashboardTasksWithInactive: ManagementTaskProps[] = useMemo(() => {
+    if (inactiveMembersCount > 0) {
+      return [
+        ...dashboardTasks,
+        {
+          icon: <TrendingUpIcon className="h-8 w-8" />,
+          title: 'Inactive Members to Re-engage',
+          count: inactiveMembersCount,
+          description:
+            'Reach out to members who have been inactive for over 3 months.',
+          onClick: () => {
+            handleViewChange('members');
+            // Pre-filter to show only inactive members
+            setMemberFilter({
+              status: OnboardingStatus.CONFIRMED,
+              showInactiveOnly: true,
+            });
+          },
+          priority: 'low',
+        },
+      ];
+    }
+    return dashboardTasks;
+  }, [dashboardTasks, inactiveMembersCount]);
 
   if (!currentUser) return null;
 
   const handleSelectUser = (user: User) =>
     navigate(`/manage/member/${user.id}`);
+
+  const handleViewChange = (newView: ManagementView) => {
+    setView(newView);
+    // Clear member filter when switching views
+    if (newView !== 'members') {
+      setMemberFilter({});
+    }
+  };
 
   const renderContent = () => {
     switch (view) {
@@ -311,7 +383,7 @@ const ManagementPage: React.FC = () => {
             <div className="mb-8">
               <h2 className="mb-4 text-2xl font-bold">Actionable Tasks</h2>
               <div className="space-y-4">
-                {dashboardTasks.map((task) => (
+                {dashboardTasksWithInactive.map((task) => (
                   <ManagementTask key={task.title} {...task} />
                 ))}
               </div>
@@ -344,9 +416,16 @@ const ManagementPage: React.FC = () => {
               Member Directory
             </h2>
             <MemberDirectory
-              members={visibleMembers}
+              members={
+                memberFilter.showInactiveOnly
+                  ? visibleMembers.filter((user) =>
+                      isUserInactive(user, allEvents)
+                    )
+                  : visibleMembers
+              }
               onSelectUser={handleSelectUser}
               filterableChapters={filterableChaptersForDirectory}
+              pendingRequests={visibleChapterJoinRequests}
             />
           </div>
         );
@@ -371,7 +450,7 @@ const ManagementPage: React.FC = () => {
               <h2 className="border-b-2 border-primary pb-2 text-2xl font-bold text-black">
                 Chapter Inventory
               </h2>
-              {(currentUser?.chapters.length || 0) > 1 && (
+              {manageableChapters.length > 1 && (
                 <select
                   value={selectedChapterForInventory}
                   onChange={(e) =>
@@ -379,19 +458,11 @@ const ManagementPage: React.FC = () => {
                   }
                   className="border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none"
                 >
-                  {currentUser?.chapters.map((chapterName) => (
-                    <option key={chapterName} value={chapterName}>
-                      {chapterName}
+                  {manageableChapters.map((chapter) => (
+                    <option key={chapter.name} value={chapter.name}>
+                      {chapter.name}
                     </option>
                   ))}
-                  {currentUser?.role === 'Global Admin' &&
-                    allChapters
-                      .filter((ch) => !currentUser.chapters.includes(ch.name))
-                      .map((chapter) => (
-                        <option key={chapter.name} value={chapter.name}>
-                          {chapter.name}
-                        </option>
-                      ))}
                 </select>
               )}
             </div>
@@ -403,13 +474,23 @@ const ManagementPage: React.FC = () => {
                   updateChapterInventory(selectedChapterForInventory, items)
                 }
               />
+            ) : manageableChapters.length === 0 ? (
+              <div className="border-2 border-gray-200 bg-gray-50 p-8 text-center">
+                <h3 className="text-lg font-bold text-gray-900">
+                  No Manageable Chapters
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  You don't have permission to manage inventory for any
+                  chapters.
+                </p>
+              </div>
             ) : (
               <div className="border-2 border-gray-200 bg-gray-50 p-8 text-center">
                 <h3 className="text-lg font-bold text-gray-900">
                   No Chapter Selected
                 </h3>
                 <p className="mt-1 text-gray-600">
-                  You need to be part of a chapter to manage inventory.
+                  Please select a chapter to manage its inventory.
                 </p>
               </div>
             )}
@@ -442,21 +523,21 @@ const ManagementPage: React.FC = () => {
       <div className="mb-8 border-b-2 border-black">
         <nav className="flex flex-row space-x-2 overflow-x-auto border border-black bg-white p-2 md:flex-col md:space-x-0 md:space-y-1 md:p-2">
           <TabButton
-            onClick={() => setView('dashboard')}
+            onClick={() => handleViewChange('dashboard')}
             isActive={view === 'dashboard'}
           >
             <HomeIcon className="h-5 w-5 flex-shrink-0" />
             <span className="flex-grow">Priority Tasks</span>
           </TabButton>
           <TabButton
-            onClick={() => setView('pipeline')}
+            onClick={() => handleViewChange('pipeline')}
             isActive={view === 'pipeline'}
           >
             <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
             <span className="flex-grow">Onboarding & Requests</span>
           </TabButton>
           <TabButton
-            onClick={() => setView('members')}
+            onClick={() => handleViewChange('members')}
             isActive={view === 'members'}
           >
             <UserGroupIcon className="h-5 w-5 flex-shrink-0" />
@@ -464,7 +545,7 @@ const ManagementPage: React.FC = () => {
           </TabButton>
           {canManageChapters && (
             <TabButton
-              onClick={() => setView('chapters')}
+              onClick={() => handleViewChange('chapters')}
               isActive={view === 'chapters'}
             >
               <BuildingOfficeIcon className="h-5 w-5 flex-shrink-0" />
@@ -472,7 +553,7 @@ const ManagementPage: React.FC = () => {
             </TabButton>
           )}
           <TabButton
-            onClick={() => setView('inventory')}
+            onClick={() => handleViewChange('inventory')}
             isActive={view === 'inventory'}
           >
             <ClipboardListIcon className="h-5 w-5 flex-shrink-0" />

@@ -1,17 +1,15 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { hasOrganizerRole } from '@/utils/auth';
-import { LogoutIcon, BellIcon, SearchIcon } from '@/icons';
+import { useNavItems } from '@/hooks/useNavItems';
+import { LogoutIcon, BellIcon } from '@/icons';
 import NotificationPopover from './NotificationPopover';
-import SearchResults from './SearchResults';
 import { useCurrentUser, useAuthActions } from '@/store/auth.store';
 import {
   useNotificationsForUser,
   useUnreadNotificationCount,
   useNotificationsActions,
-} from '@/store';
+} from '@/store/notifications.store';
 import { type Notification, OnboardingStatus } from '@/types';
-import useSearch from '@/hooks/useSearch';
 
 const NavLinkStyled: React.FC<{
   to: string;
@@ -33,69 +31,19 @@ const NavLinkStyled: React.FC<{
   </NavLink>
 );
 
-const navItems = [
-  {
-    to: '/dashboard',
-    label: 'Dashboard',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  { to: '/cubes', label: 'Cubes', requiresAuth: true, requiresConfirmed: true },
-  {
-    to: '/chapters',
-    label: 'Chapters',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  {
-    to: '/leaderboard',
-    label: 'Leaderboard',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  { to: '/announcements', label: 'Announcements', requiresAuth: true },
-  { to: '/resources', label: 'Resources', requiresAuth: true },
-  {
-    to: '/outreach',
-    label: 'Outreach',
-    requiresAuth: true,
-    requiresConfirmed: true,
-  },
-  {
-    to: '/manage',
-    label: 'Management',
-    requiresAuth: true,
-    requiresOrganizer: true,
-  },
-  {
-    to: '/analytics',
-    label: 'Analytics',
-    requiresAuth: true,
-    requiresOrganizer: true,
-  },
-  {
-    to: '/onboarding-status',
-    label: 'My Application',
-    requiresAuth: true,
-    requiresPending: true,
-  },
-];
-
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const { logout } = useAuthActions();
   const { markNotificationAsRead, markAllNotificationsAsRead } =
     useNotificationsActions();
+  const navItems = useNavItems();
 
   const notifications = useNotificationsForUser(currentUser?.id);
   const unreadCount = useUnreadNotificationCount(currentUser?.id);
 
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
   const notificationRef = React.useRef<HTMLDivElement>(null);
-  const searchRef = React.useRef<HTMLDivElement>(null);
-  const { users, chapters, events, loading } = useSearch(searchQuery);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -113,22 +61,6 @@ const Sidebar: React.FC = () => {
     };
   }, [notificationRef]);
 
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setSearchQuery('');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [searchRef]);
-
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -140,42 +72,6 @@ const Sidebar: React.FC = () => {
     }
     setIsNotificationsOpen(false);
     navigate(notification.linkTo);
-  };
-
-  const closeSearchResults = () => {
-    setSearchQuery('');
-  };
-
-  const renderNavLinks = () => {
-    if (!currentUser) return null;
-    const isConfirmed =
-      currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
-
-    return navItems
-      .filter((item) => {
-        if (!item.requiresAuth) {
-          return true;
-        }
-
-        // Management/Analytics tabs require a confirmed organizer
-        if (item.requiresOrganizer) {
-          return hasOrganizerRole(currentUser) && isConfirmed;
-        }
-        if (item.requiresConfirmed) {
-          return isConfirmed;
-        }
-        if (item.requiresPending) {
-          return !isConfirmed;
-        }
-
-        // Default for items that only require authentication
-        return true;
-      })
-      .map((item) => (
-        <NavLinkStyled key={item.to} to={item.to}>
-          {item.label}
-        </NavLinkStyled>
-      ));
   };
 
   if (!currentUser) {
@@ -194,33 +90,15 @@ const Sidebar: React.FC = () => {
             AV<span className="text-primary">.</span>
           </Link>
         </div>
-        {/* Search */}
-        <div className="mb-4 px-4" ref={searchRef}>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="h-5 w-5 text-neutral-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-none border-2 border-black bg-white py-2 pl-10 pr-4 text-sm font-bold text-black placeholder-neutral-400 focus:border-primary focus:outline-none"
-            />
-            {searchQuery && (
-              <SearchResults
-                users={users}
-                chapters={chapters}
-                events={events}
-                loading={loading}
-                onClose={closeSearchResults}
-              />
-            )}
-          </div>
-        </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-2 px-4">{renderNavLinks()}</nav>
+        <nav className="flex-1 space-y-2 px-4">
+          {navItems.map((item) => (
+            <NavLinkStyled key={item.to} to={item.to}>
+              {item.label}
+            </NavLinkStyled>
+          ))}
+        </nav>
 
         {/* Bottom section with notifications and user */}
         <div className="flex-shrink-0 space-y-4 px-4">
@@ -240,7 +118,7 @@ const Sidebar: React.FC = () => {
               )}
             </button>
             {isNotificationsOpen && (
-              <div className="absolute bottom-full left-0 mb-2 w-80">
+              <div className="absolute left-0 top-full mt-2 w-80">
                 <NotificationPopover
                   notifications={notifications}
                   onNotificationClick={handleNotificationClick}
@@ -257,7 +135,7 @@ const Sidebar: React.FC = () => {
           <Link
             to={
               currentUser.onboardingStatus === OnboardingStatus.CONFIRMED
-                ? '/dashboard'
+                ? `/members/${currentUser.id}`
                 : '/onboarding-status'
             }
             className="flex items-center space-x-3 rounded-none border-2 border-transparent p-3 transition-colors hover:border-black focus:border-black"

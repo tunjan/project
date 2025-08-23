@@ -3,6 +3,8 @@ import { type AccommodationRequest } from '@/types';
 import { CheckCircleIcon, XCircleIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
 import { useAccommodationsActions } from '@/store';
+import { safeParseDate, safeFormatLocaleDate } from '@/utils/date';
+import Tag from '@/components/ui/Tag';
 
 interface RequestCardProps {
   request: AccommodationRequest;
@@ -11,15 +13,16 @@ interface RequestCardProps {
 const StatusBadge: React.FC<{ status: AccommodationRequest['status'] }> = ({
   status,
 }) => {
-  const styles = {
-    Pending: 'bg-yellow-100 text-yellow-800',
-    Accepted: 'bg-green-100 text-green-800',
-    Denied: 'bg-red-100 text-red-800',
+  const variantMap = {
+    Pending: 'warning' as const,
+    Accepted: 'success' as const,
+    Denied: 'danger' as const,
   };
+
   return (
-    <span className={`px-2 py-0.5 text-xs font-bold ${styles[status]}`}>
+    <Tag variant={variantMap[status]} size="sm">
       {status.toUpperCase()}
-    </span>
+    </Tag>
   );
 };
 
@@ -39,14 +42,18 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   };
 
   const formatDateRange = (start: Date, end: Date) => {
+    const startDate = safeParseDate(start);
+    const endDate = safeParseDate(end);
+
+    if (!startDate || !endDate) {
+      return 'Invalid dates';
+    }
+
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',
       day: 'numeric',
     };
-    return `${start.toLocaleDateString(
-      undefined,
-      options
-    )} - ${end.toLocaleDateString(undefined, options)}`;
+    return `${safeFormatLocaleDate(startDate, options)} - ${safeFormatLocaleDate(endDate, options)}`;
   };
 
   return (
@@ -112,18 +119,18 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
             onChange={(e) => setReply(e.target.value)}
             placeholder="Optional: Reply with a message..."
             rows={2}
-            className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+            className="block w-full border-2 border-black bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
           />
           <div className="flex items-center space-x-2">
             <button
               onClick={() => handleRespond('Denied')}
-              className="flex w-full items-center justify-center bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
+              className="btn-secondary flex w-full items-center justify-center"
             >
               <XCircleIcon className="mr-1.5 h-5 w-5" /> Deny
             </button>
             <button
               onClick={() => handleRespond('Accepted')}
-              className="flex w-full items-center justify-center bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
+              className="btn-primary flex w-full items-center justify-center"
             >
               <CheckCircleIcon className="mr-1.5 h-5 w-5" /> Accept
             </button>

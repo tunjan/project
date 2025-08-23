@@ -1,4 +1,4 @@
-import { type User, Role, AnnouncementScope } from '@/types';
+import { type User, Role, AnnouncementScope, OnboardingStatus } from '@/types';
 
 export const ROLE_HIERARCHY: Record<Role, number> = {
     [Role.ACTIVIST]: 0,
@@ -16,6 +16,7 @@ export const hasOrganizerRole = (user: User): boolean => {
         Role.GLOBAL_ADMIN,
         Role.GODMODE,
     ];
+
     return organizerRoles.includes(user.role);
 };
 
@@ -63,7 +64,8 @@ export const getPostableScopes = (user: User): AnnouncementScope[] => {
  * NEW: Determines if a user has permission to verify another user.
  * Verification is allowed if:
  * 1. The currentUser is a Regional Organiser or higher.
- * 2. The currentUser is a Chapter Organiser and shares a managed chapter with the targetUser.
+ * 2. The currentUser is a Chapter Organiser and shares a managed chapter with the targetUser,
+ *    AND the targetUser actually needs verification (onboardingStatus === AWAITING_VERIFICATION).
  */
 export const canVerifyUser = (
     currentUser: User,
@@ -78,10 +80,11 @@ export const canVerifyUser = (
         return true;
     }
 
-    // Condition 2: Chapter Organiser can verify members of their chapter.
+    // Condition 2: Chapter Organiser can verify members of their chapter ONLY if they need verification.
     if (
         currentUser.role === Role.CHAPTER_ORGANISER &&
-        currentUser.organiserOf
+        currentUser.organiserOf &&
+        targetUser.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION
     ) {
         const organisedChapters = new Set(currentUser.organiserOf);
         return targetUser.chapters.some((chapter) =>

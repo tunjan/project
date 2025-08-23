@@ -229,25 +229,23 @@ export const useEventsStore = create<EventsState & EventsActions>()(
             e.id === eventId ? { ...e, report, status: EventStatus.FINISHED } : e
           );
 
-          // Update user stats based on attendance
+          // Prepare batch update for user stats
           const usersStore = useUsersStore.getState();
+          const statsUpdates: { userId: string; newStats: Partial<User['stats']> }[] = [];
+
           event.participants.forEach((participant) => {
-            if (participant.status === ParticipantStatus.ATTENDING &&
-              report.attendance[participant.user.id] === 'Attended') {
-              const user = usersStore.users.find(u => u.id === participant.user.id);
-              if (user) {
+            if (report.attendance[participant.user.id] === 'Attended') {
+              const user = usersStore.users.find((u) => u.id === participant.user.id);
+              if (user && user.stats) {
                 const newCities = [...new Set([...user.stats.cities, event.city])];
-                usersStore.updateProfile(user.id, {
-                  stats: {
-                    ...user.stats,
-                    totalHours: user.stats.totalHours + report.hours,
-                    cubesAttended: user.stats.cubesAttended + 1,
-                    cities: newCities,
-                  },
-                });
+                statsUpdates.push({
+                  userId: user.id,
+                  newStats: { totalHours: user.stats.totalHours + report.hours, cubesAttended: user.stats.cubesAttended + 1, cities: newCities },
+                })
               }
             }
           });
+          usersStore.batchUpdateUserStats(statsUpdates);
 
           return { events: updatedEvents };
         });

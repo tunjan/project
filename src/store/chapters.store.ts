@@ -32,10 +32,31 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
             c.name === chapterName ? { ...c, ...updatedData } : c
           ),
         })),
-      deleteChapter: (chapterName) =>
+      deleteChapter: (chapterName) => {
         set((state) => ({
           chapters: state.chapters.filter((c) => c.name !== chapterName),
-        })),
+        }));
+
+        // Clean up user references to the deleted chapter
+        import('./users.store').then(({ useUsersStore }) => {
+          const usersStore = useUsersStore.getState();
+          const usersToUpdate = usersStore.users.filter(
+            (u) => u.chapters.includes(chapterName) || u.organiserOf?.includes(chapterName)
+          );
+
+          usersToUpdate.forEach((user) => {
+            // Remove chapter from user's chapters array
+            const updatedChapters = user.chapters.filter((c) => c !== chapterName);
+            usersStore.updateUserChapters(user.id, updatedChapters);
+
+            // Remove chapter from user's organiserOf array if it exists
+            if (user.organiserOf && user.organiserOf.includes(chapterName)) {
+              const updatedOrganiserOf = user.organiserOf.filter((c) => c !== chapterName);
+              usersStore.updateUserOrganiserOf(user.id, updatedOrganiserOf);
+            }
+          });
+        });
+      },
 
       requestToJoinChapter: (chapterName, user) => {
         const existingRequest = get().chapterJoinRequests.find(
@@ -55,13 +76,25 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
           chapterJoinRequests: [...state.chapterJoinRequests, newRequest],
         }));
 
-        // Notify chapter organizers
-        useNotificationsStore.getState().addNotification({
-          userId: user.id, // This will be updated when we have users store access
-          type: NotificationType.CHAPTER_JOIN_REQUEST,
-          message: `${user.name} has requested to join the ${chapterName} chapter.`,
-          linkTo: '/manage',
-          relatedUser: user,
+        // Notify chapter organizers instead of the requesting user
+        // Import users store to access all users
+        import('./users.store').then(({ useUsersStore }) => {
+          const allUsers = useUsersStore.getState().users;
+          const chapterOrganizers = allUsers.filter(
+            (u) => u.role === 'Chapter Organiser' && u.organiserOf?.includes(chapterName)
+          );
+
+          const notificationsToCreate = chapterOrganizers.map(org => ({
+            userId: org.id,
+            type: NotificationType.CHAPTER_JOIN_REQUEST,
+            message: `${user.name} has requested to join the ${chapterName} chapter.`,
+            linkTo: '/manage',
+            relatedUser: user,
+          }));
+
+          if (notificationsToCreate.length > 0) {
+            useNotificationsStore.getState().addNotifications(notificationsToCreate);
+          }
         });
       },
 

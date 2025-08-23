@@ -12,11 +12,14 @@ interface PastEventsModalProps {
 
 const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const formattedDate = event.startDate.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const formattedDate = new Date(event.startDate).toLocaleDateString(
+    undefined,
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }
+  );
 
   return (
     <div className="border-b border-black last:border-b-0">
@@ -81,10 +84,21 @@ const PastEventsModal: React.FC<PastEventsModalProps> = ({
           ))}
         </div>
       ) : (
-        <div className="flex h-full items-center justify-center p-8 text-center">
-          <p className="text-neutral-500">
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <p className="text-neutral-500 mb-4">
             No past events found for this chapter.
           </p>
+          <div className="text-sm text-neutral-400 space-y-2">
+            <p>This could be because:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>The chapter hasn't held any events yet</li>
+              <li>All events are scheduled for the future</li>
+              <li>There might be a mismatch between chapter names and event cities</li>
+            </ul>
+            <p className="mt-4 text-xs">
+              Tip: Check if the chapter name "{chapterName}" matches the city field in events.
+            </p>
+          </div>
         </div>
       )}
     </Modal>

@@ -2,6 +2,7 @@ import React from 'react';
 import { type Notification } from '@/types';
 import { BellIcon } from '@/icons';
 import { Link } from 'react-router-dom';
+import { safeFormatLocaleString } from '@/utils/date';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -30,10 +31,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             {notification.message}
           </p>
           <p className="mt-1 text-xs text-neutral-500">
-            {notification.createdAt.toLocaleString(undefined, {
-              dateStyle: 'short',
-              timeStyle: 'short',
-            })}
+            {safeFormatLocaleString(notification.createdAt)}
           </p>
         </div>
       </div>
@@ -57,7 +55,7 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="animate-fade-in shadow-brutal absolute right-0 top-14 z-30 w-[80vw] max-w-sm border-2 border-black bg-white sm:w-96">
+    <div className="animate-fade-in absolute right-0 top-14 z-30 w-[80vw] max-w-sm border-2 border-black bg-white shadow-brutal sm:w-96">
       <div className="flex items-center justify-between border-b-2 border-black p-3">
         <h3 className="font-bold text-black">Notifications</h3>
         {unreadCount > 0 && (

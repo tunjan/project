@@ -167,8 +167,8 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                       }
                       className={`flex w-full items-center justify-center px-3 py-2 text-sm font-semibold transition-colors sm:w-28 ${
                         attendance[user.id] === 'Attended'
-                          ? 'bg-primary text-white'
-                          : 'bg-neutral-200 text-black hover:bg-neutral-300'
+                          ? 'btn-primary'
+                          : 'btn-outline'
                       }`}
                     >
                       <CheckCircleIcon className="mr-1.5 h-5 w-5" />
@@ -179,8 +179,8 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                       onClick={() => handleAttendanceChange(user.id, 'Absent')}
                       className={`flex w-full items-center justify-center px-3 py-2 text-sm font-semibold transition-colors sm:w-28 ${
                         attendance[user.id] === 'Absent'
-                          ? 'bg-black text-white'
-                          : 'bg-neutral-200 text-black hover:bg-neutral-300'
+                          ? 'btn-secondary'
+                          : 'btn-outline'
                       }`}
                     >
                       <XCircleIcon className="mr-1.5 h-5 w-5" />

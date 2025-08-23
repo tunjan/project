@@ -6,6 +6,7 @@ import {
   useEvents,
   useChaptersActions,
   useChapterJoinRequests,
+  useOutreachLogs,
 } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
@@ -72,6 +73,7 @@ const ChapterDetailPage: React.FC = () => {
   const allUsers = useUsers();
   const allEvents = useEvents();
   const allAnnouncements = useAnnouncements();
+  const allOutreachLogs = useOutreachLogs();
   const [isPastEventsModalOpen, setIsPastEventsModalOpen] = useState(false);
 
   const isMember = useMemo(() => {
@@ -105,7 +107,12 @@ const ChapterDetailPage: React.FC = () => {
         pastChapterEvents: [],
       };
 
-    const calculatedStats = getChapterStats(allUsers, allEvents, [chapter])[0];
+    const calculatedStats = getChapterStats(
+      allUsers,
+      allEvents,
+      [chapter],
+      allOutreachLogs
+    )[0];
     const members = allUsers.filter(
       (u) =>
         u.chapters.includes(chapter.name) && u.onboardingStatus === 'Confirmed'
@@ -174,6 +181,34 @@ const ChapterDetailPage: React.FC = () => {
           onClose={() => setIsPastEventsModalOpen(false)}
         />
       )}
+      
+      {/* Temporary debug info - remove this after fixing the issue */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
+          <h3 className="font-bold text-yellow-800">Debug Info (Development Only)</h3>
+          <p><strong>Chapter Name:</strong> {chapter.name}</p>
+          <p><strong>Total Events:</strong> {allEvents.length}</p>
+          <p><strong>Events for this chapter:</strong> {allEvents.filter(e => e.city === chapter.name).length}</p>
+          <p><strong>Past Events for this chapter:</strong> {pastChapterEvents.length}</p>
+          <p><strong>Sample Events:</strong></p>
+          <ul className="text-sm">
+            {allEvents.slice(0, 5).map(e => (
+              <li key={e.id}>
+                {e.city} - {e.startDate.toDateString()} - {e.startDate < new Date() ? 'PAST' : 'FUTURE'}
+              </li>
+            ))}
+          </ul>
+          
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+            <h4 className="font-semibold text-blue-800 mb-2">Available Chapter Names in Events:</h4>
+            <div className="text-xs text-blue-700">
+              {Array.from(new Set(allEvents.map(e => e.city))).slice(0, 10).join(', ')}
+              {allEvents.length > 10 && '...'}
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="animate-fade-in py-8 md:py-12">
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
           <button
@@ -233,7 +268,7 @@ const ChapterDetailPage: React.FC = () => {
               value={stats.memberCount}
             />
             <div
-              className="cursor-pointer"
+              className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
               onClick={() => setIsPastEventsModalOpen(true)}
             >
               <StatCard
