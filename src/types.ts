@@ -298,11 +298,6 @@ export interface BadgeAward {
 export interface InventoryItem {
   id: string;
   chapterName: string;
-  name: string;
-  category: 'Masks' | 'Laptops' | 'Signs' | 'Cameras' | 'Miscellaneous';
+  category: 'Masks' | 'TVs' | 'Signs';
   quantity: number;
-  condition: 'Excellent' | 'Good' | 'Fair' | 'Needs Repair';
-  location?: string;
-  notes?: string;
-  lastUpdated: Date;
 }

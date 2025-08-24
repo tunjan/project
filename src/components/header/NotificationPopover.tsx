@@ -1,6 +1,6 @@
 import React from 'react';
 import { type Notification } from '@/types';
-import { BellIcon } from '@/icons';
+import { BellIcon, XIcon } from '@/icons';
 import { Link } from 'react-router-dom';
 import { safeFormatLocaleString } from '@/utils/date';
 
@@ -54,50 +54,78 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
 }) => {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  return (
-    <div className="animate-fade-in absolute right-0 top-14 z-30 w-[80vw] max-w-sm border-2 border-black bg-white shadow-brutal sm:w-96">
-      <div className="flex items-center justify-between border-b-2 border-black p-3">
-        <h3 className="font-bold text-black">Notifications</h3>
-        {unreadCount > 0 && (
-          <button
-            onClick={onMarkAllRead}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
-            Mark all as read
-          </button>
-        )}
-      </div>
+  // Handle escape key press
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
 
-      <div className="max-h-96 divide-y divide-neutral-200 overflow-y-auto">
-        {notifications.length > 0 ? (
-          notifications
-            .slice(0, 5)
-            .map((n) => (
-              <NotificationItem
-                key={n.id}
-                notification={n}
-                onNotificationClick={onNotificationClick}
-              />
-            ))
-        ) : (
-          <div className="p-8 text-center text-neutral-500">
-            <BellIcon className="mx-auto h-8 w-8 text-neutral-300" />
-            <p className="mt-2 text-sm">You have no notifications.</p>
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="animate-fade-in fixed inset-0 z-40 bg-black bg-opacity-50"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-white shadow-brutal">
+          <div className="flex items-center justify-between border-b-2 border-black p-3">
+            <h3 className="font-bold text-black">Notifications</h3>
+            <div className="flex items-center space-x-2">
+              {unreadCount > 0 && (
+                <button
+                  onClick={onMarkAllRead}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  Mark all as read
+                </button>
+              )}
+              <button onClick={onClose} className="p-1 hover:bg-neutral-100">
+                <XIcon className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-      {notifications.length > 0 && (
-        <div className="border-t-2 border-black p-2 text-center">
-          <Link
-            to="/notifications"
-            onClick={onClose}
-            className="text-sm font-bold text-primary hover:underline"
-          >
-            View All Notifications
-          </Link>
+
+          <div className="max-h-96 divide-y divide-neutral-200 overflow-y-auto">
+            {notifications.length > 0 ? (
+              notifications
+                .slice(0, 5)
+                .map((n) => (
+                  <NotificationItem
+                    key={n.id}
+                    notification={n}
+                    onNotificationClick={onNotificationClick}
+                  />
+                ))
+            ) : (
+              <div className="p-8 text-center text-neutral-500">
+                <BellIcon className="mx-auto h-8 w-8 text-neutral-300" />
+                <p className="mt-2 text-sm">You have no notifications.</p>
+              </div>
+            )}
+          </div>
+          {notifications.length > 0 && (
+            <div className="border-t-2 border-black p-2 text-center">
+              <Link
+                to="/notifications"
+                onClick={onClose}
+                className="text-sm font-bold text-primary hover:underline"
+              >
+                View All Notifications
+              </Link>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -10,6 +10,8 @@
     "resolveJsonModule": true,
     "allowJs": false,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "@/*": ["./src/*"]
     },

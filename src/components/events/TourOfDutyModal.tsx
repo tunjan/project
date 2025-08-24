@@ -12,7 +12,7 @@ interface TourOfDutyModalProps {
 
 const getDatesBetween = (start: Date, end: Date): Date[] => {
   const dates = [];
-  let currentDate = new Date(new Date(start).toISOString().split('T')[0]);
+  const currentDate = new Date();
   const lastDate = new Date(new Date(end).toISOString().split('T')[0]);
 
   while (currentDate <= lastDate) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AnnouncementScope, Role, Chapter } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
 import { useChapters } from '@/store';
@@ -22,21 +22,30 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
   const currentUser = useCurrentUser();
   const chapters = useChapters();
 
-  if (!currentUser) return null;
+  const postableScopes = useMemo(
+    () => (currentUser ? getPostableScopes(currentUser) : []),
+    [currentUser]
+  );
 
-  const postableScopes = getPostableScopes(currentUser);
-  const availableChapters =
-    currentUser.role === Role.CHAPTER_ORGANISER
+  const availableChapters = useMemo(() => {
+    if (!currentUser) return [];
+    return currentUser.role === Role.CHAPTER_ORGANISER
       ? currentUser.organiserOf || []
       : chapters.map((c: Chapter) => c.name);
-  const availableCountries =
-    currentUser.role === Role.REGIONAL_ORGANISER
+  }, [currentUser, chapters]);
+
+  const availableCountries = useMemo(() => {
+    if (!currentUser) return [];
+    return currentUser.role === Role.REGIONAL_ORGANISER
       ? [currentUser.managedCountry || '']
       : [...new Set(chapters.map((c: Chapter) => c.country))];
+  }, [currentUser, chapters]);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [scope, setScope] = useState<AnnouncementScope>(postableScopes[0]);
+  const [scope, setScope] = useState<AnnouncementScope>(
+    postableScopes[0] || AnnouncementScope.GLOBAL
+  );
   const [target, setTarget] = useState('');
 
   useEffect(() => {
@@ -48,6 +57,8 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
       setTarget('');
     }
   }, [scope, availableChapters, availableCountries]);
+
+  if (!currentUser) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

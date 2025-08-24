@@ -283,7 +283,7 @@ const ManagementPage: React.FC = () => {
         currentUser.role === 'Global Admin'
           ? allUsers
           : allUsers.filter((u) =>
-              u.chapters.some((c) => managedChapterNames.has(c))
+              u.chapters?.some((c) => managedChapterNames.has(c))
             );
 
       // Apply member filter if set
@@ -303,8 +303,11 @@ const ManagementPage: React.FC = () => {
 
     const onboardingUsers = allUsers.filter(
       (u) =>
-        u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW ||
-        u.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION
+        (u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW ||
+          u.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION) &&
+        // Ensure onboarding users are also within the current user's scope
+        (currentUserLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN] ||
+          u.chapters?.some((c) => managedChapterNames.has(c)))
     );
 
     // Filter chapter join requests to only show requests for chapters the current user can manage
@@ -326,7 +329,6 @@ const ManagementPage: React.FC = () => {
     allChapters,
     manageableChapters,
     memberFilter,
-    allEvents,
     chapterJoinRequests,
   ]);
 
@@ -335,12 +337,14 @@ const ManagementPage: React.FC = () => {
     return visibleMembers.filter((user) => isUserInactive(user, allEvents))
       .length;
   }, [visibleMembers, allEvents]);
+  const inactiveMembers = useMemo(() => {
+    return visibleMembers.filter((user) => isUserInactive(user, allEvents));
+  }, [visibleMembers, allEvents]);
 
   // Add inactive members task if there are any inactive members
   const dashboardTasksWithInactive: ManagementTaskProps[] = useMemo(() => {
     if (inactiveMembersCount > 0) {
       return [
-        ...dashboardTasks,
         {
           icon: <TrendingUpIcon className="h-8 w-8" />,
           title: 'Inactive Members to Re-engage',
@@ -358,8 +362,9 @@ const ManagementPage: React.FC = () => {
           priority: 'low',
         },
       ];
+    } else {
+      return [...dashboardTasks];
     }
-    return dashboardTasks;
   }, [dashboardTasks, inactiveMembersCount]);
 
   if (!currentUser) return null;
@@ -417,11 +422,7 @@ const ManagementPage: React.FC = () => {
             </h2>
             <MemberDirectory
               members={
-                memberFilter.showInactiveOnly
-                  ? visibleMembers.filter((user) =>
-                      isUserInactive(user, allEvents)
-                    )
-                  : visibleMembers
+                memberFilter.showInactiveOnly ? inactiveMembers : visibleMembers
               }
               onSelectUser={handleSelectUser}
               filterableChapters={filterableChaptersForDirectory}
@@ -520,7 +521,7 @@ const ManagementPage: React.FC = () => {
         </Link> */}
       </div>
 
-      <div className="mb-8 border-b-2 border-black">
+      <div className="mb-8 border-2 border-black">
         <nav className="flex flex-row space-x-2 overflow-x-auto border border-black bg-white p-2 md:flex-col md:space-x-0 md:space-y-1 md:p-2">
           <TabButton
             onClick={() => handleViewChange('dashboard')}

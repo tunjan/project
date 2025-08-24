@@ -13,7 +13,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
   return (
     <div
       onClick={() => onNavigate(user)}
-              className="cursor-pointer border-2 border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal"
+      className="cursor-pointer border-2 border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal"
     >
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center space-x-3">
@@ -25,7 +25,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
           <div className="min-w-0">
             <p className="truncate font-bold text-black">{user.name}</p>
             <p className="truncate text-sm text-neutral-500">
-              {user.chapters.join(', ')}
+              {user.chapters?.join(', ') || 'No chapters'}
             </p>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { PencilIcon, TrashIcon } from '@/icons';
 import { useChaptersActions, useUsers } from '@/store';
 import EditChapterModal from './EditChapterModal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import ManageOrganiserModal from './ManageOrganiserModal';
 
 interface ChapterManagementProps {
   chapters: Chapter[];
@@ -20,6 +21,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
+  const [managingOrganiser, setManagingOrganiser] = useState<User | null>(null);
 
   const handleDelete = (chapterName: string) => {
     deleteChapter(chapterName);
@@ -68,6 +70,17 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
           onClose={() => setEditingChapter(null)}
         />
       )}
+
+      {managingOrganiser && (
+        <ManageOrganiserModal
+          organiser={managingOrganiser}
+          onClose={() => setManagingOrganiser(null)}
+          onUpdate={() => {
+            // Force re-render by updating a dependency
+            setManagingOrganiser(null);
+          }}
+        />
+      )}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <h3 className="mb-4 text-xl font-bold text-black">
@@ -113,19 +126,21 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                         {organizers.length > 0 ? (
                           <div className="mt-1 flex flex-wrap gap-2">
                             {organizers.map((org) => (
-                              <div
+                              <button
                                 key={org.id}
-                                className="flex items-center space-x-2 bg-neutral-100 p-1 pr-2"
+                                onClick={() => setManagingOrganiser(org)}
+                                className="flex cursor-pointer items-center space-x-2 bg-neutral-100 p-1 pr-2 transition-colors hover:bg-neutral-200"
+                                title={`Click to manage ${org.name}`}
                               >
                                 <img
                                   src={org.profilePictureUrl}
                                   alt={org.name}
                                   className="h-5 w-5 object-cover"
                                 />
-                                <span className="text-xs font-semibold">
+                                <span className="text-xs font-semibold text-black hover:text-primary">
                                   {org.name}
                                 </span>
-                              </div>
+                              </button>
                             ))}
                           </div>
                         ) : (

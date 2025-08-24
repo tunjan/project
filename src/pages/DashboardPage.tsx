@@ -156,7 +156,7 @@ const DashboardPage: React.FC = () => {
           title: 'New Applicants',
           description: 'New members awaiting approval',
           count: newApplicants.length,
-          action: () => navigate('/management'),
+          action: () => navigate('/manage'),
           urgent: true,
         });
       }
@@ -190,8 +190,8 @@ const DashboardPage: React.FC = () => {
 
     const userCountries = new Set(
       currentUser.chapters
-        .map((chName) => allChapters.find((c) => c.name === chName)?.country)
-        .filter(Boolean)
+        ?.map((chName) => allChapters.find((c) => c.name === chName)?.country)
+        .filter(Boolean) || []
     );
 
     // Get recent announcements relevant to user
@@ -208,7 +208,7 @@ const DashboardPage: React.FC = () => {
         if (
           ann.scope === 'Chapter' &&
           ann.chapter &&
-          currentUser.chapters.includes(ann.chapter)
+          currentUser.chapters?.includes(ann.chapter)
         )
           return true;
         return false;

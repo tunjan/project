@@ -33,14 +33,14 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
         (c) => c.country === currentUser.managedCountry
       );
       return countryChapters.filter((c) =>
-        userToManage.chapters.includes(c.name)
+        userToManage.chapters?.includes(c.name)
       );
     }
     if (
       currentUser.role === Role.GLOBAL_ADMIN ||
       currentUser.role === Role.GODMODE
     ) {
-      return allChapters.filter((c) => userToManage.chapters.includes(c.name));
+      return allChapters.filter((c) => userToManage.chapters?.includes(c.name));
     }
     return [];
   }, [currentUser, userToManage, allChapters]);

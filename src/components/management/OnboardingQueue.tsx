@@ -14,7 +14,7 @@ const ApplicantCard: React.FC<{
 }> = ({ user, onApprove, onDeny }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const chapterText =
-    user.chapters.length > 0
+    user.chapters && user.chapters.length > 0
       ? `${user.chapters.join(', ')} Chapter`
       : 'No chapter';
 

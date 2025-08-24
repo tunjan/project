@@ -37,7 +37,7 @@ export { useNotificationsState as useNotifications } from './notifications.store
 export { useChapterJoinRequests, useChapterByName } from './chapters.store';
 export { useBadgeAwardsForUser } from './awards.store';
 export { useEventById } from './events.store';
-export { useUserById } from './users.store';
+export { useUserById, useUsersActions } from './users.store';
 export { useNotificationsForUser, useUnreadNotificationCount } from './notifications.store';
 export { useLogsForEvent } from './outreach.store';
 

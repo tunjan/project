@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
-import { calculateChapterScorecard, ScorecardData } from '@/utils/scorecard';
+import { calculateChapterScorecard } from '@/utils/scorecard';
 
 const getScoreColor = (score: number) => {
   if (score >= 80) return 'bg-green-600';

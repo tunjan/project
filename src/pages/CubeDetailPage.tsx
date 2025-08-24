@@ -39,7 +39,7 @@ const CubeDetailPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    const isGuest = !currentUser.chapters.includes(event.city);
+    const isGuest = !currentUser.chapters?.includes(event.city);
     rsvp(id, currentUser, isGuest, duties, eventRole);
   };
 

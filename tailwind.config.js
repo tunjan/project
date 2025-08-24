@@ -45,6 +45,13 @@ export default {
           secondary: '#737373', // neutral-500
           subtle: '#f5f5f5', // neutral-100 for backgrounds
         },
+        // New outreach button palette
+        buff: '#cb997eff',
+        'desert-sand': '#ddbea9ff',
+        'champagne-pink': '#ffe8d6ff',
+        'ash-gray': '#b7b7a4ff',
+        sage: '#a5a58dff',
+        'reseda-green': '#6b705cff',
       },
       boxShadow: {
         brutal: '4px 4px 0 #000',

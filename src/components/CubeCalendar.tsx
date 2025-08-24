@@ -5,6 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import momentPlugin from '@fullcalendar/moment';
 import { CubeEvent } from '@/types';
+import { type EventClickArg } from '@fullcalendar/core';
 
 interface CubeCalendarProps {
   events: CubeEvent[];
@@ -15,18 +16,23 @@ const CubeCalendar: React.FC<CubeCalendarProps> = ({
   events,
   onSelectEvent,
 }) => {
-  const calendarEvents = events.map((event) => ({
-    id: event.id,
-    title: event.location,
-    start: event.startDate,
-    end: event.endDate,
-    extendedProps: { originalEvent: event },
-    backgroundColor: '#b91c1c',
-    borderColor: '#000000',
-    textColor: '#ffffff',
-  }));
+  const calendarEvents = events.map((event) => {
+    // Create title with only chapter name
+    const title = event.city;
 
-  const handleEventClick = (clickInfo: any) => {
+    return {
+      id: event.id,
+      title: title,
+      start: event.startDate,
+      end: event.endDate,
+      extendedProps: { originalEvent: event },
+      backgroundColor: '#b91c1c',
+      borderColor: '#000000',
+      textColor: '#ffffff',
+    };
+  });
+
+  const handleEventClick = (clickInfo: EventClickArg) => {
     onSelectEvent(clickInfo.event.extendedProps.originalEvent);
   };
 

@@ -67,15 +67,6 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
     [chapterStats]
   );
 
-  const topChaptersByMembers = useMemo(
-    () =>
-      [...chapterStats]
-        .sort((a, b) => b.memberCount - a.memberCount)
-        .slice(0, 5)
-        .map((c) => ({ label: c.name, value: c.memberCount })),
-    [chapterStats]
-  );
-
   if (!overviewStats) return null;
 
   return (
@@ -142,7 +133,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       {!isChapterView && <ChapterScorecard />}
 
       {/* Overview */}
-      <section className="mb-16">
+      <section className="my-16">
         <h2 className="mb-6 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
           Overview
         </h2>

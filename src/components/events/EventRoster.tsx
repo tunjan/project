@@ -1,5 +1,8 @@
-import React, { useMemo } from 'react';
-import { type CubeEvent, EventRole } from '@/types';
+import React, { useState, useMemo } from 'react';
+import { EventRole, EventRoleRequirement, User, CubeEvent } from '@/types';
+import { useUsers } from '@/store';
+import { Badge } from '@/components/ui/Tag';
+import { ClockIcon, UsersIcon } from '@/icons';
 import { Link } from 'react-router-dom';
 
 interface EventRosterProps {
@@ -24,7 +27,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
   }, [event.startDate, event.endDate]);
 
   const rosterByDay = useMemo(() => {
-    const roster: Record<string, Record<EventRole, any[]>> = {};
+    const roster: Record<string, Record<EventRole, User[]>> = {};
 
     for (const day of eventDays) {
       const dateString = new Date(day).toISOString().split('T')[0];
@@ -32,7 +35,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
         [EventRole.OUTREACH]: [],
         [EventRole.EQUIPMENT]: [],
         [EventRole.TRANSPORT]: [],
-      } as Record<EventRole, any[]>;
+      } as Record<EventRole, User[]>;
     }
 
     for (const participant of event.participants) {

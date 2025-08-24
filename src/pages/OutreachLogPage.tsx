@@ -34,17 +34,17 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
   const getOutcomeColor = (outcome: OutreachOutcome) => {
     switch (outcome) {
       case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
-        return 'bg-green-600';
+        return 'bg-reseda-green';
       case OutreachOutcome.BECAME_VEGAN:
-        return 'bg-green-500';
+        return 'bg-sage';
       case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
-        return 'bg-blue-600';
+        return 'bg-ash-gray';
       case OutreachOutcome.MOSTLY_SURE:
-        return 'bg-yellow-500';
+        return 'bg-champagne-pink';
       case OutreachOutcome.NOT_SURE:
-        return 'bg-gray-500';
+        return 'bg-desert-sand';
       case OutreachOutcome.NO_CHANGE:
-        return 'bg-red-600';
+        return 'bg-buff';
       default:
         return 'bg-black';
     }
@@ -85,7 +85,7 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={openNotesModal}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              className="hover:bg-sage flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:text-white"
               title={
                 log.notes
                   ? 'Edit notes for this log entry'
@@ -101,14 +101,14 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
             </button>
             <button
               onClick={() => onEdit(log)}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              className="hover:bg-ash-gray flex items-center gap-1 px-2 py-1 text-xs font-bold text-neutral-600 transition-colors duration-300 hover:text-white"
               title="Edit this log entry"
             >
               <PencilIcon className="h-3 w-3" />
             </button>
             <button
               onClick={() => onDelete(log)}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-red-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              className="hover:bg-buff flex items-center gap-1 px-2 py-1 text-xs font-bold text-red-600 transition-colors duration-300 hover:text-white"
               title="Delete this log entry"
             >
               <XIcon className="h-3 w-3" />
@@ -151,7 +151,7 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
             <div className="flex gap-2">
               <button
                 onClick={handleAddNotes}
-                className="flex-1 bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
+                className="bg-reseda-green flex-1 px-4 py-2 font-bold text-white hover:opacity-90"
                 disabled={!newNotes.trim()}
               >
                 {log.notes ? 'Update Notes' : 'Add Notes'}
@@ -291,13 +291,17 @@ const OutreachLogPage: React.FC = () => {
         </div>
       )}
       {/* RESTRUCTURED: Switched to a more logical 2-column grid layout */}
-      <div className="my-8 grid grid-cols-1 gap-12 lg:grid-cols-3">
-        <div className="space-y-12 lg:col-span-2">
+      <div className="my-8 grid grid-cols-1 gap-12">
+        <div className="space-y-12 py-8 md:py-4">
           <section>
-            <h2 className="h-section mb-4">Quick Log</h2>
-            <p className="mb-6 font-mono text-sm uppercase tracking-wider text-neutral-600">
-              Log a conversation with one click - perfect for busy cubes!
-            </p>
+            <div className="mb-8 md:mb-12">
+              <h2 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
+                Quick Log
+              </h2>
+              <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+                Log a conversation with one click - perfect for busy cubes!
+              </p>
+            </div>
             {pastEvents.length > 0 && selectedQuickLogEvent ? (
               <div className="card-brutal p-6">
                 <div className="mb-4">
@@ -346,17 +350,17 @@ const OutreachLogPage: React.FC = () => {
                     const getOutcomeColor = (outcome: OutreachOutcome) => {
                       switch (outcome) {
                         case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
-                          return 'btn-success';
+                          return 'btn-reseda-green';
                         case OutreachOutcome.BECAME_VEGAN:
-                          return 'btn-success';
+                          return 'btn-sage';
                         case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
-                          return 'btn-info';
+                          return 'btn-ash-gray';
                         case OutreachOutcome.MOSTLY_SURE:
-                          return 'btn-warning';
+                          return 'btn-champagne-pink';
                         case OutreachOutcome.NOT_SURE:
-                          return 'btn-gray';
+                          return 'btn-desert-sand';
                         case OutreachOutcome.NO_CHANGE:
-                          return 'btn-danger';
+                          return 'btn-buff';
                         default:
                           return 'bg-black text-white hover:bg-gray-800';
                       }
@@ -442,7 +446,7 @@ const OutreachLogPage: React.FC = () => {
                         setStartDate('');
                         setEndDate('');
                       }}
-                      className="h-[38px] border-2 border-black bg-black px-4 text-sm font-bold text-white hover:bg-neutral-800"
+                      className="border-buff bg-buff h-[38px] border-2 px-4 text-sm font-bold text-white hover:opacity-90"
                     >
                       Reset
                     </button>

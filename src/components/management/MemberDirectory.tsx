@@ -22,7 +22,7 @@ const MemberRow: React.FC<{
   isPendingForCurrentChapter?: boolean; // New prop to show pending status
 }> = ({ user, onSelectUser, isPendingForCurrentChapter }) => {
   const chapterText =
-    user.chapters.length > 0
+    user.chapters && user.chapters.length > 0
       ? `${user.chapters.join(', ')} Chapter(s)`
       : 'No chapter';
 
@@ -85,7 +85,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       if (selectedChapter === 'all') return true;
 
       // Check if user is already a member of the selected chapter
-      const isAlreadyMember = member.chapters.includes(selectedChapter);
+      const isAlreadyMember = member.chapters?.includes(selectedChapter);
 
       // Check if there's a pending request for this member and chapter
       const hasPendingRequestForChapter = pendingRequests.some(

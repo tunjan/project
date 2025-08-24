@@ -2,26 +2,21 @@ import React, { useMemo, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-import { divIcon, point, LatLngBounds } from 'leaflet';
+// Import specific functions from leaflet to avoid module issues
+import * as L from 'leaflet';
 import { type CubeEvent, type Chapter } from '@/types';
 import { safeFormatLocaleString } from '@/utils/date';
 
-const getEventCoords = (
-  event: CubeEvent,
-  chapters: Chapter[]
-): [number, number] | null => {
-  const chapter = chapters.find((c) => c.name === event.city);
-  return chapter ? [chapter.lat, chapter.lng] : null;
-};
-
-const CustomMarkerIcon = divIcon({
+const CustomMarkerIcon = L.divIcon({
   html: `<div class="w-4 h-4 bg-primary border-2 border-black"></div>`,
   className: '',
-  iconSize: point(16, 16),
-  iconAnchor: point(8, 8),
+  iconSize: L.point(16, 16),
+  iconAnchor: L.point(8, 8),
 });
 
-const ChangeView: React.FC<{ bounds: LatLngBounds | null }> = ({ bounds }) => {
+const ChangeView: React.FC<{ bounds: L.LatLngBounds | null }> = ({
+  bounds,
+}) => {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
@@ -61,13 +56,13 @@ const CubeMap: React.FC<CubeMapProps> = ({
     if (eventMarkers.length === 0) return null;
     const allCoords = eventMarkers.map((m) => m.coords);
 
-    return new LatLngBounds(allCoords);
+    return new L.LatLngBounds(allCoords);
   }, [eventMarkers]);
 
   return (
     <div className="h-[600px] w-full border border-black bg-white">
       <MapContainer
-        center={[20, 0]}
+        center={[20, 0] as [number, number]}
         zoom={2}
         scrollWheelZoom={false}
         style={{ height: '100%', width: '100%' }}

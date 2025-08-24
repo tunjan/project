@@ -125,6 +125,26 @@
     @apply bg-gray-500 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-600;
   }
 
+  /* New outreach button palette classes */
+  .btn-buff {
+    @apply bg-buff px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
+  }
+  .btn-desert-sand {
+    @apply bg-desert-sand px-4 py-2 font-bold text-black transition-colors duration-300 hover:opacity-90;
+  }
+  .btn-champagne-pink {
+    @apply bg-champagne-pink px-4 py-2 font-bold text-black transition-colors duration-300 hover:opacity-90;
+  }
+  .btn-ash-gray {
+    @apply bg-ash-gray px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
+  }
+  .btn-sage {
+    @apply bg-sage px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
+  }
+  .btn-reseda-green {
+    @apply bg-reseda-green px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
+  }
+
   /* Tag/badge variants */
   .tag-brutal {
     @apply border-2 border-black bg-neutral-100 px-2 py-1 text-xs font-bold uppercase tracking-wider text-black;
@@ -139,6 +159,10 @@
     animation: fadeIn 0.3s ease-in-out;
   }
 
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -147,6 +171,17 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 }

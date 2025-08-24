@@ -31,6 +31,7 @@ import EventRoster from './events/EventRoster';
 import TourOfDutyModal from './events/TourOfDutyModal';
 import EventRoleManagement from './events/EventRoleManagement';
 import RoleSignupModal from './events/RoleSignupModal';
+import InventoryDisplay from './charts/InventoryDisplay';
 import { useCurrentUser } from '@/store/auth.store';
 import {
   useEventsActions,
@@ -66,108 +67,129 @@ const ParticipantCard: React.FC<{
   participant: EventParticipant;
   isOrganizerView: boolean;
   onRemove: (userId: string) => void;
-}> = ({ participant, isOrganizerView, onRemove }) => (
-  <li>
-    <div className="flex items-center justify-between p-3 transition-colors hover:bg-neutral-100">
-      <Link
-        to={`/members/${participant.user.id}`}
-        className="flex min-w-0 items-center"
-      >
-        <img
-          className="h-10 w-10 flex-shrink-0 object-cover"
-          src={participant.user.profilePictureUrl}
-          alt={participant.user.name}
-        />
-        <div className="ml-4 min-w-0">
-          <p className="truncate text-sm font-semibold text-black">
-            {participant.user.name}
-          </p>
-          <p className="truncate text-sm text-neutral-500">
-            {participant.user.role}
-          </p>
+}> = ({ participant, isOrganizerView, onRemove }) => {
+  // Add safety check for participant and user
+  if (!participant?.user) {
+    return null;
+  }
+
+  return (
+    <li>
+      <div className="flex items-center justify-between p-3 transition-colors hover:bg-neutral-100">
+        <Link
+          to={`/members/${participant.user.id}`}
+          className="flex min-w-0 items-center"
+        >
+          <img
+            className="h-10 w-10 flex-shrink-0 object-cover"
+            src={participant.user.profilePictureUrl}
+            alt={participant.user.name}
+          />
+          <div className="ml-4 min-w-0">
+            <p className="truncate text-sm font-semibold text-black">
+              {participant.user.name}
+            </p>
+            <p className="truncate text-sm text-neutral-500">
+              {participant.user.role}
+            </p>
+          </div>
+        </Link>
+        <div className="flex flex-shrink-0 items-center space-x-2">
+          <RoleBadge role={participant.eventRole} />
+          {isOrganizerView && (
+            <button
+              onClick={() => onRemove(participant.user.id)}
+              className="p-1 text-neutral-400 hover:text-primary"
+              aria-label={`Remove ${participant.user.name}`}
+            >
+              <TrashIcon className="h-4 w-4" />
+            </button>
+          )}
         </div>
-      </Link>
-      <div className="flex flex-shrink-0 items-center space-x-2">
-        <RoleBadge role={participant.eventRole} />
-        {isOrganizerView && (
-          <button
-            onClick={() => onRemove(participant.user.id)}
-            className="p-1 text-neutral-400 hover:text-primary"
-            aria-label={`Remove ${participant.user.name}`}
-          >
-            <TrashIcon className="h-4 w-4" />
-          </button>
-        )}
       </div>
-    </div>
-  </li>
-);
+    </li>
+  );
+};
 
 const PendingRequestCard: React.FC<{
   participant: EventParticipant;
   onAccept: () => void;
   onDeny: () => void;
-}> = ({ participant, onAccept, onDeny }) => (
-  <li className="flex items-center justify-between p-3">
-    <div className="flex items-center">
-      <img
-        className="h-10 w-10 object-cover"
-        src={participant.user.profilePictureUrl}
-        alt={participant.user.name}
-      />
-      <div className="ml-4">
-        <p className="text-sm font-semibold text-black">
-          {participant.user.name}
-        </p>
-        <p className="text-sm text-neutral-500">
-          {participant.user.chapters.join(', ')}
-        </p>
+}> = ({ participant, onAccept, onDeny }) => {
+  // Add safety check for participant and user
+  if (!participant?.user) {
+    return null;
+  }
+
+  return (
+    <li className="flex items-center justify-between p-3">
+      <div className="flex items-center">
+        <img
+          className="h-10 w-10 object-cover"
+          src={participant.user.profilePictureUrl}
+          alt={participant.user.name}
+        />
+        <div className="ml-4">
+          <p className="text-sm font-semibold text-black">
+            {participant.user.name}
+          </p>
+          <p className="text-sm text-neutral-500">
+            {participant.user.chapters?.join(', ') || 'No chapters assigned'}
+          </p>
+        </div>
       </div>
-    </div>
-    <div className="flex items-center space-x-2">
-      <button
-        onClick={onDeny}
-        className="bg-black px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-800"
-      >
-        Deny
-      </button>
-      <button
-        onClick={onAccept}
-        className="bg-primary px-3 py-1 text-xs font-semibold text-white hover:bg-primary-hover"
-      >
-        Accept
-      </button>
-    </div>
-  </li>
-);
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={onDeny}
+          className="bg-black px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-800"
+        >
+          Deny
+        </button>
+        <button
+          onClick={onAccept}
+          className="bg-primary px-3 py-1 text-xs font-semibold text-white hover:bg-primary-hover"
+        >
+          Accept
+        </button>
+      </div>
+    </li>
+  );
+};
 
 const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> = ({
   host,
   onRequest,
-}) => (
-  <li className="flex items-center justify-between py-3">
-    <div className="flex items-center">
-      <img
-        className="h-10 w-10 object-cover"
-        src={host.profilePictureUrl}
-        alt={host.name}
-      />
-      <div className="ml-4">
-        <p className="text-sm font-semibold text-black">{host.name}</p>
-        <p className="text-sm text-neutral-500">
-          Can host {host.hostingCapacity}{' '}
-          {host.hostingCapacity === 1 ? 'person' : 'people'}
-        </p>
+}) => {
+  // Add safety check for host
+  if (!host) {
+    return null;
+  }
+
+  return (
+    <li className="flex items-center justify-between py-3">
+      <div className="flex items-center">
+        <img
+          className="h-10 w-10 object-cover"
+          src={host.profilePictureUrl}
+          alt={host.name}
+        />
+        <div className="ml-4">
+          <p className="text-sm font-semibold text-black">{host.name}</p>
+          <p className="text-sm text-neutral-500">
+            Can host {host.hostingCapacity}{' '}
+            {host.hostingCapacity === 1 ? 'person' : 'people'}
+          </p>
+        </div>
       </div>
-    </div>
-    <button
-      onClick={() => onRequest(host)}
-      className="bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
-    >
-      Request Stay
-    </button>
-  </li>
-);
+      <button
+        onClick={() => onRequest(host)}
+        className="bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
+      >
+        Request Stay
+      </button>
+    </li>
+  );
+};
 
 const CubeDetail: React.FC<CubeDetailProps> = ({
   event,
@@ -229,7 +251,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   const isPending =
     currentUserParticipant?.status === ParticipantStatus.PENDING;
   const isGuest = currentUser
-    ? !currentUser.chapters.includes(event.city)
+    ? !currentUser.chapters?.includes(event.city)
     : true;
 
   const isPastEvent = startDate ? new Date() > startDate : false;
@@ -263,7 +285,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     return allUsers.filter(
       (u: User) =>
         u.id !== currentUser?.id &&
-        u.chapters.includes(event.city) &&
+        u.chapters?.includes(event.city) &&
         u.hostingAvailability &&
         u.hostingCapacity &&
         u.hostingCapacity > 0
@@ -545,14 +567,16 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   </p>
                 </div>
                 <ul className="divide-y divide-yellow-300 px-6">
-                  {pendingParticipants.map((p) => (
-                    <PendingRequestCard
-                      key={p.user.id}
-                      participant={p}
-                      onAccept={() => handleAcceptRsvp(p.user.id)}
-                      onDeny={() => handleDenyRsvp(p.user.id)}
-                    />
-                  ))}
+                  {pendingParticipants
+                    .filter((p) => p?.user) // Filter out invalid participants
+                    .map((p) => (
+                      <PendingRequestCard
+                        key={p.user.id}
+                        participant={p}
+                        onAccept={() => handleAcceptRsvp(p.user.id)}
+                        onDeny={() => handleDenyRsvp(p.user.id)}
+                      />
+                    ))}
                 </ul>
               </div>
             )}
@@ -567,13 +591,15 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   </div>
                   {availableHosts.length > 0 ? (
                     <ul className="divide-y divide-neutral-200">
-                      {availableHosts.map((host: User) => (
-                        <HostCard
-                          key={host.id}
-                          host={host}
-                          onRequest={handleRequestStay}
-                        />
-                      ))}
+                      {availableHosts
+                        .filter((host) => host) // Filter out invalid hosts
+                        .map((host: User) => (
+                          <HostCard
+                            key={host.id}
+                            host={host}
+                            onRequest={handleRequestStay}
+                          />
+                        ))}
                     </ul>
                   ) : (
                     <p className="py-4 text-center text-sm text-neutral-500">
@@ -587,6 +613,17 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
             {canParticipateInDiscussion && (
               <EventDiscussion eventId={event.id} />
             )}
+
+            {/* Chapter Inventory */}
+            <div className="border border-black bg-white">
+              <div className="p-6 md:p-8">
+                <InventoryDisplay
+                  chapterName={event.city}
+                  showTitle={true}
+                  compact={false}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="mt-8 lg:mt-0">
@@ -599,14 +636,16 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 </div>
               </div>
               <ul className="-mx-3 divide-y divide-neutral-200">
-                {attendingParticipants.map((p: EventParticipant) => (
-                  <ParticipantCard
-                    key={p.user.id}
-                    participant={p}
-                    isOrganizerView={isOrganizer && !isPastEvent}
-                    onRemove={openRemoveParticipantModal}
-                  />
-                ))}
+                {attendingParticipants
+                  .filter((p) => p?.user) // Filter out invalid participants
+                  .map((p: EventParticipant) => (
+                    <ParticipantCard
+                      key={p.user.id}
+                      participant={p}
+                      isOrganizerView={isOrganizer && !isPastEvent}
+                      onRemove={openRemoveParticipantModal}
+                    />
+                  ))}
               </ul>
               <div className="mt-6 space-y-2">
                 {/* Status Display */}

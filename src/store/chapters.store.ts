@@ -16,6 +16,7 @@ export interface ChaptersActions {
   requestToJoinChapter: (chapterName: string, user: User) => void;
   approveChapterJoinRequest: (requestId: string, approver: User) => void;
   denyChapterJoinRequest: (requestId: string) => void;
+  resetToInitialData: () => void;
 }
 
 export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
@@ -134,6 +135,10 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
           ),
         }));
       },
+
+      resetToInitialData: () => {
+        set({ chapters: initialChapters, chapterJoinRequests: [] });
+      },
     }),
     { name: 'chapters-store' }
   )
@@ -149,6 +154,7 @@ export const useChaptersActions = () =>
     requestToJoinChapter: s.requestToJoinChapter,
     approveChapterJoinRequest: s.approveChapterJoinRequest,
     denyChapterJoinRequest: s.denyChapterJoinRequest,
+    resetToInitialData: s.resetToInitialData,
   }));
 
 // Selectors

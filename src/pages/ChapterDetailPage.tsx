@@ -23,6 +23,7 @@ import {
 } from '@/icons';
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
+import InventoryDisplay from '@/components/charts/InventoryDisplay';
 import { toast } from 'sonner';
 
 const StatCard: React.FC<{
@@ -78,7 +79,7 @@ const ChapterDetailPage: React.FC = () => {
 
   const isMember = useMemo(() => {
     if (!currentUser || !chapter) return false;
-    return currentUser.chapters.includes(chapter.name);
+    return currentUser.chapters?.includes(chapter.name) || false;
   }, [currentUser, chapter]);
 
   const hasPendingRequest = useMemo(() => {
@@ -115,7 +116,7 @@ const ChapterDetailPage: React.FC = () => {
     )[0];
     const members = allUsers.filter(
       (u) =>
-        u.chapters.includes(chapter.name) && u.onboardingStatus === 'Confirmed'
+        u.chapters?.includes(chapter.name) && u.onboardingStatus === 'Confirmed'
     );
     const organisers = members.filter(
       (u) =>
@@ -181,34 +182,6 @@ const ChapterDetailPage: React.FC = () => {
           onClose={() => setIsPastEventsModalOpen(false)}
         />
       )}
-      
-      {/* Temporary debug info - remove this after fixing the issue */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
-          <h3 className="font-bold text-yellow-800">Debug Info (Development Only)</h3>
-          <p><strong>Chapter Name:</strong> {chapter.name}</p>
-          <p><strong>Total Events:</strong> {allEvents.length}</p>
-          <p><strong>Events for this chapter:</strong> {allEvents.filter(e => e.city === chapter.name).length}</p>
-          <p><strong>Past Events for this chapter:</strong> {pastChapterEvents.length}</p>
-          <p><strong>Sample Events:</strong></p>
-          <ul className="text-sm">
-            {allEvents.slice(0, 5).map(e => (
-              <li key={e.id}>
-                {e.city} - {e.startDate.toDateString()} - {e.startDate < new Date() ? 'PAST' : 'FUTURE'}
-              </li>
-            ))}
-          </ul>
-          
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-            <h4 className="font-semibold text-blue-800 mb-2">Available Chapter Names in Events:</h4>
-            <div className="text-xs text-blue-700">
-              {Array.from(new Set(allEvents.map(e => e.city))).slice(0, 10).join(', ')}
-              {allEvents.length > 10 && '...'}
-            </div>
-          </div>
-        </div>
-      )}
-      
       <div className="animate-fade-in py-8 md:py-12">
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
           <button
@@ -358,6 +331,15 @@ const ChapterDetailPage: React.FC = () => {
                 </p>
               </div>
             )}
+
+            {/* Chapter Inventory */}
+            <div className="mt-8">
+              <InventoryDisplay
+                chapterName={chapter.name}
+                showTitle={true}
+                compact={false}
+              />
+            </div>
           </div>
         </div>
       </div>

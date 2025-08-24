@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type InventoryItem } from '@/types';
+import { initialInventory } from './initialData';
 
 interface InventoryState {
     inventory: InventoryItem[];
@@ -12,8 +13,8 @@ interface InventoryActions {
 
 export const useInventoryStore = create<InventoryState & InventoryActions>()(
     persist(
-        (set, get) => ({
-            inventory: [], // Start with empty inventory
+        (set) => ({
+            inventory: initialInventory, // Start with initial inventory data
 
             updateChapterInventory: (chapterName: string, items: InventoryItem[]) => {
                 set((state) => ({

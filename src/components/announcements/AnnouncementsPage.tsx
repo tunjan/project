@@ -26,11 +26,11 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
   const userCountries = [
     ...new Set(
       currentUser.chapters
-        .map(
+        ?.map(
           (chName: string) =>
             chapters.find((c: Chapter) => c.name === chName)?.country
         )
-        .filter((r): r is string => !!r)
+        .filter((r): r is string => !!r) || []
     ),
   ];
 
@@ -56,7 +56,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         case AnnouncementScope.REGIONAL:
           return a.country ? userCountries.includes(a.country) : false;
         case AnnouncementScope.CHAPTER:
-          return a.chapter ? currentUser.chapters.includes(a.chapter) : false;
+          return a.chapter ? currentUser.chapters?.includes(a.chapter) : false;
         default:
           return false;
       }

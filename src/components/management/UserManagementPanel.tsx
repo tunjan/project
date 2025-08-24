@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { type User, Role } from '@/types';
-import { getAssignableRoles, ROLE_HIERARCHY } from '@/utils/auth';
+import React, { useState, useMemo } from 'react';
+import { User, Role } from '@/types';
+import { useUsers, useUsersActions } from '@/store';
+import { getAssignableRoles } from '@/utils/auth';
 import { toast } from 'sonner';
 import { PencilIcon, TrophyIcon, ChatBubbleLeftRightIcon } from '@/icons';
 
@@ -32,13 +33,12 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
   const assignableRoles = getAssignableRoles(currentUser);
 
   const handleSaveRole = () => {
-    if (selectedRole === user.role) return;
-    if (
-      selectedRole === Role.CHAPTER_ORGANISER &&
-      ROLE_HIERARCHY[user.role] < ROLE_HIERARCHY[Role.CHAPTER_ORGANISER]
-    ) {
+    // If the selected role is Chapter Organiser, always open the modal.
+    // This handles both promotion and editing chapters for an existing organiser.
+    if (selectedRole === Role.CHAPTER_ORGANISER) {
       onOpenPromoteModal();
-    } else {
+    } else if (selectedRole !== user.role) {
+      // Handle other role changes only if the role is different
       onUpdateRole(user.id, selectedRole);
       toast.success(`${user.name}'s role has been updated to ${selectedRole}.`);
     }
@@ -61,10 +61,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
                 </p>
               </div>
             </div>
-            <button
-              onClick={onSendMessage}
-              className="btn-info"
-            >
+            <button onClick={onSendMessage} className="btn-info">
               Send Email
             </button>
           </div>
@@ -91,10 +88,15 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         </select>
         <button
           onClick={handleSaveRole}
-          disabled={selectedRole === user.role}
+          disabled={
+            selectedRole === user.role && user.role !== Role.CHAPTER_ORGANISER
+          }
           className="w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Save Role
+          {user.role === Role.CHAPTER_ORGANISER &&
+          selectedRole === Role.CHAPTER_ORGANISER
+            ? 'Edit Organised Chapters'
+            : 'Save Role'}
         </button>
 
         {canEditChapters && (

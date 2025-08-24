@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { hasOrganizerRole } from '@/utils/auth';
+import { useCurrentUser, useAuthActions } from '@/store/auth.store';
 import { useNavItems } from '@/hooks/useNavItems';
 import useSearch from '@/hooks/useSearch';
 import {
@@ -14,7 +14,6 @@ import {
 } from '@/icons';
 import NotificationPopover from './NotificationPopover';
 import SearchResults from './SearchResults';
-import { useCurrentUser, useAuthActions } from '@/store/auth.store';
 import {
   useNotificationsForUser,
   useUnreadNotificationCount,

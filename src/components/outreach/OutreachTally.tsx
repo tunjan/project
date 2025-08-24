@@ -18,25 +18,25 @@ const outcomeMeta: Record<
 > = {
   [OutreachOutcome.BECAME_VEGAN_ACTIVIST]: {
     icon: UsersIcon,
-    color: 'text-green-600',
+    color: 'text-reseda-green',
   },
   [OutreachOutcome.BECAME_VEGAN]: {
     icon: CheckCircleIcon,
-    color: 'text-green-500',
+    color: 'text-sage',
   },
   [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: {
     icon: UserAddIcon,
-    color: 'text-blue-600',
+    color: 'text-ash-gray',
   },
   [OutreachOutcome.MOSTLY_SURE]: {
     icon: TrendingUpIcon,
-    color: 'text-yellow-500',
+    color: 'text-champagne-pink',
   },
   [OutreachOutcome.NOT_SURE]: {
     icon: TrendingUpIcon,
-    color: 'text-gray-500',
+    color: 'text-desert-sand',
   },
-  [OutreachOutcome.NO_CHANGE]: { icon: XCircleIcon, color: 'text-red-600' },
+  [OutreachOutcome.NO_CHANGE]: { icon: XCircleIcon, color: 'text-buff' },
 };
 
 const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {

@@ -46,12 +46,20 @@ export interface UsersActions {
   batchUpdateUserStats: (
     updates: { userId: string; newStats: Partial<User['stats']> }[]
   ) => void;
+  resetToInitialData: () => void;
 }
 
 export const useUsersStore = create<UsersState & UsersActions>()(
   persist(
     (set, get) => ({
       users: processedUsers,
+
+      // Debug logging
+      ...(() => {
+        console.log('Users store initialized with users:', processedUsers);
+        console.log('Users store - processedUsers length:', processedUsers.length);
+        return {};
+      })(),
 
       register: (formData) => {
         const newUser: User = {
@@ -266,8 +274,20 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           }),
         }));
       },
+
+      resetToInitialData: () => {
+        set({ users: processedUsers });
+      },
     }),
-    { name: 'users-store' }
+    {
+      name: 'users-store', onRehydrateStorage: () => (rehydrated, error) => {
+        if (rehydrated) {
+          console.log('Users store rehydrated successfully');
+        } else {
+          console.log('Users store rehydration failed', error);
+        }
+      }
+    }
   )
 );
 
@@ -288,10 +308,20 @@ export const useUsersActions = () =>
     editOrganizerNote: s.editOrganizerNote,
     deleteOrganizerNote: s.deleteOrganizerNote,
     batchUpdateUserStats: s.batchUpdateUserStats,
+    resetToInitialData: s.resetToInitialData,
   }));
 
 // Selectors
-export const useUserById = (userId?: string) =>
-  useUsersStore((s) => s.users.find((u) => u.id === userId));
+export const useUserById = (userId?: string) => {
+  const user = useUsersStore((s) => {
+    console.log('useUserById called with userId:', userId);
+    console.log('useUserById - store users:', s.users);
+    console.log('useUserById - users length:', s.users.length);
+    const foundUser = s.users.find((u) => u.id === userId);
+    console.log('useUserById - found user:', foundUser);
+    return foundUser;
+  });
+  return user;
+};
 
 

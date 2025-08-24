@@ -128,7 +128,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
       currentUser.managedCountry
     ) {
       const userInChapters = allChapters.filter((c) =>
-        user.chapters.includes(c.name)
+        user.chapters?.includes(c.name)
       );
       const userCountries = new Set(userInChapters.map((c) => c.country));
       return userCountries.has(currentUser.managedCountry);
@@ -136,7 +136,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
 
     if (currentUser.role === Role.CHAPTER_ORGANISER) {
       const managedChapters = new Set(currentUser.organiserOf || []);
-      return user.chapters.some((chapter) => managedChapters.has(chapter));
+      return user.chapters?.some((chapter) => managedChapters.has(chapter));
     }
 
     return false;
@@ -145,9 +145,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   const canEditChapters =
     !!currentUser &&
     ROLE_HIERARCHY[currentUser.role] >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER];
-  const canDeleteUser =
-    !!currentUser &&
-    ROLE_HIERARCHY[currentUser.role] > ROLE_HIERARCHY[user.role];
+  const canDeleteUser = canManageRole;
   const canManuallyVerify = currentUser
     ? canVerifyUser(currentUser, user) &&
       user.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION

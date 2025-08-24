@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import FocusTrap from 'focus-trap-react';
-import { type CubeEvent } from '@/types';
-import { XIcon, ChevronDownIcon } from '@/icons';
 import Modal from '@/components/ui/Modal';
+import { Chapter, CubeEvent } from '@/types';
+import { ChevronDownIcon } from '@/icons';
 
 interface PastEventsModalProps {
   chapterName: string;
@@ -85,18 +84,21 @@ const PastEventsModal: React.FC<PastEventsModalProps> = ({
         </div>
       ) : (
         <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <p className="text-neutral-500 mb-4">
+          <p className="mb-4 text-neutral-500">
             No past events found for this chapter.
           </p>
-          <div className="text-sm text-neutral-400 space-y-2">
+          <div className="space-y-2 text-sm text-neutral-400">
             <p>This could be because:</p>
-            <ul className="list-disc list-inside space-y-1">
+            <ul className="list-inside list-disc space-y-1">
               <li>The chapter hasn't held any events yet</li>
               <li>All events are scheduled for the future</li>
-              <li>There might be a mismatch between chapter names and event cities</li>
+              <li>
+                There might be a mismatch between chapter names and event cities
+              </li>
             </ul>
             <p className="mt-4 text-xs">
-              Tip: Check if the chapter name "{chapterName}" matches the city field in events.
+              Tip: Check if the chapter name "{chapterName}" matches the city
+              field in events.
             </p>
           </div>
         </div>

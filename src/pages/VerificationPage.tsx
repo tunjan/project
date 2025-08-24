@@ -56,7 +56,7 @@ const VerificationPage: React.FC = () => {
           />
           <p className="text-xl font-bold">{userToVerify.name}</p>
           <p className="text-neutral-500">
-            {userToVerify.chapters.join(', ')} Chapter
+            {userToVerify.chapters?.join(', ') || 'No chapters'} Chapter
           </p>
         </div>
         <button

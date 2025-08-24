@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EventRole, type EventRoleRequirement, type CubeEvent } from '@/types';
+import { EventRole, User, CubeEvent } from '@/types';
 import { SelectField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
 import { UsersIcon } from '@/icons';

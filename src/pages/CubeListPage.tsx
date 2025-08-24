@@ -191,7 +191,7 @@ const CubeListPage: React.FC = () => {
             {eventsToDisplay.map((event) => {
               const isAffiliated =
                 !!currentUser &&
-                (currentUser.chapters.includes(event.city) ||
+                (currentUser.chapters?.includes(event.city) ||
                   currentUser.organiserOf?.includes(event.city));
               return (
                 <CubeCard
