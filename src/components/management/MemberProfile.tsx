@@ -202,13 +202,13 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         {user.onboardingStatus ===
           OnboardingStatus.PENDING_APPLICATION_REVIEW &&
           user.onboardingAnswers && (
-            <section className="mb-8 border-2 border-yellow-500 bg-yellow-50 p-6">
+            <section className="mb-8 border-2 border-red bg-white p-6">
               <h2 className="mb-4 text-2xl font-bold text-black">
                 Applicant Review
               </h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs font-bold uppercase text-neutral-500">
+                  <p className="text-xs font-bold uppercase text-white0">
                     Why did you go vegan?
                   </p>
                   <p className="text-sm text-black">
@@ -216,7 +216,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase text-neutral-500">
+                  <p className="text-xs font-bold uppercase text-white0">
                     Are you aligned with our abolitionist values?
                   </p>
                   <p className="text-sm text-black">
@@ -226,7 +226,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase text-neutral-500">
+                  <p className="text-xs font-bold uppercase text-white0">
                     How can you contribute?
                   </p>
                   <p className="text-sm text-black">
@@ -234,10 +234,10 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </p>
                 </div>
               </div>
-              <div className="mt-6 flex space-x-4 border-t border-yellow-400 pt-4">
+              <div className="mt-6 flex space-x-4 border-t border-white pt-4">
                 <button
                   onClick={handleDeny}
-                  className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-neutral-800"
+                  className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black"
                 >
                   Deny
                 </button>

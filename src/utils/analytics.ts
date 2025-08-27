@@ -240,6 +240,40 @@ export const getMemberGrowth = (
         .reverse();
 };
 
+export const getTotalMembersByMonth = (
+    users: User[],
+    months: number = 12
+): MonthlyTrend[] => {
+    const trends: Record<string, number> = {};
+    const now = new Date();
+    const confirmedUsers = getConfirmedUsers(users);
+
+    for (let i = 0; i < months; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+        const activeUsers = confirmedUsers.filter(user => {
+            if (!user.joinDate) {
+                return false;
+            }
+            const joinDate = new Date(user.joinDate);
+            const leaveDate = user.leaveDate ? new Date(user.leaveDate) : null;
+
+            const joinedBeforeMonthEnd = joinDate <= monthEnd;
+            const notLeftBeforeMonthStart = !leaveDate || leaveDate > d;
+
+            return joinedBeforeMonthEnd && notLeftBeforeMonthStart;
+        });
+
+        trends[key] = activeUsers.length;
+    }
+
+    return Object.entries(trends)
+        .map(([month, count]) => ({ month, count }))
+        .reverse();
+};
+
 export const getTopActivistsByHours = (
     users: User[],
     count: number = 5

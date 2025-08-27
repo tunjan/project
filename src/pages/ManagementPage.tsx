@@ -65,9 +65,9 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
   priority,
 }) => {
   const priorityStyles = {
-    high: 'border-l-4 border-red-500 bg-red-50',
-    medium: 'border-l-4 border-orange-500 bg-orange-50',
-    low: 'border-l-4 border-blue-500 bg-blue-50',
+    high: 'border-l-4 border-red bg-white',
+    medium: 'border-l-4 border-grey-500 bg-white',
+    low: 'border-l-4 border-black bg-white',
   };
 
   return (
@@ -83,7 +83,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
               <h3 className="h-card">{title}</h3>
               <span className="tag-brutal">{count}</span>
             </div>
-            <p className="text-sm text-neutral-600">{description}</p>
+            <p className="text-grey-600 text-sm">{description}</p>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@ const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         <CalendarIcon className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
         <div>
           <h3 className="h-card">{event.location}</h3>
-          <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
+          <div className="text-grey-600 mt-1 flex items-center gap-4 text-sm">
             <span className="flex items-center gap-1">
               <ClockIcon className="h-4 w-4" />
               {new Date(event.startDate).toLocaleDateString()}
@@ -116,7 +116,7 @@ const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
               {event.city}
             </span>
           </div>
-          <div className="mt-2 text-sm text-neutral-700">
+          <div className="mt-2 text-sm text-black">
             {event.participants.length} participants
           </div>
         </div>
@@ -137,8 +137,8 @@ const TabButton: React.FC<{
     onClick={onClick}
     className={`flex w-full items-center space-x-3 border-l-4 p-4 text-left text-sm font-bold transition-colors duration-200 ${
       isActive
-        ? 'border-primary bg-neutral-100 text-black'
-        : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:bg-neutral-50 hover:text-black'
+        ? 'border-primary bg-white text-black'
+        : 'text-white0 border-transparent hover:border-black hover:bg-white hover:text-black'
     }`}
   >
     {children}
@@ -457,7 +457,7 @@ const ManagementPage: React.FC = () => {
                   onChange={(e) =>
                     setSelectedChapterForInventory(e.target.value)
                   }
-                  className="border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none"
+                  className="border border-black px-3 py-2 focus:border-primary focus:outline-none"
                 >
                   {manageableChapters.map((chapter) => (
                     <option key={chapter.name} value={chapter.name}>
@@ -476,21 +476,21 @@ const ManagementPage: React.FC = () => {
                 }
               />
             ) : manageableChapters.length === 0 ? (
-              <div className="border-2 border-gray-200 bg-gray-50 p-8 text-center">
-                <h3 className="text-lg font-bold text-gray-900">
+              <div className="border-2 border-white bg-white p-8 text-center">
+                <h3 className="text-lg font-bold text-black">
                   No Manageable Chapters
                 </h3>
-                <p className="mt-1 text-gray-600">
+                <p className="text-red mt-1">
                   You don't have permission to manage inventory for any
                   chapters.
                 </p>
               </div>
             ) : (
-              <div className="border-2 border-gray-200 bg-gray-50 p-8 text-center">
-                <h3 className="text-lg font-bold text-gray-900">
+              <div className="border-2 border-white bg-white p-8 text-center">
+                <h3 className="text-lg font-bold text-black">
                   No Chapter Selected
                 </h3>
-                <p className="mt-1 text-gray-600">
+                <p className="text-red mt-1">
                   Please select a chapter to manage its inventory.
                 </p>
               </div>
@@ -509,7 +509,7 @@ const ManagementPage: React.FC = () => {
           <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             Management
           </h1>
-          <p className="mt-2 max-w-2xl text-lg text-neutral-600">
+          <p className="text-red mt-2 max-w-2xl text-lg">
             Oversee activists, chapters, and onboarding processes.
           </p>
         </div>

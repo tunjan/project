@@ -32,7 +32,7 @@ const CustomTooltip = ({
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="shadow-brutal border-2 border-black bg-white p-3">
+      <div className="border-2 border-black bg-white p-3 shadow-brutal">
         <p className="font-bold text-black">{data.label}</p>
         <p className="text-primary">
           {data.y.toLocaleString()} conversations / {data.x.toLocaleString()}{' '}
@@ -54,7 +54,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     return (
       <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-        <div className="flex h-[350px] items-center justify-center text-neutral-500">
+        <div className="text-white0 flex h-[350px] items-center justify-center">
           Not enough data to display chart.
         </div>
       </div>
@@ -81,21 +81,21 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
               bottom: 60,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" />
             <XAxis
               type="number"
               dataKey="x"
               name={xAxisLabel}
-              tick={{ fontSize: 12, fill: '#111827' }}
-              axisLine={{ stroke: '#111827' }}
-              tickLine={{ stroke: '#111827' }}
+              tick={{ fontSize: 12, fill: '#000000' }}
+              axisLine={{ stroke: '#000000' }}
+              tickLine={{ stroke: '#000000' }}
               label={{
                 value: xAxisLabel,
                 position: 'insideBottom',
                 offset: -10,
                 style: {
                   textAnchor: 'middle',
-                  fill: '#111827',
+                  fill: '#000000',
                   fontSize: '12px',
                 },
               }}
@@ -105,15 +105,15 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
               dataKey="y"
               name={yAxisLabel}
               tick={{ fontSize: 12, fill: '#6b7280' }}
-              axisLine={{ stroke: '#111827' }}
-              tickLine={{ stroke: '#111827' }}
+              axisLine={{ stroke: '#000000' }}
+              tickLine={{ stroke: '#000000' }}
               label={{
                 value: yAxisLabel,
                 angle: -90,
                 position: 'insideLeft',
                 style: {
                   textAnchor: 'middle',
-                  fill: '#111827',
+                  fill: '#000000',
                   fontSize: '12px',
                 },
               }}
@@ -121,7 +121,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
             <Tooltip content={<CustomTooltip />} />
             <Scatter
               dataKey="y"
-              fill="#c70f0f"
+              fill="#6b7280"
               stroke="#000000"
               strokeWidth={1}
               r={6}

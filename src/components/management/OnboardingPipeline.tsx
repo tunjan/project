@@ -24,7 +24,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
           />
           <div className="min-w-0">
             <p className="truncate font-bold text-black">{user.name}</p>
-            <p className="truncate text-sm text-neutral-500">
+            <p className="truncate text-sm text-white0">
               {user.chapters?.join(', ') || 'No chapters'}
             </p>
           </div>
@@ -45,10 +45,10 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
   users,
   onNavigate,
 }) => (
-  <div className="flex flex-col border-2 border-black bg-neutral-100">
+  <div className="flex flex-col border-2 border-black bg-white">
     <h3 className="border-b-2 border-black bg-white p-3 text-sm font-extrabold uppercase tracking-wider text-black">
       {title}{' '}
-      <span className="font-normal text-neutral-500">({users.length})</span>
+      <span className="font-normal text-white0">({users.length})</span>
     </h3>
     <div className="h-[60vh] space-y-2 overflow-y-auto p-2">
       {users.length > 0 ? (
@@ -57,7 +57,7 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
         ))
       ) : (
         <div className="flex h-full items-center justify-center p-4 text-center">
-          <p className="text-sm text-neutral-500">Empty</p>
+          <p className="text-sm text-white0">Empty</p>
         </div>
       )}
     </div>

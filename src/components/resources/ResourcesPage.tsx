@@ -38,7 +38,7 @@ const ResourcesPage: React.FC = () => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Learning Center
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
           Access protocol documents, training materials, and outreach guides.
         </p>
       </div>
@@ -64,11 +64,11 @@ const ResourcesPage: React.FC = () => {
           </div>
         ) : (
           <div className="border-2 border-black bg-white p-8 text-center">
-            <BookOpenIcon className="mx-auto h-12 w-12 text-neutral-300" />
+            <BookOpenIcon className="text-grey-500 mx-auto h-12 w-12" />
             <h3 className="mt-4 text-xl font-bold text-black">
               No resources found.
             </h3>
-            <p className="mt-2 text-neutral-500">
+            <p className="text-white0 mt-2">
               Try adjusting your search or filters.
             </p>
           </div>

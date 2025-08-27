@@ -24,18 +24,18 @@ const BadgeAwardCard: React.FC<BadgeAwardCardProps> = ({
           <IconComponent className="h-7 w-7" />
         </div>
         <div className="flex-grow">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-white0">
             Awarded by{' '}
             <span className="font-bold text-black">{award.awarder.name}</span>
           </p>
           <p className="text-lg font-bold text-black">{award.badge.name}</p>
-          <p className="text-sm text-neutral-600">{award.badge.description}</p>
+          <p className="text-sm text-red">{award.badge.description}</p>
         </div>
       </div>
       <div className="mt-4 flex items-center space-x-2 border-t border-black pt-3">
         <button
           onClick={() => onRespond(award.id, 'Rejected')}
-          className="flex w-full items-center justify-center bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
+          className="flex w-full items-center justify-center bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-black"
         >
           <XIcon className="mr-1.5 h-4 w-4" /> Decline
         </button>

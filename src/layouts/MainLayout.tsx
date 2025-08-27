@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '@/components/header/Header';
 import Sidebar from '@/components/header/Sidebar';
 import { Toaster } from 'sonner';
+import { useUsersActions } from '@/store';
 
 const MainLayout: React.FC = () => {
+  const { init } = useUsersActions();
+
+  // Initialize store when layout mounts
+  useEffect(() => {
+    init();
+  }, [init]);
+
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-50">
+    <div className="flex min-h-screen flex-col bg-white">
       <Sidebar />
       <Header />
       {/* 
@@ -32,8 +40,8 @@ const MainLayout: React.FC = () => {
       <main className="max-w-7xl flex-1 px-4 sm:px-6 lg:ml-64 lg:px-8">
         <Outlet />
       </main>
-      <footer className="bg-neutral-900 py-6 lg:ml-64">
-        <div className="mx-auto max-w-7xl px-4 text-center text-sm text-neutral-400 sm:px-6 lg:px-8">
+      <footer className="bg-black py-6 lg:ml-64">
+        <div className="mx-auto max-w-7xl px-4 text-center text-sm text-white sm:px-6 lg:px-8">
           <p>
             &copy; {new Date().getFullYear()} Anonymous for the Voiceless hub.
             Powered by respect for animals.

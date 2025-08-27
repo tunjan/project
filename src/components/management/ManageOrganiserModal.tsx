@@ -146,7 +146,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
         description="You don't have permission to manage this user."
       >
         <div className="my-6 text-center">
-          <p className="font-semibold text-red-600">
+          <p className="font-semibold text-red">
             You don't have permission to manage {organiser.name}.
           </p>
         </div>
@@ -162,7 +162,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
     >
       <div className="my-6 space-y-6">
         {/* User Info */}
-        <div className="flex items-center space-x-3 border-b border-gray-200 pb-4">
+        <div className="flex items-center space-x-3 border-b border-black pb-4">
           <img
             src={organiser.profilePictureUrl}
             alt={organiser.name}
@@ -170,8 +170,8 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           />
           <div>
             <h3 className="text-lg font-bold text-black">{organiser.name}</h3>
-            <p className="text-sm text-neutral-600">{organiser.email}</p>
-            <p className="text-xs text-neutral-500">
+            <p className="text-sm text-red">{organiser.email}</p>
+            <p className="text-xs text-white0">
               Current role: {organiser.role}
             </p>
           </div>
@@ -197,7 +197,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           <button
             onClick={handleRoleChange}
             disabled={selectedRole === organiser.role || isLoading}
-            className="mt-2 w-full bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 w-full bg-black px-4 py-2 font-bold text-white hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? 'Updating...' : 'Update Role'}
           </button>
@@ -214,7 +214,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
               {manageableChapters.map((chapter) => (
                 <label
                   key={chapter.name}
-                  className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-neutral-100"
+                  className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
                 >
                   <input
                     type="checkbox"
@@ -225,7 +225,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                   <span className="font-semibold text-black">
                     {chapter.name}
                   </span>
-                  <span className="text-sm text-neutral-500">
+                  <span className="text-sm text-white0">
                     ({chapter.country})
                   </span>
                 </label>
@@ -234,7 +234,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
             <button
               onClick={handleChapterAssignmentChange}
               disabled={isLoading}
-              className="mt-2 w-full bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 w-full bg-black px-4 py-2 font-bold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? 'Updating...' : 'Update Chapter Assignments'}
             </button>
@@ -253,13 +253,13 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                 return (
                   <div
                     key={chapterName}
-                    className="flex items-center justify-between bg-neutral-100 p-2"
+                    className="flex items-center justify-between bg-white p-2"
                   >
                     <span className="font-semibold text-black">
                       {chapterName}
                     </span>
                     {chapter && (
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs text-white0">
                         {chapter.country}
                       </span>
                     )}

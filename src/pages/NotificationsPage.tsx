@@ -25,7 +25,7 @@ const NotificationCard: React.FC<{
       )}
       <div>
         <p className="font-bold text-black">{notification.message}</p>
-        <p className="text-sm text-neutral-600">
+        <p className="text-grey-600 text-sm">
           {new Date(notification.createdAt).toLocaleString()}
         </p>
       </div>
@@ -75,9 +75,9 @@ const NotificationsPage: React.FC = () => {
         </div>
       ) : (
         <div className="card-brutal card-padding text-center">
-          <BellIcon className="mx-auto h-12 w-12 text-neutral-400" />
+          <BellIcon className="text-grey-500 mx-auto h-12 w-12" />
           <h2 className="mt-4 text-xl font-bold">No notifications</h2>
-          <p className="mt-1 text-neutral-600">You're all caught up!</p>
+          <p className="text-grey-600 mt-1">You're all caught up!</p>
         </div>
       )}
     </div>

@@ -15,7 +15,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       <div className="mx-auto max-w-md border-2 border-black bg-white p-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-extrabold text-black">Log In As</h1>
-          <p className="mt-2 text-neutral-600">
+          <p className="mt-2 text-red">
             Select a user profile to simulate logging in.
           </p>
         </div>
@@ -24,7 +24,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
             <button
               key={user.id}
               onClick={() => onLogin(user)}
-              className="flex w-full items-center space-x-4 border-2 border-black p-3 transition-colors duration-200 hover:bg-neutral-100"
+              className="flex w-full items-center space-x-4 border-2 border-black p-3 transition-colors duration-200 hover:bg-white"
             >
               <img
                 src={user.profilePictureUrl}
@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
               />
               <div className="flex-grow truncate text-left">
                 <p className="font-bold text-black">{user.name}</p>
-                <p className="text-sm text-neutral-500">{user.role}</p>
+                <p className="text-sm text-white0">{user.role}</p>
               </div>
               <div className="flex flex-shrink-0 flex-col items-end space-y-1">
                 {hasOrganizerRole(user) && (
@@ -51,7 +51,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
           ))}
         </div>
         {/* NEW: Added a link to the sign-up page */}
-        <p className="mt-8 text-center text-sm text-neutral-600">
+        <p className="mt-8 text-center text-sm text-red">
           Don't have an account?{' '}
           <Link to="/signup" className="font-bold text-primary hover:underline">
             Sign Up

@@ -20,7 +20,7 @@ const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
         <div className="mx-auto flex h-12 w-12 items-center justify-center bg-primary">
           <TrashIcon className="h-6 w-6 text-white" />
         </div>
-        <p className="mt-4 text-neutral-600">
+        <p className="mt-4 text-red">
           Are you sure you want to permanently delete your account,{' '}
           <span className="font-bold">{user.name}</span>? This action is
           irreversible. All of your data, including stats, badges, and outreach

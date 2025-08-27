@@ -70,7 +70,7 @@ const CreateChapterForm: React.FC<{
           required
           disabled={isCountryLocked}
           list="country-list"
-          className="block w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm"
+          className="block w-full rounded-none border border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
         />
       </div>
       {!isCountryLocked && (

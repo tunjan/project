@@ -60,7 +60,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
     <div className="border-2 border-black bg-white p-4">
       <div className="mb-3 flex flex-col justify-between border-b-2 border-black pb-3 sm:flex-row sm:items-center">
         <div className="mb-2 sm:mb-0">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-white0">
             {isHostView ? 'Request From' : 'Request To'}
           </p>
           <div className="flex items-center space-x-2">
@@ -73,7 +73,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
           </div>
         </div>
         <div className="text-left sm:text-right">
-          <p className="text-sm text-neutral-500">For Event</p>
+          <p className="text-sm text-white0">For Event</p>
           <p className="font-bold text-black">
             {request.event.location}, {request.event.city}
           </p>
@@ -83,7 +83,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2">
           <p className="mb-1 text-sm font-semibold text-black">Message:</p>
-          <p className="border-2 border-black bg-white p-2 text-sm text-neutral-700">
+          <p className="border-2 border-black bg-white p-2 text-sm text-black">
             {request.message}
           </p>
 
@@ -101,7 +101,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
         <div className="space-y-3">
           <div>
             <p className="text-sm font-semibold text-black">Dates</p>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-red">
               {formatDateRange(request.startDate, request.endDate)}
             </p>
           </div>
@@ -119,7 +119,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
             onChange={(e) => setReply(e.target.value)}
             placeholder="Optional: Reply with a message..."
             rows={2}
-            className="block w-full border-2 border-black bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+            className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
           />
           <div className="flex items-center space-x-2">
             <button

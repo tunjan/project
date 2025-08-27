@@ -34,7 +34,7 @@ const StatCard: React.FC<{
   <div className="h-full border-2 border-black bg-white p-4">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
-      <p className="ml-3 truncate text-sm font-semibold uppercase tracking-wider text-neutral-600">
+      <p className="text-grey-600 ml-3 truncate text-sm font-semibold uppercase tracking-wider">
         {title}
       </p>
     </div>
@@ -47,7 +47,7 @@ const MemberCard: React.FC<{
   onMemberClick: (member: User) => void;
 }> = ({ member, onMemberClick }) => (
   <div
-    className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-neutral-100"
+    className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
     onClick={() => onMemberClick(member)}
   >
     <img
@@ -57,7 +57,7 @@ const MemberCard: React.FC<{
     />
     <div>
       <p className="font-bold text-black">{member.name}</p>
-      <p className="text-sm text-neutral-500">{member.role}</p>
+      <p className="text-white0 text-sm">{member.role}</p>
     </div>
   </div>
 );
@@ -151,7 +151,7 @@ const ChapterDetailPage: React.FC = () => {
       chapterAnnouncements: announcements,
       pastChapterEvents: pastEvents,
     };
-  }, [chapter, allUsers, allEvents, allAnnouncements]);
+  }, [chapter, allUsers, allEvents, allAnnouncements, allOutreachLogs]);
 
   const handleMemberClick = useCallback(
     (member: User) => {
@@ -197,7 +197,7 @@ const ChapterDetailPage: React.FC = () => {
               <button
                 onClick={handleRequestJoin}
                 disabled={hasPendingRequest}
-                className="inline-flex items-center bg-primary px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-yellow-500 disabled:text-black"
+                className="disabled:bg-red inline-flex items-center bg-primary px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:text-white"
               >
                 <PlusIcon className="mr-2 h-4 w-4" />
                 {hasPendingRequest ? 'Request Pending' : 'Request to Join'}
@@ -222,7 +222,7 @@ const ChapterDetailPage: React.FC = () => {
               )}`} // CORRECTED: Use backticks ``
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center text-sm font-semibold text-neutral-600 transition hover:text-black"
+              className="text-grey-600 mt-6 inline-flex items-center text-sm font-semibold transition hover:text-black"
             >
               <InstagramIcon className="mr-2 h-5 w-5" />
               {chapter.instagram}
@@ -279,7 +279,7 @@ const ChapterDetailPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="p-2 text-sm text-neutral-500">
+                  <p className="text-white0 p-2 text-sm">
                     No organisers assigned.
                   </p>
                 )}
@@ -299,9 +299,7 @@ const ChapterDetailPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="p-2 text-sm text-neutral-500">
-                    No members yet.
-                  </p>
+                  <p className="text-white0 p-2 text-sm">No members yet.</p>
                 )}
               </div>
             </div>
@@ -325,7 +323,7 @@ const ChapterDetailPage: React.FC = () => {
                 <h3 className="text-lg font-bold text-black">
                   No chapter-specific announcements.
                 </h3>
-                <p className="mt-1 text-neutral-500">
+                <p className="text-white0 mt-1">
                   Check the main announcements page for global and regional
                   news.
                 </p>

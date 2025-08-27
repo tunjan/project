@@ -13,8 +13,8 @@ interface LeaderboardProps {
 
 const rankClasses: { [key: number]: string } = {
   1: 'bg-primary text-white',
-  2: 'bg-neutral-800 text-white',
-  3: 'bg-neutral-300 text-black',
+  2: 'bg-black text-white',
+  3: 'bg-white text-black',
 };
 
 const Leaderboard: React.FC<LeaderboardProps> = ({
@@ -51,7 +51,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
                 <Link
                   to={`/members/${user.id}`}
-                  className="flex flex-grow items-center p-4 transition-colors hover:bg-neutral-100"
+                  className="flex min-w-0 flex-grow items-center p-4 transition-colors hover:bg-white"
                 >
                   <img
                     src={user.profilePictureUrl}
@@ -63,11 +63,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                       {user.name}
                     </p>
                   </div>
-                  <div className="ml-4 text-right">
-                    <p className="text-2xl font-extrabold text-black">
+                  <div className="ml-4 flex-shrink-0 text-right">
+                    <p className="text-xl font-extrabold text-black sm:text-2xl">
                       {value.toLocaleString()}
                     </p>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+                    <p className="text-grey-600 text-xs font-semibold uppercase tracking-wider">
                       {unit}
                     </p>
                   </div>
@@ -77,8 +77,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           })}
         </ul>
       ) : (
-        <div className="p-8 text-center text-neutral-500">
-          <UsersIcon className="mx-auto h-12 w-12 text-neutral-300" />
+        <div className="text-white0 p-8 text-center">
+          <UsersIcon className="text-grey-500 mx-auto h-12 w-12" />
           <p className="mt-2 font-semibold">No data available.</p>
           <p className="text-sm">There is no activity for this time period.</p>
         </div>

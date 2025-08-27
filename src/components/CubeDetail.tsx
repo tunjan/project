@@ -75,7 +75,7 @@ const ParticipantCard: React.FC<{
 
   return (
     <li>
-      <div className="flex items-center justify-between p-3 transition-colors hover:bg-neutral-100">
+      <div className="flex items-center justify-between p-3 transition-colors hover:bg-white">
         <Link
           to={`/members/${participant.user.id}`}
           className="flex min-w-0 items-center"
@@ -89,7 +89,7 @@ const ParticipantCard: React.FC<{
             <p className="truncate text-sm font-semibold text-black">
               {participant.user.name}
             </p>
-            <p className="truncate text-sm text-neutral-500">
+            <p className="text-white0 truncate text-sm">
               {participant.user.role}
             </p>
           </div>
@@ -99,7 +99,7 @@ const ParticipantCard: React.FC<{
           {isOrganizerView && (
             <button
               onClick={() => onRemove(participant.user.id)}
-              className="p-1 text-neutral-400 hover:text-primary"
+              className="text-red p-1 hover:text-primary"
               aria-label={`Remove ${participant.user.name}`}
             >
               <TrashIcon className="h-4 w-4" />
@@ -133,7 +133,7 @@ const PendingRequestCard: React.FC<{
           <p className="text-sm font-semibold text-black">
             {participant.user.name}
           </p>
-          <p className="text-sm text-neutral-500">
+          <p className="text-white0 text-sm">
             {participant.user.chapters?.join(', ') || 'No chapters assigned'}
           </p>
         </div>
@@ -141,7 +141,7 @@ const PendingRequestCard: React.FC<{
       <div className="flex items-center space-x-2">
         <button
           onClick={onDeny}
-          className="bg-black px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-800"
+          className="bg-black px-3 py-1 text-xs font-semibold text-white hover:bg-black"
         >
           Deny
         </button>
@@ -175,7 +175,7 @@ const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> = ({
         />
         <div className="ml-4">
           <p className="text-sm font-semibold text-black">{host.name}</p>
-          <p className="text-sm text-neutral-500">
+          <p className="text-white0 text-sm">
             Can host {host.hostingCapacity}{' '}
             {host.hostingCapacity === 1 ? 'person' : 'people'}
           </p>
@@ -468,7 +468,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 
         {isCancelled && (
           <div
-            className="mb-8 flex items-center border-2 border-red-500 bg-red-100 p-4 text-red-800"
+            className="border-red mb-8 flex items-center border-2 bg-white p-4 text-black"
             role="alert"
           >
             <XCircleIcon className="h-6 w-6" />
@@ -483,10 +483,10 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 
         <div className="lg:grid lg:grid-cols-3 lg:gap-8">
           <div className="space-y-8 lg:col-span-2">
-            <div className="overflow-hidden border border-black bg-white">
+            <div className="overflow-hidden border-2 border-black bg-white">
               <img
-                src={`https://picsum.photos/seed/${event.id}/1200/400`}
-                alt="Event location photo"
+                src="/default-cube-image.svg"
+                alt="Default cube event image"
                 className="h-48 w-full object-cover sm:h-64"
               />
               <div className="p-6 md:p-8">
@@ -505,7 +505,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     </span>
                   )}
                   {event.status === EventStatus.CANCELLED && (
-                    <span className="bg-red-600 px-3 py-1 text-sm font-bold text-white">
+                    <span className="bg-red px-3 py-1 text-sm font-bold text-white">
                       Cancelled
                     </span>
                   )}
@@ -514,20 +514,20 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   {event.location}
                 </h1>
 
-                <div className="mt-6 space-y-4 text-neutral-700">
+                <div className="mt-6 space-y-4 text-black">
                   <div className="flex items-start">
-                    <CalendarIcon className="mr-4 mt-1 h-6 w-6 flex-shrink-0 text-neutral-400" />
+                    <CalendarIcon className="text-red mr-4 mt-1 h-6 w-6 flex-shrink-0" />
                     <span className="text-lg">{formattedDateRange}</span>
                   </div>
                   <div className="flex items-center">
-                    <ClockIcon className="mr-4 h-6 w-6 text-neutral-400" />
+                    <ClockIcon className="text-red mr-4 h-6 w-6" />
                     <span className="text-lg">
                       {formattedTime} (Start time)
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-8 border-t border-neutral-200 pt-6">
+                <div className="mt-8 border-t border-white pt-6">
                   <h3 className="mb-2 text-lg font-bold text-black">
                     Organizer
                   </h3>
@@ -541,7 +541,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                       <p className="text-base font-semibold text-black">
                         {event.organizer.name}
                       </p>
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-white0 text-sm">
                         {event.organizer.role}
                       </p>
                     </div>
@@ -556,12 +556,12 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
             />
             {isRegionalEvent && <EventRoster event={event} />}
             {isOrganizer && pendingParticipants.length > 0 && (
-              <div className="border border-yellow-500 bg-yellow-50">
-                <div className="border-b border-yellow-400 p-6 md:p-8">
+              <div className="border-red border bg-white">
+                <div className="border-b border-white p-6 md:p-8">
                   <h2 className="text-xl font-bold text-black">
                     Pending Join Requests ({pendingParticipants.length})
                   </h2>
-                  <p className="mt-1 text-sm text-yellow-800">
+                  <p className="mt-1 text-sm text-black">
                     These activists are not from your chapter and require your
                     approval to attend.
                   </p>
@@ -581,7 +581,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
               </div>
             )}
             {!isPastEvent && currentUser && !isRegionalEvent && (
-              <div className="border border-black bg-white">
+              <div className="border-2 border-black bg-white">
                 <div className="p-6 md:p-8">
                   <div className="mb-2 flex items-center border-b border-black pb-4">
                     <HomeIcon className="mr-3 h-6 w-6 text-black" />
@@ -602,7 +602,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                         ))}
                     </ul>
                   ) : (
-                    <p className="py-4 text-center text-sm text-neutral-500">
+                    <p className="text-white0 py-4 text-center text-sm">
                       No hosts are available for this event yet. Check back
                       later!
                     </p>
@@ -615,8 +615,8 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
             )}
 
             {/* Chapter Inventory */}
-            <div className="border border-black bg-white">
-              <div className="p-6 md:p-8">
+            <div className="bg-white">
+              <div className="">
                 <InventoryDisplay
                   chapterName={event.city}
                   showTitle={true}
@@ -650,23 +650,23 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
               <div className="mt-6 space-y-2">
                 {/* Status Display */}
                 {isAttending && (
-                  <div className="flex items-center justify-center border-2 border-green-600 bg-green-100 px-4 py-3 font-semibold text-green-800">
+                  <div className="flex items-center justify-center border-2 border-black bg-white px-4 py-3 font-semibold text-black">
                     <ClipboardCheckIcon className="mr-2 h-5 w-5" />
                     Status: Attending
                   </div>
                 )}
                 {isPending && (
-                  <div className="flex items-center justify-center border-2 border-yellow-600 bg-yellow-100 px-4 py-3 font-semibold text-yellow-800">
+                  <div className="border-red flex items-center justify-center border-2 bg-white px-4 py-3 font-semibold text-black">
                     <ClockIcon className="mr-2 h-5 w-5" />
                     Status: Request Pending
                   </div>
                 )}
                 {isPastEvent || event.status === EventStatus.FINISHED ? (
-                  <div className="flex items-center justify-center border-2 border-neutral-600 bg-neutral-100 px-4 py-3 font-semibold text-neutral-800">
+                  <div className="flex items-center justify-center border-2 border-black bg-white px-4 py-3 font-semibold text-black">
                     Event has ended
                   </div>
                 ) : isCancelled ? (
-                  <div className="flex items-center justify-center border-2 border-red-600 bg-red-100 px-4 py-3 font-semibold text-red-800">
+                  <div className="border-red flex items-center justify-center border-2 bg-white px-4 py-3 font-semibold text-black">
                     Event Cancelled
                   </div>
                 ) : null}
@@ -713,7 +713,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 {(isAttending || isPending) && !isPastEvent && !isCancelled && (
                   <button
                     onClick={() => onCancelRsvp(event.id)}
-                    className="flex w-full items-center justify-center bg-black px-4 py-3 font-bold text-white transition-colors hover:bg-neutral-800"
+                    className="flex w-full items-center justify-center bg-black px-4 py-3 font-bold text-white transition-colors hover:bg-black"
                   >
                     Cancel RSVP
                   </button>
@@ -723,7 +723,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 {canEditEvent && (
                   <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="flex w-full items-center justify-center border border-black bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+                    className="flex w-full items-center justify-center border border-black bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-black"
                   >
                     <PencilIcon className="mr-2 h-5 w-5" />
                     Edit Event

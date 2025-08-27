@@ -29,21 +29,21 @@ const ApplicantCard: React.FC<{
           />
           <div>
             <p className="font-bold text-black">{user.name}</p>
-            <p className="text-sm text-neutral-500">{chapterText}</p>
+            <p className="text-sm text-white0">{chapterText}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           {user.onboardingAnswers && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 text-sm font-semibold text-black hover:bg-neutral-100"
+              className="p-2 text-sm font-semibold text-black hover:bg-white"
             >
               {isExpanded ? 'Hide' : 'Review'} Answers
             </button>
           )}
           <button
             onClick={onDeny}
-            className="bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
+            className="bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-black"
           >
             Deny
           </button>
@@ -56,9 +56,9 @@ const ApplicantCard: React.FC<{
         </div>
       </div>
       {isExpanded && user.onboardingAnswers && (
-        <div className="space-y-3 border-t-2 border-black bg-neutral-50 p-4">
+        <div className="space-y-3 border-t-2 border-black bg-white p-4">
           <div>
-            <p className="text-xs font-bold uppercase text-neutral-500">
+            <p className="text-xs font-bold uppercase text-white0">
               Why did you go vegan?
             </p>
             <p className="text-sm text-black">
@@ -66,7 +66,7 @@ const ApplicantCard: React.FC<{
             </p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-neutral-500">
+            <p className="text-xs font-bold uppercase text-white0">
               Are you aligned with our abolitionist values?
             </p>
             <p className="text-sm text-black">
@@ -74,7 +74,7 @@ const ApplicantCard: React.FC<{
             </p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-neutral-500">
+            <p className="text-xs font-bold uppercase text-white0">
               Chapter Question: How can you contribute?
             </p>
             <p className="text-sm text-black">
@@ -96,7 +96,7 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
     return (
       <div className="border-2 border-black bg-white p-8 text-center">
         <h3 className="text-xl font-bold text-black">The queue is empty.</h3>
-        <p className="mt-2 text-neutral-500">
+        <p className="mt-2 text-white0">
           There are no new applicants to review at this time.
         </p>
       </div>

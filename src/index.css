@@ -6,7 +6,7 @@
 @layer base {
   body {
     /* Modern Brutalism: Clean background, better typography */
-    @apply bg-neutral-50 font-sans leading-relaxed text-neutral-900 antialiased;
+    @apply bg-white font-sans leading-relaxed text-black antialiased;
   }
 
   /* Enhanced typography hierarchy */
@@ -32,28 +32,166 @@
 }
 
 @layer components {
+  /* Brutalist Leaflet Popup Styling - Force Override Default Styles */
+  .leaflet-popup,
   .leaflet-popup-content-wrapper,
   .leaflet-popup-tip {
-    background: white;
-    box-shadow: 4px 4px 0px 0px theme('colors.black');
-    border-radius: 0px;
-    border: 2px solid theme('colors.black');
+    background: white !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: 2px solid #000000 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
+
+  /* Force remove all default shadows and borders */
+  .leaflet-popup {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .leaflet-popup-content-wrapper {
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    background: white !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .leaflet-popup-tip {
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    background: white !important;
+    border-radius: 0 !important;
+  }
+
   .leaflet-popup-content {
-    margin: 12px;
+    margin: 0 !important;
+    padding: 16px !important;
+    font-family: 'Libre Franklin', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #000000 !important;
+    min-width: 200px !important;
+  }
+
+  .leaflet-popup-close-button {
+    color: #000000 !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    padding: 8px !important;
+    right: 8px !important;
+    top: 8px !important;
+    background: white !important;
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+  }
+
+  .leaflet-popup-close-button:hover {
+    background: #000000 !important;
+    color: white !important;
+  }
+
+  /* Ensure popup content follows brutalist design */
+  .leaflet-popup-content h3 {
+    font-weight: bold !important;
+    font-size: 16px !important;
+    margin: 0 0 8px 0 !important;
+    color: #000000 !important;
+  }
+
+  .leaflet-popup-content p {
+    margin: 0 0 8px 0 !important;
+    color: #6b7280 !important;
+    font-size: 14px !important;
+  }
+
+  .leaflet-popup-content button {
+    margin-top: 12px !important;
+    width: 100% !important;
+  }
+
+  /* Additional overrides to ensure no rounded corners anywhere */
+  .leaflet-popup * {
+    border-radius: 0 !important;
+  }
+
+  /* Override any remaining Leaflet default styles */
+  .leaflet-popup-container {
+    border-radius: 0 !important;
+  }
+
+  /* Force override all Leaflet popup styles with higher specificity */
+  .leaflet-popup.leaflet-popup {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .leaflet-popup.leaflet-popup .leaflet-popup-content-wrapper {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    background: white !important;
+    overflow: hidden !important;
+  }
+
+  .leaflet-popup.leaflet-popup .leaflet-popup-tip {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    background: white !important;
+  }
+
+  /* Ensure no default Leaflet shadows or borders remain */
+  .leaflet-popup-content-wrapper.leaflet-popup-content-wrapper {
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+  }
+
+  .leaflet-popup-tip.leaflet-popup-tip {
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Additional specificity to override any remaining styles */
+  .leaflet-popup.leaflet-popup.leaflet-popup {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .leaflet-popup.leaflet-popup.leaflet-popup .leaflet-popup-content-wrapper {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .leaflet-popup.leaflet-popup.leaflet-popup .leaflet-popup-tip {
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
 
   .react-add-to-calendar__wrapper {
     @apply relative;
   }
   .react-add-to-calendar__button {
-    @apply w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white hover:bg-neutral-800 !important;
+    @apply hover:bg-red w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white !important;
   }
   .react-add-to-calendar__dropdown {
     @apply w-full border-2 border-black bg-white !important;
   }
   .react-add-to-calendar__dropdown a {
-    @apply block p-2 text-sm text-black hover:bg-neutral-100 !important;
+    @apply hover:bg-red block p-2 text-sm text-black hover:text-white !important;
   }
 
   /* Modern Brutalism: Refined utility classes */
@@ -70,7 +208,7 @@
     @apply border-2 border-black bg-white transition-all hover:shadow-brutal;
   }
   .h-section {
-    @apply mb-6 border-b-4 border-primary pb-3 text-3xl font-extrabold tracking-tight text-black;
+    @apply border-grey-500 mb-6 border-b-4 pb-3 text-3xl font-extrabold tracking-tight text-black;
   }
   .h-subsection {
     @apply mb-4 text-xl font-bold text-black;
@@ -101,57 +239,164 @@
 
   /* Button variants for consistency */
   .btn-primary {
-    @apply bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover;
+    @apply bg-red px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black;
   }
   .btn-secondary {
-    @apply bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800;
+    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
   }
   .btn-outline {
     @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-black hover:text-white;
   }
   .btn-danger {
-    @apply bg-danger hover:bg-danger-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply bg-red px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black;
   }
   .btn-warning {
-    @apply bg-warning hover:bg-warning-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply bg-red px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black;
   }
   .btn-success {
-    @apply bg-success hover:bg-success-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
   }
   .btn-info {
-    @apply bg-info hover:bg-info-hover px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
   }
   .btn-gray {
-    @apply bg-gray-500 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-600;
-  }
-
-  /* New outreach button palette classes */
-  .btn-buff {
-    @apply bg-buff px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
-  }
-  .btn-desert-sand {
-    @apply bg-desert-sand px-4 py-2 font-bold text-black transition-colors duration-300 hover:opacity-90;
-  }
-  .btn-champagne-pink {
-    @apply bg-champagne-pink px-4 py-2 font-bold text-black transition-colors duration-300 hover:opacity-90;
-  }
-  .btn-ash-gray {
-    @apply bg-ash-gray px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
-  }
-  .btn-sage {
-    @apply bg-sage px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
-  }
-  .btn-reseda-green {
-    @apply bg-reseda-green px-4 py-2 font-bold text-white transition-colors duration-300 hover:opacity-90;
+    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
   }
 
   /* Tag/badge variants */
   .tag-brutal {
-    @apply border-2 border-black bg-neutral-100 px-2 py-1 text-xs font-bold uppercase tracking-wider text-black;
+    @apply border-2 border-black bg-white px-2 py-1 text-xs font-bold uppercase tracking-wider text-black;
   }
   .tag-status {
     @apply border-2 px-2 py-1 text-xs font-bold uppercase tracking-wider;
   }
+
+  /* Brutalist Select Styling - Override Safari Defaults */
+  select {
+    /* Reset Safari's default appearance */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+
+    /* Custom styling */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 0.5rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5em 1.5em !important;
+
+    /* Ensure consistent styling across browsers */
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    padding: 0.5rem 2.5rem 0.5rem 0.5rem !important;
+
+    /* Remove default focus styles */
+    outline: none !important;
+
+    /* Ensure proper sizing */
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 2.5rem !important;
+  }
+
+  /* Focus state for select elements */
+  select:focus {
+    border-color: #d81313 !important;
+    box-shadow: 0 0 0 2px rgba(216, 19, 19, 0.2) !important;
+  }
+
+  /* Disabled state for select elements */
+  select:disabled {
+    background-color: #f3f4f6 !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Hover state for select elements */
+  select:hover:not(:disabled) {
+    background-color: #f9fafb !important;
+  }
+
+  /* Option styling */
+  select option {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    padding: 0.5rem !important;
+    border: none !important;
+  }
+
+  /* Option hover state */
+  select option:hover {
+    background-color: #f3f4f6 !important;
+  }
+
+  /* Option selected state */
+  select option:checked {
+    background-color: #d81313 !important;
+    color: #ffffff !important;
+  }
+
+  /* Select with error state */
+  select.border-danger {
+    border-color: #d81313 !important;
+  }
+
+  /* Select with success state */
+  select.border-success {
+    border-color: #000000 !important;
+  }
+
+  /* Custom select arrow positioning */
+  select::-ms-expand {
+    display: none !important;
+  }
+
+  /* Safari-specific overrides */
+  @supports (-webkit-appearance: none) {
+    select {
+      /* Force webkit appearance reset */
+      -webkit-appearance: none !important;
+      -webkit-border-radius: 0 !important;
+      -webkit-box-shadow: none !important;
+
+      /* Ensure proper text rendering */
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+    }
+
+    /* Override Safari's default select button */
+    select::-webkit-select-placeholder {
+      color: #6b7280 !important;
+    }
+
+    /* Remove Safari's default focus ring */
+    select:focus {
+      -webkit-box-shadow: 0 0 0 2px rgba(216, 19, 19, 0.2) !important;
+      -webkit-outline: none !important;
+    }
+  }
+
+  /* Firefox-specific overrides */
+  @-moz-document url-prefix() {
+    select {
+      /* Ensure Firefox respects our styling */
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+      background-position: right 0.5rem center !important;
+      background-repeat: no-repeat !important;
+      background-size: 1.5em 1.5em !important;
+    }
+  }
+
+  /* Edge-specific overrides */
 }
 
 @layer utilities {
@@ -184,4 +429,97 @@
       transform: scale(1);
     }
   }
+}
+
+/* Force override any remaining styles with maximum specificity */
+html body div.leaflet-popup,
+html body div.leaflet-popup *,
+html body div.leaflet-popup-content-wrapper,
+html body div.leaflet-popup-content-wrapper *,
+html body div.leaflet-popup-tip,
+html body div.leaflet-popup-tip * {
+  border-radius: 0 !important;
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+  -ms-border-radius: 0 !important;
+  -o-border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -ms-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
+}
+
+/* Additional shadow overrides for all Leaflet elements */
+.leaflet-popup,
+.leaflet-popup *,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-content-wrapper *,
+.leaflet-popup-tip,
+.leaflet-popup-tip *,
+.leaflet-popup-container,
+.leaflet-popup-container *,
+.leaflet-popup-pane,
+.leaflet-popup-pane *,
+.leaflet-overlay-pane,
+.leaflet-overlay-pane * {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -ms-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
+}
+
+/* Override any inline shadow styles */
+.leaflet-popup[style*='box-shadow'],
+.leaflet-popup-content-wrapper[style*='box-shadow'],
+.leaflet-popup-tip[style*='box-shadow'],
+.leaflet-popup[style*='boxShadow'],
+.leaflet-popup-content-wrapper[style*='boxShadow'],
+.leaflet-popup-tip[style*='boxShadow'] {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -ms-box-shadow: none !important;
+  -o-box-shadow: none !important;
+}
+
+/* Override any filter-based shadows */
+.leaflet-popup[style*='filter'],
+.leaflet-popup-content-wrapper[style*='filter'],
+.leaflet-popup-tip[style*='filter'] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
+}
+
+/* Maximum specificity shadow overrides */
+html body .leaflet-popup,
+html body .leaflet-popup *,
+html body .leaflet-popup-content-wrapper,
+html body .leaflet-popup-content-wrapper *,
+html body .leaflet-popup-tip,
+html body .leaflet-popup-tip * {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -ms-box-shadow: none !important;
+  -o-box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
 }

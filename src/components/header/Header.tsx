@@ -18,8 +18,10 @@ import {
   useNotificationsForUser,
   useUnreadNotificationCount,
   useNotificationsActions,
+  useUsersActions,
 } from '@/store';
 import { type Notification, OnboardingStatus } from '@/types';
+import Avatar from '@/components/ui/Avatar';
 
 const NavLinkStyled: React.FC<{
   to: string;
@@ -33,7 +35,7 @@ const NavLinkStyled: React.FC<{
       `text-md relative flex h-full items-center p-2 font-bold transition-colors duration-200 ${
         isActive
           ? 'text-black'
-          : 'text-neutral-500 hover:text-black focus:text-black'
+          : 'text-white0 hover:text-black focus:text-black'
       }`
     }
   >
@@ -57,6 +59,7 @@ const Header: React.FC = () => {
   const navItems = useNavItems();
   const { markNotificationAsRead, markAllNotificationsAsRead } =
     useNotificationsActions();
+  const { updateProfile } = useUsersActions();
 
   const notifications = useNotificationsForUser(currentUser?.id);
   const unreadCount = useUnreadNotificationCount(currentUser?.id);
@@ -65,7 +68,6 @@ const Header: React.FC = () => {
     'menu' | 'search' | 'notifications' | null
   >(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const notificationRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const { users, chapters, events, loading } = useSearch(searchQuery);
 
@@ -81,22 +83,6 @@ const Header: React.FC = () => {
       document.body.style.overflow = 'unset';
     };
   }, [activePopover]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target as Node)
-      ) {
-        setActivePopover(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [notificationRef]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -173,18 +159,18 @@ const Header: React.FC = () => {
                   onClick={() => togglePopover('search')}
                   className={`relative border-2 p-2 transition-colors lg:hidden ${
                     activePopover === 'search'
-                      ? 'border-black bg-neutral-100'
+                      ? 'border-black bg-white'
                       : 'border-transparent hover:border-black focus:border-black'
                   }`}
                 >
                   <SearchIcon className="h-6 w-6" />
                 </button>
-                <div className="relative" ref={notificationRef}>
+                <div className="relative">
                   <button
                     onClick={() => togglePopover('notifications')}
                     className={`relative border-2 p-2 transition-colors ${
                       activePopover === 'notifications'
-                        ? 'border-black bg-neutral-100'
+                        ? 'border-black bg-white'
                         : 'border-transparent hover:border-black focus:border-black'
                     }`}
                   >
@@ -205,21 +191,42 @@ const Header: React.FC = () => {
                   )}
                 </div>
 
-                <Link
-                  to={
-                    currentUser.onboardingStatus === OnboardingStatus.CONFIRMED
-                      ? '/dashboard'
-                      : '/onboarding-status'
-                  }
-                  className="flex items-center space-x-2 border-2 border-transparent p-1 hover:border-black focus:border-black"
-                  onClick={closeMenus}
-                >
-                  <img
-                    src={currentUser.profilePictureUrl}
-                    alt="User profile"
-                    className="h-10 w-10 border-2 border-black object-cover"
-                  />
-                </Link>
+                <div className="group relative">
+                  <Link
+                    to={
+                      currentUser.onboardingStatus ===
+                      OnboardingStatus.CONFIRMED
+                        ? '/dashboard'
+                        : '/onboarding-status'
+                    }
+                    className="flex items-center space-x-2 border-2 border-transparent p-1 hover:border-black focus:border-black"
+                    onClick={closeMenus}
+                  >
+                    <Avatar
+                      src={currentUser.profilePictureUrl}
+                      alt="User profile"
+                      className="h-10 w-10 border-2 border-black object-cover"
+                      editable={true}
+                      onImageChange={(newImageUrl) => {
+                        // Update the user's profile picture
+                        updateProfile(currentUser.id, {
+                          name: currentUser.name,
+                          instagram: currentUser.instagram || '',
+                          hostingAvailability: currentUser.hostingAvailability,
+                          hostingCapacity: currentUser.hostingCapacity || 1,
+                          profilePictureUrl: newImageUrl,
+                        });
+                      }}
+                    />
+                  </Link>
+                  {/* Tooltip */}
+                  <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white">
+                      Click to upload new avatar
+                    </div>
+                    <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                  </div>
+                </div>
 
                 <button
                   onClick={handleLogout}
@@ -269,7 +276,7 @@ const Header: React.FC = () => {
         >
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="h-5 w-5 text-neutral-400" />
+              <SearchIcon className="h-5 w-5 text-red" />
             </div>
             <input
               type="text"
@@ -295,7 +302,7 @@ const Header: React.FC = () => {
         <div className="absolute left-0 top-16 w-full border-b-2 border-black bg-white shadow-brutal lg:hidden">
           <nav className="space-y-1 px-2 pb-3 pt-2">
             {renderNavLinks(true)}
-            <div className="my-2 border-t border-neutral-200 pt-2 sm:hidden">
+            <div className="my-2 border-t border-white pt-2 sm:hidden">
               <button
                 onClick={handleLogout}
                 className="flex w-full items-center space-x-2 px-3 py-2 text-left text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"

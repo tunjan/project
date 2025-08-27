@@ -15,22 +15,29 @@ const sizeClasses = {
 const PigSpinnerIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg
     className={className}
-    viewBox="0 0 24 24"
-    fill="none"
+    viewBox="0 0 64 64"
     xmlns="http://www.w3.org/2000/svg"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    fill="#FFF0F5"
+    stroke="#F4B5D1"
+    strokeWidth="3"
   >
     {/* Head */}
-    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" />
+    <path d="M32 8 C17.64 8 8 17.64 8 32 C8 46.36 17.64 56 32 56 C46.36 56 56 46.36 56 32 C56 17.64 46.36 8 32 8 Z" />
+
+    {/* Ears */}
+    <path d="M20 16 C16 12 20 24 26 22" />
+    <path d="M44 16 C48 12 44 24 38 22" />
+
     {/* Snout */}
-    <path d="M12 14c-1.66 0-3-1.12-3-2.5S10.34 9 12 9s3 1.12 3 2.5-1.34 2.5-3 2.5z" />
+    <ellipse cx="32" cy="38" rx="10" ry="7" />
+
     {/* Nostrils */}
-    <path d="M11.25 11.5v.01M12.75 11.5v.01" />
+    <path d="M29 38 L29 38" strokeLinecap="round" />
+    <path d="M35 38 L35 38" strokeLinecap="round" />
+
     {/* Eyes */}
-    <path d="M9.5 9.5v.01M14.5 9.5v.01" />
+    <path d="M25 30 L25 30" strokeLinecap="round" />
+    <path d="M39 30 L39 30" strokeLinecap="round" />
   </svg>
 );
 
@@ -57,7 +64,7 @@ export const LoadingOverlay: React.FC<{ children?: React.ReactNode }> = ({
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-white bg-opacity-75">
       <div className="text-center">
         <LoadingSpinner size="lg" />
-        {children && <p className="mt-4 text-gray-600">{children}</p>}
+        {children && <p className="mt-4 text-red">{children}</p>}
       </div>
     </div>
   );

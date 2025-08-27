@@ -9,7 +9,9 @@ import {
   useUnreadNotificationCount,
   useNotificationsActions,
 } from '@/store/notifications.store';
+import { useUsersActions } from '@/store';
 import { type Notification, OnboardingStatus } from '@/types';
+import Avatar from '@/components/ui/Avatar';
 
 const NavLinkStyled: React.FC<{
   to: string;
@@ -22,8 +24,8 @@ const NavLinkStyled: React.FC<{
     className={({ isActive }) =>
       `text-md relative flex h-12 items-center rounded-none px-4 font-bold transition-colors duration-200 ${
         isActive
-          ? 'border-2 border-black bg-neutral-100 text-black'
-          : 'text-neutral-500 hover:bg-neutral-50 hover:text-black focus:text-black'
+          ? 'border-2 border-black bg-white text-black'
+          : 'text-white0 hover:bg-white hover:text-black focus:text-black'
       }`
     }
   >
@@ -37,6 +39,7 @@ const Sidebar: React.FC = () => {
   const { logout } = useAuthActions();
   const { markNotificationAsRead, markAllNotificationsAsRead } =
     useNotificationsActions();
+  const { updateProfile } = useUsersActions();
   const navItems = useNavItems();
 
   const notifications = useNotificationsForUser(currentUser?.id);
@@ -108,7 +111,7 @@ const Sidebar: React.FC = () => {
               onClick={() => setIsNotificationsOpen((p) => !p)}
               className={`relative flex w-full items-center justify-center rounded-none border-2 p-3 transition-colors ${
                 isNotificationsOpen
-                  ? 'border-black bg-neutral-100'
+                  ? 'border-black bg-white'
                   : 'border-transparent hover:border-black focus:border-black'
               }`}
             >
@@ -132,28 +135,47 @@ const Sidebar: React.FC = () => {
           </div>
 
           {/* User profile */}
-          <Link
-            to={
-              currentUser.onboardingStatus === OnboardingStatus.CONFIRMED
-                ? `/members/${currentUser.id}`
-                : '/onboarding-status'
-            }
-            className="flex items-center space-x-3 rounded-none border-2 border-transparent p-3 transition-colors hover:border-black focus:border-black"
-          >
-            <img
-              src={currentUser.profilePictureUrl}
-              alt="User profile"
-              className="h-10 w-10 rounded-none border-2 border-black object-cover"
-            />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-black">
-                {currentUser.name}
-              </p>
-              <p className="truncate text-xs text-neutral-500">
-                {currentUser.email}
-              </p>
+          <div className="group relative">
+            <Link
+              to={
+                currentUser.onboardingStatus === OnboardingStatus.CONFIRMED
+                  ? `/members/${currentUser.id}`
+                  : '/onboarding-status'
+              }
+              className="flex items-center space-x-3 rounded-none border-2 border-transparent p-3 transition-colors hover:border-black focus:border-black"
+            >
+              <Avatar
+                src={currentUser.profilePictureUrl}
+                alt="User profile"
+                className="h-10 w-10 rounded-none border-2 border-black object-cover"
+                editable={true}
+                onImageChange={(newImageUrl) => {
+                  updateProfile(currentUser.id, {
+                    name: currentUser.name,
+                    instagram: currentUser.instagram || '',
+                    hostingAvailability: currentUser.hostingAvailability,
+                    hostingCapacity: currentUser.hostingCapacity || 1,
+                    profilePictureUrl: newImageUrl,
+                  });
+                }}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-black">
+                  {currentUser.name}
+                </p>
+                <p className="truncate text-xs text-white0">
+                  {currentUser.email}
+                </p>
+              </div>
+            </Link>
+            {/* Tooltip */}
+            <div className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white">
+                Click to upload new avatar
+              </div>
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black"></div>
             </div>
-          </Link>
+          </div>
 
           {/* Logout button */}
           <button

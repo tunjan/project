@@ -29,7 +29,7 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
               <h3 className="text-lg font-bold text-black">
                 Manual Verification
               </h3>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="mt-1 text-sm text-red">
                 Force-verify this user and grant them full access.
               </p>
               <button
@@ -43,7 +43,7 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
           )}
         <div>
           <h3 className="text-lg font-bold text-black">Delete User</h3>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-red">
             This action is permanent and cannot be undone.
           </p>
           <button

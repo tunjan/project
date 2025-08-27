@@ -27,7 +27,7 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
   if (userHistory.length === 0) {
     return (
       <div className="card-brutal p-6 text-center">
-        <p className="text-neutral-500">
+        <p className="text-white0">
           No participation history found. Attend a Cube to get started!
         </p>
       </div>
@@ -54,17 +54,17 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
             <li key={event.id}>
               <button
                 onClick={() => navigate(`/cubes/${event.id}`)}
-                className="flex w-full items-center justify-between space-x-4 p-4 text-left transition-colors hover:bg-neutral-100"
+                className="flex w-full items-center justify-between space-x-4 p-4 text-left transition-colors hover:bg-white"
               >
                 <div>
                   <p className="font-bold text-black">{event.location}</p>
-                  <p className="text-sm text-neutral-500">{event.city}</p>
+                  <p className="text-sm text-white0">{event.city}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-mono text-sm font-medium text-black">
                     {formattedDate}
                   </p>
-                  <p className="text-xs font-semibold text-neutral-500">
+                  <p className="text-xs font-semibold text-white0">
                     {participation.eventRole}
                   </p>
                 </div>

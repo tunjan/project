@@ -136,7 +136,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Create New Event
           </h1>
-          <p className="mt-2 text-neutral-600">
+          <p className="mt-2 text-red">
             Schedule a standard chapter cube or organize a special multi-day
             regional event.
           </p>
@@ -251,7 +251,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-black"
             >
               Cancel
             </button>

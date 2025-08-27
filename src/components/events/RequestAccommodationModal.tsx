@@ -91,7 +91,7 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
           >
             Cancel
           </button>

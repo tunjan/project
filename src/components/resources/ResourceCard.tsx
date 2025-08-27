@@ -8,7 +8,7 @@ interface ResourceCardProps {
 
 const MetaTag: React.FC<{ text: string; className?: string }> = ({
   text,
-  className = 'bg-neutral-100 text-neutral-800',
+  className = 'bg-white text-black',
 }) => (
   <span
     className={`inline-block px-2 py-0.5 text-xs font-semibold ${className}`}
@@ -32,7 +32,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
             {resource.title}
           </h3>
         </div>
-        <p className="mb-4 h-20 overflow-hidden text-sm text-neutral-600">
+        <p className="text-grey-500 mb-4 h-20 overflow-hidden text-sm">
           {resource.description}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -41,7 +41,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
           <MetaTag text={resource.language} />
         </div>
       </div>
-      <div className="border-t-2 border-black bg-neutral-50 p-5">
+      <div className="border-t-2 border-black bg-white p-5">
         <a
           href={resource.url}
           target="_blank"

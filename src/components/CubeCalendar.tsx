@@ -26,7 +26,7 @@ const CubeCalendar: React.FC<CubeCalendarProps> = ({
       start: event.startDate,
       end: event.endDate,
       extendedProps: { originalEvent: event },
-      backgroundColor: '#b91c1c',
+      backgroundColor: '#6b7280',
       borderColor: '#000000',
       textColor: '#ffffff',
     };

@@ -30,7 +30,7 @@ const DashboardSearch: React.FC = () => {
   return (
     <div className="relative w-full max-w-xl" ref={searchRef}>
       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-        <SearchIcon className="h-5 w-5 text-neutral-500" />
+        <SearchIcon className="h-5 w-5 text-white0" />
       </div>
       <input
         type="text"

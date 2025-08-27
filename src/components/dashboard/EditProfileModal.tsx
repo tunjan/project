@@ -7,6 +7,7 @@ import { useUsersActions } from '@/store';
 import { useAuthActions } from '@/store/auth.store';
 import { toast } from 'sonner';
 import { UsersIcon } from '@/icons';
+import Avatar from '@/components/ui/Avatar';
 
 interface EditProfileModalProps {
   user: User;
@@ -78,20 +79,30 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         size="lg"
       >
         <div className="my-6 space-y-4">
-          <div className="flex items-center space-x-4">
-            <img
-              src={profilePictureUrl}
-              alt="Profile avatar"
-              className="h-20 w-20 object-cover"
-            />
-            <button
-              type="button"
-              onClick={handleGenerateAvatar}
-              className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
-            >
-              <UsersIcon className="h-4 w-4" />
-              <span>New Avatar</span>
-            </button>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-4">
+              <Avatar
+                src={profilePictureUrl}
+                alt="Profile avatar"
+                className="h-20 w-20 object-cover"
+                editable={true}
+                onImageChange={(newImageUrl) => {
+                  setProfilePictureUrl(newImageUrl);
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleGenerateAvatar}
+                className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+              >
+                <UsersIcon className="h-4 w-4" />
+                <span>New Avatar</span>
+              </button>
+            </div>
+            <p className="text-sm text-red">
+              💡 Click on your avatar to upload a custom image, or use the "New
+              Avatar" button for a random one.
+            </p>
           </div>
 
           <InputField
@@ -133,7 +144,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   value={hostingCapacity}
                   onChange={(e) => setHostingCapacity(Number(e.target.value))}
                   min="1"
-                  className="block w-full border-2 border-black bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                 />
               </div>
             )}
@@ -145,7 +156,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <h3 className="font-extrabold text-black">Danger Zone</h3>
           <div>
             <p className="text-sm font-bold text-black">Deactivate Account</p>
-            <p className="mb-2 text-sm text-neutral-600">
+            <p className="mb-2 text-sm text-red">
               Permanently delete your account and all associated data. This
               action cannot be undone.
             </p>

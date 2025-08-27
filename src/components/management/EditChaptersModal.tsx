@@ -44,7 +44,7 @@ const EditChaptersModal: React.FC<EditChaptersModalProps> = ({
             .map((chapter) => (
               <label
                 key={chapter.name}
-                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-neutral-100"
+                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
               >
                 <input
                   type="checkbox"
@@ -53,7 +53,7 @@ const EditChaptersModal: React.FC<EditChaptersModalProps> = ({
                   className="h-5 w-5 accent-primary"
                 />
                 <span className="font-bold text-black">{chapter.name}</span>
-                <span className="text-sm text-neutral-500">
+                <span className="text-sm text-white0">
                   ({chapter.country})
                 </span>
               </label>
@@ -64,7 +64,7 @@ const EditChaptersModal: React.FC<EditChaptersModalProps> = ({
       <div className="flex items-center space-x-4">
         <button
           onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
         >
           Cancel
         </button>

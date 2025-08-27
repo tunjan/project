@@ -4,6 +4,7 @@ import { type Chapter } from '@/types';
 import { getChapterStats, ChapterStats } from '@/utils/analytics';
 import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
 import { SearchIcon } from '@/icons';
+import ChapterMap from './ChapterMap';
 
 // A small helper component for stats on mobile
 const Stat: React.FC<{ label: string; value: string | number }> = ({
@@ -12,7 +13,7 @@ const Stat: React.FC<{ label: string; value: string | number }> = ({
 }) => (
   <div className="text-center">
     <p className="font-mono text-xl font-bold">{value}</p>
-    <p className="text-xs font-semibold uppercase text-neutral-500">{label}</p>
+    <p className="text-white0 text-xs font-semibold uppercase">{label}</p>
   </div>
 );
 
@@ -22,7 +23,7 @@ const ChapterRow: React.FC<{
 }> = ({ chapterStats, onSelect }) => {
   return (
     <div
-      className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-neutral-50 hover:bg-neutral-100 hover:shadow-md md:grid md:grid-cols-6 md:items-center"
+      className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-white hover:bg-white hover:shadow-md md:grid md:grid-cols-6 md:items-center"
       onClick={onSelect}
     >
       {/* --- Mobile & Desktop: Chapter Name --- */}
@@ -34,7 +35,7 @@ const ChapterRow: React.FC<{
         >
           {chapterStats.name}
         </Link>
-        <p className="text-sm text-neutral-500 transition-colors duration-300 group-hover:text-neutral-700">
+        <p className="text-white0 text-sm transition-colors duration-300 group-hover:text-black">
           {chapterStats.country}
         </p>
       </div>
@@ -59,7 +60,7 @@ const ChapterRow: React.FC<{
       </p>
       <p className="hidden items-center justify-between font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:flex">
         {chapterStats.totalConversations}
-        <span className="text-2xl text-neutral-400 transition-all duration-300 group-hover:translate-x-2 group-hover:text-primary">
+        <span className="text-grey-500 text-2xl transition-all duration-300 group-hover:translate-x-2 group-hover:text-primary">
           →
         </span>
       </p>
@@ -79,6 +80,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
 
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const chapterStats = useMemo(
     () => getChapterStats(allUsers, allEvents, allChapters, allOutreachLogs),
@@ -104,30 +106,42 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [selectedRegion, searchTerm, chapterStats]);
 
+  const filteredChapters = useMemo(() => {
+    return allChapters.filter((chapter) => {
+      const regionMatch =
+        selectedRegion === 'all' || chapter.country === selectedRegion;
+      const searchMatch =
+        searchTerm === '' ||
+        chapter.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        chapter.country.toLowerCase().includes(searchTerm.toLowerCase());
+      return regionMatch && searchMatch;
+    });
+  }, [selectedRegion, searchTerm, allChapters]);
+
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Global Chapters
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
           An operational directory of our global network of activist chapters.
         </p>
       </div>
 
       {/* Search and Filter Controls */}
       <div className="card-brutal mb-8 p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="md:col-span-1">
             <label
               htmlFor="search-filter"
-              className="mb-1 block text-sm font-bold text-neutral-700"
+              className="mb-1 block text-sm font-bold text-black"
             >
               Search by Name or Country
             </label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="h-5 w-5 text-neutral-400" />
+                <SearchIcon className="text-grey-500 h-5 w-5" />
               </div>
               <input
                 id="search-filter"
@@ -135,14 +149,14 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="Search by chapter..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="placeholder:text-grey-400 block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
           <div className="md:col-span-1">
             <label
               htmlFor="region-filter"
-              className="mb-1 block text-sm font-bold text-neutral-700"
+              className="mb-1 block text-sm font-bold text-black"
             >
               Filter by Region
             </label>
@@ -151,7 +165,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               name="region-filter"
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block w-full border-2 border-black bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full border-2 border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             >
               {availableRegions.map((region) => (
                 <option key={region} value={region}>
@@ -160,41 +174,82 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               ))}
             </select>
           </div>
+          <div className="md:col-span-1">
+            <label className="mb-1 block text-sm font-bold text-black">
+              View Mode
+            </label>
+            <div className="flex border-2 border-black">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex-1 p-2 text-sm font-bold transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-black text-white'
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`}
+              >
+                List
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`flex-1 p-2 text-sm font-bold transition-colors ${
+                  viewMode === 'map'
+                    ? 'bg-black text-white'
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`}
+              >
+                Map
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Chapters Table */}
-      <div className="card-brutal">
-        {/* Desktop Header */}
-        <div className="hidden grid-cols-6 items-center border-b-2 border-black bg-neutral-50 p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
-          <p className="col-span-2">Chapter</p>
-          <p>Members</p>
-          <p>Events</p>
-          <p>Hours</p>
-          <p>Conversations</p>
+      {/* Map View */}
+      {viewMode === 'map' && (
+        <div className="card-brutal mb-8">
+          <ChapterMap
+            chapters={filteredChapters}
+            onSelectChapter={onNavigateToChapter}
+          />
         </div>
-        {filteredAndSortedStats.length > 0 ? (
-          <div className="divide-y-2 divide-black">
-            {filteredAndSortedStats.map((stat) => {
-              const chapter = allChapters.find((c) => c.name === stat.name)!;
-              return (
-                <ChapterRow
-                  key={stat.name}
-                  chapterStats={stat}
-                  onSelect={() => onNavigateToChapter(chapter)}
-                />
-              );
-            })}
+      )}
+
+      {/* Chapters Table */}
+      {viewMode === 'list' && (
+        <div className="card-brutal">
+          {/* Desktop Header */}
+          <div className="text-white0 hidden grid-cols-6 items-center border-b-2 border-black bg-white p-4 text-xs font-bold uppercase tracking-wider md:grid">
+            <p className="col-span-2">Chapter</p>
+            <p>Members</p>
+            <p>Events</p>
+            <p>Hours</p>
+            <p>Conversations</p>
           </div>
-        ) : (
-          <div className="p-8 text-center">
-            <h3 className="text-xl font-bold text-black">No chapters found.</h3>
-            <p className="mt-2 text-neutral-500">
-              Try adjusting your search or filters.
-            </p>
-          </div>
-        )}
-      </div>
+          {filteredAndSortedStats.length > 0 ? (
+            <div className="divide-y-2 divide-black">
+              {filteredAndSortedStats.map((stat) => {
+                const chapter = allChapters.find((c) => c.name === stat.name)!;
+                return (
+                  <ChapterRow
+                    key={stat.name}
+                    chapterStats={stat}
+                    onSelect={() => onNavigateToChapter(chapter)}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-8 text-center">
+              <h3 className="text-xl font-bold text-black">
+                No chapters found.
+              </h3>
+              <p className="text-white0 mt-2">
+                Try adjusting your search or filters.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

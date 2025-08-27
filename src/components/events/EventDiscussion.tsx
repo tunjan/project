@@ -23,9 +23,9 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({ comment }) => {
       <div className="flex-1">
         <div className="flex items-baseline space-x-2">
           <p className="font-bold text-black">{comment.author.name}</p>
-          <p className="text-xs text-neutral-500">{formattedTime}</p>
+          <p className="text-xs text-white0">{formattedTime}</p>
         </div>
-        <p className="whitespace-pre-wrap text-sm text-neutral-800">
+        <p className="whitespace-pre-wrap text-sm text-black">
           {comment.content}
         </p>
       </div>
@@ -72,7 +72,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
                 <EventCommentCard key={comment.id} comment={comment} />
               ))
           ) : (
-            <p className="py-4 text-center text-sm text-neutral-500">
+            <p className="py-4 text-center text-sm text-white0">
               No comments yet. Start the conversation!
             </p>
           )}
@@ -93,7 +93,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add to the discussion..."
               rows={2}
-              className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full border border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               required
             />
             <button

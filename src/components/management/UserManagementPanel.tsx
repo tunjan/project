@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { User, Role } from '@/types';
-import { useUsers, useUsersActions } from '@/store';
 import { getAssignableRoles } from '@/utils/auth';
 import { toast } from 'sonner';
 import { PencilIcon, TrophyIcon, ChatBubbleLeftRightIcon } from '@/icons';
@@ -50,13 +49,13 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         Manage User
       </h2>
       <div className="space-y-4 border-2 border-black bg-white p-6">
-        <div className="border-b border-gray-200 pb-4">
+        <div className="border-b border-black pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <ChatBubbleLeftRightIcon className="mr-3 h-5 w-5 text-black" />
               <div>
                 <h3 className="text-lg font-bold text-black">Send Message</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-red">
                   Reach out to this member directly
                 </p>
               </div>
@@ -102,7 +101,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         {canEditChapters && (
           <button
             onClick={onOpenEditChaptersModal}
-            className="mt-2 w-full border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
+            className="mt-2 w-full border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-black"
           >
             Edit Chapter Memberships
           </button>
@@ -110,7 +109,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         {canAwardBadges && (
           <button
             onClick={onOpenAwardBadgeModal}
-            className="mt-2 flex w-full items-center justify-center border-2 border-yellow-500 bg-yellow-400 px-4 py-2 font-bold text-black hover:bg-yellow-500"
+            className="mt-2 flex w-full items-center justify-center border-2 border-red bg-white px-4 py-2 font-bold text-black hover:bg-red"
           >
             <TrophyIcon className="mr-2 h-5 w-5" />
             Award Recognition

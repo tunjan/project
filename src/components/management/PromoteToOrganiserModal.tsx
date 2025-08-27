@@ -78,7 +78,7 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
             {promotableChapters.map((chapter) => (
               <label
                 key={chapter.name}
-                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-neutral-100"
+                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
               >
                 <input
                   type="checkbox"
@@ -87,18 +87,18 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
                   className="h-5 w-5 accent-primary"
                 />
                 <span className="font-bold text-black">{chapter.name}</span>
-                <span className="text-sm text-neutral-500">
+                <span className="text-sm text-white0">
                   ({chapter.country})
                 </span>
               </label>
             ))}
           </div>
         ) : (
-          <div className="border border-black bg-neutral-100 p-4 text-center">
+          <div className="border border-black bg-white p-4 text-center">
             <p className="font-bold text-black">
               No promotable chapters found.
             </p>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 text-sm text-red">
               {currentUser?.role === Role.REGIONAL_ORGANISER
                 ? `This user is not a member of any chapters within your managed region (${currentUser.managedCountry}).`
                 : 'This user is not a member of any chapters.'}
@@ -110,7 +110,7 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
       <div className="flex items-center space-x-4">
         <button
           onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
         >
           Cancel
         </button>

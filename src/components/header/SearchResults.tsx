@@ -26,7 +26,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       <div className="max-h-96 overflow-y-auto p-4">
         {loading && <LoadingSpinner />}
         {!loading && !hasResults && (
-          <p className="text-center text-sm text-neutral-500">
+          <p className="text-center text-sm text-white0">
             No results found.
           </p>
         )}
@@ -34,7 +34,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="space-y-4">
             {users.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase text-neutral-400">
+                <h3 className="text-xs font-bold uppercase text-red">
                   Users
                 </h3>
                 <ul className="mt-2 space-y-1">
@@ -43,7 +43,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/members/${user.id}`}
                         onClick={onClose}
-                        className="block rounded-none p-2 font-bold hover:bg-neutral-100"
+                        className="block rounded-none p-2 font-bold hover:bg-white"
                       >
                         {user.name}
                       </Link>
@@ -54,7 +54,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
             {chapters.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase text-neutral-400">
+                <h3 className="text-xs font-bold uppercase text-red">
                   Chapters
                 </h3>
                 <ul className="mt-2 space-y-1">
@@ -63,7 +63,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/chapters/${chapter.name}`}
                         onClick={onClose}
-                        className="block rounded-none p-2 font-bold hover:bg-neutral-100"
+                        className="block rounded-none p-2 font-bold hover:bg-white"
                       >
                         {chapter.name}
                       </Link>
@@ -74,7 +74,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
             {events.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase text-neutral-400">
+                <h3 className="text-xs font-bold uppercase text-red">
                   Events
                 </h3>
                 <ul className="mt-2 space-y-1">
@@ -83,7 +83,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/cubes/${event.id}`}
                         onClick={onClose}
-                        className="block rounded-none p-2 font-bold hover:bg-neutral-100"
+                        className="block rounded-none p-2 font-bold hover:bg-white"
                       >
                         {event.location}
                       </Link>

@@ -26,7 +26,7 @@ const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
       text = target ? `${target.toUpperCase()} REGION` : text;
       break;
     case AnnouncementScope.CHAPTER:
-      bgColor = 'bg-neutral-200';
+      bgColor = 'bg-white';
       textColor = 'text-black';
       text = target ? `${target.toUpperCase()} CHAPTER` : text;
       break;
@@ -97,19 +97,19 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               target={announcement.country || announcement.chapter}
             />
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-neutral-500">{formattedDate}</p>
+              <p className="text-sm text-white0">{formattedDate}</p>
               {canManage && (
                 <>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="p-1 text-neutral-500 hover:text-black"
+                    className="p-1 text-white0 hover:text-black"
                     aria-label="Edit announcement"
                   >
                     <PencilIcon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setIsDeleteModalOpen(true)}
-                    className="p-1 text-neutral-500 hover:text-primary"
+                    className="p-1 text-white0 hover:text-primary"
                     aria-label="Delete announcement"
                   >
                     <TrashIcon className="h-4 w-4" />
@@ -122,11 +122,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           <h3 className="text-2xl font-bold text-black">
             {announcement.title}
           </h3>
-          <p className="mt-3 whitespace-pre-wrap text-neutral-700">
+          <p className="mt-3 whitespace-pre-wrap text-black">
             {announcement.content}
           </p>
 
-          <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
+          <div className="mt-6 flex items-center border-t border-white pt-4">
             <img
               className="h-10 w-10 object-cover"
               src={announcement.author.profilePictureUrl}
@@ -136,7 +136,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               <p className="text-sm font-semibold text-black">
                 {announcement.author.name}
               </p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-white0">
                 {announcement.author.role}
               </p>
             </div>

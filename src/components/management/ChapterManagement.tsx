@@ -94,25 +94,25 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                   const organizers =
                     chapterOrganizersMap.get(chapter.name) || [];
                   return (
-                    <li key={chapter.name} className="p-4 hover:bg-neutral-50">
+                    <li key={chapter.name} className="p-4 hover:bg-white">
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="font-bold">{chapter.name}</span>
-                          <span className="ml-2 text-sm text-neutral-500">
+                          <span className="ml-2 text-sm text-white0">
                             ({chapter.country})
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => setEditingChapter(chapter)}
-                            className="p-1 text-neutral-500 hover:text-black"
+                            className="p-1 text-white0 hover:text-black"
                             aria-label="Edit Chapter"
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => openDeleteModal(chapter.name)}
-                            className="p-1 text-neutral-500 hover:text-red-600"
+                            className="p-1 text-white0 hover:text-red"
                             aria-label="Delete Chapter"
                           >
                             <TrashIcon className="h-4 w-4" />
@@ -120,7 +120,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                         </div>
                       </div>
                       <div className="mt-2 pl-2">
-                        <p className="text-xs font-bold uppercase text-neutral-500">
+                        <p className="text-xs font-bold uppercase text-white0">
                           Organizers ({organizers.length})
                         </p>
                         {organizers.length > 0 ? (
@@ -129,7 +129,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                               <button
                                 key={org.id}
                                 onClick={() => setManagingOrganiser(org)}
-                                className="flex cursor-pointer items-center space-x-2 bg-neutral-100 p-1 pr-2 transition-colors hover:bg-neutral-200"
+                                className="flex cursor-pointer items-center space-x-2 bg-white p-1 pr-2 transition-colors hover:bg-white"
                                 title={`Click to manage ${org.name}`}
                               >
                                 <img
@@ -144,7 +144,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                             ))}
                           </div>
                         ) : (
-                          <p className="mt-1 text-xs text-neutral-500">
+                          <p className="mt-1 text-xs text-white0">
                             No organizers assigned.
                           </p>
                         )}

@@ -21,7 +21,7 @@ const variantStyles = {
   warning: 'bg-warning text-white border-warning',
   danger: 'bg-danger text-white border-danger',
   info: 'bg-info text-white border-info',
-  neutral: 'bg-neutral-100 text-neutral-900 border-black',
+  neutral: 'bg-white text-black border-black',
 };
 
 const sizeStyles = {

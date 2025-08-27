@@ -94,7 +94,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
       className={`-mb-px border-b-2 px-4 py-2 text-sm font-bold ${
         isActive
           ? 'border-primary text-primary'
-          : 'border-transparent text-neutral-500 hover:text-black'
+          : 'border-transparent text-white0 hover:text-black'
       }`}
     >
       {children}
@@ -142,7 +142,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
                 className={`flex w-full items-center space-x-4 border-2 p-3 text-left transition-all ${
                   isSelected
                     ? 'border-primary bg-primary/10'
-                    : 'border-black bg-white hover:bg-neutral-50'
+                    : 'border-black bg-white hover:bg-white'
                 }`}
               >
                 <div
@@ -154,7 +154,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
                 </div>
                 <div>
                   <p className="font-bold text-black">{badge.name}</p>
-                  <p className="text-sm text-neutral-600">
+                  <p className="text-sm text-red">
                     {badge.description}
                   </p>
                 </div>
@@ -187,7 +187,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
         >
           Cancel
         </button>

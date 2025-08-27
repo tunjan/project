@@ -67,7 +67,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Log Event Report
           </h1>
-          <p className="mt-2 text-neutral-600">
+          <p className="mt-2 text-red">
             Submit the final details for{' '}
             <span className="font-bold">{event.location}</span> in{' '}
             <span className="font-bold">{event.city}</span>. This will update
@@ -100,7 +100,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   required
                   min="0.1"
                   step="0.1"
-                  className="block w-full border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                   placeholder="e.g., 4.5"
                 />
               </div>
@@ -122,18 +122,18 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   >
                     <p className="font-semibold">{log.outcome}</p>
                     {log.notes && (
-                      <p className="text-sm text-neutral-600">{log.notes}</p>
+                      <p className="text-sm text-red">{log.notes}</p>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-neutral-500">
+              <p className="text-white0">
                 No outreach outcomes have been logged for this event by
                 participants yet.
               </p>
             )}
-            <p className="mt-4 text-sm text-neutral-600">
+            <p className="mt-4 text-sm text-red">
               Note: Individual activists log their own outreach outcomes from
               the 'Outreach' page. This is a summary.
             </p>
@@ -156,7 +156,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                     />
                     <div>
                       <p className="font-bold text-black">{user.name}</p>
-                      <p className="text-sm text-neutral-500">{user.role}</p>
+                      <p className="text-sm text-white0">{user.role}</p>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">

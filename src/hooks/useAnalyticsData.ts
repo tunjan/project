@@ -9,6 +9,7 @@ import {
     getEventTrendsByMonth,
     getActivistRetention,
     getMemberGrowth,
+    getTotalMembersByMonth,
     getTopActivistsByHours,
     getAverageActivistsPerEvent,
     getChapterOutreachStats, // NEW
@@ -183,7 +184,8 @@ export function useAnalyticsData() {
         () => getEventTrendsByMonth(filteredEvents, 12),
         [filteredEvents]
     );
-    const memberGrowth = useMemo(() => getMemberGrowth(filteredUsers, 12), [filteredUsers]); // FIX: Member growth should also be filtered
+    const memberGrowth = useMemo(() => getMemberGrowth(filteredUsers, 12), [filteredUsers]);
+    const totalMembersByMonth = useMemo(() => getTotalMembersByMonth(filteredUsers, 12), [filteredUsers]);
 
     // NEW: Calculate conversation trends
     const conversationTrends = useMemo(
@@ -228,6 +230,7 @@ export function useAnalyticsData() {
         chapterStats,
         eventTrends,
         memberGrowth,
+        totalMembersByMonth,
         conversationTrends, // NEW: Expose new data
         activistRetention,
         avgActivistsPerEvent,

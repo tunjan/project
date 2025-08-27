@@ -139,6 +139,7 @@ export interface User {
   };
   organizerNotes?: OrganizerNote[];
   lastLogin: Date;
+  leaveDate?: Date;
 }
 
 export interface TourDuty {

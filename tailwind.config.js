@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
@@ -18,44 +18,50 @@ export default {
         ],
       },
       colors: {
-        primary: {
-          DEFAULT: '#b91c1c',
-          hover: '#991b1b',
+        black: '#000000',
+        red: '#d81313',
+        white: '#ffffff',
+        grey: {
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
-        // ADD a full semantic palette
+        // Semantic color mappings using our three colors
+        primary: {
+          DEFAULT: '#d81313',
+          hover: '#000000',
+        },
         success: {
-          DEFAULT: '#16a34a', // green-600
-          hover: '#15803d', // green-700
+          DEFAULT: '#000000',
+          hover: '#d81313',
         },
         warning: {
-          DEFAULT: '#ca8a04', // yellow-600
-          hover: '#a16207', // yellow-700
+          DEFAULT: '#d81313',
+          hover: '#000000',
         },
         danger: {
-          DEFAULT: '#dc2626', // red-600
-          hover: '#b91c1b', // red-700
+          DEFAULT: '#d81313',
+          hover: '#000000',
         },
         info: {
-          DEFAULT: '#2563eb', // blue-600
-          hover: '#1d4ed8', // blue-700
+          DEFAULT: '#000000',
+          hover: '#d81313',
         },
-        // You could also add neutral/gray variants
         neutral: {
-          DEFAULT: '#171717', // neutral-900 for text
-          secondary: '#737373', // neutral-500
-          subtle: '#f5f5f5', // neutral-100 for backgrounds
+          DEFAULT: '#000000',
+          secondary: '#6b7280', // Changed from red to grey-500
+          subtle: '#ffffff',
         },
-        // New outreach button palette
-        buff: '#cb997eff',
-        'desert-sand': '#ddbea9ff',
-        'champagne-pink': '#ffe8d6ff',
-        'ash-gray': '#b7b7a4ff',
-        sage: '#a5a58dff',
-        'reseda-green': '#6b705cff',
       },
       boxShadow: {
-        brutal: '4px 4px 0 #000',
-        'brutal-lg': '8px 8px 0 #000',
+        brutal: '4px 4px 0 #000000',
+        'brutal-lg': '8px 8px 0 #000000',
       },
       borderRadius: {
         none: '0',

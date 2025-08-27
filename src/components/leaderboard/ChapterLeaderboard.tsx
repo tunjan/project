@@ -1,6 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type ChapterLeaderboardEntry, calculateRanks } from '@/utils/leaderboard';
+import {
+  type ChapterLeaderboardEntry,
+  calculateRanks,
+} from '@/utils/leaderboard';
 import { BuildingOfficeIcon } from '@/icons';
 
 interface ChapterLeaderboardProps {
@@ -11,8 +14,8 @@ interface ChapterLeaderboardProps {
 
 const rankClasses: { [key: number]: string } = {
   1: 'bg-primary text-white',
-  2: 'bg-neutral-800 text-white',
-  3: 'bg-neutral-300 text-black',
+  2: 'bg-black text-white',
+  3: 'bg-white text-black',
 };
 
 const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
@@ -21,7 +24,7 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
   unit,
 }) => {
   const navigate = useNavigate();
-  
+
   // Calculate proper ranks that handle ties
   const rankedData = calculateRanks(data);
 
@@ -49,7 +52,7 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
                 >
                   {rank}
                 </div>
-                <div className="flex flex-grow items-center p-4 transition-colors hover:bg-neutral-100">
+                <div className="flex flex-grow items-center p-4 transition-colors hover:bg-white">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-black bg-black">
                     <BuildingOfficeIcon className="h-6 w-6 text-white" />
                   </div>
@@ -57,15 +60,13 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
                     <p className="truncate font-bold text-black sm:max-w-xs">
                       {chapter.name}
                     </p>
-                    <p className="text-sm text-neutral-500">
-                      {chapter.country}
-                    </p>
+                    <p className="text-white0 text-sm">{chapter.country}</p>
                   </div>
                   <div className="ml-2 flex-shrink-0 text-right">
-                    <p className="text-2xl font-extrabold text-black">
+                    <p className="text-xl font-extrabold text-black sm:text-2xl">
                       {value.toLocaleString()}
                     </p>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+                    <p className="text-grey-600 text-xs font-semibold uppercase tracking-wider">
                       {unit}
                     </p>
                   </div>
@@ -75,8 +76,8 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
           })}
         </ul>
       ) : (
-        <div className="p-8 text-center text-neutral-500">
-          <BuildingOfficeIcon className="mx-auto h-12 w-12 text-neutral-300" />
+        <div className="text-white0 p-8 text-center">
+          <BuildingOfficeIcon className="text-grey-500 mx-auto h-12 w-12" />
           <p className="mt-2 font-semibold">No data available.</p>
           <p className="text-sm">There is no activity for this time period.</p>
         </div>

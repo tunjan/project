@@ -8,6 +8,7 @@ import ParticipationHistory from '@/components/dashboard/ParticipationHistory';
 import EditProfileModal from '@/components/dashboard/EditProfileModal';
 import HostingDashboard from '@/components/dashboard/HostingDashboard';
 import BadgeAwardsDashboard from '@/components/dashboard/BadgeAwardsDashboard';
+import Avatar from '@/components/ui/Avatar';
 import QRCode from 'qrcode.react';
 import { toast } from 'sonner';
 import {
@@ -45,7 +46,8 @@ const QuickActionButton: React.FC<{
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { updateProfile } = useUsersActions();
+  const { updateProfile, clearPersistedData, getStoreHealth } =
+    useUsersActions();
   const allEvents = useEvents();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
@@ -72,6 +74,27 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
     toast.success('Profile updated successfully.');
   };
 
+  const handleClearStoreData = () => {
+    clearPersistedData();
+    toast.success('Store data cleared. Please refresh the page.');
+  };
+
+  const handleCheckStoreHealth = () => {
+    const health = getStoreHealth();
+    console.log('Store Health Check:', health);
+    toast.info('Store health check completed. Check console for details.');
+  };
+
+  const handleAvatarChange = (newImageUrl: string) => {
+    updateProfile(user.id, {
+      name: user.name,
+      instagram: user.instagram || '',
+      hostingAvailability: user.hostingAvailability,
+      hostingCapacity: user.hostingCapacity || 1,
+      profilePictureUrl: newImageUrl,
+    });
+  };
+
   return (
     <>
       {/* MODAL LOGIC (OWNER ONLY) */}
@@ -93,7 +116,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
         {/* PENDING VERIFICATION BANNER (OWNER ONLY) */}
         {isOwnProfile && user.onboardingStatus === 'Awaiting Verification' && (
           <div
-            className="shadow-brutal mb-8 border-2 border-black bg-yellow-300 p-4"
+            className="mb-8 border-2 border-black bg-white p-4 shadow-brutal"
             role="alert"
           >
             <div className="flex flex-col items-center gap-4 md:flex-row">
@@ -131,11 +154,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
 
         {/* HEADER SECTION */}
         <div className="card-brutal mb-12 flex flex-col items-center gap-6 p-6 text-center sm:flex-row sm:text-left md:gap-8">
-          <img
-            src={user.profilePictureUrl}
-            alt={user.name}
-            className="border-brutal h-24 w-24 flex-shrink-0 object-cover md:h-32 md:w-32"
-          />
+          <div className="flex flex-col items-center">
+            <Avatar
+              src={user.profilePictureUrl}
+              alt={user.name}
+              className="border-brutal h-24 w-24 flex-shrink-0 object-cover md:h-32 md:w-32"
+              editable={isOwnProfile}
+              onImageChange={handleAvatarChange}
+            />
+            {isOwnProfile && (
+              <p className="mt-2 text-center text-xs text-white0">
+                Click to upload new avatar
+              </p>
+            )}
+          </div>
           <div className="flex-grow">
             <p className="text-lg font-bold text-primary">
               {getUserRoleDisplay(user)}
@@ -148,7 +180,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                 href={`https://instagram.com/${user.instagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-neutral-600 hover:text-primary hover:underline"
+                className="font-semibold text-red hover:text-primary hover:underline"
               >
                 @{user.instagram}
               </a>
@@ -163,6 +195,28 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
             >
               <PencilIcon className="h-6 w-6 text-white" />
             </button>
+          )}
+
+          {/* DEBUG BUTTON (DEVELOPMENT ONLY) */}
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              <button
+                onClick={handleClearStoreData}
+                className="border-brutal group flex h-14 w-14 flex-shrink-0 items-center justify-center bg-red transition-colors hover:bg-black"
+                aria-label="Clear Store Data (Debug)"
+                title="Clear Store Data (Debug)"
+              >
+                <span className="text-xs font-bold text-white">DBG</span>
+              </button>
+              <button
+                onClick={handleCheckStoreHealth}
+                className="border-brutal group flex h-14 w-14 flex-shrink-0 items-center justify-center bg-black transition-colors hover:bg-red"
+                aria-label="Check Store Health (Debug)"
+                title="Check Store Health (Debug)"
+              >
+                <span className="text-xs font-bold text-white">HLTH</span>
+              </button>
+            </>
           )}
         </div>
 

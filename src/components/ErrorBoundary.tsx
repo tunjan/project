@@ -24,26 +24,49 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
+  handleClearStoreData = () => {
+    try {
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+      }
+      // Reload the page
+      window.location.reload();
+    } catch (e) {
+      console.error('Failed to clear store data:', e);
+      // Fallback to just reloading
+      window.location.reload();
+    }
+  };
+
   render() {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="flex min-h-screen items-center justify-center bg-neutral-50">
+          <div className="flex min-h-screen items-center justify-center bg-white">
             <div className="card-brutal card-padding text-center">
               <h1 className="mb-4 text-2xl font-bold text-black">
                 Something went wrong
               </h1>
-              <p className="mb-6 text-neutral-600">
+              <p className="text-grey-600 mb-6">
                 We're sorry, but something unexpected happened.
               </p>
-              <button
-                onClick={() =>
-                  this.setState({ hasError: false, error: undefined })
-                }
-                className="btn-secondary"
-              >
-                Try again
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={() =>
+                    this.setState({ hasError: false, error: undefined })
+                  }
+                  className="btn-secondary w-full"
+                >
+                  Try again
+                </button>
+                <button
+                  onClick={this.handleClearStoreData}
+                  className="btn-secondary bg-red w-full text-white hover:bg-black"
+                >
+                  Clear Data & Reload
+                </button>
+              </div>
             </div>
           </div>
         )

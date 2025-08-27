@@ -31,7 +31,7 @@ const CustomTooltip = ({
 }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="shadow-brutal border-2 border-black bg-white p-3">
+      <div className="border-2 border-black bg-white p-3 shadow-brutal">
         <p className="font-bold text-black">{label}</p>
         <p className="text-primary">
           Value:{' '}
@@ -46,13 +46,13 @@ const CustomTooltip = ({
 const LineChart: React.FC<LineChartProps> = ({
   data,
   title,
-  lineColor = '#c70f0f',
+  lineColor = '#d81313',
 }) => {
   if (data.length === 0) {
     return (
       <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-        <div className="flex h-[300px] items-center justify-center text-neutral-500">
+        <div className="text-white0 flex h-[300px] items-center justify-center">
           Not enough data to display chart.
         </div>
       </div>
@@ -79,17 +79,17 @@ const LineChart: React.FC<LineChartProps> = ({
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 12, fill: '#111827' }}
-              axisLine={{ stroke: '#111827' }}
-              tickLine={{ stroke: '#111827' }}
+              tick={{ fontSize: 12, fill: '#000000' }}
+              axisLine={{ stroke: '#000000' }}
+              tickLine={{ stroke: '#000000' }}
             />
             <YAxis
               tick={{ fontSize: 12, fill: '#6b7280' }}
-              axisLine={{ stroke: '#111827' }}
-              tickLine={{ stroke: '#111827' }}
+              axisLine={{ stroke: '#000000' }}
+              tickLine={{ stroke: '#000000' }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line

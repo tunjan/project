@@ -25,7 +25,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
           </label>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="h-5 w-5 text-neutral-400" />
+              <SearchIcon className="text-grey-500 h-5 w-5" />
             </div>
             <input
               type="text"
@@ -33,7 +33,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               placeholder="Search by keyword..."
               value={props.searchTerm}
               onChange={(e) => props.setSearchTerm(e.target.value)}
-              className="block w-full rounded-none border border-neutral-300 bg-white py-2 pl-10 pr-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="placeholder:text-white0 block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             />
           </div>
         </div>
@@ -93,7 +93,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               props.setSelectedLevel('all');
               props.setSelectedLang('all');
             }}
-            className="h-full w-full border-2 border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+            className="h-full w-full border-2 border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
           >
             Reset
           </button>

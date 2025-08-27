@@ -30,7 +30,7 @@ const StatCard: React.FC<{
   >
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
-      <p className="ml-3 truncate text-sm font-semibold uppercase tracking-wider text-neutral-600">
+      <p className="ml-3 truncate text-sm font-semibold uppercase tracking-wider text-red">
         {title}
       </p>
     </div>

@@ -1,8 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { EventRole, EventRoleRequirement, User, CubeEvent } from '@/types';
-import { useUsers } from '@/store';
-import { Badge } from '@/components/ui/Tag';
-import { ClockIcon, UsersIcon } from '@/icons';
+import React, { useMemo } from 'react';
+import { EventRole, User, CubeEvent } from '@/types';
 import { Link } from 'react-router-dom';
 
 interface EventRosterProps {
@@ -11,7 +8,7 @@ interface EventRosterProps {
 
 const getDatesBetween = (start: Date, end: Date): Date[] => {
   const dates = [];
-  let currentDate = new Date(new Date(start).toISOString().split('T')[0]);
+  const currentDate = new Date(new Date(start).toISOString().split('T')[0]);
   const lastDate = new Date(new Date(end).toISOString().split('T')[0]);
   while (currentDate <= lastDate) {
     dates.push(new Date(currentDate));
@@ -32,10 +29,13 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
     for (const day of eventDays) {
       const dateString = new Date(day).toISOString().split('T')[0];
       roster[dateString] = {
+        [EventRole.ORGANIZER]: [],
+        [EventRole.ACTIVIST]: [],
+        [EventRole.VOLUNTEER]: [],
         [EventRole.OUTREACH]: [],
         [EventRole.EQUIPMENT]: [],
         [EventRole.TRANSPORT]: [],
-      } as Record<EventRole, User[]>;
+      };
     }
 
     for (const participant of event.participants) {
@@ -56,7 +56,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
     <div className="border-2 border-black bg-white">
       <div className="border-b-2 border-black p-6">
         <h2 className="text-xl font-bold text-black">Event Roster</h2>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-red">
           Daily breakdown of activist duties.
         </p>
       </div>
@@ -77,7 +77,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
               <div className="mt-2 space-y-3">
                 {Object.entries(dailyRoster).map(([role, users]) => (
                   <div key={role}>
-                    <p className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
+                    <p className="text-sm font-semibold uppercase tracking-wider text-white0">
                       {role} ({users.length})
                     </p>
                     {users.length > 0 ? (
@@ -86,7 +86,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
                           <Link
                             key={user.id}
                             to={`/members/${user.id}`}
-                            className="flex items-center space-x-1.5 rounded-none bg-neutral-100 p-1 transition-colors hover:bg-neutral-200"
+                            className="flex items-center space-x-1.5 rounded-none bg-white p-1 transition-colors hover:bg-white"
                           >
                             <img
                               src={user.profilePictureUrl}
@@ -100,7 +100,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-neutral-400">
+                      <p className="text-xs text-red">
                         No volunteers for this role.
                       </p>
                     )}

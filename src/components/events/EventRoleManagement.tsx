@@ -123,10 +123,10 @@ const RoleRequirementCard: React.FC<{
 
   const statusColor =
     requirement.filled >= requirement.needed
-      ? 'text-green-600 bg-green-100 border-green-600'
-      : requirement.filled > 0
-        ? 'text-yellow-600 bg-yellow-100 border-yellow-600'
-        : 'text-red-600 bg-red-100 border-red-600';
+              ? 'text-black bg-white border-black'
+        : requirement.filled > 0
+        ? 'text-red bg-white border-red'
+        : 'text-red bg-white border-red';
 
   return (
     <div className="card-brutal card-padding">
@@ -144,7 +144,7 @@ const RoleRequirementCard: React.FC<{
               <span>Progress</span>
               <span>{progressPercentage}%</span>
             </div>
-            <div className="h-3 border-2 border-black bg-neutral-200">
+            <div className="h-3 border-2 border-black bg-white">
               <div
                 className="h-full bg-primary transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
@@ -153,7 +153,7 @@ const RoleRequirementCard: React.FC<{
           </div>
 
           {requirement.description && (
-            <p className="mb-2 text-sm text-neutral-600">
+            <p className="mb-2 text-sm text-red">
               {requirement.description}
             </p>
           )}
@@ -163,14 +163,14 @@ const RoleRequirementCard: React.FC<{
           <div className="flex gap-2">
             <button
               onClick={onEdit}
-              className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
+              className="p-2 text-red transition-colors duration-300 hover:bg-black hover:text-white"
               title="Edit requirement"
             >
               <PencilIcon className="h-4 w-4" />
             </button>
             <button
               onClick={onDelete}
-              className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-primary hover:text-white"
+              className="p-2 text-red transition-colors duration-300 hover:bg-primary hover:text-white"
               title="Delete requirement"
             >
               <TrashIcon className="h-4 w-4" />
@@ -271,7 +271,7 @@ const EventRoleManagement: React.FC<EventRoleManagementProps> = ({
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="h-subsection">Event Roles</h3>
-          <p className="font-mono text-sm uppercase tracking-wider text-neutral-600">
+          <p className="font-mono text-sm uppercase tracking-wider text-red">
             Coordinate specific roles needed for this event
           </p>
         </div>
@@ -314,9 +314,9 @@ const EventRoleManagement: React.FC<EventRoleManagementProps> = ({
         </div>
       ) : (
         <div className="card-brutal card-padding text-center">
-          <UsersIcon className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
-          <h4 className="h-card text-neutral-700">No specific roles defined</h4>
-          <p className="text-sm text-neutral-600">
+          <UsersIcon className="mx-auto mb-3 h-12 w-12 text-red" />
+          <h4 className="h-card text-black">No specific roles defined</h4>
+          <p className="text-sm text-red">
             {canEdit
               ? 'Add role requirements to help coordinate this event.'
               : "The organizer hasn't defined specific roles for this event yet."}

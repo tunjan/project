@@ -80,7 +80,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Create Announcement
           </h1>
-          <p className="mt-2 text-neutral-600">
+          <p className="text-grey-600 mt-2">
             Your message will be visible to the audience defined by the selected
             scope.
           </p>
@@ -151,7 +151,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-neutral-800"
+              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-black"
             >
               Cancel
             </button>

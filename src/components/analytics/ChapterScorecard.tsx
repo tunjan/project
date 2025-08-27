@@ -3,9 +3,9 @@ import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 import { calculateChapterScorecard } from '@/utils/scorecard';
 
 const getScoreColor = (score: number) => {
-  if (score >= 80) return 'bg-green-600';
-  if (score >= 60) return 'bg-yellow-500';
-  return 'bg-red-600';
+  if (score >= 80) return 'bg-black';
+  if (score >= 60) return 'bg-grey-500';
+  return 'bg-grey-400';
 };
 
 const ChapterScorecard: React.FC = () => {
@@ -28,7 +28,7 @@ const ChapterScorecard: React.FC = () => {
       </h2>
       <div className="border border-black bg-white">
         <table className="w-full text-left">
-          <thead className="border-b border-black text-xs uppercase text-neutral-500">
+          <thead className="text-white0 border-b border-black text-xs uppercase">
             <tr>
               <th className="p-3">Chapter</th>
               <th className="p-3 text-center">Health Score</th>
@@ -39,7 +39,7 @@ const ChapterScorecard: React.FC = () => {
           </thead>
           <tbody>
             {scorecardData.map((data) => (
-              <tr key={data.name} className="border-t border-neutral-200">
+              <tr key={data.name} className="border-t border-white">
                 <td className="p-3 font-bold">{data.name}</td>
                 <td className="p-3 text-center">
                   <div className="flex items-center justify-center">

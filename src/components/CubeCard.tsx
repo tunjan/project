@@ -1,4 +1,3 @@
-import React from 'react';
 import { type CubeEvent, EventStatus } from '@/types';
 
 import { CalendarIcon, ClockIcon, UsersIcon } from '@/icons';
@@ -27,9 +26,10 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
     minute: '2-digit',
   });
 
-  const formattedDateRange = startDate && endDate
-    ? `${safeFormatDate(startDate, { month: 'short', day: 'numeric' })} - ${safeFormatDate(endDate, { month: 'short', day: 'numeric', year: 'numeric' })}`
-    : formattedDate;
+  const formattedDateRange =
+    startDate && endDate
+      ? `${safeFormatDate(startDate, { month: 'short', day: 'numeric' })} - ${safeFormatDate(endDate, { month: 'short', day: 'numeric', year: 'numeric' })}`
+      : formattedDate;
 
   const handleSelect = () => {
     onSelect(event);
@@ -74,7 +74,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
               </span>
             )}
             {isCancelled && (
-              <span className="bg-red-600 px-2 py-1 text-xs font-bold text-white">
+              <span className="bg-red px-2 py-1 text-xs font-bold text-white">
                 CANCELLED
               </span>
             )}
@@ -85,20 +85,20 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
           </div>
         </div>
 
-        <div className="mt-4 space-y-3 text-neutral-600">
+        <div className="text-grey-800 mt-4 space-y-3">
           <div className="flex items-center">
-            <CalendarIcon className="mr-3 h-5 w-5 text-neutral-400" />
+            <CalendarIcon className="text-red mr-3 h-5 w-5" />
             <span>{formattedDateRange}</span>
           </div>
           {!event.endDate && (
             <div className="flex items-center">
-              <ClockIcon className="mr-3 h-5 w-5 text-neutral-400" />
+              <ClockIcon className="text-red mr-3 h-5 w-5" />
               <span>{formattedTime}</span>
             </div>
           )}
         </div>
 
-        <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
+        <div className="mt-6 flex items-center border-t border-white pt-4">
           <img
             className="h-10 w-10 object-cover"
             src={event.organizer.profilePictureUrl}
@@ -108,7 +108,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
             <p className="text-sm font-semibold text-black">
               {event.organizer.name}
             </p>
-            <p className="text-xs text-neutral-500">Organizer</p>
+            <p className="text-white0 text-xs">Organizer</p>
           </div>
         </div>
       </div>

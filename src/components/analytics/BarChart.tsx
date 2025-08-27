@@ -32,7 +32,7 @@ const CustomTooltip = ({
 }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="shadow-brutal border-2 border-black bg-white p-3">
+      <div className="border-2 border-black bg-white p-3 shadow-brutal">
         <p className="font-bold text-black">{label}</p>
         <p className="text-primary">
           Value:{' '}
@@ -47,7 +47,7 @@ const CustomTooltip = ({
 const BarChart: React.FC<BarChartProps> = ({
   data,
   title,
-  barColor = '#c70f0f',
+  barColor = '#d81313',
 }) => {
   // Transform data for Recharts format
   const chartData = data.map((item) => ({
@@ -70,17 +70,17 @@ const BarChart: React.FC<BarChartProps> = ({
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 12, fill: '#111827' }}
-              axisLine={{ stroke: '#111827' }}
-              tickLine={{ stroke: '#111827' }}
+              tick={{ fontSize: 12, fill: '#000000' }}
+              axisLine={{ stroke: '#000000' }}
+              tickLine={{ stroke: '#000000' }}
             />
             <YAxis
               tick={{ fontSize: 12, fill: '#6b7280' }}
-              axisLine={{ stroke: '#111827' }}
-              tickLine={{ stroke: '#111827' }}
+              axisLine={{ stroke: '#000000' }}
+              tickLine={{ stroke: '#000000' }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar

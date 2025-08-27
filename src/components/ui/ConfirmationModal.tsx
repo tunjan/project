@@ -66,7 +66,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-bold text-black">{title}</h3>
-            <p className="mt-2 text-sm text-neutral-600">{message}</p>
+            <p className="mt-2 text-sm text-red">{message}</p>
           </div>
         </div>
 

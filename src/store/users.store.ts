@@ -47,6 +47,17 @@ export interface UsersActions {
     updates: { userId: string; newStats: Partial<User['stats']> }[]
   ) => void;
   resetToInitialData: () => void;
+  getUsers: () => User[];
+  clearPersistedData: () => void;
+  init: () => void;
+  getStoreHealth: () => {
+    hasUsers: boolean;
+    usersCount: number;
+    usersValid: boolean;
+    sampleUser: User | null;
+    localStorageKey: string;
+    localStorageData: string | null;
+  };
 }
 
 export const useUsersStore = create<UsersState & UsersActions>()(
@@ -60,6 +71,37 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         console.log('Users store - processedUsers length:', processedUsers.length);
         return {};
       })(),
+
+      // Ensure users are always available
+      getUsers: () => {
+        const state = get();
+        if (!state.users || state.users.length === 0) {
+          console.log('Users store: No users found, resetting to initial data');
+          set({ users: processedUsers });
+          return processedUsers;
+        }
+        return state.users;
+      },
+
+      // Initialize store with fallback to initial data
+      init: () => {
+        const state = get();
+        if (!state.users || state.users.length === 0) {
+          console.log('Users store: Initializing with fallback data');
+          set({ users: processedUsers });
+        }
+
+        // Validate user data structure
+        const hasValidUsers = state.users &&
+          Array.isArray(state.users) &&
+          state.users.length > 0 &&
+          state.users.every(user => user && user.id && user.name);
+
+        if (!hasValidUsers) {
+          console.warn('Users store: Invalid user data detected, resetting to initial data');
+          set({ users: processedUsers });
+        }
+      },
 
       register: (formData) => {
         const newUser: User = {
@@ -278,6 +320,32 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       resetToInitialData: () => {
         set({ users: processedUsers });
       },
+
+      // Clear persisted data and reset to initial data
+      clearPersistedData: () => {
+        // Clear localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('users-store');
+        }
+        // Reset to initial data
+        set({ users: processedUsers });
+        console.log('Users store: Persisted data cleared and reset to initial data');
+      },
+
+      // Check store health and provide debugging info
+      getStoreHealth: () => {
+        const state = get();
+        const health = {
+          hasUsers: !!state.users,
+          usersCount: state.users?.length || 0,
+          usersValid: state.users && Array.isArray(state.users) && state.users.length > 0,
+          sampleUser: state.users?.[0] || null,
+          localStorageKey: 'users-store',
+          localStorageData: typeof window !== 'undefined' ? localStorage.getItem('users-store') : null,
+        };
+        console.log('Users store health check:', health);
+        return health;
+      },
     }),
     {
       name: 'users-store', onRehydrateStorage: () => (rehydrated, error) => {
@@ -291,7 +359,10 @@ export const useUsersStore = create<UsersState & UsersActions>()(
   )
 );
 
-export const useUsersState = () => useUsersStore((s) => s.users);
+export const useUsersState = () => useUsersStore((s) => {
+  // Ensure users are available
+  return s.users && s.users.length > 0 ? s.users : s.getUsers();
+});
 export const useUsersActions = () =>
   useUsersStore((s) => ({
     register: s.register,
@@ -309,15 +380,22 @@ export const useUsersActions = () =>
     deleteOrganizerNote: s.deleteOrganizerNote,
     batchUpdateUserStats: s.batchUpdateUserStats,
     resetToInitialData: s.resetToInitialData,
+    clearPersistedData: s.clearPersistedData,
+    init: s.init,
+    getStoreHealth: s.getStoreHealth,
   }));
 
 // Selectors
 export const useUserById = (userId?: string) => {
   const user = useUsersStore((s) => {
     console.log('useUserById called with userId:', userId);
-    console.log('useUserById - store users:', s.users);
-    console.log('useUserById - users length:', s.users.length);
-    const foundUser = s.users.find((u) => u.id === userId);
+
+    // Ensure users are available
+    const users = s.users && s.users.length > 0 ? s.users : s.getUsers();
+
+    console.log('useUserById - store users:', users);
+    console.log('useUserById - users length:', users.length);
+    const foundUser = users.find((u) => u.id === userId);
     console.log('useUserById - found user:', foundUser);
     return foundUser;
   });

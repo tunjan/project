@@ -27,6 +27,7 @@ export function useAsync<T>(
       // @ts-ignore
       setState({ data: null, loading: false, error: error as Error });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asyncFunction, ...dependencies]);
 
   useEffect(() => {

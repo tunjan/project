@@ -17,11 +17,11 @@ const ProgressBar: React.FC<{
     <div>
       <div className="mb-1 flex items-baseline justify-between">
         <span className="text-sm font-semibold text-black">{label}</span>
-        <span className="text-xs font-medium text-neutral-500">
+        <span className="text-xs font-medium text-white0">
           {current} / {required}
         </span>
       </div>
-      <div className="h-2 w-full border border-black bg-neutral-200">
+      <div className="h-2 w-full border border-black bg-white">
         <div
           className="h-full bg-primary"
           style={{ width: `${percentage}%` }}
@@ -51,7 +51,7 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
 
       {progress ? (
         <div className="space-y-4">
-          <p className="text-sm font-semibold text-neutral-600">
+          <p className="text-sm font-semibold text-red">
             Progress to {nextTier}:
           </p>
           <ProgressBar
@@ -77,7 +77,7 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
           <p className="font-bold text-black">
             You've reached the highest tier!
           </p>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-red">
             Thank you for your incredible dedication.
           </p>
         </div>

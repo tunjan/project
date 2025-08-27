@@ -24,7 +24,7 @@ const StatCard: React.FC<{
   <div className="group relative border-2 border-black bg-white p-4">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
-      <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
+      <p className="text-grey-600 ml-3 text-sm font-semibold uppercase tracking-wider">
         {title}
       </p>
     </div>
@@ -51,6 +51,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
     chapterStats,
     eventTrends,
     memberGrowth,
+    totalMembersByMonth,
     conversationTrends,
     activistRetention,
     avgActivistsPerEvent,
@@ -75,7 +76,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Analytics: {viewTitle}
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
           Organization performance metrics and impact tracking. Use the filters
           to drill down.
         </p>
@@ -96,7 +97,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedCountry}
               onChange={handleCountryChange}
               disabled={availableCountries.length <= 1}
-              className="w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm"
+              className="w-full rounded-none border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
             >
               {availableCountries.map((country) => (
                 <option key={country} value={country}>
@@ -117,7 +118,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedChapter}
               onChange={handleChapterChange}
               disabled={chaptersInSelectedCountry.length === 0}
-              className="w-full rounded-none border border-neutral-300 bg-white p-2 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-neutral-200 sm:text-sm"
+              className="w-full rounded-none border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
             >
               <option value="all">All Chapters</option>
               {chaptersInSelectedCountry.map((chapter) => (
@@ -184,53 +185,88 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
 
       {/* Charts */}
       <section className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-        <LineChart
-          data={eventTrends.map((t) => ({
-            label: t.month.split(' ')[0],
-            value: t.count,
-          }))}
-          title="Events per Month"
-        />
-        <LineChart
-          data={memberGrowth.map((t) => ({
-            label: t.month.split(' ')[0],
-            value: t.count,
-          }))}
-          title="New Members per Month"
-          lineColor="#000000"
-        />
-        <LineChart
-          data={conversationTrends.map((t) => ({
-            label: t.month.split(' ')[0],
-            value: t.count,
-          }))}
-          title="Conversations per Month"
-          lineColor="#16a34a"
-        />
+        <div className="card">
+          <div className="card-content">
+            <LineChart
+              data={eventTrends.map((t) => ({
+                label: t.month.split(' ')[0],
+                value: t.count,
+              }))}
+              title="Events per Month"
+            />
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-content">
+            <LineChart
+              title="New Members per Month"
+              data={memberGrowth.map((t) => ({
+                label: t.month.split(' ')[0],
+                value: t.count,
+              }))}
+            />
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-content">
+            <LineChart
+              title="Total Members per Month"
+              data={totalMembersByMonth.map((t) => ({
+                label: t.month.split(' ')[0],
+                value: t.count,
+              }))}
+            />
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-content">
+            <LineChart
+              data={conversationTrends.map((t) => ({
+                label: t.month.split(' ')[0],
+                value: t.count,
+              }))}
+              title="Conversations per Month"
+              lineColor="#6b7280"
+            />
+          </div>
+        </div>
+
         {!isChapterView && (
           <>
-            <BarChart
-              data={topChaptersByHours}
-              title="Top 5 Chapters by Activist Hours"
-            />
-            <ScatterPlot
-              data={chapterOutreachStats.map((s) => ({
-                label: s.name,
-                x: s.totalHours,
-                y: s.totalConversations,
-              }))}
-              title="Chapter Efficiency"
-              xAxisLabel="Total Activist Hours"
-              yAxisLabel="Total Conversations Logged"
-            />
+            <div className="card">
+              <div className="card-content">
+                <BarChart
+                  data={topChaptersByHours}
+                  title="Top 5 Chapters by Activist Hours"
+                />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-content">
+                <ScatterPlot
+                  data={chapterOutreachStats.map((s) => ({
+                    label: s.name,
+                    x: s.totalHours,
+                    y: s.totalConversations,
+                  }))}
+                  title="Chapter Efficiency"
+                  xAxisLabel="Total Activist Hours"
+                  yAxisLabel="Total Conversations Logged"
+                />
+              </div>
+            </div>
           </>
         )}
 
         {isChapterView && (
-          <BarChart
-            data={topActivists.map((a) => ({ label: a.name, value: a.value }))}
-            title="Top 5 Activists by Hours"
-          />
+          <div className="card">
+            <div className="card-content">
+              <BarChart
+                data={topActivists.map((a) => ({ label: a.name, value: a.value }))}
+                title="Top 5 Activists by Hours"
+              />
+            </div>
+          </div>
         )}
       </section>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from '@/components/ui/Modal';
-import { Chapter, CubeEvent } from '@/types';
+import { CubeEvent } from '@/types';
 import { ChevronDownIcon } from '@/icons';
 
 interface PastEventsModalProps {
@@ -25,20 +25,20 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-neutral-100"
+        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-white"
       >
         <div>
           <p className="font-bold text-black">{event.location}</p>
-          <p className="text-sm text-neutral-500">{formattedDate}</p>
+          <p className="text-sm text-white0">{formattedDate}</p>
         </div>
         <ChevronDownIcon
-          className={`h-5 w-5 text-neutral-500 transition-transform ${
+          className={`h-5 w-5 text-white0 transition-transform ${
             isExpanded ? 'rotate-180' : ''
           }`}
         />
       </button>
       {isExpanded && (
-        <div className="border-t border-black bg-neutral-50 p-4">
+        <div className="border-t border-black bg-white p-4">
           <h4 className="mb-3 text-sm font-bold">
             Attendees ({event.participants.length})
           </h4>
@@ -54,7 +54,7 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
                   <p className="text-sm font-semibold text-black">
                     {p.user.name}
                   </p>
-                  <p className="text-xs text-neutral-600">{p.eventRole}</p>
+                  <p className="text-xs text-red">{p.eventRole}</p>
                 </div>
               </li>
             ))}
@@ -84,10 +84,10 @@ const PastEventsModal: React.FC<PastEventsModalProps> = ({
         </div>
       ) : (
         <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <p className="mb-4 text-neutral-500">
+          <p className="mb-4 text-white0">
             No past events found for this chapter.
           </p>
-          <div className="space-y-2 text-sm text-neutral-400">
+          <div className="space-y-2 text-sm text-red">
             <p>This could be because:</p>
             <ul className="list-inside list-disc space-y-1">
               <li>The chapter hasn't held any events yet</li>

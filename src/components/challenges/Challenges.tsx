@@ -19,7 +19,7 @@ const Challenges = () => {
           <h3 className="mt-4 text-xl font-bold text-black">
             No Active Challenges
           </h3>
-          <p className="mt-2 text-neutral-500">
+          <p className="text-white0 mt-2">
             Check back later for new team-based challenges!
           </p>
         </div>
@@ -48,10 +48,10 @@ const Challenges = () => {
                 <h3 className="text-xl font-bold text-black">
                   {challenge.title}
                 </h3>
-                <p className="mb-4 mt-2 text-sm text-neutral-600">
+                <p className="text-grey-600 mb-4 mt-2 text-sm">
                   {challenge.description}
                 </p>
-                <div className="flex items-center text-sm text-neutral-500">
+                <div className="text-white0 flex items-center text-sm">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   <span>
                     Ends: {new Date(challenge.endDate).toLocaleDateString()}
@@ -59,7 +59,7 @@ const Challenges = () => {
                 </div>
               </div>
 
-              <div className="flex-grow border-t border-black bg-neutral-50 p-6">
+              <div className="flex-grow border-t border-black bg-white p-6">
                 <h4 className="text-md mb-3 font-semibold text-black">
                   Leaderboard
                 </h4>
@@ -89,7 +89,7 @@ const Challenges = () => {
                               </span>
                             )}
                           </div>
-                          <span className="text-sm font-bold text-neutral-800">
+                          <span className="text-sm font-bold text-black">
                             {p.progress.toLocaleString()} {challenge.metric}
                           </span>
                         </div>

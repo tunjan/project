@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EventRole, User, CubeEvent } from '@/types';
+import { EventRole, CubeEvent } from '@/types';
 import { SelectField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
 import { UsersIcon } from '@/icons';
@@ -87,7 +87,7 @@ const RoleSignupModal: React.FC<RoleSignupModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="form-spacing">
         <div className="mb-6">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-red">
             {currentRole
               ? `You're currently signed up as: ${currentRole}. Choose a different role if you'd like to change.`
               : "Select the role you'd like to contribute in for this event."}
@@ -116,12 +116,12 @@ const RoleSignupModal: React.FC<RoleSignupModalProps> = ({
         </SelectField>
 
         {/* Role Description */}
-        <div className="card-brutal card-padding bg-neutral-50">
+        <div className="card-brutal card-padding bg-white">
           <div className="flex items-start gap-3">
             <UsersIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
             <div>
               <h4 className="mb-1 font-bold text-black">{selectedRole}</h4>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-red">
                 {getRoleInfo(selectedRole).description}
               </p>
 

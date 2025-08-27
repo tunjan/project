@@ -18,7 +18,7 @@ const MemberProfileHeader: React.FC<MemberProfileHeaderProps> = ({ user }) => {
         <h1 className="text-3xl font-extrabold text-black md:text-4xl">
           {user.name}
         </h1>
-        <p className="text-lg text-neutral-600">{getUserRoleDisplay(user)}</p>
+        <p className="text-lg text-red">{getUserRoleDisplay(user)}</p>
       </div>
     </div>
   );

@@ -8,10 +8,10 @@ import { type CubeEvent, type Chapter } from '@/types';
 import { safeFormatLocaleString } from '@/utils/date';
 
 const CustomMarkerIcon = L.divIcon({
-  html: `<div class="w-4 h-4 bg-primary border-2 border-black"></div>`,
+  html: `<div class="w-5 h-5 bg-red border-2 border-black "></div>`,
   className: '',
-  iconSize: L.point(16, 16),
-  iconAnchor: L.point(8, 8),
+  iconSize: L.point(20, 20),
+  iconAnchor: L.point(10, 10),
 });
 
 const ChangeView: React.FC<{ bounds: L.LatLngBounds | null }> = ({
@@ -37,6 +37,65 @@ const CubeMap: React.FC<CubeMapProps> = ({
   chapters,
   onSelectCube,
 }) => {
+  // Force remove rounded corners and shadows from Leaflet popups
+  useEffect(() => {
+    const forceLeafletStyles = () => {
+      const popups = document.querySelectorAll(
+        '.leaflet-popup, .leaflet-popup-content-wrapper, .leaflet-popup-tip'
+      );
+      popups.forEach((popup) => {
+        if (popup instanceof HTMLElement) {
+          popup.style.borderRadius = '0';
+          popup.style.webkitBorderRadius = '0';
+          popup.style.boxShadow = 'none';
+          popup.style.webkitBoxShadow = 'none';
+          popup.style.filter = 'none';
+          popup.style.webkitFilter = 'none';
+        }
+      });
+    };
+
+    // Apply styles immediately
+    forceLeafletStyles();
+
+    // Set up a mutation observer to catch dynamically created popups
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof HTMLElement) {
+              if (
+                node.classList.contains('leaflet-popup') ||
+                node.classList.contains('leaflet-popup-content-wrapper') ||
+                node.classList.contains('leaflet-popup-tip')
+              ) {
+                forceLeafletStyles();
+              }
+              // Also check child elements
+              const popupElements = node.querySelectorAll(
+                '.leaflet-popup, .leaflet-popup-content-wrapper, .leaflet-popup-tip'
+              );
+              if (popupElements.length > 0) {
+                forceLeafletStyles();
+              }
+            }
+          });
+        }
+      });
+    });
+
+    // Start observing
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Cleanup
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const eventMarkers = useMemo(() => {
     return events
       .map((event) => {
@@ -60,7 +119,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
   }, [eventMarkers]);
 
   return (
-    <div className="h-[600px] w-full border border-black bg-white">
+    <div className="h-[600px] w-full border-2 border-black bg-white">
       <MapContainer
         center={[20, 0] as [number, number]}
         zoom={2}
@@ -75,20 +134,26 @@ const CubeMap: React.FC<CubeMapProps> = ({
         {eventMarkers.map(({ event, coords }) => (
           <Marker key={event.id} position={coords} icon={CustomMarkerIcon}>
             <Popup>
-              <div className="font-sans">
-                <h3 className="mb-1 text-base font-extrabold text-black">
-                  {event.location}
-                </h3>
-                <p className="m-0 text-sm text-neutral-600">{event.city}</p>
-                <p className="m-0 my-1 text-sm text-neutral-800">
-                  {safeFormatLocaleString(event.startDate, {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  })}
-                </p>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-bold leading-tight text-black">
+                    {event.location}
+                  </h3>
+                  <p className="text-sm font-semibold uppercase tracking-wide text-neutral-secondary">
+                    {event.city}
+                  </p>
+                </div>
+                <div className="border-t-2 border-black pt-3">
+                  <p className="text-sm font-medium text-neutral">
+                    {safeFormatLocaleString(event.startDate, {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    })}
+                  </p>
+                </div>
                 <button
                   onClick={() => onSelectCube(event)}
-                  className="mt-2 w-full cursor-pointer border-none bg-primary p-1 font-bold text-white hover:bg-primary-hover"
+                  className="w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:bg-black hover:shadow-brutal"
                 >
                   View Details
                 </button>

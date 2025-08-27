@@ -28,7 +28,7 @@ const ViewToggleButton: React.FC<{
     className={`flex items-center space-x-2 border px-3 py-1.5 text-sm font-semibold ${
       isActive
         ? 'border-black bg-black text-white'
-        : 'border-black bg-white text-black hover:bg-neutral-100'
+        : 'border-black bg-white text-black hover:bg-white'
     } transition-colors duration-200`}
   >
     {children}
@@ -121,7 +121,7 @@ const CubeListPage: React.FC = () => {
             </button>
           )}
         </div>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
           {eventTimeView === 'upcoming'
             ? 'Find an event near you and join the movement.'
             : 'A history of our actions. Organizers can select an event to log reports.'}
@@ -149,7 +149,7 @@ const CubeListPage: React.FC = () => {
         {}
         <div className="relative w-full md:w-auto">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <SearchIcon className="h-5 w-5 text-neutral-600" />
+            <SearchIcon className="text-grey-500 h-5 w-5" />
           </div>
           <input
             type="text"
@@ -220,7 +220,7 @@ const CubeListPage: React.FC = () => {
           <h3 className="text-xl font-bold">
             No {eventTimeView} events found for this region.
           </h3>
-          <p className="mt-2 text-neutral-500">
+          <p className="text-white0 mt-2">
             Check back later or change your filter selection.
           </p>
         </div>

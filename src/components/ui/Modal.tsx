@@ -65,13 +65,13 @@ const Modal: React.FC<ModalProps> = ({
                 {title}
               </h2>
               {description && (
-                <p className="mt-1 text-sm text-neutral-600">{description}</p>
+                <p className="mt-1 text-sm text-red">{description}</p>
               )}
             </div>
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="-m-2 p-2 text-black hover:bg-neutral-100"
+                className="-m-2 p-2 text-black hover:bg-white"
                 aria-label="Close modal"
               >
                 <XIcon className="h-6 w-6" />

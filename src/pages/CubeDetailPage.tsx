@@ -17,7 +17,7 @@ const CubeDetailPage: React.FC = () => {
     return (
       <div className="py-16 text-center">
         <h1 className="text-2xl font-bold">Event Not Found</h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="text-grey-600 mt-2">
           The event you are looking for does not exist.
         </p>
         <button

@@ -14,9 +14,7 @@ const TabButton: React.FC<{
   <button
     onClick={onClick}
     className={`w-full border-r-2 border-black px-4 py-3 text-sm font-extrabold uppercase tracking-wider transition-colors duration-200 last:border-b-0 last:border-r-0 md:w-auto md:last:border-b-0 ${
-      isActive
-        ? 'bg-black text-white'
-        : 'bg-white text-black hover:bg-neutral-100'
+      isActive ? 'bg-black text-white' : 'bg-white text-black hover:bg-white'
     }`}
   >
     {children}
@@ -45,7 +43,7 @@ const LeaderboardPage: React.FC = () => {
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Leaderboards
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600">
+        <p className="text-grey-500 mx-auto mt-3 max-w-2xl text-lg">
           See who our most dedicated activists are. Your stats are highlighted.
         </p>
       </div>

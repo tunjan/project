@@ -16,7 +16,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <button
       onClick={() => onNotificationClick(notification)}
-      className="w-full p-3 text-left transition-colors duration-200 hover:bg-neutral-100"
+      className="w-full p-3 text-left transition-colors duration-200 hover:bg-white"
     >
       <div className="flex items-start space-x-3">
         {!notification.isRead && (
@@ -30,7 +30,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <p className="text-sm leading-tight text-black">
             {notification.message}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-white0">
             {safeFormatLocaleString(notification.createdAt)}
           </p>
         </div>
@@ -66,16 +66,24 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
+  // Prevent clicks inside the modal from bubbling up to the backdrop
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - positioned behind the modal */}
       <div
-        className="animate-fade-in fixed inset-0 z-40 bg-black bg-opacity-50"
+        className="fixed inset-0 z-40 bg-black bg-opacity-50"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Modal - positioned above the backdrop */}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onClick={handleModalClick}
+      >
         <div className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-white shadow-brutal">
           <div className="flex items-center justify-between border-b-2 border-black p-3">
             <h3 className="font-bold text-black">Notifications</h3>
@@ -88,7 +96,7 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
                   Mark all as read
                 </button>
               )}
-              <button onClick={onClose} className="p-1 hover:bg-neutral-100">
+              <button onClick={onClose} className="p-1 hover:bg-white">
                 <XIcon className="h-5 w-5" />
               </button>
             </div>
@@ -106,8 +114,8 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
                   />
                 ))
             ) : (
-              <div className="p-8 text-center text-neutral-500">
-                <BellIcon className="mx-auto h-8 w-8 text-neutral-300" />
+              <div className="p-8 text-center text-white0">
+                <BellIcon className="mx-auto h-8 w-8 text-red" />
                 <p className="mt-2 text-sm">You have no notifications.</p>
               </div>
             )}

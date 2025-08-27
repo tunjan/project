@@ -44,7 +44,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
         <h3 className="text-lg font-bold uppercase tracking-wider text-black">
           No inventory items
         </h3>
-        <p className="mt-2 font-mono text-sm text-neutral-600">
+        <p className="text-grey-600 mt-2 font-mono text-sm">
           This chapter hasn't added any inventory items yet.
         </p>
         {canManageInventory && (
@@ -67,7 +67,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="h-section">{chapterName} Inventory</h2>
-            <p className="font-mono text-sm uppercase tracking-wider text-neutral-600">
+            <p className="text-grey-600 font-mono text-sm uppercase tracking-wider">
               {inventory.length} item types • {totalItems} total items
             </p>
           </div>
@@ -117,7 +117,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
           <h3 className="text-lg font-bold uppercase tracking-wider text-black">
             No {filter.toLowerCase()} found
           </h3>
-          <p className="mt-2 font-mono text-sm text-neutral-600">
+          <p className="text-grey-600 mt-2 font-mono text-sm">
             Try a different category.
           </p>
         </div>

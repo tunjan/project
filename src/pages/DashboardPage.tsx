@@ -47,29 +47,25 @@ const TaskItem: React.FC<TaskItemProps> = ({
   urgent = false,
 }) => (
   <div
-    className={`border-2 border-black bg-white p-4 ${urgent ? 'border-orange-500 bg-orange-50' : ''}`}
+    className={`border-2 border-black bg-white p-4 ${urgent ? 'border-red bg-white' : ''}`}
   >
     <div className="flex items-start justify-between">
       <div className="flex items-start gap-3">
-        <div className={`${urgent ? 'text-orange-600' : 'text-primary'}`}>
-          {icon}
-        </div>
+        <div className={`${urgent ? 'text-red' : 'text-primary'}`}>{icon}</div>
         <div className="flex-1">
           <h3 className="flex items-center gap-2 font-bold text-black">
             {title}
             {count !== undefined && (
               <span
                 className={`rounded-none px-2 py-0.5 text-xs font-bold ${
-                  urgent
-                    ? 'bg-orange-200 text-orange-800'
-                    : 'bg-neutral-200 text-neutral-800'
+                  urgent ? 'bg-red text-black' : 'bg-white text-black'
                 }`}
               >
                 {count}
               </span>
             )}
           </h3>
-          <p className="mt-1 text-sm text-neutral-600">{description}</p>
+          <p className="text-grey-600 mt-1 text-sm">{description}</p>
         </div>
       </div>
       {action && (
@@ -254,7 +250,7 @@ const DashboardPage: React.FC = () => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Welcome back, {currentUser.name.split(' ')[0]}!
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
+        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
           Here's what needs your attention today. Use the search bar below to
           find anything on the platform.
         </p>
@@ -280,7 +276,7 @@ const DashboardPage: React.FC = () => {
                       <h3 className="text-lg font-bold text-black">
                         {nextEvent.location}
                       </h3>
-                      <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
+                      <div className="text-grey-600 mt-1 flex items-center gap-4 text-sm">
                         <span className="flex items-center gap-1">
                           <ClockIcon className="h-4 w-4" />
                           {safeFormatLocaleDate(nextEvent.startDate)}
@@ -302,11 +298,11 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <CalendarIcon className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
+                <CalendarIcon className="text-grey-500 mx-auto mb-3 h-12 w-12" />
                 <h3 className="mb-2 font-bold text-black">
                   No upcoming events
                 </h3>
-                <p className="mb-4 text-sm text-neutral-600">
+                <p className="text-grey-600 mb-4 text-sm">
                   Find a cube near you or create one yourself.
                 </p>
                 <button
@@ -332,9 +328,9 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <CheckCircleIcon className="mx-auto mb-3 h-12 w-12 text-green-500" />
+                <CheckCircleIcon className="text-white0 mx-auto mb-3 h-12 w-12" />
                 <h3 className="mb-2 font-bold text-black">All caught up!</h3>
-                <p className="text-sm text-neutral-600">
+                <p className="text-grey-600 text-sm">
                   No pending tasks require your attention.
                 </p>
               </div>
@@ -366,7 +362,7 @@ const DashboardPage: React.FC = () => {
                 {relevantAnnouncements.map((announcement) => (
                   <div
                     key={announcement.id}
-                    className="border border-neutral-200 bg-white p-4"
+                    className="border-2 border-black bg-white p-4"
                   >
                     <div className="flex items-start gap-3">
                       <MegaphoneIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
@@ -374,14 +370,14 @@ const DashboardPage: React.FC = () => {
                         <h3 className="text-sm font-semibold text-black">
                           {announcement.title}
                         </h3>
-                        <p className="mt-1 line-clamp-2 text-xs text-neutral-600">
+                        <p className="text-grey-600 mt-1 line-clamp-2 text-xs">
                           {announcement.content}
                         </p>
                         <div className="mt-2 flex items-center justify-between">
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-white0 text-xs">
                             {safeFormatLocaleDate(announcement.createdAt)}
                           </span>
-                          <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium">
+                          <span className="rounded bg-white px-2 py-0.5 text-xs font-medium">
                             {announcement.scope}
                           </span>
                         </div>
@@ -398,10 +394,8 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <MegaphoneIcon className="mx-auto mb-2 h-8 w-8 text-neutral-400" />
-                <p className="text-sm text-neutral-600">
-                  No recent announcements
-                </p>
+                <MegaphoneIcon className="text-grey-500 mx-auto mb-2 h-8 w-8" />
+                <p className="text-grey-600 text-sm">No recent announcements</p>
               </div>
             )}
           </section>
@@ -414,7 +408,7 @@ const DashboardPage: React.FC = () => {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/cubes')}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-neutral-50"
+                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-white"
               >
                 <div className="flex items-center gap-3">
                   <MapPinIcon className="h-5 w-5 text-primary" />
@@ -423,7 +417,7 @@ const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/outreach')}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-neutral-50"
+                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-white"
               >
                 <div className="flex items-center gap-3">
                   <PencilIcon className="h-5 w-5 text-primary" />
@@ -432,7 +426,7 @@ const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate(`/members/${currentUser.id}`)}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-neutral-50"
+                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-white"
               >
                 <div className="flex items-center gap-3">
                   <UsersIcon className="h-5 w-5 text-primary" />
