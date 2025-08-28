@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
 import { useNavItems } from '@/hooks/useNavItems';
-import useSearch from '@/hooks/useSearch';
 import { LoginIcon, UserAddIcon, MenuIcon, XIcon, SearchIcon } from '@/icons';
-import SearchResults from './SearchResults';
 import NotificationBell from './NotificationBell';
 import UserMenu from './UserMenu';
+import { useSearchActions } from '@/store/search.store';
 
 const NavLinkStyled: React.FC<{
   to: string;
@@ -38,27 +37,9 @@ const NavLinkStyled: React.FC<{
 const Header: React.FC = () => {
   const currentUser = useCurrentUser();
   const navItems = useNavItems();
+  const { open: openSearch } = useSearchActions();
 
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [isSearchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchRef = useRef<HTMLDivElement>(null);
-  const { users, chapters, events, loading } = useSearch(searchQuery);
-
-  // Close search popover on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setSearchOpen(false);
-        setSearchQuery('');
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [searchRef]);
 
   // Lock body scroll for mobile menu
   useEffect(() => {
@@ -70,8 +51,6 @@ const Header: React.FC = () => {
 
   const closeMenus = () => {
     setMenuOpen(false);
-    setSearchOpen(false);
-    setSearchQuery('');
   };
 
   return (
@@ -90,12 +69,8 @@ const Header: React.FC = () => {
             {currentUser ? (
               <>
                 <button
-                  onClick={() => setSearchOpen((v) => !v)}
-                  className={`relative border-2 p-2 transition-colors ${
-                    isSearchOpen
-                      ? 'border-black bg-white'
-                      : 'border-transparent hover:border-black focus:border-black'
-                  }`}
+                  onClick={openSearch}
+                  className="relative border-2 border-transparent p-2 transition-colors hover:border-black focus:border-black"
                   aria-label="Open search"
                 >
                   <SearchIcon className="h-6 w-6" />
@@ -131,35 +106,7 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {isSearchOpen && (
-        <div
-          className="border-b-2 border-black bg-white p-4"
-          ref={searchRef}
-        >
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="h-5 w-5 text-neutral-500" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search users, chapters, events..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-none border-2 border-black bg-white py-2 pl-10 pr-4 text-sm font-bold text-black placeholder:font-normal focus:border-primary focus:outline-none"
-              autoFocus
-            />
-            {searchQuery && (
-              <SearchResults
-                users={users}
-                chapters={chapters}
-                events={events}
-                loading={loading}
-                onClose={closeMenus}
-              />
-            )}
-          </div>
-        </div>
-      )}
+
 
       {isMenuOpen && (
         <div

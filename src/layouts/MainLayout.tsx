@@ -4,14 +4,29 @@ import Header from '@/components/header/Header';
 import Sidebar from '@/components/header/Sidebar';
 import { Toaster } from 'sonner';
 import { useUsersActions } from '@/store';
+import CommandPalette from '@/components/search/CommandPalette';
+import { useSearchActions } from '@/store/search.store';
 
 const MainLayout: React.FC = () => {
   const { init } = useUsersActions();
+  const { open } = useSearchActions();
 
   // Initialize store when layout mounts
   useEffect(() => {
     init();
   }, [init]);
+
+  // Add global keyboard shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        open();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -37,6 +52,7 @@ const MainLayout: React.FC = () => {
         }}
         theme="light"
       />
+      <CommandPalette />
       <main className="max-w-7xl flex-1 px-4 sm:px-6 lg:ml-64 lg:px-8">
         <Outlet />
       </main>
