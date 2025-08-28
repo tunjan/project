@@ -1,17 +1,4 @@
 import { BadgeTemplate } from './types';
-import {
-  MOCK_USERS,
-  MOCK_CUBE_EVENTS,
-  MOCK_CHAPTERS,
-  MOCK_ANNOUNCEMENTS,
-  MOCK_RESOURCES,
-  MOCK_ACCOMMODATION_REQUESTS,
-  MOCK_OUTREACH_LOGS,
-  MOCK_EVENT_COMMENTS,
-  MOCK_CHALLENGES,
-  MOCK_NOTIFICATIONS,
-  MOCK_BADGE_AWARDS,
-} from './mockData';
 
 /**
  * ============================================================================
@@ -65,20 +52,11 @@ export const BADGE_TEMPLATES: BadgeTemplate[] = [
 
 /**
  * ============================================================================
- *                           MOCK DATA RE-EXPORTS
+ *                           MOCK DATA SERVICE
  * ============================================================================
- * This section re-exports the auto-generated data from `mockData.ts` under
- * simpler, more consistent names for use throughout the application,
- * particularly in the Zustand store (`appStore.ts`).
+ * Mock data is now provided by the mockDataService instead of static imports.
+ * Use the service functions to fetch data dynamically.
+ * 
+ * Example:
+ * import { getUsers, getEvents, getChapters } from '@/services/mockDataService';
  */
-export const USERS = MOCK_USERS;
-export const CUBE_EVENTS = MOCK_CUBE_EVENTS;
-export const CHAPTERS = MOCK_CHAPTERS;
-export const ANNOUNCEMENTS = MOCK_ANNOUNCEMENTS;
-export const RESOURCES = MOCK_RESOURCES;
-export const ACCOMMODATION_REQUESTS = MOCK_ACCOMMODATION_REQUESTS;
-export const OUTREACH_LOGS = MOCK_OUTREACH_LOGS;
-export const EVENT_COMMENTS = MOCK_EVENT_COMMENTS;
-export const CHALLENGES_DATA = MOCK_CHALLENGES;
-export const NOTIFICATIONS = MOCK_NOTIFICATIONS;
-export const BADGE_AWARDS = MOCK_BADGE_AWARDS;

@@ -15,7 +15,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 try:
-    from api.mock_data.index import generate_mock_data
+    from api.mock_data import generate_mock_data
 except ImportError:
     print("❌ Could not import mock data generator. Make sure all dependencies are installed.")
     print("Run: pip install -r requirements.txt")
