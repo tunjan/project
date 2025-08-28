@@ -102,6 +102,7 @@ const DashboardPage: React.FC = () => {
   const [showScheduleCallModal, setShowScheduleCallModal] = useState(false);
   const [selectedOrganiserId, setSelectedOrganiserId] = useState<string>('');
   const [callWhen, setCallWhen] = useState<string>(''); // datetime-local string
+  const [contactInfo, setContactInfo] = useState('');
 
   useEffect(() => {
     if (!currentUser) {
@@ -411,10 +412,32 @@ const DashboardPage: React.FC = () => {
                   className="w-full border-2 border-black bg-white p-2"
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="contact-info"
+                  className="mb-1 block text-sm font-semibold text-black"
+                >
+                  Contact Info (e.g., WhatsApp, Instagram, Zoom Link)
+                </label>
+                <input
+                  id="contact-info"
+                  type="text"
+                  value={contactInfo}
+                  onChange={(e) => setContactInfo(e.target.value)}
+                  className="w-full border-2 border-black bg-white p-2"
+                  placeholder="How can the organizer reach you?"
+                  required
+                />
+              </div>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
-                    if (!selectedOrganiserId || !callWhen) return;
+                    if (!selectedOrganiserId || !callWhen || !contactInfo) {
+                      toast.error(
+                        'Please fill all fields to schedule the call.'
+                      );
+                      return;
+                    }
                     if (
                       currentUser.onboardingStatus ===
                       OnboardingStatus.AWAITING_REVISION_CALL
@@ -422,18 +445,21 @@ const DashboardPage: React.FC = () => {
                       scheduleRevisionCall(
                         currentUser.id,
                         selectedOrganiserId,
-                        new Date(callWhen)
+                        new Date(callWhen),
+                        contactInfo
                       );
                     } else {
                       scheduleOnboardingCall(
                         currentUser.id,
                         selectedOrganiserId,
-                        new Date(callWhen)
+                        new Date(callWhen),
+                        contactInfo
                       );
                     }
                     setShowScheduleCallModal(false);
+                    setContactInfo('');
                   }}
-                  disabled={!selectedOrganiserId || !callWhen}
+                  disabled={!selectedOrganiserId || !callWhen || !contactInfo}
                   className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover disabled:opacity-50"
                 >
                   Schedule

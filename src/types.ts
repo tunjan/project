@@ -125,6 +125,8 @@ export interface User {
     selectedOrganiserId?: string;
     onboardingCallScheduledAt?: Date;
     revisionCallScheduledAt?: Date;
+    onboardingCallContactInfo?: string;
+    revisionCallContactInfo?: string;
   };
   joinDate?: Date;
   organizerNotes?: OrganizerNote[];

@@ -83,9 +83,9 @@ export interface UsersActions {
   updateUserOrganiserOf: (userId: string, newOrganiserOf: string[]) => void;
   updateProfile: (userId: string, updatedData: Partial<User>) => void;
   // Onboarding progress actions
-  scheduleOnboardingCall: (userId: string, organiserId: string, when: Date) => void;
+  scheduleOnboardingCall: (userId: string, organiserId: string, when: Date, contactInfo: string) => void;
   confirmWatchedMasterclass: (userId: string) => void;
-  scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => void;
+  scheduleRevisionCall: (userId: string, organiserId: string, when: Date, contactInfo: string) => void;
   deleteUser: (userIdToDelete: string) => Promise<void>;
   addOrganizerNote: (targetUserId: string, noteContent: string, author: User) => void;
   editOrganizerNote: (
@@ -412,7 +412,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       },
 
       // Schedule a revision call with selected organiser and time
-      scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => {
+      scheduleRevisionCall: (userId: string, organiserId: string, when: Date, contactInfo: string) => {
         const currentUser = get().users.find((u) => u.id === userId);
         const organiser = get().users.find((u) => u.id === organiserId);
 
@@ -438,6 +438,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               ...(u.onboardingProgress || {}),
               selectedOrganiserId: organiserId,
               revisionCallScheduledAt: when,
+              revisionCallContactInfo: contactInfo,
             };
             const updatedUser = { ...u, onboardingProgress: progress };
             if (useAuthStore.getState().currentUser?.id === userId) {
@@ -460,14 +461,14 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         useNotificationsStore.getState().addNotification({
           userId: organiserId,
           type: NotificationType.EVENT_UPDATED, // Re-using a relevant type
-          message: `${currentUser.name} has scheduled a revision call with you for ${when.toLocaleString()}.`,
+          message: `${currentUser.name} scheduled a revision call for ${when.toLocaleString()}. Contact: ${contactInfo}`,
           linkTo: `/manage/member/${userId}`,
           relatedUser: currentUser,
         });
       },
 
       // Schedule the initial onboarding call
-      scheduleOnboardingCall: (userId, organiserId, when) => {
+      scheduleOnboardingCall: (userId, organiserId, when, contactInfo) => {
         const currentUser = get().users.find((u) => u.id === userId);
         const organiser = get().users.find((u) => u.id === organiserId);
         if (!currentUser || !organiser || currentUser.onboardingStatus !== OnboardingStatus.PENDING_ONBOARDING_CALL) {
@@ -481,6 +482,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               ...(u.onboardingProgress || {}),
               selectedOrganiserId: organiserId,
               onboardingCallScheduledAt: when,
+              onboardingCallContactInfo: contactInfo,
             };
             const updatedUser = { ...u, onboardingProgress: progress };
             if (useAuthStore.getState().currentUser?.id === userId) {
@@ -503,7 +505,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         useNotificationsStore.getState().addNotification({
           userId: organiserId,
           type: NotificationType.EVENT_UPDATED,
-          message: `${currentUser.name} has scheduled an onboarding call with you for ${when.toLocaleString()}.`,
+          message: `${currentUser.name} scheduled an onboarding call for ${when.toLocaleString()}. Contact: ${contactInfo}`,
           linkTo: `/manage/member/${userId}`,
           relatedUser: currentUser,
         });
