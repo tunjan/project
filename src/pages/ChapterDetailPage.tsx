@@ -14,8 +14,6 @@ import {
   type User,
   AnnouncementScope,
   Role,
-  CubeEvent,
-  EventStatus,
 } from '@/types';
 import { getChapterStats } from '@/utils/analytics';
 import {
@@ -26,7 +24,6 @@ import {
   ChevronLeftIcon,
   InstagramIcon,
   PlusIcon,
-  CalendarIcon,
 } from '@/icons';
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
