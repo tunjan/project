@@ -134,7 +134,7 @@ const OutreachLogPage: React.FC = () => {
         )}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* --- Left Column: Actions & Personal Stats --- */}
         <div className="space-y-8 lg:col-span-1">
           <QuickLogForm
@@ -150,7 +150,7 @@ const OutreachLogPage: React.FC = () => {
         </div>
 
         {/* --- Right Column: Data & History --- */}
-        <div className="space-y-8 lg:col-span-2">
+        <div className="space-y-8 lg:col-span-1">
           <section>
             <h2 className="h-section">
               {view === 'personal' ? 'Your Tally' : 'Team Tally'}

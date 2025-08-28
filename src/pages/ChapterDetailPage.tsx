@@ -275,7 +275,7 @@ const ChapterDetailPage: React.FC = () => {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-1">
             <div>
               <h2 className="mb-4 text-xl font-bold text-black">Organisers</h2>
