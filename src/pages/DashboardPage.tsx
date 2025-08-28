@@ -87,7 +87,11 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const allUsers = useUsers();
-  const { confirmWatchedMasterclass, scheduleRevisionCall, scheduleOnboardingCall } = useUsersActions();
+  const {
+    confirmWatchedMasterclass,
+    scheduleRevisionCall,
+    scheduleOnboardingCall,
+  } = useUsersActions();
   const allEvents = useEvents();
   const announcements = useAnnouncementsState();
   const notifications = useNotificationsState();
@@ -123,9 +127,10 @@ const DashboardPage: React.FC = () => {
     if (
       (currentUser.onboardingStatus ===
         OnboardingStatus.AWAITING_REVISION_CALL &&
-      !progress.revisionCallScheduledAt) || 
-      (currentUser.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL &&
-      !progress.onboardingCallScheduledAt)
+        !progress.revisionCallScheduledAt) ||
+      (currentUser.onboardingStatus ===
+        OnboardingStatus.PENDING_ONBOARDING_CALL &&
+        !progress.onboardingCallScheduledAt)
     ) {
       setShowScheduleCallModal(true);
       return;
@@ -329,7 +334,10 @@ const DashboardPage: React.FC = () => {
                     setShowMasterclassModal(false);
                     // If this advances to revision phase, open scheduling
                     setTimeout(() => {
-                      if (currentUser?.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL) {
+                      if (
+                        currentUser?.onboardingStatus ===
+                        OnboardingStatus.AWAITING_REVISION_CALL
+                      ) {
                         setShowScheduleCallModal(true);
                       }
                     }, 0);
@@ -351,7 +359,12 @@ const DashboardPage: React.FC = () => {
 
         {showScheduleCallModal && currentUser && (
           <Modal
-            title={currentUser.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL ? "Schedule Revision Call" : "Schedule Onboarding Call"}
+            title={
+              currentUser.onboardingStatus ===
+              OnboardingStatus.AWAITING_REVISION_CALL
+                ? 'Schedule Revision Call'
+                : 'Schedule Onboarding Call'
+            }
             description="Pick an organiser and time for your call."
             onClose={() => setShowScheduleCallModal(false)}
             size="md"
@@ -405,14 +418,21 @@ const DashboardPage: React.FC = () => {
                 <button
                   onClick={() => {
                     if (!selectedOrganiserId || !callWhen) return;
-                    if(currentUser.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL){
+                    if (
+                      currentUser.onboardingStatus ===
+                      OnboardingStatus.AWAITING_REVISION_CALL
+                    ) {
                       scheduleRevisionCall(
                         currentUser.id,
                         selectedOrganiserId,
                         new Date(callWhen)
                       );
                     } else {
-                       scheduleOnboardingCall(currentUser.id, selectedOrganiserId, new Date(callWhen));
+                      scheduleOnboardingCall(
+                        currentUser.id,
+                        selectedOrganiserId,
+                        new Date(callWhen)
+                      );
                     }
                     setShowScheduleCallModal(false);
                   }}
@@ -421,7 +441,10 @@ const DashboardPage: React.FC = () => {
                 >
                   Schedule
                 </button>
-                <button onClick={() => setShowScheduleCallModal(false)} className="border-2 border-black bg-white px-4 py-2 font-semibold">
+                <button
+                  onClick={() => setShowScheduleCallModal(false)}
+                  className="border-2 border-black bg-white px-4 py-2 font-semibold"
+                >
                   Cancel
                 </button>
               </div>

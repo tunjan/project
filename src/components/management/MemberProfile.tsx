@@ -85,11 +85,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     toast.success(`${user.name} has been confirmed and now has full access.`);
   };
 
-  const handleMasterclassCompleted = () => {
-    if (!currentUser) return;
-    updateUserStatus(user.id, OnboardingStatus.AWAITING_REVISION_CALL, currentUser);
-    toast.success(`${user.name} completed the masterclass. Next: revision call.`);
-  };
+
 
   const handleRevisionCallPassed = () => {
     finalizeOnboarding(user.id);
@@ -257,13 +253,29 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         {user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL && canManageRole && (
           <section className="mb-8 border-2 border-primary bg-white p-6">
             <h2 className="mb-4 text-2xl font-bold text-black">Onboarding Call</h2>
-            <p className="mb-4 text-sm text-black">Mark the outcome of the applicant's onboarding call.</p>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleOnboardingCallPassed}
-                className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-              >
+            <p className="mb-4 text-sm text-black">Mark the outcome of the applicant's onboarding call. Passing them will move them to the "Awaiting First Cube" stage.</p>
+            <div className="flex space-x-4 border-t border-neutral-200 pt-4">
+              <button onClick={handleDeny} className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black">
+                Deny Application
+              </button>
+              <button onClick={handleOnboardingCallPassed} className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover">
                 Mark Call as Passed
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Revision Call Actions */}
+        {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL && canManageRole && (
+          <section className="mb-8 border-2 border-primary bg-white p-6">
+            <h2 className="mb-4 text-2xl font-bold text-black">Revision Call</h2>
+            <p className="mb-4 text-sm text-black">This is the final step. Passing them will fully confirm their account and grant activist permissions.</p>
+            <div className="flex space-x-4 border-t border-neutral-200 pt-4">
+              <button onClick={handleDeny} className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black">
+                 Deny Application
+              </button>
+              <button onClick={handleRevisionCallPassed} className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover">
+                Mark Revision Call Passed & Confirm
               </button>
             </div>
           </section>
@@ -282,37 +294,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           </section>
         )}
 
-        {/* Masterclass Actions */}
-        {user.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS && canManageRole && (
-          <section className="mb-8 border-2 border-primary bg-white p-6">
-            <h2 className="mb-4 text-2xl font-bold text-black">Masterclass</h2>
-            <p className="mb-4 text-sm text-black">Mark the masterclass as completed for this user.</p>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleMasterclassCompleted}
-                className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-              >
-                Mark Masterclass Completed
-              </button>
-            </div>
-          </section>
-        )}
 
-        {/* Revision Call Actions */}
-        {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL && canManageRole && (
-          <section className="mb-8 border-2 border-primary bg-white p-6">
-            <h2 className="mb-4 text-2xl font-bold text-black">Revision Call</h2>
-            <p className="mb-4 text-sm text-black">Mark the revision call as passed to fully verify the user.</p>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleRevisionCallPassed}
-                className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-              >
-                Mark Revision Call Passed
-              </button>
-            </div>
-          </section>
-        )}
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
