@@ -15,13 +15,14 @@ const AtRiskMembersSnapshot: React.FC = () => {
     if (!currentUser) return [];
 
     // Determine the members this user can see
-    const visibleMembers = allUsers.filter(user => 
-      currentUser.role === 'Global Admin' || 
-      user.chapters?.some(c => currentUser.organiserOf?.includes(c))
+    const visibleMembers = allUsers.filter(
+      (user) =>
+        currentUser.role === 'Global Admin' ||
+        user.chapters?.some((c) => currentUser.organiserOf?.includes(c))
     );
 
     // Filter for inactive members among the visible ones
-    return visibleMembers.filter(user => isUserInactive(user, allEvents));
+    return visibleMembers.filter((user) => isUserInactive(user, allEvents));
   }, [currentUser, allUsers, allEvents]);
 
   const handleSelectUser = (user: User) => {
@@ -30,23 +31,31 @@ const AtRiskMembersSnapshot: React.FC = () => {
 
   if (atRiskMembers.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-center text-grey-600">
+      <div className="text-grey-600 flex h-full items-center justify-center text-center">
         <p>No at-risk members found. Great job!</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 overflow-y-auto" style={{ maxHeight: '300px' }}>
-      {atRiskMembers.map(user => (
-        <div 
-          key={user.id} 
-          className="flex items-center justify-between rounded-lg p-2 hover:bg-gray-100 cursor-pointer"
+    <div className="divide-y-2 divide-black overflow-y-auto" style={{ maxHeight: '300px' }}>
+      {atRiskMembers.map((user) => (
+        <button
+          key={user.id}
+          className="flex w-full cursor-pointer items-center justify-between p-3 text-left transition-colors hover:bg-primary-lightest"
           onClick={() => handleSelectUser(user)}
         >
-          <p className="font-semibold">{user.name}</p>
-          <p className="text-sm text-grey-500">{user.chapters?.join(', ')}</p>
-        </div>
+          <div className="flex items-center gap-3">
+            <img src={user.profilePictureUrl} alt={user.name} className="h-8 w-8 object-cover" />
+            <div>
+              <p className="font-semibold">{user.name}</p>
+              <p className="text-xs text-neutral-500">
+                Last login: {new Date(user.lastLogin).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          <p className="text-sm font-semibold text-neutral-600">{user.chapters?.join(', ')}</p>
+        </button>
       ))}
     </div>
   );

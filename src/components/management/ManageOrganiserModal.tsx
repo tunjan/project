@@ -146,7 +146,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
         description="You don't have permission to manage this user."
       >
         <div className="my-6 text-center">
-          <p className="font-semibold text-red">
+          <p className="font-semibold text-danger">
             You don't have permission to manage {organiser.name}.
           </p>
         </div>
@@ -170,8 +170,8 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           />
           <div>
             <h3 className="text-lg font-bold text-black">{organiser.name}</h3>
-            <p className="text-sm text-red">{organiser.email}</p>
-            <p className="text-xs text-white">
+            <p className="text-sm text-neutral-600">{organiser.email}</p>
+            <p className="text-xs text-neutral-500">
               Current role: {organiser.role}
             </p>
           </div>
@@ -225,7 +225,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                   <span className="font-semibold text-black">
                     {chapter.name}
                   </span>
-                  <span className="text-sm text-white">
+                  <span className="text-sm text-neutral-500">
                     ({chapter.country})
                   </span>
                 </label>
@@ -259,7 +259,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                       {chapterName}
                     </span>
                     {chapter && (
-                      <span className="text-xs text-white">
+                      <span className="text-xs text-neutral-500">
                         {chapter.country}
                       </span>
                     )}

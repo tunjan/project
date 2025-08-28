@@ -24,12 +24,12 @@ const BadgeAwardCard: React.FC<BadgeAwardCardProps> = ({
           <IconComponent className="h-7 w-7" />
         </div>
         <div className="flex-grow">
-          <p className="text-sm text-white">
+          <p className="text-sm text-neutral-600">
             Awarded by{' '}
             <span className="font-bold text-black">{award.awarder.name}</span>
           </p>
           <p className="text-lg font-bold text-black">{award.badge.name}</p>
-          <p className="text-sm text-red">{award.badge.description}</p>
+          <p className="text-sm text-neutral-600">{award.badge.description}</p>
         </div>
       </div>
       <div className="mt-4 flex items-center space-x-2 border-t border-black pt-3">

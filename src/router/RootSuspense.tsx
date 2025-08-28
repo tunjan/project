@@ -6,8 +6,9 @@ import FeedbackButton from '@/components/FeedbackButton';
 const RootSuspense = () => (
   <Suspense
     fallback={
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen flex-col items-center justify-center gap-4">
         <LoadingSpinner size="lg" />
+        <p className="font-bold text-neutral-600">Loading Hub...</p>
       </div>
     }
   >

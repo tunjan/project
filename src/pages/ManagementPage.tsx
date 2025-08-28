@@ -1,7 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Responsive, WidthProvider } from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
 import {
@@ -40,6 +37,7 @@ import ChapterHealthSnapshot from '@/components/dashboard/ChapterHealthSnapshot'
 import AtRiskMembersSnapshot from '@/components/dashboard/AtRiskMembersSnapshot';
 import ReviewApplicantModal from '@/components/management/ReviewApplicantModal';
 import NextEventWidget from '@/components/dashboard/NextEventWidget';
+import ChapterRequestQueue from '@/components/management/ChapterRequestQueue';
 
 type ManagementView =
   | 'dashboard'
@@ -79,7 +77,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
 
   return (
     <button
-      className={`card-brutal card-padding ${priorityStyles[priority]} w-full cursor-pointer text-left transition-all hover:scale-[1.02] hover:shadow-brutal-lg`}
+      className={`card-brutal card-padding ${priorityStyles[priority]} w-full cursor-pointer text-left transition-all hover:scale-[1.02] hover:shadow-brutal-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -87,14 +85,19 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
           onClick();
         }
       }}
+      aria-label={`${title}: ${description}`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
-          <div className="text-2xl text-primary">{icon}</div>
+          <div className="text-2xl text-primary" aria-hidden="true">
+            {icon}
+          </div>
           <div>
             <div className="mb-2 flex items-center gap-2">
               <h3 className="h-card">{title}</h3>
-              <span className="tag-brutal">{count}</span>
+              <span className="tag-brutal" aria-label={`${count} items`}>
+                {count}
+              </span>
             </div>
             <p className="text-grey-600 text-sm">{description}</p>
           </div>
@@ -111,100 +114,60 @@ const TabButton: React.FC<{
 }> = ({ onClick, isActive, children }) => (
   <button
     onClick={onClick}
-    className={`flex w-full items-center space-x-3 border-l-4 p-4 text-left text-sm font-bold transition-colors duration-200 ${
+    className={`flex flex-1 items-center justify-center gap-2 border-b-4 px-2 py-3 text-sm font-bold transition-colors duration-200 md:flex-none md:justify-start md:border-b-0 md:border-l-4 md:px-4 md:py-3 ${
       isActive
-        ? 'border-primary bg-white text-black'
-        : 'border-transparent hover:border-black hover:bg-white hover:text-black'
+        ? 'border-primary text-primary md:bg-white md:text-black'
+        : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-black md:border-transparent md:hover:border-black md:hover:bg-white'
     }`}
   >
     {children}
   </button>
 );
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
-
 const Dashboard: React.FC<{
   tasks: ManagementTaskProps[];
   showChapterHealth: boolean;
 }> = ({ tasks, showChapterHealth }) => {
-  const layout = useMemo(() => {
-    const baseLayout = [
-      { i: 'tasks', x: 0, y: 0, w: 1, h: 2, minH: 2, minW: 1 },
-      { i: 'events', x: 1, y: 0, w: 1, h: 2, minH: 2, minW: 1 },
-      { i: 'leaderboard', x: 0, y: 2, w: 1, h: 2, minH: 2, minW: 1 },
-    ];
-
-    if (showChapterHealth) {
-      baseLayout.push({
-        i: 'chapterHealth',
-        x: 1,
-        y: 2,
-        w: 1,
-        h: 2,
-        minH: 2,
-        minW: 1,
-      });
-      baseLayout.push({
-        i: 'atRiskMembers',
-        x: 0,
-        y: 3,
-        w: 2,
-        h: 2,
-        minH: 2,
-        minW: 1,
-      });
-    }
-
-    return baseLayout;
-  }, [showChapterHealth]);
-
   return (
-    <ResponsiveGridLayout
-      className="layout"
-      layouts={{ lg: layout }}
-      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 2, md: 2, sm: 1, xs: 1, xxs: 1 }}
-      rowHeight={200}
-      draggableHandle=".h-card-brutal"
-    >
-      <div key="tasks">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="lg:col-span-1">
         <Widget title="Actionable Tasks">
           <div className="space-y-4">
             {tasks.length > 0 ? (
               tasks.map((task) => <ManagementTask key={task.title} {...task} />)
             ) : (
-              <p className="text-grey-600">
+              <p className="text-neutral-600">
                 No actionable tasks at the moment.
               </p>
             )}
           </div>
         </Widget>
       </div>
-      <div key="events">
+      <div className="lg:col-span-1">
         <Widget title="Upcoming Events">
           <NextEventWidget />
         </Widget>
       </div>
-      <div key="leaderboard">
-        <Widget title="Leaderboard">
+      <div className="lg:col-span-1">
+        <Widget title="Leaderboard Snapshot">
           <LeaderboardSnapshot />
         </Widget>
       </div>
       {showChapterHealth && (
-        <div key="chapterHealth">
-          <Widget title="Chapter Health">
-            <ChapterHealthSnapshot />
-          </Widget>
-        </div>
+        <>
+          <div className="lg:col-span-1">
+            <Widget title="Chapter Health">
+              <ChapterHealthSnapshot />
+            </Widget>
+          </div>
+          <div className="lg:col-span-2">
+            <Widget title="At-Risk Members">
+              <AtRiskMembersSnapshot />
+            </Widget>
+          </div>
+        </>
       )}
-      {showChapterHealth && (
-        <div key="atRiskMembers">
-          <Widget title="At-Risk Members">
-            <AtRiskMembersSnapshot />
-          </Widget>
-        </div>
-      )}
-    </ResponsiveGridLayout>
+    </div>
   );
 };
 
@@ -265,27 +228,6 @@ const ManagementPage: React.FC = () => {
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 
   const newApplicants = useMemo(() => {
-    // Debug: Log all users and their statuses
-    console.log('All Users Debug:', {
-      totalUsers: allUsers.length,
-      usersByStatus: allUsers.reduce(
-        (acc, user) => {
-          const status = user.onboardingStatus;
-          if (!acc[status]) acc[status] = [];
-          acc[status].push({
-            id: user.id,
-            name: user.name,
-            chapters: user.chapters,
-          });
-          return acc;
-        },
-        {} as Record<
-          string,
-          Array<{ id: string; name: string; chapters: string[] }>
-        >
-      ),
-    });
-
     if (!currentUser) return [];
 
     // Get the chapters this user can manage
@@ -312,72 +254,57 @@ const ManagementPage: React.FC = () => {
         u.chapters?.some((c) => managedChapterNames.has(c))
     );
 
-    // TEMPORARY: Add a test applicant if none exist (remove after debugging)
-    if (
-      filteredApplicants.length === 0 &&
-      currentUser.role !== Role.APPLICANT
-    ) {
-      console.log(
-        'No applicants found, checking if we can create a test one...'
-      );
-      const testApplicant = allUsers.find(
-        (u) =>
-          u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-      );
-      if (testApplicant) {
-        console.log('Found test applicant:', testApplicant);
-        // Check if we can assign them to a managed chapter
-        const availableChapters = Array.from(managedChapterNames);
-        if (availableChapters.length > 0) {
-          console.log('Available chapters for test:', availableChapters);
-        }
-      }
-    }
-
-    // Debug logging
-    console.log('New Applicants Debug:', {
-      currentUser: currentUser.name,
-      role: currentUser.role,
-      organiserOf: currentUser.organiserOf,
-      managedCountry: currentUser.managedCountry,
-      managedChapters: Array.from(managedChapterNames),
-      totalUsers: allUsers.length,
-      pendingReviewUsers: allUsers.filter(
-        (u) =>
-          u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-      ),
-      filteredApplicants: filteredApplicants,
-      allChapters: allChapters.map((c) => ({
-        name: c.name,
-        country: c.country,
-      })),
-    });
-
     return filteredApplicants;
   }, [currentUser, allUsers, allChapters]);
 
   const dashboardTasks: ManagementTaskProps[] = useMemo(() => {
-    // Debug logging for dashboard tasks
-    console.log('Dashboard Tasks Debug:', {
-      currentUser: currentUser?.name,
-      newApplicantsLength: newApplicants.length,
-      newApplicants: newApplicants,
-      shouldShowTasks: currentUser && newApplicants.length > 0,
-    });
+    if (!currentUser) return [];
 
-    if (!currentUser || newApplicants.length === 0) return [];
+    const tasks: ManagementTaskProps[] = [];
 
-    return [
-      {
+    // New applicants task
+    if (newApplicants.length > 0) {
+      tasks.push({
         icon: <UserGroupIcon className="h-8 w-8" />,
         title: 'New Applicants to Review',
         count: newApplicants.length,
         description: 'Review and approve new applicants to the platform.',
         onClick: () => setReviewModalOpen(true),
         priority: 'high',
-      },
-    ];
-  }, [currentUser, newApplicants]);
+      });
+    }
+
+    // Chapter join requests task (only for chapters the user can manage)
+    const managedChapterNames = new Set<string>(
+      currentUser.role === 'Global Admin'
+        ? allChapters.map((c) => c.name)
+        : currentUser.organiserOf || []
+    );
+    if (
+      currentUser.role === Role.REGIONAL_ORGANISER &&
+      currentUser.managedCountry
+    ) {
+      allChapters
+        .filter((c) => c.country === currentUser.managedCountry)
+        .forEach((c) => managedChapterNames.add(c.name));
+    }
+    const pendingJoinRequestsCount = chapterJoinRequests.filter((req) =>
+      managedChapterNames.has(req.chapterName)
+    ).length;
+
+    if (pendingJoinRequestsCount > 0) {
+      tasks.push({
+        icon: <ClipboardCheckIcon className="h-8 w-8" />,
+        title: 'Chapter Join Requests',
+        count: pendingJoinRequestsCount,
+        description: 'Activists are waiting to join your chapter(s).',
+        onClick: () => setView('pipeline'),
+        priority: 'high',
+      });
+    }
+
+    return tasks;
+  }, [currentUser, newApplicants, allChapters, chapterJoinRequests]);
 
   const {
     visibleMembers,
@@ -492,6 +419,7 @@ const ManagementPage: React.FC = () => {
   const dashboardTasksWithInactive: ManagementTaskProps[] = useMemo(() => {
     if (inactiveMembersCount > 0) {
       return [
+        ...dashboardTasks,
         {
           icon: <TrendingUpIcon className="h-8 w-8" />,
           title: 'Inactive Members to Re-engage',
@@ -538,10 +466,16 @@ const ManagementPage: React.FC = () => {
         );
       case 'pipeline':
         return (
-          <OnboardingPipeline
-            users={onboardingUsers}
-            onNavigate={handleSelectUser}
-          />
+          <div className="space-y-8">
+            <ChapterRequestQueue
+              requests={visibleChapterJoinRequests}
+              currentUser={currentUser}
+            />
+            <OnboardingPipeline
+              users={onboardingUsers}
+              onNavigate={handleSelectUser}
+            />
+          </div>
         );
       case 'members':
         return (
@@ -645,78 +579,66 @@ const ManagementPage: React.FC = () => {
             Oversee activists, chapters, and onboarding processes.
           </p>
         </div>
-        {/* Debug button - remove after testing */}
-        <button
-          onClick={() => {
-            console.log('Debug Info:', {
-              currentUser: currentUser,
-              allUsers: allUsers,
-              newApplicants: newApplicants,
-              dashboardTasks: dashboardTasks,
-            });
-          }}
-          className="btn-info btn-sm"
-        >
-          Debug Info
-        </button>
       </div>
 
-      <div className="mb-8 border-2 border-black">
-        <nav className="flex flex-row space-x-2 overflow-x-auto border border-black bg-white p-2 md:flex-col md:space-x-0 md:space-y-1 md:p-2">
-          <TabButton
-            onClick={() => handleViewChange('dashboard')}
-            isActive={view === 'dashboard'}
-          >
-            <HomeIcon className="h-5 w-5 flex-shrink-0" />
-            <span className="flex-grow">Priority Tasks</span>
-          </TabButton>
-          <TabButton
-            onClick={() => handleViewChange('pipeline')}
-            isActive={view === 'pipeline'}
-          >
-            <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
-            <span className="flex-grow">Onboarding & Requests</span>
-          </TabButton>
-          <TabButton
-            onClick={() => handleViewChange('members')}
-            isActive={view === 'members'}
-          >
-            <UserGroupIcon className="h-5 w-5 flex-shrink-0" />
-            <span className="flex-grow">Member Directory</span>
-          </TabButton>
-          {canManageChapters && (
+      <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-4">
+        <aside className="md:col-span-1">
+          <nav className="flex flex-row border-b-2 border-black bg-white md:flex-col md:border-2">
             <TabButton
-              onClick={() => handleViewChange('chapters')}
-              isActive={view === 'chapters'}
+              onClick={() => handleViewChange('dashboard')}
+              isActive={view === 'dashboard'}
             >
-              <BuildingOfficeIcon className="h-5 w-5 flex-shrink-0" />
-              <span className="flex-grow">Chapters</span>
+              <HomeIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden md:inline">Priority Tasks</span>
             </TabButton>
+            <TabButton
+              onClick={() => handleViewChange('pipeline')}
+              isActive={view === 'pipeline'}
+            >
+              <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden md:inline">Onboarding & Requests</span>
+            </TabButton>
+            <TabButton
+              onClick={() => handleViewChange('members')}
+              isActive={view === 'members'}
+            >
+              <UserGroupIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden md:inline">Member Directory</span>
+            </TabButton>
+            {canManageChapters && (
+              <TabButton
+                onClick={() => handleViewChange('chapters')}
+                isActive={view === 'chapters'}
+              >
+                <BuildingOfficeIcon className="h-5 w-5 flex-shrink-0" />
+                <span className="hidden md:inline">Chapters</span>
+              </TabButton>
+            )}
+            <TabButton
+              onClick={() => handleViewChange('inventory')}
+              isActive={view === 'inventory'}
+            >
+              <ClipboardListIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden md:inline">Inventory</span>
+            </TabButton>
+            <TabButton
+              onClick={() => handleViewChange('onboarding-health')}
+              isActive={view === 'onboarding-health'}
+            >
+              <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden md:inline">Onboarding Health</span>
+            </TabButton>
+          </nav>
+        </aside>
+        <main className="md:col-span-3">
+          {renderContent()}
+          {isReviewModalOpen && (
+            <ReviewApplicantModal
+              applicants={newApplicants}
+              onClose={() => setReviewModalOpen(false)}
+            />
           )}
-          <TabButton
-            onClick={() => handleViewChange('inventory')}
-            isActive={view === 'inventory'}
-          >
-            <ClipboardListIcon className="h-5 w-5 flex-shrink-0" />
-            <span className="flex-grow">Inventory</span>
-          </TabButton>
-          <TabButton
-            onClick={() => handleViewChange('onboarding-health')}
-            isActive={view === 'onboarding-health'}
-          >
-            <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
-            <span className="flex-grow">Onboarding Health</span>
-          </TabButton>
-        </nav>
-      </div>
-      <div>
-        {renderContent()}
-        {isReviewModalOpen && (
-          <ReviewApplicantModal
-            applicants={newApplicants}
-            onClose={() => setReviewModalOpen(false)}
-          />
-        )}
+        </main>
       </div>
     </div>
   );

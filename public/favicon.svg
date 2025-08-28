@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Vegan Action Hub">
+  <title>Vegan Action Hub</title>
+  <desc>Minimal brutalist favicon with dark-mode aware colors</desc>
+  <style>
+    :root { --bg: #ffffff; --fg: #000000; --accent: #d81313; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0b0b0b; --fg: #ffffff; --accent: #f87171; }
+    }
+  </style>
+  <rect x="2" y="2" width="60" height="60" fill="var(--bg)" stroke="var(--fg)" stroke-width="4"/>
+  <!-- V / A monogram -->
+  <path d="M16 18 L28 46 L40 18" fill="none" stroke="var(--fg)" stroke-width="5" stroke-linecap="square"/>
+  <path d="M36 46 L48 18 L54 34" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="square"/>
+</svg>

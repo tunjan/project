@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { User, Role } from '@/types';
-import { getAssignableRoles } from '@/config/permissions';
-import { toast } from 'sonner';
-import { PencilIcon, TrophyIcon, ChatBubbleLeftRightIcon } from '@/icons';
+import {
+  UserGroupIcon,
+  BuildingOfficeIcon,
+  StarIcon,
+  ChatBubbleLeftRightIcon,
+} from '@/icons';
 
 interface UserManagementPanelProps {
   user: User;
   currentUser: User;
   canEditChapters: boolean;
   canAwardBadges: boolean;
-  onUpdateRole: (userId: string, role: Role) => void;
-  onSetChapterOrganiser: (userId: string, chaptersToOrganise: string[]) => void;
+  onUpdateRole: (userId: string, newRole: Role) => void;
+  onSetChapterOrganiser: (
+    userId: string,
+    chapterName: string,
+    isOrganiser: boolean
+  ) => void;
   onOpenPromoteModal: () => void;
   onOpenEditChaptersModal: () => void;
   onOpenAwardBadgeModal: () => void;
-  onSendMessage: () => void;
+  onSendMessage: (userId: string) => void;
 }
 
 const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
@@ -23,105 +30,96 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
   canEditChapters,
   canAwardBadges,
   onUpdateRole,
+  onSetChapterOrganiser,
   onOpenPromoteModal,
   onOpenEditChaptersModal,
   onOpenAwardBadgeModal,
   onSendMessage,
 }) => {
-  const [selectedRole, setSelectedRole] = useState<Role>(user.role);
-  const assignableRoles = getAssignableRoles(currentUser);
-
-  const handleSaveRole = () => {
-    // If the selected role is Chapter Organiser, always open the modal.
-    // This handles both promotion and editing chapters for an existing organiser.
-    if (selectedRole === Role.CHAPTER_ORGANISER) {
-      onOpenPromoteModal();
-    } else if (selectedRole !== user.role) {
-      // Handle other role changes only if the role is different
-      onUpdateRole(user.id, selectedRole);
-      toast.success(`${user.name}'s role has been updated to ${selectedRole}.`);
-    }
-  };
-
   return (
-    <div>
+    <section>
       <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-        Manage User
+        User Management
       </h2>
-      <div className="space-y-6 border-2 border-black bg-white p-8">
-        <div className="border-b border-black pb-6">
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start space-x-3">
-              <ChatBubbleLeftRightIcon className="mt-1 h-6 w-6 flex-shrink-0 text-black" />
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold text-black">Send Message</h3>
-                <p className="text-red text-sm leading-relaxed">
-                  Reach out to this member directly via email
-                </p>
-              </div>
-            </div>
+      <div className="space-y-4">
+        {/* Role Management */}
+        <div className="border-2 border-black bg-white p-4">
+          <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
+            <UserGroupIcon className="h-5 w-5" />
+            Role Management
+          </h3>
+          <div className="space-y-2">
+            <p className="text-sm text-neutral-600">
+              Current Role: <span className="font-bold">{user.role}</span>
+            </p>
             <button
-              onClick={onSendMessage}
-              className="btn-info whitespace-nowrap px-6 py-3 text-sm font-semibold"
+              onClick={onOpenPromoteModal}
+              className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
             >
-              Send Email
+              Promote to Organiser
             </button>
           </div>
         </div>
 
-        <div className="pt-4">
-          <div className="mb-3 flex items-center space-x-3">
-            <PencilIcon className="h-6 w-6 flex-shrink-0 text-black" />
-            <h3 className="text-xl font-bold text-black">Assign Role</h3>
+        {/* Chapter Management */}
+        {canEditChapters && (
+          <div className="border-2 border-black bg-white p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
+              <BuildingOfficeIcon className="h-5 w-5" />
+              Chapter Management
+            </h3>
+            <div className="space-y-2">
+              <p className="text-sm text-neutral-600">
+                Chapters: {user.chapters?.join(', ') || 'None'}
+              </p>
+              <button
+                onClick={onOpenEditChaptersModal}
+                className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
+              >
+                Edit Chapters
+              </button>
+            </div>
           </div>
-          <select
-            id="role-select"
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="block w-full border-2 border-black bg-white p-3 text-sm text-black"
-          >
-            <option value={user.role} disabled>
-              {user.role} (Current)
-            </option>
-            {assignableRoles.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleSaveRole}
-            disabled={
-              selectedRole === user.role && user.role !== Role.CHAPTER_ORGANISER
-            }
-            className="w-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {user.role === Role.CHAPTER_ORGANISER &&
-            selectedRole === Role.CHAPTER_ORGANISER
-              ? 'Edit Organised Chapters'
-              : 'Save Role'}
-          </button>
+        )}
 
-          {canEditChapters && (
+        {/* Badge Management */}
+        {canAwardBadges && (
+          <div className="border-2 border-black bg-white p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
+              <StarIcon className="h-5 w-5" />
+              Badge Management
+            </h3>
+            <div className="space-y-2">
+              <p className="text-sm text-neutral-600">
+                Current Badges: {user.badges?.length || 0}
+              </p>
+              <button
+                onClick={onOpenAwardBadgeModal}
+                className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
+              >
+                Award Badge
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Communication */}
+        <div className="border-2 border-black bg-white p-4">
+          <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
+            <ChatBubbleLeftRightIcon className="h-5 w-5" />
+            Communication
+          </h3>
+          <div className="space-y-2">
             <button
-              onClick={onOpenEditChaptersModal}
-              className="mt-4 w-full border-2 border-black bg-black px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-black"
+              onClick={() => onSendMessage(user.id)}
+              className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
             >
-              Edit Chapter Memberships
+              Send Message
             </button>
-          )}
-          {canAwardBadges && (
-            <button
-              onClick={onOpenAwardBadgeModal}
-              className="border-red hover:bg-red mt-4 flex w-full items-center justify-center border-2 bg-white px-6 py-3 font-bold text-black transition-colors"
-            >
-              <TrophyIcon className="mr-2 h-6 w-6" />
-              Award Recognition
-            </button>
-          )}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

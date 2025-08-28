@@ -55,7 +55,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
     <div className="border-2 border-black bg-white">
       <div className="border-b-2 border-black p-6">
         <h2 className="text-xl font-bold text-black">Event Roster</h2>
-        <p className="text-sm text-red">
+        <p className="text-sm text-neutral-600">
           Daily breakdown of activist duties.
         </p>
       </div>
@@ -76,7 +76,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
               <div className="mt-2 space-y-3">
                 {Object.entries(dailyRoster).map(([role, users]) => (
                   <div key={role}>
-                    <p className="text-sm font-semibold uppercase tracking-wider text-white">
+                    <p className="text-sm font-semibold uppercase tracking-wider text-neutral-600">
                       {role} ({users.length})
                     </p>
                     {users.length > 0 ? (
@@ -99,7 +99,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-red">
+                      <p className="text-xs text-neutral-500">
                         No volunteers for this role.
                       </p>
                     )}

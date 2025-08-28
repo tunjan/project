@@ -1,6 +1,6 @@
 import React from 'react';
-import { type User, OnboardingStatus } from '@/types';
-import { ShieldCheckIcon } from '@/icons';
+import { User } from '@/types';
+import { ExclamationTriangleIcon, TrashIcon } from '@/icons';
 
 interface UserDangerZoneProps {
   user: User;
@@ -19,41 +19,56 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
 }) => {
   return (
     <section>
-      <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
+      <h2 className="mb-4 border-b-2 border-danger pb-2 text-2xl font-bold text-black">
         Danger Zone
       </h2>
-      <div className="space-y-4 border-2 border-primary bg-white p-6">
-        {user.onboardingStatus !== OnboardingStatus.CONFIRMED &&
-          canManuallyVerify && (
-            <div className="border-b border-primary pb-4">
-              <h3 className="text-lg font-bold text-black">
-                Bypass Onboarding Process
-              </h3>
-              <p className="mt-1 text-sm text-red">
-                Skip all onboarding steps and immediately grant full activist permissions. Use only for trusted individuals.
-              </p>
-              <button
-                onClick={onManualVerify}
-                className="btn-warning mt-2 flex w-full items-center justify-center"
-              >
-                <ShieldCheckIcon className="mr-2 h-5 w-5" />
-                Bypass Onboarding & Verify
-              </button>
-            </div>
-          )}
-        <div>
-          <h3 className="text-lg font-bold text-black">Delete User</h3>
-          <p className="mt-1 text-sm text-red">
-            This action is permanent and cannot be undone.
+      <div className="space-y-4 border-2 border-danger bg-white p-4">
+        {/* Manual Verification */}
+        {canManuallyVerify && (
+          <div className="border-2 border-warning bg-warning/10 p-4">
+            <h3 className="text-warning-700 mb-2 flex items-center gap-2 text-lg font-bold">
+              <ExclamationTriangleIcon className="h-5 w-5" />
+              Manual Verification Override
+            </h3>
+            <p className="text-warning-700 mb-3 text-sm">
+              This bypasses the entire onboarding process and immediately grants
+              full activist permissions. Only use for trusted individuals who
+              don't need standard verification steps.
+            </p>
+            <button
+              onClick={onManualVerify}
+              className="w-full bg-warning px-3 py-2 text-sm font-bold text-white hover:bg-warning/80"
+            >
+              Bypass & Verify User
+            </button>
+          </div>
+        )}
+
+        {/* Delete User */}
+        {canDeleteUser && (
+          <div className="border-2 border-danger bg-danger/10 p-4">
+            <h3 className="text-danger-700 mb-2 flex items-center gap-2 text-lg font-bold">
+              <TrashIcon className="h-5 w-5" />
+              Delete User Account
+            </h3>
+            <p className="text-danger-700 mb-3 text-sm">
+              This action permanently removes the user account and all
+              associated data. This action cannot be undone.
+            </p>
+            <button
+              onClick={onOpenDeleteModal}
+              className="w-full bg-danger px-3 py-2 text-sm font-bold text-white hover:bg-danger/80"
+            >
+              Delete User Account
+            </button>
+          </div>
+        )}
+
+        {!canManuallyVerify && !canDeleteUser && (
+          <p className="text-sm text-neutral-500">
+            You don't have permission to perform dangerous actions on this user.
           </p>
-          <button
-            onClick={onOpenDeleteModal}
-            disabled={!canDeleteUser}
-            className="btn-danger mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Delete User
-          </button>
-        </div>
+        )}
       </div>
     </section>
   );

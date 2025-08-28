@@ -87,7 +87,7 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
                   className="h-5 w-5 accent-primary"
                 />
                 <span className="font-bold text-black">{chapter.name}</span>
-                <span className="text-sm text-white">
+                <span className="text-sm text-neutral-500">
                   ({chapter.country})
                 </span>
               </label>
@@ -98,7 +98,7 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
             <p className="font-bold text-black">
               No promotable chapters found.
             </p>
-            <p className="mt-1 text-sm text-red">
+            <p className="mt-1 text-sm text-neutral-600">
               {currentUser?.role === Role.REGIONAL_ORGANISER
                 ? `This user is not a member of any chapters within your managed region (${currentUser.managedCountry}).`
                 : 'This user is not a member of any chapters.'}

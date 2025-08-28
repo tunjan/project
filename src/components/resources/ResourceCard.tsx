@@ -21,7 +21,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   const IconComponent =
     Icons[resource.icon as keyof typeof Icons] || Icons.BookOpenIcon; // Fallback to a default icon
   return (
-    <div className="flex flex-col justify-between border-2 border-black bg-white">
+    <div className="card-brutal-hover hover-raise flex flex-col justify-between border-2 border-black bg-white transition-transform">
       <div className="p-5">
         <div className="mb-3 flex items-center space-x-3">
           <div className="flex-shrink-0 bg-black p-2">

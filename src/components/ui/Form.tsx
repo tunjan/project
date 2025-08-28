@@ -28,7 +28,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputProps>(
         aria-invalid={!!error}
       />
       {isValid && !error && (
-        <div className="absolute right-2 top-8 text-success">
+        <div className="absolute right-2 top-8 text-success animate-pop-in">
           <CheckIcon className="h-5 w-5" />
         </div>
       )}
@@ -70,7 +70,7 @@ export const TextAreaField = React.forwardRef<
       aria-invalid={!!error}
     />
     {isValid && !error && (
-      <div className="absolute right-2 top-8 text-success">
+      <div className="absolute right-2 top-8 text-success animate-pop-in">
         <CheckIcon className="h-5 w-5" />
       </div>
     )}
@@ -111,7 +111,7 @@ export const SelectField = React.forwardRef<
       {children}
     </select>
     {isValid && !error && (
-      <div className="absolute right-2 top-8 text-success">
+      <div className="absolute right-2 top-8 text-success animate-pop-in">
         <CheckIcon className="h-5 w-5" />
       </div>
     )}

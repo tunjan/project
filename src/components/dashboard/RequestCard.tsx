@@ -60,7 +60,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
     <div className="border-2 border-black bg-white p-4">
       <div className="mb-3 flex flex-col justify-between border-b-2 border-black pb-3 sm:flex-row sm:items-center">
         <div className="mb-2 sm:mb-0">
-          <p className="text-sm text-white">
+          <p className="text-sm text-neutral-600">
             {isHostView ? 'Request From' : 'Request To'}
           </p>
           <div className="flex items-center space-x-2">
@@ -73,7 +73,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
           </div>
         </div>
         <div className="text-left sm:text-right">
-          <p className="text-sm text-white">For Event</p>
+          <p className="text-sm text-neutral-600">For Event</p>
           <p className="font-bold text-black">
             {request.event.location}, {request.event.city}
           </p>
@@ -101,7 +101,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
         <div className="space-y-3">
           <div>
             <p className="text-sm font-semibold text-black">Dates</p>
-            <p className="text-sm text-red">
+            <p className="text-sm text-neutral-600">
               {formatDateRange(request.startDate, request.endDate)}
             </p>
           </div>
@@ -119,7 +119,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
             onChange={(e) => setReply(e.target.value)}
             placeholder="Optional: Reply with a message..."
             rows={2}
-            className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+            className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
           />
           <div className="flex items-center space-x-2">
             <button

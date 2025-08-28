@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { differenceInDays, formatDistanceToNow } from 'date-fns';
 import { type Announcement, Role, AnnouncementScope } from '@/types';
 import { useCurrentUser } from '@/store/auth.store';
 import { useAnnouncementsActions } from '@/store/announcements.store';
@@ -26,7 +27,7 @@ const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
       text = target ? `${target.toUpperCase()} REGION` : text;
       break;
     case AnnouncementScope.CHAPTER:
-      bgColor = 'bg-white';
+      bgColor = 'bg-neutral-300';
       textColor = 'text-black';
       text = target ? `${target.toUpperCase()} CHAPTER` : text;
       break;
@@ -58,6 +59,13 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
     month: 'long',
     day: 'numeric',
   });
+
+  // Relative timestamp for recent announcements
+  const createdDate = new Date(announcement.createdAt);
+  const isRecent = differenceInDays(new Date(), createdDate) < 7;
+  const relative = isRecent
+    ? formatDistanceToNow(createdDate, { addSuffix: true })
+    : null;
 
   if (!currentUser) return null;
 
@@ -97,7 +105,9 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               target={announcement.country || announcement.chapter}
             />
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-neutral-500">{formattedDate}</p>
+              <p className="text-sm text-neutral-500" title={formattedDate}>
+                {relative ?? formattedDate}
+              </p>
               {canManage && (
                 <>
                   <button

@@ -32,6 +32,13 @@ const ResourcesPage: React.FC = () => {
     });
   }, [allResources, searchTerm, selectedType, selectedLevel, selectedLang]);
 
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSelectedType('all');
+    setSelectedLevel('all');
+    setSelectedLang('all');
+  };
+
   return (
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
@@ -63,14 +70,21 @@ const ResourcesPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="border-2 border-black bg-white p-8 text-center">
+          <div className="card-brutal card-padding text-center">
             <BookOpenIcon className="text-grey-500 mx-auto h-12 w-12" />
-            <h3 className="mt-4 text-xl font-bold text-black">
-              No resources found.
-            </h3>
-            <p className="text-white mt-2">
-              Try adjusting your search or filters.
-            </p>
+            <h3 className="mt-4 text-xl font-bold text-black">No resources found</h3>
+            <p className="mt-2 text-neutral-500">Try adjusting your search or reset filters to see everything.</p>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="btn-outline"
+                aria-label="Reset filters"
+                title="Reset filters"
+              >
+                Reset Filters
+              </button>
+            </div>
           </div>
         )}
       </div>

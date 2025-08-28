@@ -107,7 +107,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
                 ))
             ) : (
               <div className="p-8 text-center text-neutral-500">
-                <BellIcon className="mx-auto h-8 w-8 text-red" />
+                <BellIcon className="mx-auto h-8 w-8 text-neutral-400" />
                 <p className="mt-2 text-sm">You have no notifications.</p>
               </div>
             )}

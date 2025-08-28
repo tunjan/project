@@ -20,7 +20,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
         <div className="mx-auto flex h-12 w-12 items-center justify-center bg-primary">
           <TrashIcon className="h-6 w-6 text-white" />
         </div>
-        <p className="mt-4 text-sm text-red">
+        <p className="mt-4 text-sm text-danger">
           Are you sure you want to delete{' '}
           <span className="font-bold">{user.name}</span>? This action is
           permanent and cannot be undone. All associated data will be removed.

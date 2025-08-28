@@ -54,7 +54,7 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
                   <p className="text-sm font-semibold text-black">
                     {p.user.name}
                   </p>
-                                    <p className="text-xs text-red">{p.user.role}</p>
+                                    <p className="text-xs text-neutral-500">{p.user.role}</p>
                 </div>
               </li>
             ))}
@@ -87,7 +87,7 @@ const PastEventsModal: React.FC<PastEventsModalProps> = ({
           <p className="mb-4 text-neutral-600">
             No past events found for this chapter.
           </p>
-          <div className="space-y-2 text-sm text-red">
+          <div className="space-y-2 text-sm text-neutral-600">
             <p>This could be because:</p>
             <ul className="list-inside list-disc space-y-1">
               <li>The chapter hasn't held any events yet</li>

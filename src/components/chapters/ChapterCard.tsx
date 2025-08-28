@@ -35,7 +35,7 @@ const ChapterCard: React.FC<ChapterCardProps> = ({
   return (
     <button
       onClick={onSelect}
-      className="card-brutal-hover w-full transform cursor-pointer overflow-hidden text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      className="card-brutal-hover hover-raise w-full transform cursor-pointer overflow-hidden text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
     >
       <div className="p-6">
         <p className="text-sm font-semibold uppercase tracking-wide text-primary">

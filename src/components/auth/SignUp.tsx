@@ -107,7 +107,7 @@ const SignUp: React.FC<SignUpProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Join the Movement
           </h1>
-          <p className="text-red mt-2">
+          <p className="text-neutral-600 mt-2">
             Complete the application below. An organizer from your selected
             chapter will review it.
           </p>
@@ -220,7 +220,7 @@ const SignUp: React.FC<SignUpProps> = ({
             </button>
           </div>
 
-          <p className="text-red text-center text-sm">
+          <p className="text-neutral-600 text-center text-sm">
             Already have an account?{' '}
             <button
               type="button"

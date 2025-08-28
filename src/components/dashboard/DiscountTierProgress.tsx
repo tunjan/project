@@ -51,7 +51,7 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
 
       {progress ? (
         <div className="space-y-4">
-          <p className="text-sm font-semibold text-red">
+          <p className="text-sm font-semibold text-neutral-600">
             Progress to {nextTier}:
           </p>
           {progress.cubes && (
@@ -81,7 +81,7 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
           <p className="font-bold text-black">
             You've reached the highest tier!
           </p>
-          <p className="text-sm text-red">
+          <p className="text-sm text-neutral-600">
             Thank you for your incredible dedication.
           </p>
         </div>

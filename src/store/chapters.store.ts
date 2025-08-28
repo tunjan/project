@@ -99,10 +99,9 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
         const request = get().chapterJoinRequests.find((r) => r.id === requestId);
         if (!request) return;
 
+        // Remove the request from the queue after approving it to reflect a processed queue
         set((state) => ({
-          chapterJoinRequests: state.chapterJoinRequests.map((r) =>
-            r.id === requestId ? { ...r, status: 'Approved' } : r
-          ),
+          chapterJoinRequests: state.chapterJoinRequests.filter((r) => r.id !== requestId),
         }));
 
         // Update user's chapters

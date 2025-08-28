@@ -207,7 +207,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         {user.onboardingStatus ===
           OnboardingStatus.PENDING_APPLICATION_REVIEW &&
           user.onboardingAnswers && (
-            <section className="border-red mb-8 border-2 bg-white p-6">
+            <section className="border-warning mb-8 border-2 bg-white p-6">
               <h2 className="mb-4 text-2xl font-bold text-black">
                 Applicant Review
               </h2>

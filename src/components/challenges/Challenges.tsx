@@ -19,7 +19,7 @@ const Challenges = () => {
           <h3 className="mt-4 text-xl font-bold text-black">
             No Active Challenges
           </h3>
-          <p className="text-white mt-2">
+          <p className="text-neutral-600 mt-2">
             Check back later for new team-based challenges!
           </p>
         </div>
@@ -51,7 +51,7 @@ const Challenges = () => {
                 <p className="text-grey-600 mb-4 mt-2 text-sm">
                   {challenge.description}
                 </p>
-                <div className="text-white flex items-center text-sm">
+                <div className="text-neutral-600 flex items-center text-sm">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   <span>
                     Ends: {new Date(challenge.endDate).toLocaleDateString()}

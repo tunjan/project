@@ -29,7 +29,7 @@ const MemberRow: React.FC<{
   return (
     <button
       onClick={() => onSelectUser(user)}
-      className="group flex w-full items-center justify-between p-4 text-left transition-colors duration-200 hover:bg-white"
+      className="group flex w-full items-center justify-between p-4 text-left transition-colors duration-200 hover:bg-neutral-100"
     >
       <div className="flex items-center space-x-4">
         <img
@@ -43,7 +43,7 @@ const MemberRow: React.FC<{
           </p>
           <p className="text-sm text-neutral-500">{chapterText}</p>
           {isPendingForCurrentChapter && (
-            <p className="text-xs font-medium text-red">
+            <p className="text-xs font-medium text-warning">
               ⏳ Pending Chapter Join Request
             </p>
           )}
@@ -51,14 +51,14 @@ const MemberRow: React.FC<{
       </div>
       <div className="flex items-center space-x-4">
         {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE && (
-          <span className="hidden bg-red px-2 py-1 text-xs font-bold text-white sm:block">
+          <span className="hidden bg-warning px-2 py-1 text-xs font-bold text-white sm:block">
             AWAITING FIRST CUBE
           </span>
         )}
         <span className="hidden text-sm font-semibold text-black md:block">
           {user.role}
         </span>
-        <ChevronRightIcon className="h-5 w-5 text-red transition-colors group-hover:text-black" />
+        <ChevronRightIcon className="h-5 w-5 text-primary transition-colors group-hover:text-black" />
       </div>
     </button>
   );
@@ -113,14 +113,14 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
           <div className="lg:col-span-4">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="h-5 w-5 text-red" />
+                <SearchIcon className="h-5 w-5 text-primary" />
               </div>
               <input
                 type="text"
                 placeholder="Search members by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border border-black bg-white p-2 pl-10 text-black placeholder:text-red focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                className="block w-full rounded-none border border-black bg-white p-2 pl-10 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               />
             </div>
           </div>
@@ -169,6 +169,11 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
           </SelectField>
         </div>
       </div>
+      <div className="border-b-2 border-black bg-neutral-100 p-2 text-center text-sm font-semibold">
+        <p>
+          Showing {filteredMembers.length} of {members.length} members
+        </p>
+      </div>
       {filteredMembers.length > 0 ? (
         <div className="max-h-[70vh] overflow-y-auto">
           <div className="divide-y-2 divide-black">
@@ -193,7 +198,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       ) : (
         <div className="p-16 text-center">
           <p className="text-lg font-bold">No members found.</p>
-          <p className="mt-2 text-white">
+          <p className="mt-2 text-neutral-600">
             Try adjusting your search or filter selection.
           </p>
         </div>

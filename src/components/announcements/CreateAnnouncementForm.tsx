@@ -95,6 +95,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            autoFocus
           />
           <TextAreaField
             label="Content"

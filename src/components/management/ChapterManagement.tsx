@@ -94,7 +94,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                   const organizers =
                     chapterOrganizersMap.get(chapter.name) || [];
                   return (
-                    <li key={chapter.name} className="p-4 hover:bg-white">
+                    <li key={chapter.name} className="p-4 transition-colors hover:bg-primary-lightest">
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="font-bold">{chapter.name}</span>
@@ -105,14 +105,14 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => setEditingChapter(chapter)}
-                            className="p-1 text-neutral-500 hover:text-black"
+                            className="rounded-none p-2 text-neutral-500 transition-colors hover:bg-black hover:text-white"
                             aria-label="Edit Chapter"
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => openDeleteModal(chapter.name)}
-                            className="p-1 text-neutral-500 hover:text-red"
+                            className="rounded-none p-2 text-neutral-500 transition-colors hover:bg-danger hover:text-white"
                             aria-label="Delete Chapter"
                           >
                             <TrashIcon className="h-4 w-4" />
@@ -129,7 +129,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                               <button
                                 key={org.id}
                                 onClick={() => setManagingOrganiser(org)}
-                                className="flex cursor-pointer items-center space-x-2 bg-white p-1 pr-2 transition-colors hover:bg-white"
+                                className="flex cursor-pointer items-center space-x-2 rounded-none border border-black bg-white p-1 pr-2 transition-colors hover:bg-neutral-100"
                                 title={`Click to manage ${org.name}`}
                               >
                                 <img

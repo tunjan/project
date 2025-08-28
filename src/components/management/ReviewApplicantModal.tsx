@@ -78,9 +78,15 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   };
 
   const handleNext = () => {
-    setRemainingApplicants((prev) => prev.slice(1));
+    setRemainingApplicants((prev) => {
+      const next = prev.slice(1);
+      // Close the modal when there are no more applicants to review
+      if (next.length === 0) {
+        onClose();
+      }
+      return next;
+    });
     setNote('');
-    if (remainingApplicants.length <= 1) onClose();
   };
 
   const modalTitle = `Review Applicants (${applicants.length - remainingApplicants.length + 1} of ${
@@ -97,7 +103,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
             alt={currentApplicant.name}
             className="h-24 w-24 flex-shrink-0 border-2 border-black object-cover"
           />
-          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-4 ">
             <ApplicantDetail
               icon={<UserCircleIcon className="h-5 w-5" />}
               label="Name"

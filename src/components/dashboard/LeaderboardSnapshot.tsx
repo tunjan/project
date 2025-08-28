@@ -16,14 +16,17 @@ const LeaderboardSnapshot: React.FC = () => {
     const currentYear = new Date().getFullYear();
 
     const chapterMembers = allUsers.filter((user: User) =>
-      user.chapters?.some(c => currentUser.chapters.includes(c))
+      user.chapters?.some((c) => currentUser.chapters.includes(c))
     );
 
     const getMonthlyHours = (userId: string) => {
       return allEvents.reduce((total: number, event: CubeEvent) => {
         if (event.report?.attendance[userId] === 'Attended') {
           const eventDate = new Date(event.startDate);
-          if (eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear) {
+          if (
+            eventDate.getMonth() === currentMonth &&
+            eventDate.getFullYear() === currentYear
+          ) {
             return total + (event.report.hours || 0);
           }
         }
@@ -32,13 +35,14 @@ const LeaderboardSnapshot: React.FC = () => {
     };
 
     const rankedUsers = chapterMembers
-      .map(user => ({
+      .map((user) => ({
         ...user,
         monthlyHours: getMonthlyHours(user.id),
       }))
       .sort((a, b) => b.monthlyHours - a.monthlyHours);
 
-    const rank = rankedUsers.findIndex(user => user.id === currentUser.id) + 1;
+    const rank =
+      rankedUsers.findIndex((user) => user.id === currentUser.id) + 1;
 
     return {
       rank,
@@ -49,22 +53,26 @@ const LeaderboardSnapshot: React.FC = () => {
 
   if (!userRank || userRank.hours === 0) {
     return (
-        <div className="flex h-full flex-col items-center justify-center text-center">
-          <TrophyIcon className="h-12 w-12 text-grey-400 mb-4" />
-          <h3 className="font-bold">No activity this month</h3>
-          <p className="text-sm text-grey-600">Log some hours to get on the board!</p>
-        </div>
+      <div className="flex h-full flex-col items-center justify-center text-center">
+        <TrophyIcon className="text-grey-400 mb-4 h-12 w-12" />
+        <h3 className="font-bold">No activity this month</h3>
+        <p className="text-grey-600 text-sm">
+          Log some hours to get on the board!
+        </p>
+      </div>
     );
   }
 
   return (
-      <div className="flex h-full flex-col items-center justify-center text-center">
-        <TrophyIcon className="h-16 w-16 text-yellow" />
-        <p className="mt-4 text-lg">You are</p>
-        <h3 className="text-5xl font-bold">#{userRank.rank}</h3>
-        <p className="text-lg">out of {userRank.total} activists</p>
-        <p className="mt-2 text-sm text-grey-600">with {userRank.hours.toFixed(1)} hours this month.</p>
-      </div>
+    <div className="flex h-full flex-col items-center justify-center text-center">
+      <TrophyIcon className="h-16 w-16 text-yellow" />
+      <p className="mt-4 text-lg">You are</p>
+      <h3 className="text-5xl font-bold">#{userRank.rank}</h3>
+      <p className="text-lg">out of {userRank.total} activists</p>
+      <p className="text-grey-600 mt-2 text-sm">
+        with {userRank.hours.toFixed(1)} hours this month.
+      </p>
+    </div>
   );
 };
 

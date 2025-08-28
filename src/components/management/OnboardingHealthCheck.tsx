@@ -88,14 +88,14 @@ const OnboardingHealthCheck: React.FC = () => {
       </div>
 
       {/* Status Overview */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         {Object.entries(statusCounts).map(([status, count]) => (
           <div
             key={status}
-            className="border-2 border-black bg-white p-4 text-center"
+            className="border-2 border-black bg-white p-4 text-center transition-all hover:bg-neutral-100"
           >
             <div className="text-2xl font-bold text-black">{count}</div>
-            <div className="text-grey-600 text-sm">{status}</div>
+            <div className="text-xs text-neutral-600">{status}</div>
           </div>
         ))}
       </div>
