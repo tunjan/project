@@ -49,7 +49,7 @@ The application is built with a modern, brutalist design aesthetic and features 
 - **UI Components:** [FullCalendar](https://fullcalendar.io/), [Sonner](https://sonner.emilkowal.ski/) (for toasts)
 - **Testing:** [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/)
 - **Linting & Formatting:** [ESLint](https://eslint.org/) & [Prettier](https://prettier.io/)
-- **Mock Data:** Advanced Python pipeline using [Faker](https://faker.readthedocs.io/en/master/)
+- **Mock Data:** TypeScript-based generation using [@faker-js/faker](https://fakerjs.dev/)
 
 ## 🚀 Getting Started
 
@@ -59,7 +59,6 @@ Follow these instructions to set up and run the project locally.
 
 - [Node.js](https://nodejs.org/) (v18 or later)
 - [npm](https://www.npmjs.com/)
-- [Python 3](https://www.python.org/) (for mock data generation)
 
 ### Installation & Setup
 
@@ -78,12 +77,11 @@ Follow these instructions to set up and run the project locally.
     -   There are no required environment variables to run the application locally as it uses mock data. If you add services that require API keys, create a `.env.local` file.
 
 4.  **Generate mock data:**
-    -   The application relies on a generated TypeScript file for all its data. Run the enhanced Python script to create it.
-    -   (Optional) Install Python dependencies if needed: `pip install faker nanoid-py`
+    -   The application relies on a generated TypeScript file for all its data. Run the TypeScript script to create it.
     ```bash
-    python generate_mock_data_enhanced.py
+    npm run generate-data
     ```
-    This will create `src/mockData.ts` which is imported by the application's state management.
+    This will create `src/data/mockData.ts` which is imported by the application's state management.
 
 5.  **Run the development server:**
     ```bash
@@ -100,22 +98,17 @@ Follow these instructions to set up and run the project locally.
 -   `npm run coverage`: Runs tests and generates a coverage report.
 -   `npm run lint`: Lints the codebase using ESLint.
 -   `npm run format`: Formats all files using Prettier.
+-   `npm run generate-data`: Generates mock data using the TypeScript script.
 
 ## 📊 Mock Data Generation
 
-This project includes a sophisticated, modular Python script (`generate_mock_data_enhanced.py`) to create realistic and deeply interconnected mock data.
+This project includes a sophisticated TypeScript script (`scripts/generate-mock-data.ts`) to create realistic and deeply interconnected mock data using `@faker-js/faker`.
 
 **Key Features:**
 -   **Realistic Data:** Generates users with varied activity levels, roles, and chapter affiliations.
 -   **Data Relationships:** Creates logical connections between users, events, and chapters.
--   **Configurable:** Easily change the number of users, chapters, events, etc. via environment variables.
--   **Multiple Scenarios:** Includes predefined scenarios like `small_test`, `large_production`, etc.
--   **Multiple Export Formats:** Can output to TypeScript (default), JSON, CSV, and SQLite.
-
-To run with custom parameters:
-```bash
-MOCK_CHAPTERS=10 MOCK_USERS=100 python generate_mock_data_enhanced.py
-```
+-   **TypeScript Native:** Runs directly within your Node.js environment without needing Python.
+-   **Typed Output:** Generates a fully typed `mockData.ts` file, ensuring type safety throughout the application.
 
 For more details, see the [Mock Data Documentation](./README_MOCK_DATA.md).
 

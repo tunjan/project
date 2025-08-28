@@ -14,7 +14,8 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/data/*": ["./src/data/*"]
     },
     "noEmit": true,
     "strict": true,

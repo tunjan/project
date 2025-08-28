@@ -1,4 +1,4 @@
-import { type Chapter, type User, type CubeEvent, type OutreachLog, type Announcement, type Resource, type Notification, type BadgeAward, type InventoryItem, type Challenge, Role, OnboardingStatus, EventStatus } from '@/types';
+import { type Chapter, type User, type CubeEvent, type OutreachLog, type Announcement, type Resource, type Notification, type BadgeAward, type InventoryItem, type Challenge, Role, OnboardingStatus } from '@/types';
 
 export interface MockDataResponse {
   chapters: Chapter[];
@@ -25,11 +25,11 @@ class MockDataService {
   private cacheTimestamps: Map<string, number> = new Map();
 
   /**
-   * Fetch mock data from the Vercel API
-   * Defaults to 'minimal' scenario for fastest response
+   * Fetch mock data from static generated data
+   * No more broken API calls - uses local data directly
    */
   async fetchMockData(options: MockDataOptions = {}): Promise<MockDataResponse> {
-    const { scenario = 'minimal', cache = true } = options;
+    const { scenario = 'default', cache = true } = options;
     const cacheKey = `mock_data_${scenario}`;
 
     // Check cache first
@@ -42,32 +42,23 @@ class MockDataService {
     }
 
     try {
-      // In development, use localhost, in production use current domain
-      const baseUrl = process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : window.location.origin;
+      console.log('📊 Loading mock data from static files...');
 
-      console.log('🚀 Fetching fresh mock data from API...');
-      const url = `${baseUrl}/api/mock-data?scenario=${scenario}`;
+      // Import the static mock data directly
+      const mockData = await import('../data/mockData');
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: MockDataResponse = await response.json();
+      const data: MockDataResponse = {
+        chapters: mockData.chapters || [],
+        users: mockData.users || [],
+        events: mockData.events || [],
+        outreachLogs: mockData.outreachLogs || [],
+        announcements: mockData.announcements || [],
+        resources: mockData.resources || [],
+        notifications: mockData.notifications || [],
+        badges: mockData.badgeAwards || [],
+        inventory: mockData.inventory || [],
+        challenges: mockData.challenges || [],
+      };
 
       // Cache the response
       if (cache) {
@@ -76,20 +67,13 @@ class MockDataService {
         console.log('💾 Mock data cached');
       }
 
+      console.log(`✅ Loaded ${data.users.length} users, ${data.chapters.length} chapters, ${data.events.length} events`);
       return data;
 
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          console.error('⏰ API request timed out, using fallback data');
-        } else {
-          console.error('❌ Failed to fetch mock data:', error.message);
-        }
-      } else {
-        console.error('❌ Failed to fetch mock data:', error);
-      }
+      console.error('❌ Failed to load mock data:', error);
 
-      // Return fallback data if API fails
+      // Return fallback data if import fails
       return this.getFallbackData();
     }
   }
@@ -114,86 +98,52 @@ class MockDataService {
   }
 
   /**
-   * Get fallback data when API is unavailable
-   * This provides minimal data for development and testing
+   * Get fallback data if everything else fails
    */
   private getFallbackData(): MockDataResponse {
-    console.log('🔄 Using minimal fallback mock data');
+    console.log('🔄 Using fallback mock data');
 
     return {
       chapters: [
         {
-          name: 'London',
-          country: 'United Kingdom',
-          lat: 51.5074,
-          lng: -0.1278,
-          instagram: '@london_activists',
+          name: 'Fallback Chapter',
+          country: 'United States',
+          lat: 40.7128,
+          lng: -74.0060,
+          instagram: '@fallback_chapter'
         }
       ],
       users: [
         {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          instagram: '@johndoe',
-          chapters: ['London'],
-          onboardingStatus: OnboardingStatus.CONFIRMED,
+          id: 'fallback-user',
+          name: 'Fallback User',
+          email: 'fallback@example.com',
           role: Role.ACTIVIST,
-          joinDate: new Date(),
+          chapters: ['Fallback Chapter'],
+          onboardingStatus: OnboardingStatus.CONFIRMED,
+          profilePictureUrl: 'https://i.pravatar.cc/150?u=fallback',
+          joinDate: new Date('2023-01-01'),
+          lastLogin: new Date(),
           stats: {
-            totalHours: 0,
-            cubesAttended: 0,
-            veganConversions: 0,
-            totalConversations: 0,
-            cities: ['London'],
+            totalHours: 10,
+            cubesAttended: 2,
+            veganConversions: 1,
+            totalConversations: 5,
+            cities: ['Fallback Chapter']
           },
-          profilePictureUrl: '',
           badges: [],
           hostingAvailability: false,
-          lastLogin: new Date(),
+          hostingCapacity: 1
         }
       ],
-      events: [
-        {
-          id: '1',
-          name: 'Sample Cube Event',
-          city: 'London',
-          location: 'Central London',
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 2 * 60 * 60 * 1000),
-          scope: 'Chapter' as const,
-          organizer: {
-            id: '1',
-            name: 'John Doe',
-            email: 'john@example.com',
-            instagram: '@johndoe',
-            chapters: ['London'],
-            onboardingStatus: OnboardingStatus.CONFIRMED,
-            role: Role.ACTIVIST,
-            joinDate: new Date(),
-            stats: {
-              totalHours: 0,
-              cubesAttended: 0,
-              veganConversions: 0,
-              totalConversations: 0,
-              cities: ['London'],
-            },
-            profilePictureUrl: '',
-            badges: [],
-            hostingAvailability: false,
-            lastLogin: new Date(),
-          },
-          participants: [],
-          status: EventStatus.UPCOMING,
-        }
-      ],
+      events: [],
       outreachLogs: [],
       announcements: [],
       resources: [],
       notifications: [],
       badges: [],
       inventory: [],
-      challenges: [],
+      challenges: []
     };
   }
 
@@ -251,7 +201,6 @@ class MockDataService {
   }
 }
 
-// Export singleton instance
 export const mockDataService = new MockDataService();
 
 // Export individual functions for convenience

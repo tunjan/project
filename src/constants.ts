@@ -50,13 +50,3 @@ export const BADGE_TEMPLATES: BadgeTemplate[] = [
   },
 ];
 
-/**
- * ============================================================================
- *                           MOCK DATA SERVICE
- * ============================================================================
- * Mock data is now provided by the mockDataService instead of static imports.
- * Use the service functions to fetch data dynamically.
- * 
- * Example:
- * import { getUsers, getEvents, getChapters } from '@/services/mockDataService';
- */
