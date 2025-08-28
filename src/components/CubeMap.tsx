@@ -28,14 +28,14 @@ const ChangeView: React.FC<{ bounds: L.LatLngBounds | null }> = ({
 interface CubeMapProps {
   events: CubeEvent[];
   chapters: Chapter[];
-  onSelectEvent: (event: CubeEvent) => void;
+  onSelectCube: (event: CubeEvent) => void;
   popupActionText?: string;
 }
 
 const CubeMap: React.FC<CubeMapProps> = ({
   events,
   chapters,
-  onSelectEvent,
+  onSelectCube,
   popupActionText = 'View Event',
 }) => {
   const [tileError, setTileError] = useState(false);
@@ -196,7 +196,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
                   </p>
                 </div>
                 <button
-                  onClick={() => onSelectEvent(event)}
+                  onClick={() => onSelectCube(event)}
                   className="w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:bg-black hover:shadow-brutal"
                 >
                   {popupActionText}
