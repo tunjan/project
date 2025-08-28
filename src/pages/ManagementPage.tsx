@@ -265,6 +265,17 @@ const ManagementPage: React.FC = () => {
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 
   const newApplicants = useMemo(() => {
+    // Debug: Log all users and their statuses
+    console.log('All Users Debug:', {
+      totalUsers: allUsers.length,
+      usersByStatus: allUsers.reduce((acc, user) => {
+        const status = user.onboardingStatus;
+        if (!acc[status]) acc[status] = [];
+        acc[status].push({ id: user.id, name: user.name, chapters: user.chapters });
+        return acc;
+      }, {} as Record<string, Array<{ id: string; name: string; chapters: string[] }>>)
+    });
+
     if (!currentUser) return [];
 
     // Get the chapters this user can manage
@@ -284,30 +295,57 @@ const ManagementPage: React.FC = () => {
         .forEach((c) => managedChapterNames.add(c.name));
     }
 
-    const filteredApplicants = allUsers.filter(
-      (u) =>
-        u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW &&
-        // Only show applicants for chapters the current user can manage
-        u.chapters?.some((c) => managedChapterNames.has(c))
-    );
+            const filteredApplicants = allUsers.filter(
+          (u) =>
+            u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW &&
+            // Only show applicants for chapters the current user can manage
+            u.chapters?.some((c) => managedChapterNames.has(c))
+        );
 
-    // Debug logging
-    console.log('New Applicants Debug:', {
-      currentUser: currentUser.name,
-      role: currentUser.role,
-      managedChapters: Array.from(managedChapterNames),
-      totalUsers: allUsers.length,
-      pendingReviewUsers: allUsers.filter(
-        (u) =>
-          u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-      ),
-      filteredApplicants: filteredApplicants,
-    });
+        // TEMPORARY: Add a test applicant if none exist (remove after debugging)
+        if (filteredApplicants.length === 0 && currentUser.role !== Role.APPLICANT) {
+          console.log('No applicants found, checking if we can create a test one...');
+          const testApplicant = allUsers.find(u => 
+            u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+          );
+          if (testApplicant) {
+            console.log('Found test applicant:', testApplicant);
+            // Check if we can assign them to a managed chapter
+            const availableChapters = Array.from(managedChapterNames);
+            if (availableChapters.length > 0) {
+              console.log('Available chapters for test:', availableChapters);
+            }
+          }
+        }
+
+            // Debug logging
+        console.log('New Applicants Debug:', {
+          currentUser: currentUser.name,
+          role: currentUser.role,
+          organiserOf: currentUser.organiserOf,
+          managedCountry: currentUser.managedCountry,
+          managedChapters: Array.from(managedChapterNames),
+          totalUsers: allUsers.length,
+          pendingReviewUsers: allUsers.filter(
+            (u) =>
+              u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+          ),
+          filteredApplicants: filteredApplicants,
+          allChapters: allChapters.map(c => ({ name: c.name, country: c.country }))
+        });
 
     return filteredApplicants;
   }, [currentUser, allUsers, allChapters]);
 
   const dashboardTasks: ManagementTaskProps[] = useMemo(() => {
+    // Debug logging for dashboard tasks
+    console.log('Dashboard Tasks Debug:', {
+      currentUser: currentUser?.name,
+      newApplicantsLength: newApplicants.length,
+      newApplicants: newApplicants,
+      shouldShowTasks: currentUser && newApplicants.length > 0
+    });
+
     if (!currentUser || newApplicants.length === 0) return [];
 
     return [
@@ -588,12 +626,20 @@ const ManagementPage: React.FC = () => {
             Oversee activists, chapters, and onboarding processes.
           </p>
         </div>
-        {/* <Link to="/management/create-chapter">
-          <button className="btn-primary">
-            <PlusIcon className="mr-2 h-5 w-5" />
-            Create Chapter
-          </button>
-        </Link> */}
+        {/* Debug button - remove after testing */}
+        <button 
+          onClick={() => {
+            console.log('Debug Info:', {
+              currentUser: currentUser,
+              allUsers: allUsers,
+              newApplicants: newApplicants,
+              dashboardTasks: dashboardTasks
+            });
+          }}
+          className="btn-info btn-sm"
+        >
+          Debug Info
+        </button>
       </div>
 
       <div className="mb-8 border-2 border-black">
