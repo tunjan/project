@@ -4,13 +4,13 @@
 import { type User, type CubeEvent, type Chapter, OutreachLog } from '@/types';
 
 export interface ChapterStats {
-  name: string;
-  country: string;
-  memberCount: number;
-  totalHours: number;
-  totalConversations: number;
-  eventsHeld: number;
-  conversationsPerHour: number;
+    name: string;
+    country: string;
+    memberCount: number;
+    totalHours: number;
+    totalConversations: number;
+    eventsHeld: number;
+    conversationsPerHour: number;
 }
 
 // NEW: A dedicated type for our new efficiency metric
@@ -21,12 +21,12 @@ export interface ChapterOutreachStats {
 }
 
 export interface GlobalStats {
-  totalMembers: number;
-  totalHours: number;
-  totalConversations: number;
-  totalEvents: number;
-  chapterCount: number;
-  conversationsPerHour: number;
+    totalMembers: number;
+    totalHours: number;
+    totalConversations: number;
+    totalEvents: number;
+    chapterCount: number;
+    conversationsPerHour: number;
 }
 
 export interface MonthlyTrend {
@@ -114,7 +114,7 @@ export const getChapterStats = (
     outreachLogs: OutreachLog[]
 ): ChapterStats[] => {
     const metrics = calculateChapterMetrics(users, events, chapters, outreachLogs);
-    
+
     return metrics.map((metric) => {
         const conversationsPerHour =
             metric.totalHours > 0 ? metric.totalConversations / metric.totalHours : 0;
@@ -139,7 +139,7 @@ export const getChapterOutreachStats = (
     outreachLogs: OutreachLog[]
 ): ChapterOutreachStats[] => {
     const metrics = calculateChapterMetrics(users, events, chapters, outreachLogs);
-    
+
     return metrics.map((metric) => ({
         name: metric.chapter.name,
         totalHours: metric.totalHours,
@@ -306,12 +306,26 @@ export const getTopActivistsByHours = (
 ): { name: string; value: number }[] => {
     const confirmedUsers = getConfirmedUsers(users);
 
-    const usersWithHours = confirmedUsers.map(user => {
-        const totalHours = allEvents
-            .filter(event => event.report?.attendance[user.id] === 'Attended')
-            .reduce((sum, event) => sum + (event.report?.hours || 0), 0);
-        return { ...user, totalHours };
-    });
+    // FIX: Optimize performance by iterating through events only once
+    // Build a map of user hours instead of filtering events for each user
+    const userHours = new Map<string, number>();
+
+    // Iterate through events once to build the map
+    for (const event of allEvents) {
+        if (event.report) {
+            for (const [userId, status] of Object.entries(event.report.attendance)) {
+                if (status === 'Attended') {
+                    const currentHours = userHours.get(userId) || 0;
+                    userHours.set(userId, currentHours + (event.report.hours || 0));
+                }
+            }
+        }
+    }
+
+    const usersWithHours = confirmedUsers.map(user => ({
+        ...user,
+        totalHours: userHours.get(user.id) || 0,
+    }));
 
     return usersWithHours
         .sort((a, b) => b.totalHours - a.totalHours)
@@ -405,68 +419,68 @@ export const getCityAttendanceForUser = (
 
 // A helper function to create bins for histogram data.
 const createHistogramData = (
-  values: number[],
-  numBins: number = 10
+    values: number[],
+    numBins: number = 10
 ): { range: string; count: number }[] => {
-  if (values.length === 0) return [];
+    if (values.length === 0) return [];
 
-  const maxVal = Math.max(...values, 0);
-  if (maxVal === 0) return [{ range: '0', count: values.length }];
+    const maxVal = Math.max(...values, 0);
+    if (maxVal === 0) return [{ range: '0', count: values.length }];
 
-  const binSize = Math.ceil(maxVal / numBins) || 1;
+    const binSize = Math.ceil(maxVal / numBins) || 1;
 
-  const bins: number[] = Array(numBins).fill(0);
+    const bins: number[] = Array(numBins).fill(0);
 
-  values.forEach((value) => {
-    const binIndex = Math.min(Math.floor(value / binSize), numBins - 1);
-    bins[binIndex]++;
-  });
+    values.forEach((value) => {
+        const binIndex = Math.min(Math.floor(value / binSize), numBins - 1);
+        bins[binIndex]++;
+    });
 
-  return bins.map((count, i) => {
-    const lower = i * binSize;
-    const upper = (i + 1) * binSize - 1;
-    return {
-      range: `${lower}-${upper}`,
-      count,
-    };
-  });
+    return bins.map((count, i) => {
+        const lower = i * binSize;
+        const upper = (i + 1) * binSize - 1;
+        return {
+            range: `${lower}-${upper}`,
+            count,
+        };
+    });
 };
 
 /**
  * NEW: Generates data for activist performance distribution histograms.
  */
 export const getActivistPerformanceDistribution = (
-  users: User[],
-  allEvents: CubeEvent[],
-  allLogs: OutreachLog[],
-  metric: 'totalHours' | 'totalConversations',
-  numBins: number = 10
+    users: User[],
+    allEvents: CubeEvent[],
+    allLogs: OutreachLog[],
+    metric: 'totalHours' | 'totalConversations',
+    numBins: number = 10
 ): { range: string; count: number }[] => {
-  const confirmedUsers = getConfirmedUsers(users);
+    const confirmedUsers = getConfirmedUsers(users);
 
-  const values = confirmedUsers.map(user => {
-      if (metric === 'totalHours') {
-          return allEvents
-              .filter(event => event.report?.attendance[user.id] === 'Attended')
-              .reduce((sum, event) => sum + (event.report?.hours || 0), 0);
-      }
-      // metric === 'totalConversations'
-      return allLogs.filter(log => log.userId === user.id).length;
-  });
+    const values = confirmedUsers.map(user => {
+        if (metric === 'totalHours') {
+            return allEvents
+                .filter(event => event.report?.attendance[user.id] === 'Attended')
+                .reduce((sum, event) => sum + (event.report?.hours || 0), 0);
+        }
+        // metric === 'totalConversations'
+        return allLogs.filter(log => log.userId === user.id).length;
+    });
 
-  return createHistogramData(values.map(v => Math.round(v)), numBins);
+    return createHistogramData(values.map(v => Math.round(v)), numBins);
 };
 
 /**
  * NEW: Generates data for event turnout distribution histogram.
  */
 export const getEventTurnoutDistribution = (
-  events: CubeEvent[],
-  numBins: number = 10
+    events: CubeEvent[],
+    numBins: number = 10
 ): { range: string; count: number }[] => {
-  const values = events.map((e) => {
-    if (!e.report) return 0;
-    return Object.values(e.report.attendance).filter(status => status === 'Attended').length;
-  });
-  return createHistogramData(values, numBins);
+    const values = events.map((e) => {
+        if (!e.report) return 0;
+        return Object.values(e.report.attendance).filter(status => status === 'Attended').length;
+    });
+    return createHistogramData(values, numBins);
 };

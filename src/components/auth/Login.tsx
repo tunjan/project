@@ -20,16 +20,12 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
 
   // Group users for quicker scanning
   const groups = useMemo(() => {
-
     const adminsAndOrganizers = users.filter(isOrganizer);
     const activists = users.filter(
-      (u) =>
-        !isOrganizer(u) &&
-        u.role === Role.ACTIVIST
+      (u) => !isOrganizer(u) && u.role === Role.ACTIVIST
     );
     const applicants = users.filter(
-      (u) =>
-        !isOrganizer(u) && u.role === Role.APPLICANT
+      (u) => !isOrganizer(u) && u.role === Role.APPLICANT
     );
 
     return {
@@ -40,9 +36,11 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
   }, [users]);
 
   // Accordion state
-  const [open, setOpen] = useState<{ [key: string]: boolean }>(
-    () => ({ organizers: true, activists: false, applicants: false })
-  );
+  const [open, setOpen] = useState<{ [key: string]: boolean }>(() => ({
+    organizers: true,
+    activists: false,
+    applicants: false,
+  }));
 
   const toggle = (key: 'organizers' | 'activists' | 'applicants') =>
     setOpen((s) => ({ ...s, [key]: !s[key] }));
@@ -55,7 +53,8 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
     )
       return 'border-l-4 border-primary';
 
-    if (u.onboardingStatus === OnboardingStatus.CONFIRMED) return 'border-l-4 border-success';
+    if (u.onboardingStatus === OnboardingStatus.CONFIRMED)
+      return 'border-l-4 border-success';
 
     // Emphasize actionable onboarding states
     if (
@@ -110,7 +109,9 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
             Revision scheduled
           </Tag>
         );
-      } else if (user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL) {
+      } else if (
+        user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
+      ) {
         tags.push(
           <Tag key="sched" variant="warning" size="sm">
             Schedule revision
@@ -125,7 +126,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
   const Section: React.FC<{
     title: string;
     count: number;
-    openKey: 'organizers' | 'confirmed' | 'pending';
+    openKey: 'organizers' | 'activists' | 'applicants'; // FIX: Updated type to match actual usage
     children: React.ReactNode;
   }> = ({ title, count, openKey, children }) => (
     <div className="border-2 border-black bg-white">
@@ -136,7 +137,9 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       >
         <div>
           <p className="font-extrabold">{title}</p>
-          <p className="text-xs text-neutral-600">{count.toLocaleString()} profiles</p>
+          <p className="text-xs text-neutral-600">
+            {count.toLocaleString()} profiles
+          </p>
         </div>
         <ChevronRightIcon
           className={`h-4 w-4 transition-transform ${open[openKey] ? 'rotate-90' : ''}`}
@@ -173,9 +176,15 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       <div className="mx-auto max-w-2xl border-2 border-black bg-white p-6 md:p-8">
         {/* Branding/Header */}
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight text-black">Log In</h1>
-          <p className="mt-1 text-sm font-semibold text-neutral-700">The central hub for activists</p>
-          <p className="mt-2 text-xs text-neutral-600">Select a profile to simulate logging in.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-black">
+            Log In
+          </h1>
+          <p className="mt-1 text-sm font-semibold text-neutral-700">
+            The central hub for activists
+          </p>
+          <p className="mt-2 text-xs text-neutral-600">
+            Select a profile to simulate logging in.
+          </p>
         </div>
 
         <div className="space-y-3">
@@ -184,7 +193,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
             count={groups.adminsAndOrganizers.length}
             openKey="organizers"
           >
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
               {groups.adminsAndOrganizers.map((u) => (
                 <UserButton key={u.id} user={u} />
               ))}
@@ -192,11 +201,11 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
           </Section>
 
           <Section
-                          title="Activists"
+            title="Activists"
             count={groups.activists.length}
-                          openKey="activists"
+            openKey="activists"
           >
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
               {groups.activists.map((u) => (
                 <UserButton key={u.id} user={u} />
               ))}
@@ -204,11 +213,11 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
           </Section>
 
           <Section
-                          title="Applicants / Onboarding"
+            title="Applicants / Onboarding"
             count={groups.applicants.length}
-                          openKey="applicants"
+            openKey="applicants"
           >
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
               {groups.applicants.map((u) => (
                 <UserButton key={u.id} user={u} />
               ))}

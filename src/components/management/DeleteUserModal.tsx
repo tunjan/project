@@ -36,7 +36,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
         </button>
         <button
           onClick={onConfirm}
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+          className="btn-danger w-full px-4 py-2 font-bold transition-colors duration-300"
         >
           Confirm Deletion
         </button>

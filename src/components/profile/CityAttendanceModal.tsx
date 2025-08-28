@@ -38,7 +38,7 @@ const CityAttendanceModal: React.FC<CityAttendanceModalProps> = ({
         </div>
       ) : (
         <div className="flex h-full items-center justify-center p-8 text-center">
-          <p className="text-white">
+          <p className="text-neutral-500">
             No city attendance data is available yet.
           </p>
         </div>

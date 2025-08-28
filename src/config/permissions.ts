@@ -131,6 +131,16 @@ export const can = (
     return false;
   }
 
+  // SPECIAL CASE: GODMODE bypasses all permission checks for development/debugging
+  // This should only be used in development environments
+  if (user.role === Role.GODMODE) {
+    // In production, you might want to log this or restrict certain actions
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('GODMODE permission granted in production environment');
+    }
+    return true;
+  }
+
   const userPermissions = ROLES_TO_PERMISSIONS[user.role];
   if (!userPermissions || !userPermissions.includes(permission)) {
     return false;
@@ -309,10 +319,84 @@ export const can = (
 
       return true; // GODMODE and GLOBAL_ADMIN pass if hierarchy is respected
     }
-    // Add more context-specific rules as needed...
+
+    // Add explicit cases for permissions that don't need fine-grained checks
+    case Permission.VIEW_MEMBER_DIRECTORY:
+    case Permission.VIEW_MANAGEMENT_DASHBOARD:
+    case Permission.CREATE_EVENT:
+    case Permission.CREATE_CHAPTER:
+    case Permission.CREATE_ANNOUNCEMENT:
+    case Permission.VIEW_ANALYTICS:
+      return true;
+
+    // CRITICAL FIX: Add explicit cases for destructive permissions that need context validation
+    case Permission.DELETE_CHAPTER: {
+      if (!context.chapterName || !context.allChapters) return false;
+
+      const targetChapter = context.allChapters.find(c => c.name === context.chapterName);
+      if (!targetChapter) return false;
+
+      // Regional Organisers can only delete chapters in their country
+      if (user.role === Role.REGIONAL_ORGANISER) {
+        if (!user.managedCountry) return false;
+        return targetChapter.country === user.managedCountry;
+      }
+
+      // Chapter Organisers cannot delete chapters (they can only manage their own)
+      if (user.role === Role.CHAPTER_ORGANISER) {
+        return false;
+      }
+
+      // Global Admins can delete any chapter
+      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
+    }
+
+    case Permission.EDIT_CHAPTER: {
+      if (!context.chapterName || !context.allChapters) return false;
+
+      const targetChapter = context.allChapters.find(c => c.name === context.chapterName);
+      if (!targetChapter) return false;
+
+      // Regional Organisers can only edit chapters in their country
+      if (user.role === Role.REGIONAL_ORGANISER) {
+        if (!user.managedCountry) return false;
+        return targetChapter.country === user.managedCountry;
+      }
+
+      // Chapter Organisers can only edit chapters they organize
+      if (user.role === Role.CHAPTER_ORGANISER) {
+        return (user.organiserOf || []).includes(context.chapterName);
+      }
+
+      // Global Admins can edit any chapter
+      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
+    }
+
+    case Permission.MANAGE_INVENTORY: {
+      if (!context.chapterName || !context.allChapters) return false;
+
+      const targetChapter = context.allChapters.find(c => c.name === context.chapterName);
+      if (!targetChapter) return false;
+
+      // Regional Organisers can manage inventory in their country
+      if (user.role === Role.REGIONAL_ORGANISER) {
+        if (!user.managedCountry) return false;
+        return targetChapter.country === user.managedCountry;
+      }
+
+      // Chapter Organisers can manage inventory in their chapters
+      if (user.role === Role.CHAPTER_ORGANISER) {
+        return (user.organiserOf || []).includes(context.chapterName);
+      }
+
+      // Global Admins can manage any inventory
+      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
+    }
 
     default:
-      // If no specific rule, permission is granted if it's in their role list
-      return true;
+      // CRITICAL FIX: Changed from return true to return false for security
+      // If no specific rule, permission is denied by default
+      // This prevents accidentally granting permissions without proper context checks
+      return false;
   }
 };

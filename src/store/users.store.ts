@@ -105,6 +105,7 @@ export interface UsersActions {
   getUsers: () => User[];
   clearPersistedData: () => void;
   init: () => void;
+  advanceOnboardingAfterEvent: (userId: string) => void;
 }
 
 export const useUsersStore = create<UsersState & UsersActions>()(
@@ -179,6 +180,14 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           relatedUser: newUser,
         }));
         useNotificationsStore.getState().addNotifications(notificationsToCreate);
+
+        // FIX: Add notification for the newly registered user
+        useNotificationsStore.getState().addNotification({
+          userId: newUser.id,
+          type: NotificationType.NEW_ANNOUNCEMENT, // Using existing type for now
+          message: `Welcome, ${formData.name}! Your application for ${formData.chapter} has been submitted for review.`,
+          linkTo: '/onboarding-status',
+        });
       },
 
       updateUserStatus: (userId, status, approver) => {
@@ -716,45 +725,16 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             const update = updates.find((u) => u.userId === user.id);
             if (!update) return user;
 
-            const prevCubes = user.stats?.cubesAttended ?? 0;
             const newStats = { ...user.stats, ...update.newStats };
-
-            let onboardingStatus = user.onboardingStatus;
-            // Auto-transition: first Cube attended
-            if (
-              user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
-              prevCubes === 0 &&
-              (newStats.cubesAttended ?? 0) >= 1
-            ) {
-              const watched = user.onboardingProgress?.watchedMasterclass === true;
-              if (watched) {
-                onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
-                useNotificationsStore.getState().addNotification({
-                  userId: user.id,
-                  type: NotificationType.REQUEST_ACCEPTED,
-                  message: `Nice! You completed your first Cube and already watched the masterclass. Next: schedule your revision call.`,
-                  linkTo: '/dashboard',
-                });
-              } else {
-                onboardingStatus = OnboardingStatus.AWAITING_MASTERCLASS;
-                useNotificationsStore.getState().addNotification({
-                  userId: user.id,
-                  type: NotificationType.REQUEST_ACCEPTED,
-                  message: `Nice! You completed your first Cube. Next: complete the masterclass.`,
-                  linkTo: '/dashboard',
-                });
-              }
-            }
 
             const updatedUser = {
               ...user,
               stats: newStats,
-              onboardingStatus,
             };
 
             // Keep auth store in sync if this is the current user
             if (useAuthStore.getState().currentUser?.id === user.id) {
-              useAuthStore.getState().updateCurrentUser({ stats: newStats, onboardingStatus });
+              useAuthStore.getState().updateCurrentUser({ stats: newStats });
             }
 
             return updatedUser;
@@ -774,6 +754,60 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         set({ users: processedUsers });
       },
 
+      // FIX: Added new action to decouple onboarding logic from stats updates
+      advanceOnboardingAfterEvent: (userId: string) => {
+        set((state) => {
+          const user = state.users.find(u => u.id === userId);
+          if (!user) return state;
+
+          const prevCubes = user.stats?.cubesAttended ?? 0;
+          const newCubes = prevCubes + 1;
+
+          // Only advance if this is the first cube
+          if (prevCubes === 0 && newCubes === 1) {
+            const watched = user.onboardingProgress?.watchedMasterclass === true;
+            let newOnboardingStatus = user.onboardingStatus;
+
+            if (watched) {
+              newOnboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
+              useNotificationsStore.getState().addNotification({
+                userId: user.id,
+                type: NotificationType.REQUEST_ACCEPTED,
+                message: `Nice! You completed your first Cube and already watched the masterclass. Next: schedule your revision call.`,
+                linkTo: '/dashboard',
+              });
+            } else {
+              newOnboardingStatus = OnboardingStatus.AWAITING_MASTERCLASS;
+              useNotificationsStore.getState().addNotification({
+                userId: user.id,
+                type: NotificationType.REQUEST_ACCEPTED,
+                message: `Nice! You completed your first Cube. Next: complete the masterclass.`,
+                linkTo: '/dashboard',
+              });
+            }
+
+            const updatedUser = {
+              ...user,
+              stats: { ...user.stats, cubesAttended: newCubes },
+              onboardingStatus: newOnboardingStatus,
+            };
+
+            // Keep auth store in sync if this is the current user
+            if (useAuthStore.getState().currentUser?.id === user.id) {
+              useAuthStore.getState().updateCurrentUser({
+                stats: updatedUser.stats,
+                onboardingStatus: newOnboardingStatus
+              });
+            }
+
+            return {
+              users: state.users.map(u => u.id === userId ? updatedUser : u)
+            };
+          }
+
+          return state;
+        });
+      },
 
     }),
     {
@@ -816,7 +850,8 @@ export const useUsersActions = () =>
     batchUpdateUserStats: s.batchUpdateUserStats,
     resetToInitialData: s.resetToInitialData,
     clearPersistedData: s.clearPersistedData,
-    init: s.init
+    init: s.init,
+    advanceOnboardingAfterEvent: s.advanceOnboardingAfterEvent
   }));
 
 // Selectors

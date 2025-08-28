@@ -41,7 +41,9 @@ export const calculateDiscountTier = (user: User) => {
     hours: stats.totalHours,
   };
 
-  const currentTier = TIER_CONFIG.find((tier) =>
+  // FIX: Reverse the array to find the highest-ranking tier first
+  // This ensures users get the highest tier they qualify for, not just Tier 1
+  const currentTier = [...TIER_CONFIG].reverse().find((tier) =>
     Object.entries(tier.requirements).every(([key, requiredValue]) => {
       const userValue = userStats[key as RequirementKey];
       return userValue !== undefined && userValue >= requiredValue;

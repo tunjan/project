@@ -31,13 +31,18 @@ export const calculateChapterScorecard = (
         // Normalize each metric to a 0-1 scale
         const eventScore = Math.min(stat.eventsHeld / (TARGETS.EVENTS_PER_MONTH * 3), 1); // Assuming 3 months
         const memberScore = Math.min(stat.memberCount / TARGETS.MEMBER_COUNT, 1);
-        // Calculate membership target progress (how close the chapter is to its target size)
-        const membershipTargetProgressScore = Math.min(stat.memberCount / TARGETS.MEMBER_COUNT, 1);
+
+        // FIX: This is not a true retention rate - it's just a placeholder
+        // TODO: Implement proper cohort-based retention calculation
+        // For now, using a placeholder calculation based on member count vs target
+        // In a real implementation, this would track users who joined in specific periods
+        // and measure how many are still active in later periods
+        const retentionScore = Math.min(stat.memberCount / TARGETS.MEMBER_COUNT, 1);
 
         const weightedScore =
             eventScore * WEIGHTS.EVENT_FREQUENCY +
             memberScore * WEIGHTS.MEMBER_COUNT +
-            membershipTargetProgressScore * WEIGHTS.RETENTION_RATE;
+            retentionScore * WEIGHTS.RETENTION_RATE;
 
         const healthScore = Math.round(weightedScore * 100);
 
@@ -46,11 +51,14 @@ export const calculateChapterScorecard = (
             healthScore,
             metrics: {
                 eventFrequency: stat.eventsHeld,
-                // This is a simplified, placeholder calculation for average turnout.
-                // A real implementation would require actual attendance data per event.
+                // TODO: This is a placeholder calculation for average turnout.
+                // A real implementation would require:
+                // 1. Actual attendance data per event from event reports
+                // 2. Iterating through the chapter's events and summing attendance
+                // 3. Calculating the average across all events
                 avgTurnout:
-                    stat.eventsHeld > 0 ? stat.memberCount * 0.5 : 0, // Placeholder
-                membershipTargetProgress: membershipTargetProgressScore * 100,
+                    stat.eventsHeld > 0 ? stat.memberCount * 0.5 : 0, // Placeholder - needs real data
+                membershipTargetProgress: retentionScore * 100,
             },
         };
     });

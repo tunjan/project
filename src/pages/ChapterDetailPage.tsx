@@ -219,10 +219,7 @@ const ChapterDetailPage: React.FC = () => {
 
           {chapter.instagram && (
             <a
-              href={`https://instagram.com/${chapter.instagram.replace(
-                '@',
-                ''
-              )}`} // CORRECTED: Use backticks ``
+              href={`https://instagram.com/${chapter.instagram.replace('@', '')}`} // FIX: Use backticks for template literal interpolation
               target="_blank"
               rel="noopener noreferrer"
               className="text-grey-600 mt-6 inline-flex items-center text-sm font-semibold transition hover:text-black"

@@ -19,9 +19,7 @@ const TabButton: React.FC<{
   <button
     onClick={onClick}
     className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
-      isActive
-        ? 'text-black'
-        : 'border-transparent text-white hover:text-black'
+      isActive ? 'text-black' : 'border-transparent text-white hover:text-black'
     }`}
   >
     {children}
@@ -66,13 +64,13 @@ const HostingDashboard: React.FC<HostingDashboardProps> = () => {
 
   const NoRequestsMessage = () => (
     <div className="border-2 border-black bg-white p-8 text-center">
-      <HomeIcon className="mx-auto h-12 w-12 text-red" />
+      <HomeIcon className="text-red mx-auto h-12 w-12" />
       <h3 className="mt-4 text-xl font-bold text-black">
         {view === 'incoming'
           ? 'No incoming requests.'
           : "You haven't sent any requests."}
       </h3>
-      <p className="mt-2 text-white">
+      <p className="mt-2 text-neutral-500">
         {view === 'incoming'
           ? 'When activists request to stay with you, they will appear here.'
           : 'Request accommodation from an event page.'}

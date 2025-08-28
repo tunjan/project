@@ -31,7 +31,15 @@ export const handleEventReportLogging = (event: CubeEvent, report: CubeEvent['re
   });
 
   if (statsUpdates.length > 0) {
+    // FIX: First update stats, then handle onboarding logic separately
     usersStore.batchUpdateUserStats(statsUpdates);
+
+    // Check for users who just completed their first cube and advance their onboarding
+    statsUpdates.forEach(update => {
+      if (update.newStats.cubesAttended === 1) {
+        usersStore.advanceOnboardingAfterEvent(update.userId);
+      }
+    });
   }
 };
 
