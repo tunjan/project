@@ -6,9 +6,13 @@ import Widget from '@/components/dashboard/Widget';
 const MemberCard: React.FC<{ user: User }> = ({ user }) => (
   <Link
     to={`/members/${user.id}`}
-    className="flex w-full items-center gap-3 p-2 text-left transition hover:bg-neutral-100"
+    className="flex items-center gap-3 p-2 text-left transition hover:bg-neutral-100"
   >
-    <img src={user.profilePictureUrl} alt={user.name} className="h-10 w-10 object-cover" />
+    <img
+      src={user.profilePictureUrl}
+      alt={user.name}
+      className="h-10 w-10 object-cover"
+    />
     <div>
       <p className="font-bold text-black">{user.name}</p>
       <p className="text-sm text-neutral-500">{user.role}</p>
@@ -33,34 +37,54 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
   onDenyRsvp,
   onRequestStay,
 }) => {
-  const attending = event.participants.filter(p => p.status === ParticipantStatus.ATTENDING);
-  const pending = event.participants.filter(p => p.status === ParticipantStatus.PENDING);
+  const attending = event.participants.filter(
+    (p) => p.status === ParticipantStatus.ATTENDING
+  );
+  const pending = event.participants.filter(
+    (p) => p.status === ParticipantStatus.PENDING
+  );
 
   return (
     <div className="space-y-6">
       <Widget title={`Participants (${attending.length})`}>
         {attending.length > 0 ? (
           <ul className="divide-y divide-neutral-200">
-            {attending.map(p => <li key={p.user.id}><MemberCard user={p.user} /></li>)}
+            {attending.map((p) => (
+              <li key={p.user.id}>
+                <MemberCard user={p.user} />
+              </li>
+            ))}
           </ul>
         ) : (
-          <p className="text-center text-sm text-neutral-500">No one has RSVP'd yet.</p>
+          <p className="text-center text-sm text-neutral-500">
+            No one has RSVP'd yet.
+          </p>
         )}
       </Widget>
 
       {canManageParticipants && pending.length > 0 && (
         <Widget title={`Pending Requests (${pending.length})`}>
           <ul className="divide-y divide-neutral-200">
-            {pending.map(p => (
+            {pending.map((p) => (
               <li key={p.user.id} className="p-2">
-                                  <div className="flex items-center justify-between">
-                    <MemberCard user={p.user} />
-                    <div className="flex gap-2">
-                      <button onClick={() => onDenyRsvp(p.user.id)} className="btn-secondary btn-sm">Deny</button>
-                      <button onClick={() => onAcceptRsvp(p.user.id)} className="btn-primary btn-sm">Approve</button>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <MemberCard user={p.user} />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onDenyRsvp(p.user.id)}
+                      className="btn-secondary btn-sm"
+                    >
+                      Deny
+                    </button>
+                    <button
+                      onClick={() => onAcceptRsvp(p.user.id)}
+                      className="btn-primary btn-sm"
+                    >
+                      Approve
+                    </button>
                   </div>
-                </li>
+                </div>
+              </li>
             ))}
           </ul>
         </Widget>
@@ -69,12 +93,12 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
       {availableHosts.length > 0 && (
         <Widget title={`Available Hosts (${availableHosts.length})`}>
           <ul className="divide-y divide-neutral-200">
-            {availableHosts.map(host => (
+            {availableHosts.map((host) => (
               <li key={host.id} className="p-2">
                 <div className="flex items-center justify-between">
                   <MemberCard user={host} />
-                  <button 
-                    onClick={() => onRequestStay(host)} 
+                  <button
+                    onClick={() => onRequestStay(host)}
                     className="btn-primary btn-sm"
                   >
                     Request Stay
