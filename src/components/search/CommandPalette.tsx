@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchStore } from '@/store/search.store';
 import useSearch from '@/hooks/useSearch';
-import SearchResults from '@/components/header/SearchResults';
 import { SearchIcon } from '@/icons';
 
 const CommandPalette: React.FC = () => {
@@ -54,14 +53,93 @@ const CommandPalette: React.FC = () => {
             autoFocus
           />
         </div>
+        
+        {/* Search Results */}
         {query && (
-          <SearchResults
-            users={users}
-            chapters={chapters}
-            events={events}
-            loading={loading}
-            onClose={close}
-          />
+          <div className="mt-2 max-h-96 overflow-y-auto border-2 border-black bg-white">
+            {loading && (
+              <div className="p-4 text-center">
+                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
+                <p className="mt-2 text-sm text-neutral-500">Searching...</p>
+              </div>
+            )}
+            
+            {!loading && users.length === 0 && chapters.length === 0 && events.length === 0 && (
+              <div className="p-4 text-center text-sm text-neutral-500">
+                No results found.
+              </div>
+            )}
+            
+            {!loading && (users.length > 0 || chapters.length > 0 || events.length > 0) && (
+              <div className="p-4 space-y-4">
+                {/* Users Results */}
+                {users.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold uppercase text-red mb-2">Users</h3>
+                    <ul className="space-y-1">
+                      {users.map((user) => (
+                        <li key={user.id}>
+                          <button
+                            onClick={() => {
+                              window.location.href = `/members/${user.id}`;
+                              close();
+                            }}
+                            className="block w-full text-left p-2 font-bold hover:bg-neutral-100 transition-colors"
+                          >
+                            {user.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Chapters Results */}
+                {chapters.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold uppercase text-red mb-2">Chapters</h3>
+                    <ul className="space-y-1">
+                      {chapters.map((chapter) => (
+                        <li key={chapter.name}>
+                          <button
+                            onClick={() => {
+                              window.location.href = `/chapters/${chapter.name}`;
+                              close();
+                            }}
+                            className="block w-full text-left p-2 font-bold hover:bg-neutral-100 transition-colors"
+                          >
+                            {chapter.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Events Results */}
+                {events.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold uppercase text-red mb-2">Events</h3>
+                    <ul className="space-y-1">
+                      {events.map((event) => (
+                        <li key={event.id}>
+                          <button
+                            onClick={() => {
+                              window.location.href = `/cubes/${event.id}`;
+                              close();
+                            }}
+                            className="block w-full text-left p-2 font-bold hover:bg-neutral-100 transition-colors"
+                          >
+                            {event.location}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
