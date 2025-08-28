@@ -377,7 +377,7 @@ const ManagementPage: React.FC = () => {
         priority: 'high',
       },
     ];
-  }, [currentUser, newApplicants.length]);
+  }, [currentUser, newApplicants]);
 
   const {
     visibleMembers,

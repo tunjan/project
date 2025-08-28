@@ -77,7 +77,7 @@ const CubeDetailPage: React.FC = () => {
         u.hostingCapacity &&
         u.hostingCapacity > 0
     );
-  }, [allUsers, event?.city, currentUser, event]);
+  }, [allUsers, currentUser, event]);
 
   if (!event) {
     return (
@@ -239,7 +239,7 @@ const CubeDetailPage: React.FC = () => {
           onCancelEvent={handleCancelEvent}
         />
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-2">
           <div className="lg:col-span-1">
             <div className="border-b-2 border-black">
               <TabButton
