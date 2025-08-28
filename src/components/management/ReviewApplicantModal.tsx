@@ -78,7 +78,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   };
 
   const handleNext = () => {
-    setRemainingApplicants(prev => prev.slice(1));
+    setRemainingApplicants((prev) => prev.slice(1));
     setNote('');
     if (remainingApplicants.length <= 1) onClose();
   };

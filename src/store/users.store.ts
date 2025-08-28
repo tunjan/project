@@ -412,8 +412,14 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       // Schedule a revision call with selected organiser and time
       scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => {
         const currentUser = get().users.find((u) => u.id === userId);
+        const organiser = get().users.find((u) => u.id === organiserId);
+        
         if (!currentUser) {
           console.error(`User ${userId} not found`);
+          return;
+        }
+        if (!organiser) {
+          console.error(`Organiser ${organiserId} not found`);
           return;
         }
 
@@ -446,6 +452,15 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           type: NotificationType.REQUEST_ACCEPTED,
           message: `Revision call scheduled! Please attend the call to complete your onboarding.`,
           linkTo: '/dashboard',
+        });
+
+        // **FIX: Notify the selected organizer**
+        useNotificationsStore.getState().addNotification({
+          userId: organiserId,
+          type: NotificationType.EVENT_UPDATED, // Re-using a relevant type
+          message: `${currentUser.name} has scheduled a revision call with you for ${when.toLocaleString()}.`,
+          linkTo: `/manage/member/${userId}`,
+          relatedUser: currentUser,
         });
       },
 

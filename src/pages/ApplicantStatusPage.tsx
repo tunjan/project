@@ -1,8 +1,8 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus } from '@/types';
-import { CheckIcon, ClockIcon, XCircleIcon } from '@/icons';
+import { CheckIcon, ClockIcon, XCircleIcon, CalendarIcon, CubeIcon, VideoCameraIcon } from '@/icons';
 
 const ProgressStep: React.FC<{
   title: string;
@@ -221,6 +221,40 @@ const ApplicantStatusPage: React.FC = () => {
                 {statusInfo.title.toUpperCase()}
               </div>
               <p className="mt-4 text-neutral-600">{statusInfo.message}</p>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="my-6 space-y-3 border-y-2 border-black py-6">
+              {status === OnboardingStatus.PENDING_ONBOARDING_CALL && (
+                <Link to="/dashboard" className="btn-primary flex w-full items-center justify-center gap-2">
+                  <CalendarIcon className="h-5 w-5" />
+                  Schedule Onboarding Call
+                </Link>
+              )}
+              {status === OnboardingStatus.AWAITING_FIRST_CUBE && (
+                <Link to="/cubes" className="btn-primary flex w-full items-center justify-center gap-2">
+                  <CubeIcon className="h-5 w-5" />
+                  Find a Cube to Attend
+                </Link>
+              )}
+              {status === OnboardingStatus.AWAITING_MASTERCLASS && (
+                <Link to="/dashboard" className="btn-primary flex w-full items-center justify-center gap-2">
+                  <VideoCameraIcon className="h-5 w-5" />
+                  Confirm Masterclass Watched
+                </Link>
+              )}
+              {status === OnboardingStatus.AWAITING_REVISION_CALL && (
+                <Link to="/dashboard" className="btn-primary flex w-full items-center justify-center gap-2">
+                  <CalendarIcon className="h-5 w-5" />
+                  Schedule Revision Call
+                </Link>
+              )}
+              <Link
+                to="/resources"
+                className="btn-outline flex w-full items-center justify-center"
+              >
+                Browse Learning Resources
+              </Link>
             </div>
 
             {/* Progress Steps */}
