@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BellIcon } from '@/icons';
 import NotificationModal from './NotificationModal';
@@ -20,20 +20,6 @@ const NotificationBell: React.FC = () => {
   const unreadCount = useUnreadNotificationCount(currentUser?.id);
 
   const [isOpen, setIsOpen] = useState(false);
-  const bellRef = useRef<HTMLDivElement>(null);
-
-  // Close modal on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {
@@ -50,7 +36,7 @@ const NotificationBell: React.FC = () => {
   };
 
   return (
-    <div className="relative" ref={bellRef}>
+    <div className="relative">
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className={`relative border-2 p-2 transition-colors ${
@@ -67,14 +53,12 @@ const NotificationBell: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-30 mt-2 w-80 lg:left-0">
-          <NotificationModal
-            notifications={notifications}
-            onNotificationClick={handleNotificationClick}
-            onMarkAllRead={handleMarkAllRead}
-            onClose={() => setIsOpen(false)}
-          />
-        </div>
+        <NotificationModal
+          notifications={notifications}
+          onNotificationClick={handleNotificationClick}
+          onMarkAllRead={handleMarkAllRead}
+          onClose={() => setIsOpen(false)}
+        />
       )}
     </div>
   );

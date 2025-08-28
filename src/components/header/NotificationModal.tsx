@@ -66,25 +66,17 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  // Prevent clicks inside the modal from bubbling up to the backdrop
-  const handleModalClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
-    <>
-      {/* Backdrop - positioned behind the modal */}
-      <div
-        className="fixed inset-0 z-40 bg-black bg-opacity-50"
-        onClick={onClose}
-      />
-
-      {/* Modal - positioned above the backdrop */}
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={handleModalClick}
-      >
-        <div className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-white shadow-brutal">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+        <div 
+          className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-white shadow-brutal"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center justify-between border-b-2 border-black p-3">
             <h3 className="font-bold text-black">Notifications</h3>
             <div className="flex items-center space-x-2">
@@ -133,7 +125,6 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
           )}
         </div>
       </div>
-    </>
   );
 };
 
