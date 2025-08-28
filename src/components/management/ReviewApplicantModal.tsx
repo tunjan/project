@@ -51,14 +51,14 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
 }) => {
   const { updateUserStatus, addOrganizerNote } = useUsersActions();
   const currentUser = useCurrentUser();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [remainingApplicants, setRemainingApplicants] = useState(applicants);
   const [note, setNote] = useState('');
 
-  if (applicants.length === 0) {
+  if (remainingApplicants.length === 0) {
     return null;
   }
 
-  const currentApplicant = applicants[currentIndex];
+  const currentApplicant = remainingApplicants[0];
 
   if (!currentApplicant) {
     return null;
@@ -78,15 +78,12 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   };
 
   const handleNext = () => {
-    if (currentIndex < applicants.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setNote('');
-    } else {
-      onClose();
-    }
+    setRemainingApplicants(prev => prev.slice(1));
+    setNote('');
+    if (remainingApplicants.length <= 1) onClose();
   };
 
-  const modalTitle = `Review Applicants (${currentIndex + 1} of ${
+  const modalTitle = `Review Applicants (${applicants.length - remainingApplicants.length + 1} of ${
     applicants.length
   })`;
 

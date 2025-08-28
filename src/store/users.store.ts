@@ -7,6 +7,7 @@ import {
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { type OnboardingAnswers } from '@/types';
 import { useNotificationsStore } from './notifications.store';
+import { useChaptersStore } from './chapters.store';
 import { useAuthStore } from './auth.store';
 
 // Helper function to validate onboarding status transitions
@@ -147,13 +148,28 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         set((state) => ({ users: [...state.users, newUser] }));
 
         // Find organizers of the chapter and notify them
-        const chapterOrganizers = get().users.filter(
+        let organizersToNotify = get().users.filter(
           (u) =>
             u.role === Role.CHAPTER_ORGANISER &&
             u.organiserOf?.includes(formData.chapter)
         );
 
-        const notificationsToCreate = chapterOrganizers.map((org) => ({
+        // **FIX: Application Black Hole Escalation Logic**
+        if (organizersToNotify.length === 0) {
+          const allChapters = useChaptersStore.getState().chapters;
+          const chapterData = allChapters.find(c => c.name === formData.chapter);
+          if (chapterData) {
+            // Escalate to Regional Organiser
+            organizersToNotify = get().users.filter(u => u.role === Role.REGIONAL_ORGANISER && u.managedCountry === chapterData.country);
+          }
+        }
+
+        if (organizersToNotify.length === 0) {
+          // Escalate to Global Admins if no regional organizer is found
+          organizersToNotify = get().users.filter(u => u.role === Role.GLOBAL_ADMIN);
+        }
+
+        const notificationsToCreate = organizersToNotify.map((org) => ({
           userId: org.id,
           type: NotificationType.NEW_APPLICANT,
           message: `${formData.name} has applied to join the ${formData.chapter} chapter.`,
@@ -221,6 +237,15 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               type: NotificationType.REQUEST_ACCEPTED,
               message: `Great! You completed the masterclass. Next: pass the revision call to get verified.`,
               linkTo: '/dashboard',
+            });
+          }
+          if (status === OnboardingStatus.DENIED) {
+            useNotificationsStore.getState().addNotification({
+              userId: user.id,
+              type: NotificationType.REQUEST_DENIED,
+              message: `Your application for ${user.chapters[0]} was not approved at this time.`,
+              linkTo: '/onboarding-status',
+              relatedUser: approver,
             });
           }
         }
