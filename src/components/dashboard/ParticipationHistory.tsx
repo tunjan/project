@@ -58,7 +58,7 @@ const ParticipationHistory: React.FC<ParticipationHistoryProps> = ({
               >
                 <div>
                   <p className="font-bold text-black">{event.location}</p>
-                  <p className="text-sm text-white">{event.city}</p>
+                  <p className="text-sm text-neutral-500">{event.city}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-mono text-sm font-medium text-black">

@@ -10,11 +10,7 @@ import {
 } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
-import {
-  type User,
-  AnnouncementScope,
-  Role,
-} from '@/types';
+import { type User, AnnouncementScope, Role } from '@/types';
 import { getChapterStats } from '@/utils/analytics';
 import {
   UsersIcon,
