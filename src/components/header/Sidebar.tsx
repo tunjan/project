@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useNavItems } from '@/hooks/useNavItems';
 import NotificationBell from './NotificationBell';
+import SidebarSearch from './SidebarSearch';
 import UserMenu from './UserMenu';
 import { useCurrentUser } from '@/store/auth.store';
 
@@ -44,6 +45,11 @@ const Sidebar: React.FC = () => {
           >
             AV<span className="text-primary">.</span>
           </Link>
+        </div>
+
+        {/* Global Search */}
+        <div className="px-4 mb-4">
+          <SidebarSearch />
         </div>
 
         {/* Navigation */}

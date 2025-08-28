@@ -26,7 +26,7 @@ import {
   UsersIcon,
   PencilIcon,
 } from '@/icons';
-import DashboardSearch from '@/components/dashboard/DashboardSearch';
+
 import { safeFormatLocaleDate } from '@/utils/date';
 import { toast } from 'sonner';
 
@@ -304,12 +304,9 @@ const DashboardPage: React.FC = () => {
           Welcome back, {currentUser.name.split(' ')[0]}!
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-neutral-600">
-          Here's what needs your attention today. Use the search bar below to
+          Here's what needs your attention today. Use the search bar in the sidebar to
           find anything on the platform.
         </p>
-        <div className="mt-6">
-          <DashboardSearch />
-        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

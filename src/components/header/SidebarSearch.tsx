@@ -3,7 +3,7 @@ import { SearchIcon } from '@/icons';
 import useSearch from '@/hooks/useSearch';
 import SearchResults from '@/components/header/SearchResults';
 
-const DashboardSearch: React.FC = () => {
+const SidebarSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const { users, chapters, events, loading } = useSearch(searchQuery);
@@ -28,16 +28,16 @@ const DashboardSearch: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-xl" ref={searchRef}>
-      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-        <SearchIcon className="h-5 w-5 text-white" />
+    <div className="relative" ref={searchRef}>
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <SearchIcon className="h-5 w-5 text-neutral-500" />
       </div>
       <input
         type="text"
-        placeholder="Search for activists, chapters, events..."
+        placeholder="Search anything..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full rounded-none border-2 border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder-neutral-500 focus:border-primary focus:outline-none"
+        className="w-full rounded-none border-2 border-black bg-white py-2 pl-10 pr-4 text-sm font-bold text-black placeholder-neutral-500 focus:border-primary focus:outline-none"
       />
       {searchQuery && (
         <SearchResults
@@ -52,4 +52,4 @@ const DashboardSearch: React.FC = () => {
   );
 };
 
-export default DashboardSearch;
+export default SidebarSearch;
