@@ -202,6 +202,7 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
       badges: [],
       hostingAvailability: faker.datatype.boolean(),
       hostingCapacity: faker.number.int({ min: 1, max: 5 }),
+      instagram: faker.datatype.boolean({ probability: 0.7 }) ? `@av_${faker.lorem.word()}` : undefined,
     };
 
     if (onboardingStatus !== OnboardingStatus.CONFIRMED) {
