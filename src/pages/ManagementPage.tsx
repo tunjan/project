@@ -268,12 +268,22 @@ const ManagementPage: React.FC = () => {
     // Debug: Log all users and their statuses
     console.log('All Users Debug:', {
       totalUsers: allUsers.length,
-      usersByStatus: allUsers.reduce((acc, user) => {
-        const status = user.onboardingStatus;
-        if (!acc[status]) acc[status] = [];
-        acc[status].push({ id: user.id, name: user.name, chapters: user.chapters });
-        return acc;
-      }, {} as Record<string, Array<{ id: string; name: string; chapters: string[] }>>)
+      usersByStatus: allUsers.reduce(
+        (acc, user) => {
+          const status = user.onboardingStatus;
+          if (!acc[status]) acc[status] = [];
+          acc[status].push({
+            id: user.id,
+            name: user.name,
+            chapters: user.chapters,
+          });
+          return acc;
+        },
+        {} as Record<
+          string,
+          Array<{ id: string; name: string; chapters: string[] }>
+        >
+      ),
     });
 
     if (!currentUser) return [];
@@ -295,44 +305,53 @@ const ManagementPage: React.FC = () => {
         .forEach((c) => managedChapterNames.add(c.name));
     }
 
-            const filteredApplicants = allUsers.filter(
-          (u) =>
-            u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW &&
-            // Only show applicants for chapters the current user can manage
-            u.chapters?.some((c) => managedChapterNames.has(c))
-        );
+    const filteredApplicants = allUsers.filter(
+      (u) =>
+        u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW &&
+        // Only show applicants for chapters the current user can manage
+        u.chapters?.some((c) => managedChapterNames.has(c))
+    );
 
-        // TEMPORARY: Add a test applicant if none exist (remove after debugging)
-        if (filteredApplicants.length === 0 && currentUser.role !== Role.APPLICANT) {
-          console.log('No applicants found, checking if we can create a test one...');
-          const testApplicant = allUsers.find(u => 
-            u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-          );
-          if (testApplicant) {
-            console.log('Found test applicant:', testApplicant);
-            // Check if we can assign them to a managed chapter
-            const availableChapters = Array.from(managedChapterNames);
-            if (availableChapters.length > 0) {
-              console.log('Available chapters for test:', availableChapters);
-            }
-          }
+    // TEMPORARY: Add a test applicant if none exist (remove after debugging)
+    if (
+      filteredApplicants.length === 0 &&
+      currentUser.role !== Role.APPLICANT
+    ) {
+      console.log(
+        'No applicants found, checking if we can create a test one...'
+      );
+      const testApplicant = allUsers.find(
+        (u) =>
+          u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+      );
+      if (testApplicant) {
+        console.log('Found test applicant:', testApplicant);
+        // Check if we can assign them to a managed chapter
+        const availableChapters = Array.from(managedChapterNames);
+        if (availableChapters.length > 0) {
+          console.log('Available chapters for test:', availableChapters);
         }
+      }
+    }
 
-            // Debug logging
-        console.log('New Applicants Debug:', {
-          currentUser: currentUser.name,
-          role: currentUser.role,
-          organiserOf: currentUser.organiserOf,
-          managedCountry: currentUser.managedCountry,
-          managedChapters: Array.from(managedChapterNames),
-          totalUsers: allUsers.length,
-          pendingReviewUsers: allUsers.filter(
-            (u) =>
-              u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-          ),
-          filteredApplicants: filteredApplicants,
-          allChapters: allChapters.map(c => ({ name: c.name, country: c.country }))
-        });
+    // Debug logging
+    console.log('New Applicants Debug:', {
+      currentUser: currentUser.name,
+      role: currentUser.role,
+      organiserOf: currentUser.organiserOf,
+      managedCountry: currentUser.managedCountry,
+      managedChapters: Array.from(managedChapterNames),
+      totalUsers: allUsers.length,
+      pendingReviewUsers: allUsers.filter(
+        (u) =>
+          u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+      ),
+      filteredApplicants: filteredApplicants,
+      allChapters: allChapters.map((c) => ({
+        name: c.name,
+        country: c.country,
+      })),
+    });
 
     return filteredApplicants;
   }, [currentUser, allUsers, allChapters]);
@@ -343,7 +362,7 @@ const ManagementPage: React.FC = () => {
       currentUser: currentUser?.name,
       newApplicantsLength: newApplicants.length,
       newApplicants: newApplicants,
-      shouldShowTasks: currentUser && newApplicants.length > 0
+      shouldShowTasks: currentUser && newApplicants.length > 0,
     });
 
     if (!currentUser || newApplicants.length === 0) return [];
@@ -627,13 +646,13 @@ const ManagementPage: React.FC = () => {
           </p>
         </div>
         {/* Debug button - remove after testing */}
-        <button 
+        <button
           onClick={() => {
             console.log('Debug Info:', {
               currentUser: currentUser,
               allUsers: allUsers,
               newApplicants: newApplicants,
-              dashboardTasks: dashboardTasks
+              dashboardTasks: dashboardTasks,
             });
           }}
           className="btn-info btn-sm"

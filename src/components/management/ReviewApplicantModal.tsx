@@ -2,20 +2,60 @@ import React, { useState } from 'react';
 import { User, OnboardingStatus } from '@/types';
 import Modal from '@/components/ui/Modal';
 import { useUsersActions, useCurrentUser } from '@/store';
+import {
+  CheckIcon,
+  XIcon,
+  HashtagIcon,
+  MailIcon,
+  CalendarIcon,
+  UserCircleIcon,
+} from '@/icons';
+import { TextAreaField } from '@/components/ui/Form';
+
+// A small component to display applicant details in a structured way.
+const ApplicantDetail: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value?: string;
+}> = ({ icon, label, value }) => (
+  <div className="flex items-start gap-3">
+    <div className="mt-1 flex-shrink-0 text-neutral-500">{icon}</div>
+    <div>
+      <p className="text-xs font-bold uppercase text-neutral-500">{label}</p>
+      <p className="font-semibold text-black">{value || 'Not provided'}</p>
+    </div>
+  </div>
+);
+
+// A component for displaying the Q&A section in brutalist style.
+const AnswerBlock: React.FC<{ question: string; answer: string }> = ({
+  question,
+  answer,
+}) => (
+  <div>
+    <p className="mb-1 text-sm font-bold text-black">{question}</p>
+    <div className="border-2 border-black bg-white p-3">
+      <p className="text-sm text-neutral-700">{answer}</p>
+    </div>
+  </div>
+);
 
 interface ReviewApplicantModalProps {
   applicants: User[];
   onClose: () => void;
 }
 
-const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants, onClose }) => {
+const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
+  applicants,
+  onClose,
+}) => {
   const { updateUserStatus, addOrganizerNote } = useUsersActions();
   const currentUser = useCurrentUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [note, setNote] = useState('');
 
   if (applicants.length === 0) {
-    return null; // Or a message indicating no applicants
+    return null;
   }
 
   const currentApplicant = applicants[currentIndex];
@@ -24,23 +64,12 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants,
     return null;
   }
 
-  const handleApprove = () => {
+  const handleAction = (
+    status: OnboardingStatus.PENDING_ONBOARDING_CALL | OnboardingStatus.DENIED
+  ) => {
     if (currentUser) {
-      updateUserStatus(currentApplicant.id, OnboardingStatus.PENDING_ONBOARDING_CALL, currentUser);
-      
-      // Add note if provided
-      if (note.trim()) {
-        addOrganizerNote(currentApplicant.id, note, currentUser);
-      }
-    }
-    handleNext();
-  };
+      updateUserStatus(currentApplicant.id, status, currentUser);
 
-  const handleReject = () => {
-    if (currentUser) {
-      updateUserStatus(currentApplicant.id, OnboardingStatus.DENIED, currentUser);
-      
-      // Add note if provided
       if (note.trim()) {
         addOrganizerNote(currentApplicant.id, note, currentUser);
       }
@@ -51,89 +80,120 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants,
   const handleNext = () => {
     if (currentIndex < applicants.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      setNote(''); // Clear note for next applicant
+      setNote('');
     } else {
-      onClose(); // Close modal when all applicants are reviewed
+      onClose();
     }
   };
 
-  return (
-    <Modal 
-      title="Review New Applicants" 
-      onClose={onClose}
-      size='md'
-    >
-      <div className="p-4">
-        <div className="text-center">
-          <img src={currentApplicant.profilePictureUrl} alt={currentApplicant.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover" />
-          <h3 className="text-xl font-bold">{currentApplicant.name}</h3>
-          <p className="text-grey-600">{currentApplicant.chapters?.join(', ')}</p>
-        </div>
+  const modalTitle = `Review Applicants (${currentIndex + 1} of ${
+    applicants.length
+  })`;
 
-        <div className="mt-6 bg-gray-50 p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-bold mb-2">Application Details</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p><strong>Email:</strong> {currentApplicant.email}</p>
-                <p><strong>Instagram:</strong> {currentApplicant.instagram || 'Not provided'}</p>
-              </div>
-              <div>
-                <p><strong>Join Date:</strong> {currentApplicant.joinDate ? new Date(currentApplicant.joinDate).toLocaleDateString() : 'N/A'}</p>
-                <p><strong>Status:</strong> <span className="font-semibold text-primary">{currentApplicant.onboardingStatus}</span></p>
-              </div>
-            </div>
+  return (
+    <Modal title={modalTitle} onClose={onClose} size="lg">
+      <div className="space-y-6">
+        {/* Applicant Header */}
+        <div className="flex flex-col items-center gap-6 border-b-2 border-black pb-6 sm:flex-row">
+          <img
+            src={currentApplicant.profilePictureUrl}
+            alt={currentApplicant.name}
+            className="h-24 w-24 flex-shrink-0 border-2 border-black object-cover"
+          />
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+            <ApplicantDetail
+              icon={<UserCircleIcon className="h-5 w-5" />}
+              label="Name"
+              value={currentApplicant.name}
+            />
+            <ApplicantDetail
+              icon={<CalendarIcon className="h-5 w-5" />}
+              label="Applying to"
+              value={`${currentApplicant.chapters?.join(', ')} Chapter`}
+            />
+            <ApplicantDetail
+              icon={<MailIcon className="h-5 w-5" />}
+              label="Email"
+              value={currentApplicant.email}
+            />
+            <ApplicantDetail
+              icon={<HashtagIcon className="h-5 w-5" />}
+              label="Instagram"
+              value={currentApplicant.instagram}
+            />
+          </div>
         </div>
 
         {/* Onboarding Answers */}
-        {currentApplicant.onboardingAnswers ? (
-          <div className="mt-6 bg-blue-50 p-4 border border-blue-200 rounded-lg">
-            <h4 className="font-bold mb-3 text-blue-800">Onboarding Questions</h4>
-            
-            <div className="space-y-3">
-              <div>
-                <p className="font-semibold text-sm text-blue-700">Why did you go vegan?</p>
-                <p className="text-sm text-blue-800 bg-white p-2 rounded border">{currentApplicant.onboardingAnswers.veganReason}</p>
-              </div>
-              
-              <div>
-                <p className="font-semibold text-sm text-blue-700">Are you aligned with our abolitionist values?</p>
-                <p className="text-sm text-blue-800 bg-white p-2 rounded border">
-                  {currentApplicant.onboardingAnswers.abolitionistAlignment ? 'Yes' : 'No / Unsure'}
-                </p>
-              </div>
-              
-              <div>
-                <p className="font-semibold text-sm text-blue-700">How can you best contribute to your local chapter?</p>
-                <p className="text-sm text-blue-800 bg-white p-2 rounded border">{currentApplicant.onboardingAnswers.customAnswer}</p>
-              </div>
+        <div className="space-y-4">
+          <h3 className="text-lg font-extrabold text-black">
+            Application Answers
+          </h3>
+          {currentApplicant.onboardingAnswers ? (
+            <div className="space-y-4 border-2 border-black bg-neutral-100 p-4">
+              <AnswerBlock
+                question="Why did you go vegan?"
+                answer={currentApplicant.onboardingAnswers.veganReason}
+              />
+              <AnswerBlock
+                question="Are you aligned with our abolitionist values?"
+                answer={
+                  currentApplicant.onboardingAnswers.abolitionistAlignment
+                    ? 'Yes'
+                    : 'No / Unsure'
+                }
+              />
+              <AnswerBlock
+                question="How can you best contribute to your local chapter?"
+                answer={currentApplicant.onboardingAnswers.customAnswer}
+              />
             </div>
-          </div>
-        ) : (
-          <div className="mt-6 bg-yellow-50 p-4 border border-yellow-200 rounded-lg">
-            <h4 className="font-bold mb-2 text-yellow-800">⚠️ No Onboarding Answers</h4>
-            <p className="text-sm text-yellow-700">This applicant doesn't have onboarding answers recorded. This might indicate an issue with the signup process.</p>
-          </div>
-        )}
+          ) : (
+            <div className="border-2 border-warning bg-warning/10 p-4">
+              <p className="font-bold text-yellow-700">
+                ⚠️ No Onboarding Answers
+              </p>
+              <p className="text-sm text-yellow-700">
+                This applicant doesn't have answers recorded. This may indicate
+                an issue with the signup process.
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Organizer Note */}
-        <div className="mt-6 bg-gray-50 p-4 border border-gray-200 rounded-lg">
-          <h4 className="font-bold mb-2">Add Note (Optional)</h4>
-          <textarea
+        <div className="space-y-2">
+          <h3 className="text-lg font-extrabold text-black">
+            Add Note (Optional)
+          </h3>
+          <TextAreaField
+            label="Visible only to other organizers"
+            id="organizer-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Add any notes about this applicant..."
-            className="w-full p-2 border border-gray-300 rounded text-sm"
+            placeholder="e.g., 'Strong application, seems dedicated...'"
             rows={3}
           />
         </div>
 
-        <div className="mt-6 flex justify-between space-x-4">
-          <button onClick={handleReject} className="btn-danger w-full">Reject</button>
-          <button onClick={handleApprove} className="btn-primary w-full">Approve</button>
-        </div>
-
-        <div className="mt-4 text-center text-sm text-grey-500">
-          <p>Showing applicant {currentIndex + 1} of {applicants.length}</p>
+        {/* Actions */}
+        <div className="grid grid-cols-2 gap-4 border-t-2 border-black pt-6">
+          <button
+            onClick={() => handleAction(OnboardingStatus.DENIED)}
+            className="flex w-full items-center justify-center gap-2 border-2 border-black bg-danger py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg"
+          >
+            <XIcon className="h-5 w-5" />
+            Reject
+          </button>
+          <button
+            onClick={() =>
+              handleAction(OnboardingStatus.PENDING_ONBOARDING_CALL)
+            }
+            className="flex w-full items-center justify-center gap-2 border-2 border-black bg-success py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg"
+          >
+            <CheckIcon className="h-5 w-5" />
+            Approve
+          </button>
         </div>
       </div>
     </Modal>
