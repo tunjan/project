@@ -1,25 +1,26 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type User } from '@/types';
+import { type User, OnboardingStatus } from '@/types';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import BadgeList from '@/components/dashboard/BadgeList';
 import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
 import ParticipationHistory from '@/components/dashboard/ParticipationHistory';
 import EditProfileModal from '@/components/dashboard/EditProfileModal';
+import DeactivateAccountModal from '@/components/dashboard/DeactivateAccountModal';
 import HostingDashboard from '@/components/dashboard/HostingDashboard';
 import BadgeAwardsDashboard from '@/components/dashboard/BadgeAwardsDashboard';
 import Avatar from '@/components/ui/Avatar';
-import QRCode from 'qrcode.react';
+// QR flow deprecated
 import { toast } from 'sonner';
 import {
   PencilIcon,
-  InformationCircleIcon,
   ChatBubbleLeftRightIcon,
   MapIcon,
   ChevronLeftIcon,
+  ShieldCheckIcon,
 } from '@/icons';
 import { useUsersActions, useEvents, useBadgeAwardsForUser } from '@/store';
-import { useCurrentUser } from '@/store/auth.store';
+import { useCurrentUser } from '@/store';
 import UserActivityChart from '@/components/profile/UserActivityChart';
 import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
 import { getCityAttendanceForUser } from '@/utils/analytics';
@@ -46,10 +47,10 @@ const QuickActionButton: React.FC<{
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const { updateProfile, clearPersistedData, getStoreHealth } =
-    useUsersActions();
+  const { updateProfile, deleteUser } = useUsersActions();
   const allEvents = useEvents();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
 
   // CONSOLIDATED LOGIC: This boolean now controls all view variations.
@@ -74,15 +75,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
     toast.success('Profile updated successfully.');
   };
 
-  const handleClearStoreData = () => {
-    clearPersistedData();
-    toast.success('Store data cleared. Please refresh the page.');
+  const handleDeactivateInitiation = () => {
+    setIsEditModalOpen(false); // Close edit modal
+    setIsDeactivateModalOpen(true); // Open deactivate modal
   };
 
-  const handleCheckStoreHealth = () => {
-    const health = getStoreHealth();
-    console.log('Store Health Check:', health);
-    toast.info('Store health check completed. Check console for details.');
+  const handleDeactivateConfirm = async () => {
+    if (!currentUser) return;
+    try {
+      await deleteUser(currentUser.id);
+      toast.success('Your account has been permanently deleted.');
+      setIsDeactivateModalOpen(false);
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      toast.error('Failed to delete your account. Please try again.');
+    }
   };
 
   const handleAvatarChange = (newImageUrl: string) => {
@@ -103,6 +110,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           user={user}
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSaveProfile}
+          onDeactivate={handleDeactivateInitiation}
+        />
+      )}
+      {isOwnProfile && isDeactivateModalOpen && (
+        <DeactivateAccountModal
+          user={user}
+          onClose={() => setIsDeactivateModalOpen(false)}
+          onConfirm={handleDeactivateConfirm}
         />
       )}
       {isCityModalOpen && (
@@ -113,34 +128,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
         />
       )}
       <div className="py-8 md:py-12">
-        {/* PENDING VERIFICATION BANNER (OWNER ONLY) */}
-        {isOwnProfile && user.onboardingStatus === 'Awaiting Verification' && (
-          <div
-            className="mb-8 border-2 border-black bg-white p-4 shadow-brutal"
-            role="alert"
-          >
-            <div className="flex flex-col items-center gap-4 md:flex-row">
-              <div className="flex-shrink-0">
-                <InformationCircleIcon className="h-10 w-10 text-black" />
-              </div>
-              <div className="flex-grow text-center text-black md:text-left">
-                <p className="font-extrabold">ACCOUNT PENDING VERIFICATION</p>
-                <p className="text-sm">
-                  To gain full access, meet a Chapter Organizer and have them
-                  scan this QR code to confirm your identity.
-                </p>
-              </div>
-              <div className="flex-shrink-0 border-2 border-black bg-white p-2">
-                <QRCode
-                  value={`${window.location.origin}/verify/${user.id}`}
-                  size={100}
-                  level="H"
-                  includeMargin={false}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Verification banner removed with new onboarding pipeline */}
 
         {/* BACK BUTTON (PUBLIC/MANAGEMENT VIEW ONLY) */}
         {!isOwnProfile && (
@@ -163,7 +151,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
               onImageChange={handleAvatarChange}
             />
             {isOwnProfile && (
-              <p className="mt-2 text-center text-xs text-white0">
+              <p className="mt-2 text-center text-xs text-white">
                 Click to upload new avatar
               </p>
             )}
@@ -172,15 +160,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
             <p className="text-lg font-bold text-primary">
               {getUserRoleDisplay(user)}
             </p>
-            <h1 className="text-3xl font-extrabold text-black md:text-5xl">
+            <h1 className="flex items-center gap-2 text-3xl font-extrabold text-black md:text-5xl">
               {user.name}
+              {user.onboardingStatus === OnboardingStatus.CONFIRMED && (
+                <span
+                  className="inline-flex items-center gap-1 rounded bg-green-100 px-2 py-1 text-sm font-bold text-green-700"
+                  title="Verified activist"
+                >
+                  <ShieldCheckIcon className="h-5 w-5" /> Verified
+                </span>
+              )}
             </h1>
             {user.instagram && (
               <a
                 href={`https://instagram.com/${user.instagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-red hover:text-primary hover:underline"
+                className="text-red font-semibold hover:text-primary hover:underline"
               >
                 @{user.instagram}
               </a>
@@ -195,28 +191,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
             >
               <PencilIcon className="h-6 w-6 text-white" />
             </button>
-          )}
-
-          {/* DEBUG BUTTON (DEVELOPMENT ONLY) */}
-          {process.env.NODE_ENV === 'development' && (
-            <>
-              <button
-                onClick={handleClearStoreData}
-                className="border-brutal group flex h-14 w-14 flex-shrink-0 items-center justify-center bg-red transition-colors hover:bg-black"
-                aria-label="Clear Store Data (Debug)"
-                title="Clear Store Data (Debug)"
-              >
-                <span className="text-xs font-bold text-white">DBG</span>
-              </button>
-              <button
-                onClick={handleCheckStoreHealth}
-                className="border-brutal group flex h-14 w-14 flex-shrink-0 items-center justify-center bg-black transition-colors hover:bg-red"
-                aria-label="Check Store Health (Debug)"
-                title="Check Store Health (Debug)"
-              >
-                <span className="text-xs font-bold text-white">HLTH</span>
-              </button>
-            </>
           )}
         </div>
 

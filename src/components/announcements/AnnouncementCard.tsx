@@ -5,7 +5,7 @@ import { useAnnouncementsActions } from '@/store/announcements.store';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { safeFormatLocaleDate } from '@/utils/date';
 import { toast } from 'sonner';
-import { PencilIcon, TrashIcon } from '@/icons';
+import { PencilIcon, TrashIcon, ChevronRightIcon } from '@/icons';
 import EditAnnouncementModal from './EditAnnouncementModal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
@@ -97,19 +97,19 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               target={announcement.country || announcement.chapter}
             />
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-white0">{formattedDate}</p>
+              <p className="text-sm text-neutral-500">{formattedDate}</p>
               {canManage && (
                 <>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="p-1 text-white0 hover:text-black"
+                    className="p-1 text-neutral-500 hover:text-black"
                     aria-label="Edit announcement"
                   >
                     <PencilIcon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setIsDeleteModalOpen(true)}
-                    className="p-1 text-white0 hover:text-primary"
+                    className="p-1 text-neutral-500 hover:text-primary"
                     aria-label="Delete announcement"
                   >
                     <TrashIcon className="h-4 w-4" />
@@ -126,7 +126,21 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             {announcement.content}
           </p>
 
-          <div className="mt-6 flex items-center border-t border-white pt-4">
+          {announcement.ctaLink && (
+            <div className="mt-6">
+              <a
+                href={announcement.ctaLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary inline-flex items-center"
+              >
+                {announcement.ctaText || 'Learn More'}
+                <ChevronRightIcon className="ml-2 h-4 w-4" />
+              </a>
+            </div>
+          )}
+
+          <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
             <img
               className="h-10 w-10 object-cover"
               src={announcement.author.profilePictureUrl}
@@ -136,7 +150,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               <p className="text-sm font-semibold text-black">
                 {announcement.author.name}
               </p>
-              <p className="text-xs text-white0">
+              <p className="text-xs text-neutral-500">
                 {announcement.author.role}
               </p>
             </div>

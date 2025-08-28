@@ -26,7 +26,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       <div className="max-h-96 overflow-y-auto p-4">
         {loading && <LoadingSpinner />}
         {!loading && !hasResults && (
-          <p className="text-center text-sm text-white0">
+          <p className="text-center text-sm text-neutral-500">
             No results found.
           </p>
         )}

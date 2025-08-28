@@ -25,6 +25,7 @@ const ChapterListPage = React.lazy(() => import('@/pages/ChapterListPage'));
 const ChapterDetailPage = React.lazy(() => import('@/pages/ChapterDetailPage'));
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
 const SignUpPage = React.lazy(() => import('@/pages/SignUpPage'));
+const SignUpSuccessPage = React.lazy(() => import('@/pages/SignUpSuccessPage'));
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
 const VerificationPage = React.lazy(() => import('@/pages/VerificationPage'));
 const LeaderboardPage = React.lazy(() => import('@/pages/LeaderboardPage'));
@@ -39,18 +40,47 @@ export const router = createBrowserRouter([
     path: '/',
     element: <RootSuspense />,
     children: [
+      // Public landing page at root (outside MainLayout to avoid sidebar/margins)
+      { index: true, element: <IndexRedirect /> },
       {
         element: <MainLayout />,
         children: [
-          { index: true, element: <IndexRedirect /> },
-          { path: 'cubes', element: <CubeListPage /> },
-          { path: 'cubes/:eventId', element: <CubeDetailPage /> },
-          { path: 'chapters', element: <ChapterListPage /> },
-          { path: 'chapters/:chapterName', element: <ChapterDetailPage /> },
+          {
+            path: 'cubes',
+            element: (
+              <ProtectedRoute requireCoreAccess>
+                <CubeListPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'cubes/:eventId',
+            element: (
+              <ProtectedRoute requireCoreAccess>
+                <CubeDetailPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'chapters',
+            element: (
+              <ProtectedRoute requireCoreAccess>
+                <ChapterListPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'chapters/:chapterName',
+            element: (
+              <ProtectedRoute requireCoreAccess>
+                <ChapterDetailPage />
+              </ProtectedRoute>
+            ),
+          },
           {
             path: 'dashboard',
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute requireCoreAccess>
                 <DashboardPage />
               </ProtectedRoute>
             ),
@@ -74,7 +104,7 @@ export const router = createBrowserRouter([
           {
             path: 'leaderboard',
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute requireCoreAccess>
                 <LeaderboardPage />
               </ProtectedRoute>
             ),
@@ -83,7 +113,7 @@ export const router = createBrowserRouter([
           {
             path: 'members/:userId',
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute requireCoreAccess>
                 <PublicProfilePage />
               </ProtectedRoute>
             ),
@@ -107,7 +137,7 @@ export const router = createBrowserRouter([
           {
             path: 'verify/:userId',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <VerificationPage />
               </ProtectedRoute>
             ),
@@ -115,7 +145,7 @@ export const router = createBrowserRouter([
           {
             path: 'outreach',
             element: (
-              <ProtectedRoute>
+              <ProtectedRoute requireFullAccess>
                 <OutreachLogPage />
               </ProtectedRoute>
             ),
@@ -123,7 +153,7 @@ export const router = createBrowserRouter([
           {
             path: 'cubes/create',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <CreateCubePage />
               </ProtectedRoute>
             ),
@@ -131,7 +161,7 @@ export const router = createBrowserRouter([
           {
             path: 'announcements/create',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <CreateAnnouncementPage />
               </ProtectedRoute>
             ),
@@ -139,7 +169,7 @@ export const router = createBrowserRouter([
           {
             path: 'manage',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <ManagementPage />
               </ProtectedRoute>
             ),
@@ -148,7 +178,7 @@ export const router = createBrowserRouter([
           {
             path: 'manage/member/:userId',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <MemberProfilePage />
               </ProtectedRoute>
             ),
@@ -156,7 +186,7 @@ export const router = createBrowserRouter([
           {
             path: 'manage/event/:eventId',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <ManageEventPage />
               </ProtectedRoute>
             ),
@@ -164,7 +194,7 @@ export const router = createBrowserRouter([
           {
             path: 'analytics',
             element: (
-              <ProtectedRoute requiredRole="organizer">
+              <ProtectedRoute requiredRole="organizer" requireFullAccess>
                 <AnalyticsPage />
               </ProtectedRoute>
             ),
@@ -180,6 +210,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'login', element: <LoginPage /> },
           { path: 'signup', element: <SignUpPage /> },
+          { path: 'signup-success', element: <SignUpSuccessPage /> },
         ],
       },
     ],

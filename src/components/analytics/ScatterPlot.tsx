@@ -54,7 +54,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     return (
       <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-        <div className="text-white0 flex h-[350px] items-center justify-center">
+        <div className="text-neutral-500 flex h-[350px] items-center justify-center">
           Not enough data to display chart.
         </div>
       </div>
@@ -81,7 +81,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
               bottom: 60,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
               type="number"
               dataKey="x"
@@ -121,7 +121,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
             <Tooltip content={<CustomTooltip />} />
             <Scatter
               dataKey="y"
-              fill="#6b7280"
+              fill="#d81313"
               stroke="#000000"
               strokeWidth={1}
               r={6}

@@ -139,7 +139,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
                   <h3 className="text-lg font-bold leading-tight text-black">
                     {event.location}
                   </h3>
-                  <p className="text-sm font-semibold uppercase tracking-wide text-neutral-secondary">
+                  <p className="text-neutral-secondary text-sm font-semibold uppercase tracking-wide">
                     {event.city}
                   </p>
                 </div>

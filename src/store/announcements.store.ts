@@ -10,12 +10,21 @@ export interface AnnouncementsState {
 
 export interface AnnouncementsActions {
   createAnnouncement: (
-    data: { title: string; content: string; scope: Announcement['scope']; target?: string },
+    data: {
+      title: string;
+      content: string;
+      scope: Announcement['scope'];
+      target?: string;
+      ctaLink?: string;
+      ctaText?: string;
+    },
     author: User
   ) => void;
   updateAnnouncement: (
     announcementId: string,
-    updateData: Partial<Pick<Announcement, 'title' | 'content'>>
+    updateData: Partial<
+      Pick<Announcement, 'title' | 'content' | 'ctaLink' | 'ctaText'>
+    >
   ) => void;
   deleteAnnouncement: (announcementId: string) => void;
 }
@@ -35,6 +44,8 @@ export const useAnnouncementsStore = create<AnnouncementsState & AnnouncementsAc
           title: data.title,
           content: data.content,
           scope: data.scope,
+          ctaLink: data.ctaLink,
+          ctaText: data.ctaText,
         };
 
         if (data.scope === 'Chapter' && data.target) {

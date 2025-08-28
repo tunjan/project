@@ -21,7 +21,7 @@ const TabButton: React.FC<{
     className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
       isActive
         ? 'text-black'
-        : 'border-transparent text-white0 hover:text-black'
+        : 'border-transparent text-white hover:text-black'
     }`}
   >
     {children}
@@ -72,7 +72,7 @@ const HostingDashboard: React.FC<HostingDashboardProps> = () => {
           ? 'No incoming requests.'
           : "You haven't sent any requests."}
       </h3>
-      <p className="mt-2 text-white0">
+      <p className="mt-2 text-white">
         {view === 'incoming'
           ? 'When activists request to stay with you, they will appear here.'
           : 'Request accommodation from an event page.'}

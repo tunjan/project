@@ -1,5 +1,8 @@
 import { User, Role, OnboardingStatus, CubeEvent } from '@/types';
 
+// Shared constant for inactivity period
+export const INACTIVITY_PERIOD_MONTHS = 3;
+
 /**
  * Generates a clean, human-friendly display string for a user's role and affiliations.
  * Examples:
@@ -11,8 +14,8 @@ export const getUserRoleDisplay = (user: User): string => {
   // Map role labels to nicer variants
   const roleLabel = (() => {
     switch (user.role) {
-      case Role.CONFIRMED_ACTIVIST:
-        return 'Confirmed Activist';
+      case Role.ACTIVIST:
+        return 'Activist';
       case Role.GODMODE:
         return 'Administrator';
       default:
@@ -55,7 +58,7 @@ export const getUserRoleDisplay = (user: User): string => {
 
 /**
  * Checks if a user is considered inactive.
- * Inactive means they haven't logged in for 3 months AND haven't attended an event in 3 months.
+ * Inactive means they haven't logged in for the defined period AND haven't attended an event in that period.
  * @param user The user to check.
  * @param allEvents The list of all events to check against for attendance.
  * @returns True if the user is inactive, false otherwise.
@@ -63,14 +66,14 @@ export const getUserRoleDisplay = (user: User): string => {
 export const isUserInactive = (user: User, allEvents: CubeEvent[]): boolean => {
   if (user.onboardingStatus !== OnboardingStatus.CONFIRMED) return false;
 
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  const inactivityCutoff = new Date();
+  inactivityCutoff.setMonth(inactivityCutoff.getMonth() - INACTIVITY_PERIOD_MONTHS);
 
-  const hasRecentLogin = user.lastLogin && new Date(user.lastLogin) > threeMonthsAgo;
+  const hasRecentLogin = user.lastLogin && new Date(user.lastLogin) > inactivityCutoff;
 
   const hasRecentAttendance = allEvents.some(
     (event) =>
-      new Date(event.startDate) > threeMonthsAgo &&
+      new Date(event.startDate) > inactivityCutoff &&
       event.report?.attendance[user.id] === 'Attended'
   );
 

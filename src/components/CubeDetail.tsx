@@ -10,8 +10,6 @@ import {
   Chapter,
   TourDuty,
   ParticipantStatus,
-  EventRole,
-  type EventRoleRequirement,
 } from '@/types';
 import {
   CalendarIcon,
@@ -29,9 +27,8 @@ import EditEventModal from '@/components/events/EditEventModal';
 import EventDiscussion from '@/components/events/EventDiscussion';
 import EventRoster from './events/EventRoster';
 import TourOfDutyModal from './events/TourOfDutyModal';
-import EventRoleManagement from './events/EventRoleManagement';
-import RoleSignupModal from './events/RoleSignupModal';
 import InventoryDisplay from './charts/InventoryDisplay';
+import { can, Permission } from '@/config/permissions';
 import { useCurrentUser } from '@/store/auth.store';
 import {
   useEventsActions,
@@ -47,21 +44,12 @@ import ConfirmationModal from '@/components/ui/ConfirmationModal';
 interface CubeDetailProps {
   event: CubeEvent;
   onBack: () => void;
-  onRsvp: (eventId: string, duties?: TourDuty[], eventRole?: EventRole) => void;
+  onRsvp: (eventId: string, duties?: TourDuty[]) => void;
   onCancelRsvp: (eventId: string) => void;
   onManageEvent: (event: CubeEvent) => void;
+  readOnlyPublic?: boolean;
 }
 
-const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
-  const roleClasses =
-    role === 'Organizer' ? 'bg-primary text-white' : 'bg-black text-white';
-
-  return (
-    <span className={`px-2 py-1 text-xs font-medium ${roleClasses}`}>
-      {role}
-    </span>
-  );
-};
 
 const ParticipantCard: React.FC<{
   participant: EventParticipant;
@@ -89,13 +77,12 @@ const ParticipantCard: React.FC<{
             <p className="truncate text-sm font-semibold text-black">
               {participant.user.name}
             </p>
-            <p className="text-white0 truncate text-sm">
+            <p className="truncate text-sm text-neutral-500">
               {participant.user.role}
             </p>
           </div>
         </Link>
         <div className="flex flex-shrink-0 items-center space-x-2">
-          <RoleBadge role={participant.eventRole} />
           {isOrganizerView && (
             <button
               onClick={() => onRemove(participant.user.id)}
@@ -133,7 +120,7 @@ const PendingRequestCard: React.FC<{
           <p className="text-sm font-semibold text-black">
             {participant.user.name}
           </p>
-          <p className="text-white0 text-sm">
+          <p className="text-sm text-neutral-500">
             {participant.user.chapters?.join(', ') || 'No chapters assigned'}
           </p>
         </div>
@@ -175,7 +162,7 @@ const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> = ({
         />
         <div className="ml-4">
           <p className="text-sm font-semibold text-black">{host.name}</p>
-          <p className="text-white0 text-sm">
+          <p className="text-sm text-neutral-500">
             Can host {host.hostingCapacity}{' '}
             {host.hostingCapacity === 1 ? 'person' : 'people'}
           </p>
@@ -197,18 +184,18 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   onRsvp,
   onCancelRsvp,
   onManageEvent,
+  readOnlyPublic = false,
 }) => {
   const currentUser = useCurrentUser();
   const allUsers = useUsers();
   const allChapters = useChapters();
-  const { cancelEvent, approveRsvp, denyRsvp, removeParticipant, updateEvent } =
+  const { cancelEvent, approveRsvp, denyRsvp, removeParticipant } =
     useEventsActions();
   const { createAccommodationRequest } = useAccommodationsActions();
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isTourModalOpen, setIsTourModalOpen] = useState(false);
-  const [isRoleSignupModalOpen, setIsRoleSignupModalOpen] = useState(false);
   const [selectedHost, setSelectedHost] = useState<User | null>(null);
   const [removeParticipantModalOpen, setRemoveParticipantModalOpen] =
     useState(false);
@@ -256,15 +243,15 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 
   const isPastEvent = startDate ? new Date() > startDate : false;
   const isCancelled = event.status === EventStatus.CANCELLED;
-  const isOrganizer = currentUser?.id === event.organizer.id;
-  const canManageEvent =
-    isOrganizer &&
-    isPastEvent &&
-    event.status !== EventStatus.FINISHED &&
-    !isCancelled;
-  const canParticipateInDiscussion = currentUser && isAttending;
-  const canEditEvent = isOrganizer && !isPastEvent && !isCancelled;
-  const canCancelEvent = isOrganizer && !isPastEvent && !isCancelled;
+  const canManageEvent = !readOnlyPublic && can(currentUser, Permission.LOG_EVENT_REPORT, { event });
+  const canParticipateInDiscussion = !readOnlyPublic && currentUser && isAttending;
+  const canEditEvent = !readOnlyPublic && can(currentUser, Permission.EDIT_EVENT, { event });
+  const canCancelEvent = !readOnlyPublic && can(currentUser, Permission.CANCEL_EVENT, { event });
+  const canManageParticipants = !readOnlyPublic && can(
+    currentUser,
+    Permission.MANAGE_EVENT_PARTICIPANTS,
+    { event, allChapters }
+  );
   const isRegionalEvent = event.scope === 'Regional' && endDate !== null;
 
   const attendingParticipants = useMemo(
@@ -319,32 +306,16 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     if (isRegionalEvent) {
       setIsTourModalOpen(true);
     } else {
-      // Show role selection modal for non-regional events
-      setIsRoleSignupModalOpen(true);
+      onRsvp(event.id);
     }
   };
 
   const handleTourConfirm = (duties: TourDuty[]) => {
-    onRsvp(event.id, duties, EventRole.ACTIVIST);
+    onRsvp(event.id, duties);
     setIsTourModalOpen(false);
     toast.success('Your duties have been registered!');
   };
 
-  const handleRoleSignup = (role: EventRole) => {
-    onRsvp(event.id, undefined, role);
-    setIsRoleSignupModalOpen(false);
-    toast.success(`You've signed up as ${role}!`);
-  };
-
-  const handleUpdateRoleRequirements = (
-    requirements: EventRoleRequirement[]
-  ) => {
-    updateEvent(
-      event.id,
-      { roleRequirements: requirements },
-      currentUser || undefined
-    );
-  };
 
   const handleRequestStay = (host: User) => {
     setSelectedHost(host);
@@ -425,14 +396,14 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           onCreateRequest={handleCreateRequest}
         />
       )}
-      {isCancelModalOpen && canCancelEvent && (
+      {!readOnlyPublic && isCancelModalOpen && canCancelEvent && (
         <CancelEventModal
           event={event}
           onClose={() => setIsCancelModalOpen(false)}
           onConfirm={handleConfirmCancel}
         />
       )}
-      {isTourModalOpen && isRegionalEvent && (
+      {!readOnlyPublic && isTourModalOpen && isRegionalEvent && (
         <TourOfDutyModal
           event={event}
           existingDuties={currentUserParticipant?.tourDuties || []}
@@ -440,19 +411,11 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           onConfirm={handleTourConfirm}
         />
       )}
-      {isEditModalOpen && canEditEvent && (
+      {!readOnlyPublic && isEditModalOpen && canEditEvent && (
         <EditEventModal
           event={event}
           organizableChapters={organizableChapters}
           onClose={() => setIsEditModalOpen(false)}
-        />
-      )}
-      {isRoleSignupModalOpen && (
-        <RoleSignupModal
-          event={event}
-          currentRole={currentUserParticipant?.eventRole}
-          onClose={() => setIsRoleSignupModalOpen(false)}
-          onConfirm={handleRoleSignup}
         />
       )}
       <div className="animate-fade-in py-8 md:py-12">
@@ -486,7 +449,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
             <div className="overflow-hidden border-2 border-black bg-white">
               <img
                 src="/default-cube-image.svg"
-                alt="Default cube event image"
+                alt="Default cube event"
                 className="h-48 w-full object-cover sm:h-64"
               />
               <div className="p-6 md:p-8">
@@ -527,7 +490,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   </div>
                 </div>
 
-                <div className="mt-8 border-t border-white pt-6">
+                <div className="mt-8 border-t border-neutral-200 pt-6">
                   <h3 className="mb-2 text-lg font-bold text-black">
                     Organizer
                   </h3>
@@ -541,7 +504,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                       <p className="text-base font-semibold text-black">
                         {event.organizer.name}
                       </p>
-                      <p className="text-white0 text-sm">
+                      <p className="text-sm text-neutral-500">
                         {event.organizer.role}
                       </p>
                     </div>
@@ -549,15 +512,10 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 </div>
               </div>
             </div>
-            <EventRoleManagement
-              event={event}
-              onUpdateRoleRequirements={handleUpdateRoleRequirements}
-              canEdit={canEditEvent}
-            />
-            {isRegionalEvent && <EventRoster event={event} />}
-            {isOrganizer && pendingParticipants.length > 0 && (
+            {isRegionalEvent && !readOnlyPublic && <EventRoster event={event} />}
+            {canManageParticipants && pendingParticipants.length > 0 && (
               <div className="border-red border bg-white">
-                <div className="border-b border-white p-6 md:p-8">
+                <div className="border-b border-neutral-200 p-6 md:p-8">
                   <h2 className="text-xl font-bold text-black">
                     Pending Join Requests ({pendingParticipants.length})
                   </h2>
@@ -566,7 +524,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     approval to attend.
                   </p>
                 </div>
-                <ul className="divide-y divide-yellow-300 px-6">
+                <ul className="divide-y divide-yellow-300 p-6">
                   {pendingParticipants
                     .filter((p) => p?.user) // Filter out invalid participants
                     .map((p) => (
@@ -580,7 +538,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 </ul>
               </div>
             )}
-            {!isPastEvent && currentUser && !isRegionalEvent && (
+            {!readOnlyPublic && !isPastEvent && currentUser && !isRegionalEvent && (
               <div className="border-2 border-black bg-white">
                 <div className="p-6 md:p-8">
                   <div className="mb-2 flex items-center border-b border-black pb-4">
@@ -602,7 +560,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                         ))}
                     </ul>
                   ) : (
-                    <p className="text-white0 py-4 text-center text-sm">
+                    <p className="py-4 text-center text-sm text-neutral-500">
                       No hosts are available for this event yet. Check back
                       later!
                     </p>
@@ -642,20 +600,20 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     <ParticipantCard
                       key={p.user.id}
                       participant={p}
-                      isOrganizerView={isOrganizer && !isPastEvent}
+                      isOrganizerView={canManageParticipants && !isPastEvent}
                       onRemove={openRemoveParticipantModal}
                     />
                   ))}
               </ul>
               <div className="mt-6 space-y-2">
                 {/* Status Display */}
-                {isAttending && (
+                {!readOnlyPublic && isAttending && (
                   <div className="flex items-center justify-center border-2 border-black bg-white px-4 py-3 font-semibold text-black">
                     <ClipboardCheckIcon className="mr-2 h-5 w-5" />
                     Status: Attending
                   </div>
                 )}
-                {isPending && (
+                {!readOnlyPublic && isPending && (
                   <div className="border-red flex items-center justify-center border-2 bg-white px-4 py-3 font-semibold text-black">
                     <ClockIcon className="mr-2 h-5 w-5" />
                     Status: Request Pending
@@ -672,7 +630,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 ) : null}
 
                 {/* Action Buttons */}
-                {canManageEvent ? (
+                {!readOnlyPublic && canManageEvent ? (
                   <button
                     onClick={() => onManageEvent(event)}
                     className="flex w-full items-center justify-center bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
@@ -681,6 +639,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     Log Event Report
                   </button>
                 ) : (
+                  !readOnlyPublic &&
                   !isPastEvent &&
                   !isCancelled &&
                   currentUser && (
@@ -710,7 +669,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 )}
 
                 {/* Cancel RSVP Button */}
-                {(isAttending || isPending) && !isPastEvent && !isCancelled && (
+                {!readOnlyPublic && (isAttending || isPending) && !isPastEvent && !isCancelled && (
                   <button
                     onClick={() => onCancelRsvp(event.id)}
                     className="flex w-full items-center justify-center bg-black px-4 py-3 font-bold text-white transition-colors hover:bg-black"
@@ -720,7 +679,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 )}
 
                 {/* Event Management Buttons */}
-                {canEditEvent && (
+                {!readOnlyPublic && canEditEvent && (
                   <button
                     onClick={() => setIsEditModalOpen(true)}
                     className="flex w-full items-center justify-center border border-black bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-black"
@@ -729,7 +688,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     Edit Event
                   </button>
                 )}
-                {canCancelEvent && (
+                {!readOnlyPublic && canCancelEvent && (
                   <button
                     onClick={() => setIsCancelModalOpen(true)}
                     className="btn-danger flex w-full items-center justify-center"

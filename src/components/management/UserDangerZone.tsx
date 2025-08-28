@@ -23,21 +23,21 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
         Danger Zone
       </h2>
       <div className="space-y-4 border-2 border-primary bg-white p-6">
-        {user.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION &&
+        {user.onboardingStatus !== OnboardingStatus.CONFIRMED &&
           canManuallyVerify && (
             <div className="border-b border-primary pb-4">
               <h3 className="text-lg font-bold text-black">
-                Manual Verification
+                Bypass Onboarding Process
               </h3>
               <p className="mt-1 text-sm text-red">
-                Force-verify this user and grant them full access.
+                Skip all onboarding steps and immediately grant full activist permissions. Use only for trusted individuals.
               </p>
               <button
                 onClick={onManualVerify}
                 className="btn-warning mt-2 flex w-full items-center justify-center"
               >
                 <ShieldCheckIcon className="mr-2 h-5 w-5" />
-                Manually Verify User
+                Bypass Onboarding & Verify
               </button>
             </div>
           )}

@@ -17,7 +17,7 @@ const ProgressBar: React.FC<{
     <div>
       <div className="mb-1 flex items-baseline justify-between">
         <span className="text-sm font-semibold text-black">{label}</span>
-        <span className="text-xs font-medium text-white0">
+        <span className="text-xs font-medium text-neutral-600">
           {current} / {required}
         </span>
       </div>
@@ -54,16 +54,20 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
           <p className="text-sm font-semibold text-red">
             Progress to {nextTier}:
           </p>
-          <ProgressBar
-            label="Cubes Attended"
-            current={progress.cubes.current}
-            required={progress.cubes.required}
-          />
-          <ProgressBar
-            label="Cities"
-            current={progress.cities.current}
-            required={progress.cities.required}
-          />
+          {progress.cubes && (
+            <ProgressBar
+              label="Cubes Attended"
+              current={progress.cubes.current}
+              required={progress.cubes.required}
+            />
+          )}
+          {progress.cities && (
+            <ProgressBar
+              label="Cities"
+              current={progress.cities.current}
+              required={progress.cities.required}
+            />
+          )}
           {progress.hours && (
             <ProgressBar
               label="Hours Contributed"

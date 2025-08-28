@@ -1,4 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import { Responsive, WidthProvider } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
 import {
@@ -14,9 +17,6 @@ import ChapterInventory from '@/components/management/ChapterInventory';
 import {
   BuildingOfficeIcon,
   ClipboardCheckIcon,
-  CalendarIcon,
-  ClockIcon,
-  MapPinIcon,
   TrendingUpIcon,
   UserGroupIcon,
   ClipboardListIcon,
@@ -28,12 +28,17 @@ import {
   Role,
   OnboardingStatus,
   type Chapter,
-  EventStatus,
-  type CubeEvent,
   type ChapterJoinRequest,
 } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { isUserInactive } from '@/utils/user';
+import Widget from '@/components/dashboard/Widget';
+import DynamicGreeting from '@/components/dashboard/DynamicGreeting';
+import LeaderboardSnapshot from '@/components/dashboard/LeaderboardSnapshot';
+import ChapterHealthSnapshot from '@/components/dashboard/ChapterHealthSnapshot';
+import AtRiskMembersSnapshot from '@/components/dashboard/AtRiskMembersSnapshot';
+import ReviewApplicantModal from '@/components/management/ReviewApplicantModal';
+import NextEventWidget from '@/components/dashboard/NextEventWidget';
 
 type ManagementView =
   | 'dashboard'
@@ -66,7 +71,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
 }) => {
   const priorityStyles = {
     high: 'border-l-4 border-red bg-white',
-    medium: 'border-l-4 border-grey-500 bg-white',
+    medium: 'border-l-4 border-gray-500 bg-white',
     low: 'border-l-4 border-black bg-white',
   };
 
@@ -91,42 +96,6 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
   );
 };
 
-interface UpcomingEventCardProps {
-  event: CubeEvent;
-  onManage: () => void;
-}
-
-const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
-  event,
-  onManage,
-}) => (
-  <div className="card-brutal card-padding">
-    <div className="flex items-start justify-between">
-      <div className="flex items-start gap-4">
-        <CalendarIcon className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
-        <div>
-          <h3 className="h-card">{event.location}</h3>
-          <div className="text-grey-600 mt-1 flex items-center gap-4 text-sm">
-            <span className="flex items-center gap-1">
-              <ClockIcon className="h-4 w-4" />
-              {new Date(event.startDate).toLocaleDateString()}
-            </span>
-            <span className="flex items-center gap-1">
-              <MapPinIcon className="h-4 w-4" />
-              {event.city}
-            </span>
-          </div>
-          <div className="mt-2 text-sm text-black">
-            {event.participants.length} participants
-          </div>
-        </div>
-      </div>
-      <button onClick={onManage} className="btn-primary">
-        Manage Event
-      </button>
-    </div>
-  </div>
-);
 
 const TabButton: React.FC<{
   onClick: () => void;
@@ -138,12 +107,85 @@ const TabButton: React.FC<{
     className={`flex w-full items-center space-x-3 border-l-4 p-4 text-left text-sm font-bold transition-colors duration-200 ${
       isActive
         ? 'border-primary bg-white text-black'
-        : 'text-white0 border-transparent hover:border-black hover:bg-white hover:text-black'
+        : 'border-transparent hover:border-black hover:bg-white hover:text-black'
     }`}
   >
     {children}
   </button>
 );
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
+
+const Dashboard: React.FC<{
+  tasks: ManagementTaskProps[];
+  showChapterHealth: boolean;
+}> = ({ tasks, showChapterHealth }) => {
+  const layout = useMemo(() => {
+    const baseLayout = [
+      { i: 'greeting', x: 0, y: 0, w: 2, h: 1, isResizable: false, isDraggable: false },
+      { i: 'tasks', x: 0, y: 1, w: 1, h: 2, minH: 2, minW: 1 },
+      { i: 'events', x: 1, y: 1, w: 1, h: 2, minH: 2, minW: 1 },
+      { i: 'leaderboard', x: 0, y: 2, w: 1, h: 2, minH: 2, minW: 1 },
+    ];
+
+    if (showChapterHealth) {
+      baseLayout.push({ i: 'chapterHealth', x: 1, y: 2, w: 1, h: 2, minH: 2, minW: 1 });
+      baseLayout.push({ i: 'atRiskMembers', x: 0, y: 3, w: 2, h: 2, minH: 2, minW: 1 });
+    }
+
+    return baseLayout;
+  }, [showChapterHealth]);
+
+  return (
+    <ResponsiveGridLayout
+      className="layout"
+      layouts={{ lg: layout }}
+      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+      cols={{ lg: 2, md: 2, sm: 1, xs: 1, xxs: 1 }}
+      rowHeight={200}
+      draggableHandle=".h-card-brutal"
+    >
+      <div key="greeting">
+        <DynamicGreeting />
+      </div>
+      <div key="tasks">
+        <Widget title="Actionable Tasks">
+          <div className="space-y-4">
+            {tasks.length > 0 ? (
+              tasks.map((task) => <ManagementTask key={task.title} {...task} />)
+            ) : (
+              <p className="text-grey-600">No actionable tasks at the moment.</p>
+            )}
+          </div>
+        </Widget>
+      </div>
+      <div key="events">
+        <Widget title="Upcoming Events">
+          <NextEventWidget />
+        </Widget>
+      </div>
+      <div key="leaderboard">
+        <Widget title="Leaderboard">
+          <LeaderboardSnapshot />
+        </Widget>
+      </div>
+      {showChapterHealth && (
+        <div key="chapterHealth">
+          <Widget title="Chapter Health">
+            <ChapterHealthSnapshot />
+          </Widget>
+        </div>
+      )}
+      {showChapterHealth && (
+        <div key="atRiskMembers">
+          <Widget title="At-Risk Members">
+            <AtRiskMembersSnapshot />
+          </Widget>
+        </div>
+      )}
+    </ResponsiveGridLayout>
+  );
+};
 
 const ManagementPage: React.FC = () => {
   const navigate = useNavigate();
@@ -158,6 +200,7 @@ const ManagementPage: React.FC = () => {
   const [selectedChapterForInventory, setSelectedChapterForInventory] =
     useState<string>('');
   const [memberFilter, setMemberFilter] = useState<MemberFilter>({});
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
   const manageableChapters = useMemo(() => {
     if (!currentUser) return [];
@@ -200,37 +243,26 @@ const ManagementPage: React.FC = () => {
 
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 
-  const dashboardTasks: ManagementTaskProps[] = useMemo(() => {
-    if (!currentUser) return [];
-
-    const newApplicants = allUsers.filter(
+  const newApplicants = useMemo(() => 
+    allUsers.filter(
       (u) => u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-    ).length;
+    ), [allUsers]);
+
+  const dashboardTasks: ManagementTaskProps[] = useMemo(() => {
+    if (!currentUser || newApplicants.length === 0) return [];
 
     return [
       {
         icon: <UserGroupIcon className="h-8 w-8" />,
         title: 'New Applicants to Review',
-        count: newApplicants,
+        count: newApplicants.length,
         description: 'Review and approve new applicants to the platform.',
-        onClick: () => {
-          handleViewChange('pipeline');
-          // The OnboardingPipeline already filters to show only PENDING_APPLICATION_REVIEW users
-        },
+        onClick: () => setReviewModalOpen(true),
         priority: 'high',
       },
     ];
-  }, [currentUser, allUsers]);
+  }, [currentUser, newApplicants.length]);
 
-  const upcomingEvents = useMemo(() => {
-    const now = new Date();
-    return allEvents.filter(
-      (event) =>
-        event.organizer.id === currentUser?.id &&
-        event.status === EventStatus.UPCOMING &&
-        new Date(event.startDate) > now
-    );
-  }, [allEvents, currentUser]);
 
   const {
     visibleMembers,
@@ -303,8 +335,8 @@ const ManagementPage: React.FC = () => {
 
     const onboardingUsers = allUsers.filter(
       (u) =>
-        (u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW ||
-          u.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION) &&
+        u.onboardingStatus !== OnboardingStatus.CONFIRMED &&
+        u.onboardingStatus !== OnboardingStatus.INACTIVE &&
         // Ensure onboarding users are also within the current user's scope
         (currentUserLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN] ||
           u.chapters?.some((c) => managedChapterNames.has(c)))
@@ -384,28 +416,10 @@ const ManagementPage: React.FC = () => {
     switch (view) {
       case 'dashboard':
         return (
-          <div>
-            <div className="mb-8">
-              <h2 className="mb-4 text-2xl font-bold">Actionable Tasks</h2>
-              <div className="space-y-4">
-                {dashboardTasksWithInactive.map((task) => (
-                  <ManagementTask key={task.title} {...task} />
-                ))}
-              </div>
-            </div>
-            <div>
-              <h2 className="mb-4 text-2xl font-bold">Upcoming Events</h2>
-              <div className="space-y-4">
-                {upcomingEvents.map((event) => (
-                  <UpcomingEventCard
-                    key={event.id}
-                    event={event}
-                    onManage={() => navigate(`/manage/event/${event.id}`)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+          <Dashboard
+            tasks={dashboardTasksWithInactive}
+            showChapterHealth={manageableChapters.length > 0}
+          />
         );
       case 'pipeline':
         return (
@@ -448,9 +462,7 @@ const ManagementPage: React.FC = () => {
         return (
           <div>
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                Chapter Inventory
-              </h2>
+
               {manageableChapters.length > 1 && (
                 <select
                   value={selectedChapterForInventory}
@@ -562,7 +574,15 @@ const ManagementPage: React.FC = () => {
           </TabButton>
         </nav>
       </div>
-      <div>{renderContent()}</div>
+      <div>
+        {renderContent()}
+        {isReviewModalOpen && (
+          <ReviewApplicantModal 
+            applicants={newApplicants} 
+            onClose={() => setReviewModalOpen(false)} 
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { hasOrganizerRole } from '@/utils/auth';
+import { can, Permission } from '@/config/permissions';
 import { useEvents, useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import CubeCard from '@/components/CubeCard';
@@ -111,7 +111,7 @@ const CubeListPage: React.FC = () => {
           <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             {eventTimeView === 'upcoming' ? 'Upcoming Cubes' : 'Past Cubes'}
           </h1>
-          {currentUser && hasOrganizerRole(currentUser) && (
+          {currentUser && can(currentUser, Permission.CREATE_EVENT) && (
             <button
               onClick={handleCreateCube}
               className="flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
@@ -220,7 +220,7 @@ const CubeListPage: React.FC = () => {
           <h3 className="text-xl font-bold">
             No {eventTimeView} events found for this region.
           </h3>
-          <p className="text-white0 mt-2">
+          <p className="text-white mt-2">
             Check back later or change your filter selection.
           </p>
         </div>

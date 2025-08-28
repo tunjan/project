@@ -17,7 +17,7 @@ interface ResourceFiltersProps {
 
 const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
   return (
-    <div className="card-brutal p-4">
+    <div className="border-2 border-black bg-white p-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="md:col-span-4">
           <label htmlFor="keyword-search" className="sr-only">
@@ -25,7 +25,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
           </label>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="text-grey-500 h-5 w-5" />
+              <SearchIcon className="text-neutral-500 h-5 w-5" />
             </div>
             <input
               type="text"
@@ -33,7 +33,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               placeholder="Search by keyword..."
               value={props.searchTerm}
               onChange={(e) => props.setSearchTerm(e.target.value)}
-              className="placeholder:text-white0 block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="placeholder:text-neutral-500 block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             />
           </div>
         </div>

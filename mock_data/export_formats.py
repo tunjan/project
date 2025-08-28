@@ -10,7 +10,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, date
 import sqlite3
 
-from .utils import DateTimeEncoder
+from .utils import CustomEncoder
 
 
 class DataExporter:
@@ -57,7 +57,7 @@ class DataExporter:
             json_data[key] = self._prepare_for_json(items)
         
         with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, cls=DateTimeEncoder, indent=2, ensure_ascii=False)
+            json.dump(json_data, f, cls=CustomEncoder, indent=2, ensure_ascii=False)
         
         return str(output_path.absolute())
     
@@ -222,7 +222,7 @@ class DataExporter:
                 if isinstance(value, dict) and 'id' in value:
                     sql_item[f"{key}_id"] = value['id']
                 elif isinstance(value, (list, dict)):
-                    sql_item[key] = json.dumps(value, cls=DateTimeEncoder)
+                    sql_item[key] = json.dumps(value, cls=CustomEncoder)
                 elif isinstance(value, (datetime, date)):
                     sql_item[key] = value.isoformat()
                 else:

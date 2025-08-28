@@ -19,9 +19,31 @@ export default {
       },
       colors: {
         black: '#000000',
-        red: '#d81313',
         white: '#ffffff',
-        grey: {
+        // Semantic color mappings with distinct, conventional colors
+        primary: {
+          DEFAULT: '#d81313', // Your brand's red
+          hover: '#b91c1c', // A darker red for hover
+          lightest: '#fef2f2', // Very light red for backgrounds
+        },
+        success: {
+          DEFAULT: '#16a34a', // green-600
+          hover: '#15803d', // green-700
+        },
+        warning: {
+          DEFAULT: '#facc15', // yellow-400
+          hover: '#eab308', // yellow-500
+        },
+        danger: {
+          DEFAULT: '#dc2626', // red-600
+          hover: '#b91c1c', // red-700
+        },
+        info: {
+          DEFAULT: '#3b82f6', // blue-500
+          hover: '#2563eb', // blue-600
+        },
+        neutral: {
+          DEFAULT: '#6b7280', // neutral-500
           100: '#f3f4f6',
           200: '#e5e7eb',
           300: '#d1d5db',
@@ -31,32 +53,16 @@ export default {
           700: '#374151',
           800: '#1f2937',
           900: '#111827',
+          subtle: '#f3f4f6', // neutral-100
         },
-        // Semantic color mappings using our three colors
-        primary: {
-          DEFAULT: '#d81313',
-          hover: '#000000',
+        // Trophy colors for leaderboard rankings
+        yellow: {
+          DEFAULT: '#facc15', // yellow-400
+          700: '#a16207', // yellow-700
         },
-        success: {
-          DEFAULT: '#000000',
-          hover: '#d81313',
-        },
-        warning: {
-          DEFAULT: '#d81313',
-          hover: '#000000',
-        },
-        danger: {
-          DEFAULT: '#d81313',
-          hover: '#000000',
-        },
-        info: {
-          DEFAULT: '#000000',
-          hover: '#d81313',
-        },
-        neutral: {
-          DEFAULT: '#000000',
-          secondary: '#6b7280', // Changed from red to grey-500
-          subtle: '#ffffff',
+        grey: {
+          200: '#e5e7eb', // grey-200
+          300: '#d1d5db', // grey-300
         },
       },
       boxShadow: {

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import { TrashIcon } from '@/icons';
 import { type User } from '@/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface DeactivateAccountModalProps {
   user: User;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
 }
 
 const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
@@ -14,6 +15,16 @@ const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
   onClose,
   onConfirm,
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   return (
     <Modal title="Deactivate Account" onClose={onClose}>
       <div className="text-center">
@@ -31,15 +42,21 @@ const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
       <div className="mt-6 flex items-center space-x-4">
         <button
           onClick={onClose}
+          disabled={isDeleting}
           className="btn-outline w-full px-4 py-2 font-bold transition-colors duration-300"
         >
           Cancel
         </button>
         <button
-          onClick={onConfirm}
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+          onClick={handleConfirm}
+          disabled={isDeleting}
+          className="btn-danger flex w-full items-center justify-center px-4 py-2 font-bold text-white transition-colors duration-300"
         >
-          Yes, Delete My Account
+          {isDeleting ? (
+            <LoadingSpinner className="h-5 w-5" />
+          ) : (
+            'Yes, Delete My Account'
+          )}
         </button>
       </div>
     </Modal>

@@ -65,7 +65,7 @@ const Modal: React.FC<ModalProps> = ({
                 {title}
               </h2>
               {description && (
-                <p className="mt-1 text-sm text-red">{description}</p>
+                <p className="mt-1 text-sm text-neutral-500">{description}</p>
               )}
             </div>
             {showCloseButton && (

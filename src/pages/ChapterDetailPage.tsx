@@ -10,7 +10,13 @@ import {
 } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
-import { type User, AnnouncementScope, Role } from '@/types';
+import {
+  type User,
+  AnnouncementScope,
+  Role,
+  CubeEvent,
+  EventStatus,
+} from '@/types';
 import { getChapterStats } from '@/utils/analytics';
 import {
   UsersIcon,
@@ -20,6 +26,7 @@ import {
   ChevronLeftIcon,
   InstagramIcon,
   PlusIcon,
+  CalendarIcon,
 } from '@/icons';
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
@@ -46,9 +53,10 @@ const MemberCard: React.FC<{
   member: User;
   onMemberClick: (member: User) => void;
 }> = ({ member, onMemberClick }) => (
-  <div
-    className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
+  <button
+    type="button"
     onClick={() => onMemberClick(member)}
+    className="flex w-full items-center space-x-3 p-2 text-left transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-black"
   >
     <img
       src={member.profilePictureUrl}
@@ -57,9 +65,9 @@ const MemberCard: React.FC<{
     />
     <div>
       <p className="font-bold text-black">{member.name}</p>
-      <p className="text-white0 text-sm">{member.role}</p>
+      <p className="text-sm text-neutral-500">{member.role}</p>
     </div>
-  </div>
+  </button>
 );
 
 const ChapterDetailPage: React.FC = () => {
@@ -76,6 +84,8 @@ const ChapterDetailPage: React.FC = () => {
   const allAnnouncements = useAnnouncements();
   const allOutreachLogs = useOutreachLogs();
   const [isPastEventsModalOpen, setIsPastEventsModalOpen] = useState(false);
+
+  // Removed Stage 0: next upcoming public event link
 
   const isMember = useMemo(() => {
     if (!currentUser || !chapter) return false;
@@ -240,8 +250,10 @@ const ChapterDetailPage: React.FC = () => {
               title="Members"
               value={stats.memberCount}
             />
-            <div
-              className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            <button
+              type="button"
+              aria-label="View past events"
+              className="transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-black"
               onClick={() => setIsPastEventsModalOpen(true)}
             >
               <StatCard
@@ -249,7 +261,7 @@ const ChapterDetailPage: React.FC = () => {
                 title="Events Held"
                 value={stats.eventsHeld}
               />
-            </div>
+            </button>
             <StatCard
               icon={<ClockIcon className="h-6 w-6" />}
               title="Total Hours"
@@ -279,7 +291,7 @@ const ChapterDetailPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-white0 p-2 text-sm">
+                  <p className="p-2 text-sm text-neutral-500">
                     No organisers assigned.
                   </p>
                 )}
@@ -299,7 +311,9 @@ const ChapterDetailPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-white0 p-2 text-sm">No members yet.</p>
+                  <p className="p-2 text-sm text-neutral-500">
+                    No members yet.
+                  </p>
                 )}
               </div>
             </div>
@@ -323,7 +337,7 @@ const ChapterDetailPage: React.FC = () => {
                 <h3 className="text-lg font-bold text-black">
                   No chapter-specific announcements.
                 </h3>
-                <p className="text-white0 mt-1">
+                <p className="mt-1 text-neutral-500">
                   Check the main announcements page for global and regional
                   news.
                 </p>

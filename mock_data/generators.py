@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Optional, Tuple
 from faker import Faker
 from nanoid import generate
 
-from .config import GenerationConfig, BADGE_TEMPLATES, RESOURCE_CATEGORIES, REALISTIC_EVENT_NAMES, CONVERSATION_OUTCOMES_WEIGHTED
+from .config import GenerationConfig, Role, BADGE_TEMPLATES, RESOURCE_CATEGORIES, REALISTIC_EVENT_NAMES, CONVERSATION_OUTCOMES_WEIGHTED
 
 
 class BaseGenerator:
@@ -105,6 +105,8 @@ class UserGenerator(BaseGenerator):
         
         # Assign special roles after all users are created
         self._assign_organizer_roles()
+        # Assign onboarding progress and refine statuses now that roles are known
+        self._assign_onboarding_progress()
         
         return self.users
     
@@ -127,14 +129,16 @@ class UserGenerator(BaseGenerator):
     
     def _create_base_user(self, index: int, chapter_pool: List[str]) -> Dict[str, Any]:
         """Create a single user with base attributes."""
-        # Determine onboarding status
-        status_weights = [
-            ('Confirmed', self.config.role_distribution['confirmed']),
-            ('Awaiting Verification', self.config.role_distribution['awaiting_verification']),
-            ('Pending Application Review', self.config.role_distribution['pending_review']),
-            ('Denied', self.config.role_distribution['denied'])
+        # Determine onboarding status (map older config buckets to app statuses)
+        base_status_weights = [
+            ('Confirmed', self.config.onboarding_distribution['confirmed']),
+            ('Pending Application Review', self.config.onboarding_distribution['pending_review']),
+            # Split the generic "awaiting_verification" bucket across onboarding call and first cube
+            ('Pending Onboarding Call', max(0, self.config.onboarding_distribution['awaiting_verification'] * 0.4)),
+            ('Awaiting First Cube', max(0, self.config.onboarding_distribution['awaiting_verification'] * 0.6)),
+            ('Denied', self.config.onboarding_distribution['denied'])
         ]
-        onboarding_status = self._weighted_choice(status_weights)
+        onboarding_status = self._weighted_choice(base_status_weights)
         
         # Assign chapters (1-2 per user)
         num_chapters = random.choices([1, 2], weights=[0.7, 0.3], k=1)[0]
@@ -163,7 +167,7 @@ class UserGenerator(BaseGenerator):
             'id': generate(),
             'name': self.fake.name(),
             'email': self.fake.email(),
-            'role': 'Activist (Confirmed)' if onboarding_status == 'Confirmed' else 'Activist',
+            'role': Role.ACTIVIST if onboarding_status == 'Confirmed' else Role.APPLICANT,
             'instagram': self.fake.user_name(),
             'chapters': user_chapters,
             'stats': {
@@ -183,6 +187,8 @@ class UserGenerator(BaseGenerator):
                 'abolitionistAlignment': random.random() < 0.8,
                 'customAnswer': self.fake.sentence()
             },
+            # New onboarding progress flags (populated/refined later)
+            'onboardingProgress': {},
             'joinDate': join_date,
             'lastLogin': self._random_date(join_date, self.now),
             'organizerNotes': [],
@@ -191,6 +197,76 @@ class UserGenerator(BaseGenerator):
         }
         
         return user
+
+    def _assign_onboarding_progress(self) -> None:
+        """Assign onboardingProgress and refine onboardingStatus in a realistic way.
+        Uses organiser assignments to pick a sensible organiser for revision calls.
+        """
+        # Helper: pick an organiser ID for user's chapters
+        def pick_organiser_id(for_user: Dict[str, Any]) -> Optional[str]:
+            user_chapters = set(for_user.get('chapters', []))
+            organisers = [
+                u for u in self.users
+                if u.get('organiserOf') and any(ch in user_chapters for ch in u['organiserOf'])
+            ]
+            if organisers:
+                return random.choice(organisers)['id']
+            # fallback: any organiser
+            any_orgs = [u for u in self.users if u.get('organiserOf')]
+            return random.choice(any_orgs)['id'] if any_orgs else None
+
+        for user in self.users:
+            status = user['onboardingStatus']
+            progress = user.get('onboardingProgress') or {}
+
+            # Initialize defaults
+            progress.setdefault('watchedMasterclass', False)
+            progress.setdefault('selectedOrganiserId', None)
+            progress.setdefault('revisionCallScheduledAt', None)
+
+            # Distribute realistic paths based on current status
+            if status == 'Confirmed':
+                progress['watchedMasterclass'] = True
+                organiser_id = pick_organiser_id(user)
+                progress['selectedOrganiserId'] = organiser_id
+                # Revision call sometime in past
+                past_days = random.randint(7, 120)
+                progress['revisionCallScheduledAt'] = self.now - timedelta(days=past_days)
+
+            elif status == 'Pending Application Review':
+                # Keep progress empty
+                pass
+
+            elif status == 'Pending Onboarding Call':
+                # Not yet watched masterclass
+                progress['watchedMasterclass'] = False
+
+            elif status == 'Awaiting First Cube':
+                # Some pre-confirm masterclass
+                progress['watchedMasterclass'] = random.random() < 0.35
+
+            elif status == 'Awaiting Masterclass':
+                # Has done first cube; ensure not watched yet
+                progress['watchedMasterclass'] = False
+
+            elif status == 'Awaiting Revision Call':
+                # Has watched masterclass, prompt to schedule
+                progress['watchedMasterclass'] = True
+                organiser_id = pick_organiser_id(user)
+                progress['selectedOrganiserId'] = organiser_id
+                # 60% have a future schedule
+                if random.random() < 0.6:
+                    future_days = random.randint(2, 30)
+                    progress['revisionCallScheduledAt'] = self.now + timedelta(days=future_days)
+                else:
+                    progress['revisionCallScheduledAt'] = None
+
+            elif status == 'Denied':
+                # No progress
+                pass
+
+            # Apply back to user
+            user['onboardingProgress'] = progress
     
     def _assign_organizer_roles(self):
         """Assign organizer roles to confirmed users."""
@@ -201,7 +277,7 @@ class UserGenerator(BaseGenerator):
         
         # Assign one global admin
         global_admin = random.choice(confirmed_users)
-        global_admin['role'] = 'Global Admin'
+        global_admin['role'] = Role.GLOBAL_ADMIN
         
         # Assign regional organizers (one per country)
         countries = list(set(ch['country'] for ch in self.chapters))
@@ -213,7 +289,7 @@ class UserGenerator(BaseGenerator):
             
             if candidates:
                 organizer = random.choice(candidates)
-                organizer['role'] = 'Regional Organiser'
+                organizer['role'] = Role.REGIONAL_ORGANISER
                 organizer['managedCountry'] = country
         
         # Assign chapter organizers
@@ -227,7 +303,7 @@ class UserGenerator(BaseGenerator):
                 organizers = random.sample(candidates, num_organizers)
                 
                 for organizer in organizers:
-                    organizer['role'] = 'Chapter Organiser'
+                    organizer['role'] = Role.CHAPTER_ORGANISER
                     organizer.setdefault('organiserOf', []).append(chapter['name'])
                     organizer['organiserOf'] = list(set(organizer['organiserOf']))
 

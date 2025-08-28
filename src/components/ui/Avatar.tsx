@@ -13,7 +13,7 @@ interface AvatarProps {
 
 const DefaultAvatar: React.FC<{ className?: string }> = ({ className }) => (
   <div
-    className={`flex items-center justify-center bg-white text-white0 ${className}`}
+    className={`flex items-center justify-center bg-grey-200 text-white ${className}`}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

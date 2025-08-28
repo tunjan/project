@@ -24,7 +24,7 @@ const RequestCard: React.FC<{
           />
           <div>
             <p className="font-bold text-black">{request.user.name}</p>
-            <p className="text-sm text-white0">
+            <p className="text-sm text-neutral-500">
               Wants to join:
               <span className="font-semibold text-black">
                 {' '}
@@ -75,7 +75,7 @@ const ChapterRequestQueue: React.FC<ChapterRequestQueueProps> = ({
 
   return (
     <div>
-      <h2 className="mb-4 border-b-2 border-white0 pb-2 text-2xl font-bold text-black">
+      <h2 className="mb-4 border-b-2 border-black pb-2 text-2xl font-bold text-black">
         Chapter Join Requests ({requests.length})
       </h2>
       <div className="space-y-4">

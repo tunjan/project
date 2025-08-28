@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Login from '@/components/auth/Login';
 import { useAuthActions } from '@/store/auth.store';
 import { useUsers } from '@/store';
-import { type User, OnboardingStatus } from '@/types';
+import { type User, OnboardingStatus, Role } from '@/types';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -19,14 +19,27 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const organizers = users.filter(
+    (u) => u.role === Role.GLOBAL_ADMIN || u.role === Role.REGIONAL_ORGANISER
+  );
+
   const loginableUsers = users.filter(
     (u) =>
       u.onboardingStatus === OnboardingStatus.CONFIRMED ||
-      u.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION ||
-      u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+      u.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE ||
+      u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW ||
+      u.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL ||
+      u.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS ||
+      u.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
   );
 
-  return <Login users={loginableUsers} onLogin={handleLogin} />;
+  return (
+    <Login
+      users={loginableUsers}
+      onLogin={handleLogin}
+      organizers={organizers}
+    />
+  );
 };
 
 export default LoginPage;

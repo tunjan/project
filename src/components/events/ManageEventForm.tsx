@@ -100,7 +100,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   required
                   min="0.1"
                   step="0.1"
-                  className="block w-full border border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                   placeholder="e.g., 4.5"
                 />
               </div>
@@ -128,7 +128,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                 ))}
               </div>
             ) : (
-              <p className="text-white0">
+              <p className="text-white">
                 No outreach outcomes have been logged for this event by
                 participants yet.
               </p>
@@ -156,7 +156,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                     />
                     <div>
                       <p className="font-bold text-black">{user.name}</p>
-                      <p className="text-sm text-white0">{user.role}</p>
+                      <p className="text-sm text-white">{user.role}</p>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">

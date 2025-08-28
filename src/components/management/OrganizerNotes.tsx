@@ -129,7 +129,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                             {note.content}
                           </p>
                           <div className="mt-2 flex items-center justify-between">
-                            <p className="text-xs text-white0">
+                            <p className="text-xs text-neutral-500">
                               - {note.authorName} on{' '}
                               {new Date(note.createdAt).toLocaleDateString()}
                             </p>
@@ -139,14 +139,14 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                                   onClick={() =>
                                     handleStartEdit(note.id, note.content)
                                   }
-                                  className="text-white0 hover:text-black"
+                                  className="text-neutral-500 hover:text-black"
                                   aria-label="Edit note"
                                 >
                                   <PencilIcon className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={() => openDeleteModal(note.id)}
-                                  className="text-white0 hover:text-primary"
+                                  className="text-neutral-500 hover:text-primary"
                                   aria-label="Delete note"
                                 >
                                   <TrashIcon className="h-4 w-4" />
@@ -160,7 +160,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                   );
                 })
             ) : (
-              <p className="text-sm text-white0">
+              <p className="text-sm text-neutral-500">
                 No notes for this user yet.
               </p>
             )}

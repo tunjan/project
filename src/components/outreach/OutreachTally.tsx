@@ -18,25 +18,25 @@ const outcomeMeta: Record<
 > = {
   [OutreachOutcome.BECAME_VEGAN_ACTIVIST]: {
     icon: UsersIcon,
-    color: 'text-reseda-green',
+    color: 'text-success',
   },
   [OutreachOutcome.BECAME_VEGAN]: {
     icon: CheckCircleIcon,
-    color: 'text-sage',
+    color: 'text-primary',
   },
   [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: {
     icon: UserAddIcon,
-    color: 'text-ash-gray',
+    color: 'text-neutral-700',
   },
   [OutreachOutcome.MOSTLY_SURE]: {
     icon: TrendingUpIcon,
-    color: 'text-champagne-pink',
+    color: 'text-neutral-600',
   },
   [OutreachOutcome.NOT_SURE]: {
     icon: TrendingUpIcon,
-    color: 'text-desert-sand',
+    color: 'text-neutral-500',
   },
-  [OutreachOutcome.NO_CHANGE]: { icon: XCircleIcon, color: 'text-buff' },
+  [OutreachOutcome.NO_CHANGE]: { icon: XCircleIcon, color: 'text-neutral-400' },
 };
 
 const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
@@ -52,14 +52,14 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
   }, [logs]);
 
   return (
-    <div className="card-brutal border-none">
+    <div className="border-2 border-black bg-white p-4">
       <ul className="space-y-3">
         {Object.entries(tally).map(([outcome, count]) => {
           const { icon: Icon, color } = outcomeMeta[outcome as OutreachOutcome];
           return (
             <li
               key={outcome}
-              className="flex items-center justify-between border-b border-white pb-3 last:border-b-0 last:pb-0"
+              className="flex items-center justify-between border-b border-neutral-200 pb-3 last:border-b-0 last:pb-0"
             >
               <div className="flex items-center">
                 <Icon className={`mr-3 h-5 w-5 flex-shrink-0 ${color}`} />

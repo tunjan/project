@@ -14,7 +14,6 @@ import {
   Role,
   OnboardingStatus,
   NotificationType,
-  EventRole,
   EventStatus,
   ParticipantStatus,
 } from '@/types';
@@ -184,7 +183,6 @@ export {
   Role,
   OnboardingStatus,
   NotificationType,
-  EventRole,
   EventStatus,
   ParticipantStatus,
 };

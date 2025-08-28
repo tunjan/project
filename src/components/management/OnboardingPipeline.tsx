@@ -24,7 +24,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
           />
           <div className="min-w-0">
             <p className="truncate font-bold text-black">{user.name}</p>
-            <p className="truncate text-sm text-white0">
+            <p className="truncate text-sm text-neutral-500">
               {user.chapters?.join(', ') || 'No chapters'}
             </p>
           </div>
@@ -48,7 +48,7 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
   <div className="flex flex-col border-2 border-black bg-white">
     <h3 className="border-b-2 border-black bg-white p-3 text-sm font-extrabold uppercase tracking-wider text-black">
       {title}{' '}
-      <span className="font-normal text-white0">({users.length})</span>
+      <span className="font-normal text-neutral-500">({users.length})</span>
     </h3>
     <div className="h-[60vh] space-y-2 overflow-y-auto p-2">
       {users.length > 0 ? (
@@ -57,7 +57,7 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
         ))
       ) : (
         <div className="flex h-full items-center justify-center p-4 text-center">
-          <p className="text-sm text-white0">Empty</p>
+          <p className="text-sm text-neutral-500">Empty</p>
         </div>
       )}
     </div>
@@ -76,22 +76,48 @@ const OnboardingPipeline: React.FC<OnboardingPipelineProps> = ({
   const pendingReview = users.filter(
     (u) => u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
   );
-  const pendingVerification = users.filter(
-    (u) => u.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION
+  const pendingCall = users.filter(
+    (u) => u.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL
   );
+  const awaitingFirstCube = users.filter(
+    (u) => u.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE
+  );
+  const awaitingMasterclass = users.filter(
+    (u) => u.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS
+  );
+  const awaitingRevisionCall = users.filter(
+    (u) => u.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
+  );
+  const denied = users.filter((u) => u.onboardingStatus === OnboardingStatus.DENIED);
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
       <PipelineColumn
         title="Application Review"
         users={pendingReview}
         onNavigate={onNavigate}
       />
       <PipelineColumn
-        title="Identity Verification"
-        users={pendingVerification}
+        title="Onboarding Call"
+        users={pendingCall}
         onNavigate={onNavigate}
       />
+      <PipelineColumn
+        title="First Cube"
+        users={awaitingFirstCube}
+        onNavigate={onNavigate}
+      />
+      <PipelineColumn
+        title="Masterclass"
+        users={awaitingMasterclass}
+        onNavigate={onNavigate}
+      />
+      <PipelineColumn
+        title="Revision Call"
+        users={awaitingRevisionCall}
+        onNavigate={onNavigate}
+      />
+      <PipelineColumn title="Denied" users={denied} onNavigate={onNavigate} />
     </div>
   );
 };

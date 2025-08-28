@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { type User } from '@/types';
-import { InputField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
-import DeactivateAccountModal from './DeactivateAccountModal';
-import { useUsersActions } from '@/store';
-import { useAuthActions } from '@/store/auth.store';
-import { toast } from 'sonner';
 import { UsersIcon } from '@/icons';
+import { InputField } from '@/components/ui/Form';
 import Avatar from '@/components/ui/Avatar';
 
 interface EditProfileModalProps {
@@ -19,12 +15,14 @@ interface EditProfileModalProps {
     hostingCapacity: number;
     profilePictureUrl: string;
   }) => void;
+  onDeactivate: () => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({
   user,
   onClose,
   onSave,
+  onDeactivate,
 }) => {
   const [name, setName] = useState(user.name);
   const [instagram, setInstagram] = useState(user.instagram || '');
@@ -37,9 +35,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [profilePictureUrl, setProfilePictureUrl] = useState(
     user.profilePictureUrl
   );
-  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
-  const { deleteUser } = useUsersActions();
-  const { logout } = useAuthActions();
 
   const handleGenerateAvatar = () => {
     const newUrl = `https://i.pravatar.cc/150?u=${Date.now()}`;
@@ -56,28 +51,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     });
   };
 
-  const handleDeactivate = () => {
-    deleteUser(user.id);
-    setIsDeactivateModalOpen(false);
-    toast.error('Your account has been permanently deleted.');
-    logout();
-  };
 
   return (
-    <>
-      {isDeactivateModalOpen && (
-        <DeactivateAccountModal
-          user={user}
-          onClose={() => setIsDeactivateModalOpen(false)}
-          onConfirm={handleDeactivate}
-        />
-      )}
-      <Modal
-        title="Edit Profile"
-        onClose={onClose}
-        description="Update your personal and hosting information."
-        size="lg"
-      >
+    <Modal
+      title="Edit Profile"
+      onClose={onClose}
+      description="Update your personal and hosting information."
+      size="lg"
+    >
         <div className="my-6 space-y-4">
           <div className="space-y-3">
             <div className="flex items-center space-x-4">
@@ -109,13 +90,13 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             label="Full Name"
             id="edit-name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
           />
           <InputField
             label="Instagram Handle"
             id="edit-instagram"
             value={instagram}
-            onChange={(e) => setInstagram(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInstagram(e.target.value)}
             required={false}
           />
           <div className="border-t border-black pt-4">
@@ -123,7 +104,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               <input
                 type="checkbox"
                 checked={hostingAvailability}
-                onChange={(e) => setHostingAvailability(e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHostingAvailability(e.target.checked)}
                 className="h-5 w-5 accent-primary"
               />
               <span className="font-bold text-black">
@@ -142,9 +123,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   type="number"
                   id="hosting-capacity"
                   value={hostingCapacity}
-                  onChange={(e) => setHostingCapacity(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHostingCapacity(Number(e.target.value))}
                   min="1"
-                  className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-white0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                  className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
                 />
               </div>
             )}
@@ -160,10 +141,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               Permanently delete your account and all associated data. This
               action cannot be undone.
             </p>
-            <button
-              onClick={() => setIsDeactivateModalOpen(true)}
-              className="btn-danger w-full"
-            >
+            <button onClick={onDeactivate} className="btn-danger w-full">
               Delete My Account
             </button>
           </div>
@@ -177,8 +155,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             Save Changes
           </button>
         </div>
-      </Modal>
-    </>
+    </Modal>
   );
 };
 

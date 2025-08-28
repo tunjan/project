@@ -6,6 +6,7 @@ import {
     OnboardingStatus,
     NotificationType,
 } from '@/types';
+import { INACTIVITY_PERIOD_MONTHS } from '@/utils/user';
 
 /**
  * Simulates a backend job to generate inactivity notifications for chapter organisers.
@@ -34,11 +35,10 @@ export const generateInactivityNotifications = (
         Notification,
         'id' | 'createdAt' | 'isRead'
     >[] = [];
-    const twoMonthsAgo = new Date();
-    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    const inactivityCutoff = new Date();
+    inactivityCutoff.setMonth(inactivityCutoff.getMonth() - INACTIVITY_PERIOD_MONTHS);
 
     const chaptersToManage = new Set(currentUser.organiserOf);
-
 
     const managedMembers = allUsers.filter(
         (user) =>
@@ -48,28 +48,17 @@ export const generateInactivityNotifications = (
     );
 
     for (const member of managedMembers) {
+        // Check both login and attendance activity (consistent with isUserInactive)
+        const hasRecentLogin = member.lastLogin && new Date(member.lastLogin) > inactivityCutoff;
 
-        const attendedEvents = allEvents
-            .filter((event) =>
-                event.participants.some((p) => p.user.id === member.id)
-            )
-            .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+        const hasRecentAttendance = allEvents.some(
+            (event) =>
+                new Date(event.startDate) > inactivityCutoff &&
+                event.report?.attendance[member.id] === 'Attended'
+        );
 
-        const lastAttendedDate =
-            attendedEvents.length > 0 ? attendedEvents[0].startDate : null;
-        let isInactive = false;
-
-        if (lastAttendedDate) {
-
-            if (new Date(lastAttendedDate) < twoMonthsAgo) {
-                isInactive = true;
-            }
-        } else if (member.joinDate) {
-
-            if (new Date(member.joinDate) < twoMonthsAgo) {
-                isInactive = true;
-            }
-        }
+        // User is inactive if both conditions are false (consistent with isUserInactive)
+        const isInactive = !hasRecentLogin && !hasRecentAttendance;
 
         if (isInactive) {
 
@@ -84,7 +73,7 @@ export const generateInactivityNotifications = (
                 newNotifications.push({
                     userId: currentUser.id,
                     type: NotificationType.INACTIVITY_ALERT,
-                    message: `${member.name} has not attended an event in over two months. Consider reaching out.`,
+                    message: `${member.name} has not been active for over ${INACTIVITY_PERIOD_MONTHS} months. Consider reaching out.`,
                     linkTo: `/manage/member/${member.id}`,
                     relatedUser: member,
                 });

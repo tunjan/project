@@ -14,6 +14,8 @@ import {
     getAverageActivistsPerEvent,
     getChapterOutreachStats, // NEW
     getConversationTrendsByMonth, // NEW
+    getActivistPerformanceDistribution,
+    getEventTurnoutDistribution,
 } from '@/utils/analytics';
 
 export function useAnalyticsData() {
@@ -173,8 +175,8 @@ export function useAnalyticsData() {
         derivedData;
 
     const overviewStats = useMemo(
-        () => getGlobalStats(filteredUsers, filteredEvents, filteredChapters),
-        [filteredUsers, filteredEvents, filteredChapters]
+        () => getGlobalStats(filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs),
+        [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
     );
     const chapterStats = useMemo(
         () => getChapterStats(filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs),
@@ -202,8 +204,8 @@ export function useAnalyticsData() {
         [filteredEvents]
     );
     const topActivists = useMemo(
-        () => getTopActivistsByHours(filteredUsers, 5),
-        [filteredUsers]
+        () => getTopActivistsByHours(filteredUsers, filteredEvents, 5),
+        [filteredUsers, filteredEvents]
     );
     // NEW: Calculate efficiency stats
     const chapterOutreachStats = useMemo(
@@ -215,6 +217,21 @@ export function useAnalyticsData() {
                 filteredOutreachLogs
             ),
         [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
+    );
+
+    const activistHoursDistribution = useMemo(
+        () => getActivistPerformanceDistribution(filteredUsers, filteredEvents, filteredOutreachLogs, 'totalHours'),
+        [filteredUsers, filteredEvents, filteredOutreachLogs]
+    );
+
+    const activistConversationsDistribution = useMemo(
+        () => getActivistPerformanceDistribution(filteredUsers, filteredEvents, filteredOutreachLogs, 'totalConversations'),
+        [filteredUsers, filteredEvents, filteredOutreachLogs]
+    );
+
+    const eventTurnoutDistribution = useMemo(
+        () => getEventTurnoutDistribution(filteredEvents),
+        [filteredEvents]
     );
 
     return {
@@ -236,5 +253,8 @@ export function useAnalyticsData() {
         avgActivistsPerEvent,
         topActivists,
         chapterOutreachStats,
+        activistHoursDistribution,
+        activistConversationsDistribution,
+        eventTurnoutDistribution,
     };
 }

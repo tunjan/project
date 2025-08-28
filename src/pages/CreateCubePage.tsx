@@ -11,6 +11,7 @@ const CreateCubePage: React.FC = () => {
   const { createEvent } = useEventsActions();
 
   const handleCreateEvent = (eventData: {
+    name: string;
     city: string;
     location: string;
     startDate: Date;

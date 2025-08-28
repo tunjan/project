@@ -34,21 +34,25 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         return {
           icon: 'text-danger',
           confirmButton: 'btn-danger',
+          messageText: 'text-red-700',
         };
       case 'warning':
         return {
           icon: 'text-warning',
           confirmButton: 'btn-warning',
+          messageText: 'text-yellow-700',
         };
       case 'info':
         return {
           icon: 'text-info',
           confirmButton: 'btn-info',
+          messageText: 'text-blue-700',
         };
       default:
         return {
           icon: 'text-danger',
           confirmButton: 'btn-danger',
+          messageText: 'text-red-700',
         };
     }
   };
@@ -65,8 +69,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <ShieldExclamationIcon className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-black">{title}</h3>
-            <p className="mt-2 text-sm text-red">{message}</p>
+            <p className={`mt-2 text-sm ${variantStyles.messageText}`}>
+              {message}
+            </p>
           </div>
         </div>
 

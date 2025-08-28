@@ -1,6 +1,7 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import FeedbackButton from '@/components/FeedbackButton';
 
 const RootSuspense = () => (
   <Suspense
@@ -11,6 +12,7 @@ const RootSuspense = () => (
     }
   >
     <Outlet />
+    <FeedbackButton />
   </Suspense>
 );
 

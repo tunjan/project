@@ -68,7 +68,7 @@ const ResourcesPage: React.FC = () => {
             <h3 className="mt-4 text-xl font-bold text-black">
               No resources found.
             </h3>
-            <p className="text-white0 mt-2">
+            <p className="text-white mt-2">
               Try adjusting your search or filters.
             </p>
           </div>

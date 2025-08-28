@@ -208,3 +208,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Generated mock data
+src/mockData.ts

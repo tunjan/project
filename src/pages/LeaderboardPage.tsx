@@ -6,15 +6,34 @@ import Leaderboard from '@/components/leaderboard/Leaderboard';
 import ChapterLeaderboard from '@/components/leaderboard/ChapterLeaderboard';
 import { TrophyIcon } from '@/icons';
 
-const TabButton: React.FC<{
+const SectionTab: React.FC<{
   onClick: () => void;
   isActive: boolean;
   children: React.ReactNode;
 }> = ({ onClick, isActive, children }) => (
   <button
     onClick={onClick}
-    className={`w-full border-r-2 border-black px-4 py-3 text-sm font-extrabold uppercase tracking-wider transition-colors duration-200 last:border-b-0 last:border-r-0 md:w-auto md:last:border-b-0 ${
-      isActive ? 'bg-black text-white' : 'bg-white text-black hover:bg-white'
+    className={`-mb-px border-b-4 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors duration-200 ${
+      isActive
+        ? 'border-primary text-primary'
+        : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-black'
+    }`}
+  >
+    {children}
+  </button>
+);
+
+const TimeframeTab: React.FC<{
+  onClick: () => void;
+  isActive: boolean;
+  children: React.ReactNode;
+}> = ({ onClick, isActive, children }) => (
+  <button
+    onClick={onClick}
+    className={`border-r-2 border-black px-3 py-2 text-xs font-extrabold uppercase tracking-wider transition-colors last:border-r-0 ${
+      isActive
+        ? 'bg-black text-white'
+        : 'bg-white text-black hover:bg-neutral-100'
     }`}
   >
     {children}
@@ -29,6 +48,9 @@ const LeaderboardPage: React.FC = () => {
   const currentUser = useCurrentUser();
 
   const [timeframe, setTimeframe] = useState<Timeframe>('month');
+  const [metric, setMetric] = useState<'conversations' | 'hours'>(
+    'conversations'
+  );
 
   const leaderboards = useMemo(
     () =>
@@ -43,71 +65,74 @@ const LeaderboardPage: React.FC = () => {
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Leaderboards
         </h1>
-        <p className="text-grey-500 mx-auto mt-3 max-w-2xl text-lg">
+        <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600">
           See who our most dedicated activists are. Your stats are highlighted.
         </p>
       </div>
 
-      <div className="mb-8 inline-block border-2 border-black bg-white">
-        <div className="flex flex-row">
-          <TabButton
+      <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
+        <div className="border-b-2 border-black">
+          <SectionTab
+            onClick={() => setMetric('conversations')}
+            isActive={metric === 'conversations'}
+          >
+            Conversations
+          </SectionTab>
+          <SectionTab
+            onClick={() => setMetric('hours')}
+            isActive={metric === 'hours'}
+          >
+            Hours
+          </SectionTab>
+        </div>
+        <div className="inline-flex border-2 border-black bg-white">
+          <TimeframeTab
             onClick={() => setTimeframe('week')}
             isActive={timeframe === 'week'}
           >
-            Past Week
-          </TabButton>
-          <TabButton
+            Week
+          </TimeframeTab>
+          <TimeframeTab
             onClick={() => setTimeframe('month')}
             isActive={timeframe === 'month'}
           >
-            Past Month
-          </TabButton>
-          <TabButton
+            Month
+          </TimeframeTab>
+          <TimeframeTab
             onClick={() => setTimeframe('year')}
             isActive={timeframe === 'year'}
           >
-            Past Year
-          </TabButton>
-          <TabButton
+            Year
+          </TimeframeTab>
+          <TimeframeTab
             onClick={() => setTimeframe('allTime')}
             isActive={timeframe === 'allTime'}
           >
             All Time
-          </TabButton>
+          </TimeframeTab>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="space-y-8">
-          {}
-          <Leaderboard
-            title="Most Conversations (Users)"
-            data={leaderboards.user.conversations[timeframe]}
-            unit="Conversations"
-            currentUser={currentUser}
-          />
-          {}
-          <ChapterLeaderboard
-            title="Most Conversations (Chapters)"
-            data={leaderboards.chapter.conversations[timeframe]}
-            unit="Conversations"
-          />
-        </div>
-        <div className="space-y-8">
-          {}
-          <Leaderboard
-            title="Most Hours (Users)"
-            data={leaderboards.user.hours[timeframe]}
-            unit="Hours"
-            currentUser={currentUser}
-          />
-          {}
-          <ChapterLeaderboard
-            title="Most Hours (Chapters)"
-            data={leaderboards.chapter.hours[timeframe]}
-            unit="Hours"
-          />
-        </div>
+        <Leaderboard
+          title={
+            metric === 'conversations'
+              ? 'Most Conversations (Activists)'
+              : 'Most Hours (Activists)'
+          }
+          data={leaderboards.user[metric][timeframe]}
+          unit={metric === 'conversations' ? 'Convos' : 'Hours'}
+          currentUser={currentUser}
+        />
+        <ChapterLeaderboard
+          title={
+            metric === 'conversations'
+              ? 'Most Conversations (Chapters)'
+              : 'Most Hours (Chapters)'
+          }
+          data={leaderboards.chapter[metric][timeframe]}
+          unit={metric === 'conversations' ? 'Convos' : 'Hours'}
+        />
       </div>
     </div>
   );

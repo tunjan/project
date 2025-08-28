@@ -5,7 +5,7 @@ export interface ScorecardData extends ChapterStats {
     metrics: {
         eventFrequency: number;
         avgTurnout: number;
-        retention: number; // For simplicity, this will be mocked/passed in
+        membershipTargetProgress: number; // Renamed from retention to be more accurate
     };
 }
 
@@ -31,17 +31,13 @@ export const calculateChapterScorecard = (
         // Normalize each metric to a 0-1 scale
         const eventScore = Math.min(stat.eventsHeld / (TARGETS.EVENTS_PER_MONTH * 3), 1); // Assuming 3 months
         const memberScore = Math.min(stat.memberCount / TARGETS.MEMBER_COUNT, 1);
-        // This is a simplified, placeholder calculation for retention.
-        // A real implementation would need to track active members over time.
-        const retentionScore = Math.min(
-            stat.memberCount > 0 ? (stat.memberCount * 0.75) / (TARGETS.MEMBER_COUNT * TARGETS.RETENTION_RATE) : 0,
-            1
-        );
+        // Calculate membership target progress (how close the chapter is to its target size)
+        const membershipTargetProgressScore = Math.min(stat.memberCount / TARGETS.MEMBER_COUNT, 1);
 
         const weightedScore =
             eventScore * WEIGHTS.EVENT_FREQUENCY +
             memberScore * WEIGHTS.MEMBER_COUNT +
-            retentionScore * WEIGHTS.RETENTION_RATE;
+            membershipTargetProgressScore * WEIGHTS.RETENTION_RATE;
 
         const healthScore = Math.round(weightedScore * 100);
 
@@ -54,7 +50,7 @@ export const calculateChapterScorecard = (
                 // A real implementation would require actual attendance data per event.
                 avgTurnout:
                     stat.eventsHeld > 0 ? stat.memberCount * 0.5 : 0, // Placeholder
-                retention: retentionScore * 100,
+                membershipTargetProgress: membershipTargetProgressScore * 100,
             },
         };
     });

@@ -42,7 +42,7 @@ const PublicProfilePage: React.FC = () => {
         <div className="text-center">
           <LoadingSpinner size="lg" />
           <p className="text-grey-600 mt-4">Loading profile...</p>
-          <p className="text-white0 mt-2 text-sm">
+          <p className="text-white mt-2 text-sm">
             User ID: {userId} | Total users: {allUsers.length}
           </p>
 

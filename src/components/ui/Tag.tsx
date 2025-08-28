@@ -18,7 +18,7 @@ const variantStyles = {
   primary: 'bg-primary text-white border-primary',
   secondary: 'bg-black text-white border-black',
   success: 'bg-success text-white border-success',
-  warning: 'bg-warning text-white border-warning',
+  warning: 'bg-warning text-black border-warning',
   danger: 'bg-danger text-white border-danger',
   info: 'bg-info text-white border-info',
   neutral: 'bg-white text-black border-black',

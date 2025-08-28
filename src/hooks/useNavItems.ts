@@ -1,15 +1,17 @@
 import { useMemo } from 'react';
 import { useCurrentUser } from '@/store/auth.store';
-import { hasOrganizerRole } from '@/utils/auth';
 import { OnboardingStatus } from '@/types';
+import { can } from '@/config/permissions';
+import { Permission } from '@/config/permissions';
 
 export interface NavItem {
     to: string;
     label: string;
     requiresAuth?: boolean;
-    requiresConfirmed?: boolean;
-    requiresOrganizer?: boolean;
-    requiresPending?: boolean;
+    requiresCoreAppAccess?: boolean; // For users past initial review
+    requiresFullAccess?: boolean; // For fully confirmed activists
+    requiresOnboardingInProgress?: boolean; // For users not yet fully confirmed
+    permission?: Permission;
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
@@ -17,25 +19,25 @@ const ALL_NAV_ITEMS: NavItem[] = [
         to: '/dashboard',
         label: 'Dashboard',
         requiresAuth: true,
-        requiresConfirmed: true,
+        requiresCoreAppAccess: true,
     },
     {
         to: '/cubes',
         label: 'Cubes',
         requiresAuth: true,
-        requiresConfirmed: true
+        requiresCoreAppAccess: true
     },
     {
         to: '/chapters',
         label: 'Chapters',
         requiresAuth: true,
-        requiresConfirmed: true,
+        requiresCoreAppAccess: true,
     },
     {
         to: '/leaderboard',
         label: 'Leaderboard',
         requiresAuth: true,
-        requiresConfirmed: true,
+        requiresCoreAppAccess: true,
     },
     {
         to: '/announcements',
@@ -51,27 +53,27 @@ const ALL_NAV_ITEMS: NavItem[] = [
         to: '/outreach',
         label: 'Outreach',
         requiresAuth: true,
-        requiresConfirmed: true,
+        requiresFullAccess: true,
     },
     {
         to: '/manage',
         label: 'Management',
         requiresAuth: true,
-        requiresOrganizer: true,
-        requiresConfirmed: true, // FIX: Added this line
+        requiresFullAccess: true,
+        permission: Permission.VIEW_MANAGEMENT_DASHBOARD,
     },
     {
         to: '/analytics',
         label: 'Analytics',
         requiresAuth: true,
-        requiresOrganizer: true,
-        requiresConfirmed: true, // FIX: Added this line
+        requiresFullAccess: true,
+        permission: Permission.VIEW_ANALYTICS,
     },
     {
         to: '/onboarding-status',
         label: 'My Application',
         requiresAuth: true,
-        requiresPending: true,
+        requiresOnboardingInProgress: true,
     },
 ];
 
@@ -84,24 +86,27 @@ export const useNavItems = () => {
             return ALL_NAV_ITEMS.filter(item => !item.requiresAuth);
         }
 
-        const isOrganizer = hasOrganizerRole(currentUser);
-        const isConfirmed = currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
-        const isPending =
-            currentUser.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION ||
-            currentUser.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW;
+        const isConfirmed =
+            currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
+        const isOnboardingInProgress = !isConfirmed;
+
+        const canAccessCoreApp = ![
+            OnboardingStatus.PENDING_APPLICATION_REVIEW,
+            OnboardingStatus.DENIED,
+            OnboardingStatus.INACTIVE,
+        ].includes(currentUser.onboardingStatus);
 
         return ALL_NAV_ITEMS.filter(item => {
-            // Skip items that require auth when user is not authenticated
             if (item.requiresAuth && !currentUser) return false;
 
-            // Skip items that require confirmed status when user is not confirmed
-            if (item.requiresConfirmed && !isConfirmed) return false;
+            // Handle role-based visibility using the new `can` function
+            if (item.permission && !can(currentUser, item.permission)) {
+                return false;
+            }
 
-            // Skip items that require organizer role when user is not organizer
-            if (item.requiresOrganizer && !isOrganizer) return false;
-
-            // Skip items that require pending status when user is not pending
-            if (item.requiresPending && !isPending) return false;
+            if (item.requiresCoreAppAccess && !canAccessCoreApp) return false;
+            if (item.requiresFullAccess && !isConfirmed) return false;
+            if (item.requiresOnboardingInProgress && !isOnboardingInProgress) return false;
 
             return true;
         });

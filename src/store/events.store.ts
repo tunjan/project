@@ -5,7 +5,6 @@ import {
   type CubeEvent,
   type EventReport,
   type TourDuty,
-  EventRole,
   EventStatus,
   ParticipantStatus,
   NotificationType,
@@ -13,6 +12,7 @@ import {
 import { processedEvents } from './initialData';
 import { useNotificationsStore } from './notifications.store';
 import { useUsersStore } from './users.store';
+import { handleEventReportLogging, notifyEventUpdate } from './store.lib';
 import { toast } from 'sonner';
 
 export interface EventsState {
@@ -26,11 +26,11 @@ export interface EventsActions {
   ) => void;
   updateEvent: (
     eventId: string,
-    updateData: Partial<Pick<CubeEvent, 'city' | 'location' | 'startDate' | 'endDate' | 'roleRequirements'>>,
+    updateData: Partial<Pick<CubeEvent, 'city' | 'location' | 'startDate' | 'endDate'>>,
     currentUser?: User
   ) => void;
   cancelEvent: (eventId: string, reason: string, currentUser: User) => void;
-  rsvp: (eventId: string, currentUser: User, isGuest: boolean, duties?: TourDuty[], eventRole?: EventRole) => void;
+  rsvp: (eventId: string, currentUser: User, isGuest: boolean, duties?: TourDuty[]) => void;
   cancelRsvp: (eventId: string, currentUser: User) => void;
   approveRsvp: (eventId: string, guestId: string, currentUser: User) => void;
   denyRsvp: (eventId: string, guestId: string, currentUser: User) => void;
@@ -49,7 +49,7 @@ export const useEventsStore = create<EventsState & EventsActions>()(
           ...eventData,
           organizer,
           participants: [
-            { user: organizer, eventRole: EventRole.ORGANIZER, status: ParticipantStatus.ATTENDING },
+            { user: organizer, status: ParticipantStatus.ATTENDING },
           ],
           status: EventStatus.UPCOMING,
         };
@@ -64,19 +64,7 @@ export const useEventsStore = create<EventsState & EventsActions>()(
         const event = get().events.find((e) => e.id === eventId);
         if (!event || !currentUser) return;
 
-        // Only send notifications for non-role requirement updates
-        if (!updateData.roleRequirements) {
-          const notificationsToCreate = event.participants
-            .filter((p) => p.user.id !== currentUser.id)
-            .map((p) => ({
-              userId: p.user.id,
-              type: NotificationType.EVENT_UPDATED,
-              message: `Details for the event "${event.location}" have been updated by the organizer.`,
-              linkTo: `/cubes/${event.id}`,
-              relatedUser: currentUser,
-            }));
-          useNotificationsStore.getState().addNotifications(notificationsToCreate);
-        }
+        notifyEventUpdate(event, currentUser);
       },
 
       cancelEvent: (eventId, reason, currentUser) => {
@@ -101,23 +89,22 @@ export const useEventsStore = create<EventsState & EventsActions>()(
         useNotificationsStore.getState().addNotifications(notificationsToCreate);
       },
 
-      rsvp: (eventId, currentUser, isGuest, duties, eventRole) => {
+      rsvp: (eventId, currentUser, isGuest, duties) => {
         const status = isGuest ? ParticipantStatus.PENDING : ParticipantStatus.ATTENDING;
-        const roleToUse = eventRole || EventRole.ACTIVIST;
         set((state) => ({
           events: state.events.map((event) => {
             if (event.id !== eventId) return event;
             const idx = event.participants.findIndex((p) => p.user.id === currentUser.id);
             if (idx !== -1) {
               const participants = [...event.participants];
-              participants[idx] = { ...participants[idx], eventRole: roleToUse, tourDuties: duties };
+              participants[idx] = { ...participants[idx], tourDuties: duties };
               return { ...event, participants };
             }
             return {
               ...event,
               participants: [
                 ...event.participants,
-                { user: currentUser, eventRole: roleToUse, status, tourDuties: duties },
+                { user: currentUser, status, tourDuties: duties },
               ],
             };
           }),
@@ -225,27 +212,10 @@ export const useEventsStore = create<EventsState & EventsActions>()(
           const event = state.events.find((e) => e.id === eventId);
           if (!event) return state;
 
-          const updatedEvents = state.events.map((e) =>
-            e.id === eventId ? { ...e, report, status: EventStatus.FINISHED } : e
-          );
+          const updatedEvent = { ...event, report, status: EventStatus.FINISHED };
+          const updatedEvents = state.events.map((e) => (e.id === eventId ? updatedEvent : e));
 
-          // Prepare batch update for user stats
-          const usersStore = useUsersStore.getState();
-          const statsUpdates: { userId: string; newStats: Partial<User['stats']> }[] = [];
-
-          event.participants.forEach((participant) => {
-            if (report.attendance[participant.user.id] === 'Attended') {
-              const user = usersStore.users.find((u) => u.id === participant.user.id);
-              if (user && user.stats) {
-                const newCities = [...new Set([...user.stats.cities, event.city])];
-                statsUpdates.push({
-                  userId: user.id,
-                  newStats: { totalHours: user.stats.totalHours + report.hours, cubesAttended: user.stats.cubesAttended + 1, cities: newCities },
-                })
-              }
-            }
-          });
-          usersStore.batchUpdateUserStats(statsUpdates);
+          handleEventReportLogging(updatedEvent, report);
 
           return { events: updatedEvents };
         });

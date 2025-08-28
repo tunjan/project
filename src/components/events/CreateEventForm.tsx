@@ -9,6 +9,7 @@ type EventType = 'Chapter' | 'Special';
 
 interface CreateEventFormProps {
   onCreateEvent: (eventData: {
+    name: string;
     city: string;
     location: string;
     startDate: Date;
@@ -28,6 +29,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
 
   const [eventType, setEventType] = useState<EventType>('Chapter');
   const [scope, setScope] = useState<'Regional' | 'Global'>('Regional');
+  const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [location, setLocation] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -117,6 +119,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
     }
 
     onCreateEvent({
+      name,
       city,
       location,
       startDate: finalStartDate,
@@ -142,6 +145,13 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6 p-8">
+          <InputField
+            label="Event Name"
+            id="event-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
           <SelectField
             label="Event Type"
             id="event-type"

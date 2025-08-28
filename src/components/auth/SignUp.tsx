@@ -39,60 +39,49 @@ interface SignUpProps {
     answers: OnboardingAnswers;
   }) => void;
   onNavigateLogin: () => void;
+  defaultChapter?: string;
 }
 
 const SignUp: React.FC<SignUpProps> = ({
   chapters,
   onRegister,
   onNavigateLogin,
+  defaultChapter,
 }) => {
   // 3. Initialize react-hook-form
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, touchedFields, dirtyFields },
   } = useForm<SignUpFormSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      chapter: chapters[0]?.name || '',
+      chapter: defaultChapter || chapters[0]?.name || '',
     },
+    mode: 'onChange', // Enable validation on change
   });
 
   // Watch field values to determine validation states
   const watchedFields = watch();
 
-  // Helper function to check if a field is valid
+  // Helper function to check if a field is valid using react-hook-form state
   const isFieldValid = (fieldName: keyof SignUpFormSchema) => {
     const fieldValue = watchedFields[fieldName];
+    const hasError = !!errors[fieldName];
+    const isTouched = touchedFields[fieldName];
+    const isDirty = dirtyFields[fieldName];
 
-    try {
-      // Test the specific field against the schema
-      if (fieldName === 'abolitionistAlignment') {
-        return fieldValue === 'true' || fieldValue === 'false';
-      }
-      if (fieldName === 'instagram') {
-        return true; // Instagram is optional, always considered valid
-      }
-      if (fieldName === 'veganReason' || fieldName === 'customAnswer') {
-        return typeof fieldValue === 'string' && fieldValue.trim().length >= 10;
-      }
-      if (fieldName === 'name') {
-        return typeof fieldValue === 'string' && fieldValue.trim().length >= 2;
-      }
-      if (fieldName === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return (
-          typeof fieldValue === 'string' && emailRegex.test(fieldValue.trim())
-        );
-      }
-      if (fieldName === 'chapter') {
-        return typeof fieldValue === 'string' && fieldValue.trim().length >= 1;
-      }
-      return false;
-    } catch {
-      return false;
+    // Field is valid if it has a value, is touched/dirty, and has no errors
+    const hasValue =
+      fieldValue !== undefined && fieldValue !== '' && fieldValue !== null;
+
+    // Special case for optional instagram field
+    if (fieldName === 'instagram') {
+      return !hasError; // Always valid if no error (since it's optional)
     }
+
+    return hasValue && (isTouched || isDirty) && !hasError;
   };
 
   // 4. Create a submit handler that receives validated data
@@ -118,7 +107,7 @@ const SignUp: React.FC<SignUpProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Join the Movement
           </h1>
-          <p className="mt-2 text-red">
+          <p className="text-red mt-2">
             Complete the application below. An organizer from your selected
             chapter will review it.
           </p>
@@ -231,7 +220,7 @@ const SignUp: React.FC<SignUpProps> = ({
             </button>
           </div>
 
-          <p className="text-center text-sm text-red">
+          <p className="text-red text-center text-sm">
             Already have an account?{' '}
             <button
               type="button"

@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
+import { useUsers, useUsersActions } from '@/store';
 import {
   OnboardingStatus,
   EventStatus,
@@ -14,6 +15,7 @@ import {
   useChapters,
 } from '@/store';
 import StatsGrid from '@/components/dashboard/StatsGrid';
+import Modal from '@/components/ui/Modal';
 import {
   CalendarIcon,
   CheckCircleIcon,
@@ -26,6 +28,7 @@ import {
 } from '@/icons';
 import DashboardSearch from '@/components/dashboard/DashboardSearch';
 import { safeFormatLocaleDate } from '@/utils/date';
+import { toast } from 'sonner';
 
 interface TaskItemProps {
   icon: React.ReactNode;
@@ -65,7 +68,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
               </span>
             )}
           </h3>
-          <p className="text-grey-600 mt-1 text-sm">{description}</p>
+          <p className="mt-1 text-sm text-neutral-600">{description}</p>
         </div>
       </div>
       {action && (
@@ -83,18 +86,61 @@ const TaskItem: React.FC<TaskItemProps> = ({
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
+  const allUsers = useUsers();
+  const { confirmWatchedMasterclass, scheduleRevisionCall } = useUsersActions();
   const allEvents = useEvents();
   const announcements = useAnnouncementsState();
   const notifications = useNotificationsState();
   const allChapters = useChapters();
 
+  // Local UI state for onboarding modals
+  const [showMasterclassModal, setShowMasterclassModal] = useState(false);
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [selectedOrganiserId, setSelectedOrganiserId] = useState<string>('');
+  const [revisionWhen, setRevisionWhen] = useState<string>(''); // datetime-local string
+
   useEffect(() => {
     if (!currentUser) {
       navigate('/login', { replace: true });
-    } else if (currentUser.onboardingStatus !== OnboardingStatus.CONFIRMED) {
-      navigate('/onboarding-status', { replace: true });
     }
   }, [currentUser, navigate]);
+
+  // Auto-open onboarding modals based on status/progress
+  useEffect(() => {
+    if (!currentUser) return;
+    const progress = currentUser.onboardingProgress || {};
+
+    // After onboarding call => status AWAITING_FIRST_CUBE: allow pre-confirming masterclass
+    if (
+      currentUser.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
+      !progress.watchedMasterclass
+    ) {
+      setShowMasterclassModal(true);
+      return;
+    }
+
+    // After first cube and masterclass confirmed => prompt to schedule revision call
+    if (
+      currentUser.onboardingStatus ===
+        OnboardingStatus.AWAITING_REVISION_CALL &&
+      !progress.revisionCallScheduledAt
+    ) {
+      setShowRevisionModal(true);
+      return;
+    }
+
+    // If awaiting masterclass and haven't confirmed yet, you may still confirm from dashboard
+    if (
+      currentUser.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS &&
+      !progress.watchedMasterclass
+    ) {
+      setShowMasterclassModal(true);
+      return;
+    }
+
+    setShowMasterclassModal(false);
+    setShowRevisionModal(false);
+  }, [currentUser]);
 
   const dashboardData = useMemo(() => {
     if (!currentUser) return null;
@@ -133,7 +179,7 @@ const DashboardPage: React.FC = () => {
           title: 'Accommodation Requests',
           description: 'Pending requests need your attention',
           count: pendingAccommodations.length,
-          action: () => navigate('/management'),
+          action: () => navigate('/manage'),
           urgent: true,
         });
       }
@@ -179,7 +225,7 @@ const DashboardPage: React.FC = () => {
         title: 'RSVP Approvals',
         description: 'People waiting to attend your events',
         count: pendingRSVPs,
-        action: () => navigate('/manage-events'),
+        action: () => navigate('/manage'),
         urgent: false,
       });
     }
@@ -250,7 +296,7 @@ const DashboardPage: React.FC = () => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Welcome back, {currentUser.name.split(' ')[0]}!
         </h1>
-        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
+        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
           Here's what needs your attention today. Use the search bar below to
           find anything on the platform.
         </p>
@@ -260,6 +306,121 @@ const DashboardPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {/* Onboarding Modals */}
+        {showMasterclassModal && currentUser && (
+          <Modal
+            title="Masterclass"
+            description="Confirm you've completed the AV Masterclass to proceed."
+            onClose={() => setShowMasterclassModal(false)}
+            size="md"
+          >
+            <div className="space-y-4">
+              <p className="text-sm text-black">
+                Have you watched the AV Masterclass? You can pre-confirm even
+                before your first Cube, and we'll automatically advance you
+                after your first Cube.
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    confirmWatchedMasterclass(currentUser.id);
+                    setShowMasterclassModal(false);
+                    // If this advances to revision phase, open scheduling
+                    setTimeout(() => setShowRevisionModal(true), 0);
+                  }}
+                  className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover"
+                >
+                  I watched it
+                </button>
+                <button
+                  onClick={() => setShowMasterclassModal(false)}
+                  className="border-2 border-black bg-white px-4 py-2 font-semibold"
+                >
+                  Not yet
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {showRevisionModal && currentUser && (
+          <Modal
+            title="Schedule Revision Call"
+            description="Pick an organiser and time for your revision call."
+            onClose={() => setShowRevisionModal(false)}
+            size="md"
+          >
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="organiser-select"
+                  className="mb-1 block text-sm font-semibold text-black"
+                >
+                  Organiser
+                </label>
+                <select
+                  id="organiser-select"
+                  value={selectedOrganiserId}
+                  onChange={(e) => setSelectedOrganiserId(e.target.value)}
+                  className="w-full border-2 border-black bg-white p-2"
+                >
+                  <option value="">Select organiser…</option>
+                  {allUsers
+                    .filter(
+                      (u) =>
+                        u.role === 'Chapter Organiser' &&
+                        u.organiserOf?.some((ch) =>
+                          currentUser.chapters.includes(ch)
+                        )
+                    )
+                    .map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="revision-datetime"
+                  className="mb-1 block text-sm font-semibold text-black"
+                >
+                  Date & Time
+                </label>
+                <input
+                  id="revision-datetime"
+                  type="datetime-local"
+                  value={revisionWhen}
+                  onChange={(e) => setRevisionWhen(e.target.value)}
+                  className="w-full border-2 border-black bg-white p-2"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    if (!selectedOrganiserId || !revisionWhen) return;
+                    scheduleRevisionCall(
+                      currentUser.id,
+                      selectedOrganiserId,
+                      new Date(revisionWhen)
+                    );
+                    setShowRevisionModal(false);
+                  }}
+                  disabled={!selectedOrganiserId || !revisionWhen}
+                  className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover disabled:opacity-50"
+                >
+                  Schedule
+                </button>
+                <button
+                  onClick={() => setShowRevisionModal(false)}
+                  className="border-2 border-black bg-white px-4 py-2 font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
         {/* Main Content */}
         <div className="space-y-8 lg:col-span-2">
           {/* Next Event */}
@@ -276,7 +437,7 @@ const DashboardPage: React.FC = () => {
                       <h3 className="text-lg font-bold text-black">
                         {nextEvent.location}
                       </h3>
-                      <div className="text-grey-600 mt-1 flex items-center gap-4 text-sm">
+                      <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
                         <span className="flex items-center gap-1">
                           <ClockIcon className="h-4 w-4" />
                           {safeFormatLocaleDate(nextEvent.startDate)}
@@ -298,11 +459,11 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <CalendarIcon className="text-grey-500 mx-auto mb-3 h-12 w-12" />
+                <CalendarIcon className="mx-auto mb-3 h-12 w-12 text-neutral-500" />
                 <h3 className="mb-2 font-bold text-black">
                   No upcoming events
                 </h3>
-                <p className="text-grey-600 mb-4 text-sm">
+                <p className="mb-4 text-sm text-neutral-600">
                   Find a cube near you or create one yourself.
                 </p>
                 <button
@@ -328,9 +489,9 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <CheckCircleIcon className="text-white0 mx-auto mb-3 h-12 w-12" />
+                <CheckCircleIcon className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
                 <h3 className="mb-2 font-bold text-black">All caught up!</h3>
-                <p className="text-grey-600 text-sm">
+                <p className="text-sm text-neutral-600">
                   No pending tasks require your attention.
                 </p>
               </div>
@@ -345,7 +506,18 @@ const DashboardPage: React.FC = () => {
             <StatsGrid
               stats={currentUser.stats}
               showPrivateStats={true}
-              onCityClick={() => navigate(`/members/${currentUser.id}`)}
+              onCityClick={() => {
+                if (currentUser.stats.cities.length === 0) {
+                  toast.info(
+                    "You haven't been to any cities yet. Attend your first cube to start building your impact!"
+                  );
+                } else {
+                  toast.info(
+                    `You've been to ${currentUser.stats.cities.length} cities: ${currentUser.stats.cities.join(', ')}`
+                  );
+                  navigate('/chapters');
+                }
+              }}
             />
           </section>
         </div>
@@ -370,11 +542,11 @@ const DashboardPage: React.FC = () => {
                         <h3 className="text-sm font-semibold text-black">
                           {announcement.title}
                         </h3>
-                        <p className="text-grey-600 mt-1 line-clamp-2 text-xs">
+                        <p className="mt-1 line-clamp-2 text-xs text-neutral-600">
                           {announcement.content}
                         </p>
                         <div className="mt-2 flex items-center justify-between">
-                          <span className="text-white0 text-xs">
+                          <span className="text-xs text-neutral-500">
                             {safeFormatLocaleDate(announcement.createdAt)}
                           </span>
                           <span className="rounded bg-white px-2 py-0.5 text-xs font-medium">
@@ -394,8 +566,10 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <MegaphoneIcon className="text-grey-500 mx-auto mb-2 h-8 w-8" />
-                <p className="text-grey-600 text-sm">No recent announcements</p>
+                <MegaphoneIcon className="mx-auto mb-2 h-8 w-8 text-neutral-500" />
+                <p className="text-sm text-neutral-600">
+                  No recent announcements
+                </p>
               </div>
             )}
           </section>

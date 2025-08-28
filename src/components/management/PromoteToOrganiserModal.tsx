@@ -87,7 +87,7 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
                   className="h-5 w-5 accent-primary"
                 />
                 <span className="font-bold text-black">{chapter.name}</span>
-                <span className="text-sm text-white0">
+                <span className="text-sm text-white">
                   ({chapter.country})
                 </span>
               </label>

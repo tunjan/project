@@ -98,7 +98,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
           )}
         </div>
 
-        <div className="mt-6 flex items-center border-t border-white pt-4">
+        <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
           <img
             className="h-10 w-10 object-cover"
             src={event.organizer.profilePictureUrl}
@@ -108,7 +108,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
             <p className="text-sm font-semibold text-black">
               {event.organizer.name}
             </p>
-            <p className="text-white0 text-xs">Organizer</p>
+            <p className="text-xs text-neutral-500">Organizer</p>
           </div>
         </div>
       </div>

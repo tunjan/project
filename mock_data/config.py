@@ -5,7 +5,17 @@ Centralized configuration management with validation and extensibility.
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Any
+from enum import Enum
 import os
+
+class Role(Enum):
+    APPLICANT = 'Applicant'
+    ACTIVIST = 'Activist'
+    CONFIRMED_ACTIVIST = 'Activist (Confirmed)'
+    CHAPTER_ORGANISER = 'Chapter Organiser'
+    REGIONAL_ORGANISER = 'Regional Organiser'
+    GLOBAL_ADMIN = 'Global Admin'
+    GODMODE = 'Godmode'
 
 
 @dataclass
@@ -13,8 +23,8 @@ class GenerationConfig:
     """Main configuration class for mock data generation."""
     
     # Core entity counts
-    chapters: int = 20
-    users: int = 500
+    chapters: int = 50
+    users: int = 1000
     events_per_chapter: int = 20
     special_regional_events: int = 10
     announcements: int = 100
@@ -23,6 +33,7 @@ class GenerationConfig:
     comments_per_event: int = 3
     badge_awards: int = 100
     chapter_join_requests: int = 25
+    challenges: int = 15
     
     # Data quality settings
     seed: int = 42  # For reproducible data generation
@@ -52,12 +63,12 @@ class GenerationConfig:
     })
     user_churn_rate: float = 0.15  # 15% of users will have a leaveDate
     
-    # Role distribution
-    role_distribution: Dict[str, float] = field(default_factory=lambda: {
+    # Onboarding status distribution for new users
+    onboarding_distribution: Dict[str, float] = field(default_factory=lambda: {
         'confirmed': 0.80,
-        'awaiting_verification': 0.05,
-        'pending_review': 0.13,
-        'denied': 0.02
+        'awaiting_verification': 0.10,
+        'pending_review': 0.05,
+        'denied': 0.05
     })
     
     # Event patterns
@@ -95,9 +106,6 @@ class GenerationConfig:
         
         if sum(self.user_activity_weights.values()) != 1.0:
             raise ValueError("User activity weights must sum to 1.0")
-        
-        if abs(sum(self.role_distribution.values()) - 1.0) > 0.01:
-            raise ValueError("Role distribution weights must sum to 1.0")
         
         return True
     

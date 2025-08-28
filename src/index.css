@@ -208,7 +208,7 @@
     @apply border-2 border-black bg-white transition-all hover:shadow-brutal;
   }
   .h-section {
-    @apply border-grey-500 mb-6 border-b-4 pb-3 text-3xl font-extrabold tracking-tight text-black;
+    @apply mb-6 border-b-4 border-gray-500 pb-3 text-3xl font-extrabold tracking-tight text-black;
   }
   .h-subsection {
     @apply mb-4 text-xl font-bold text-black;
@@ -239,28 +239,31 @@
 
   /* Button variants for consistency */
   .btn-primary {
-    @apply bg-red px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black;
+    @apply bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover;
   }
   .btn-secondary {
-    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-600;
   }
   .btn-outline {
     @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-black hover:text-white;
   }
   .btn-danger {
-    @apply bg-red px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black;
+    @apply bg-danger px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-danger-hover;
   }
   .btn-warning {
-    @apply bg-red px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black;
+    @apply bg-warning px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-warning-hover;
   }
   .btn-success {
-    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply bg-success px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-success-hover;
   }
   .btn-info {
-    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply bg-info px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-info-hover;
   }
   .btn-gray {
-    @apply hover:bg-grey-600 bg-black px-4 py-2 font-bold text-white transition-colors duration-300;
+    @apply bg-grey-200 px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-grey-300;
+  }
+  .btn-sm {
+    @apply px-3 py-1 text-sm;
   }
 
   /* Tag/badge variants */
@@ -352,7 +355,7 @@
 
   /* Select with success state */
   select.border-success {
-    border-color: #000000 !important;
+    border-color: #22c55e !important; /* Tailwind's green-500 */
   }
 
   /* Custom select arrow positioning */

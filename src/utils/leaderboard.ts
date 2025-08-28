@@ -113,6 +113,17 @@ export const calculateLeaderboards = (
         chapters.map((c) => [c.name, c])
     );
 
+    // Performance optimization: Create chapter-to-members map once
+    const chapterToMembersMap = new Map<string, User[]>();
+    chapters.forEach(chapter => chapterToMembersMap.set(chapter.name, []));
+    confirmedUsers.forEach(user => {
+        user.chapters.forEach(chapterName => {
+            if (chapterToMembersMap.has(chapterName)) {
+                chapterToMembersMap.get(chapterName)!.push(user);
+            }
+        });
+    });
+
     const eventToCityMap = new Map<string, string>();
     events.forEach((e) => eventToCityMap.set(e.id, e.city));
 
@@ -191,13 +202,15 @@ export const calculateLeaderboards = (
     // --- CHAPTER LEADERBOARDS ---
     const chapterHoursAllTime = chapters
         .map((chapter) => {
-            const chapterMembers = confirmedUsers.filter((u) =>
-                u.chapters.includes(chapter.name)
-            );
-            const totalHours = chapterMembers.reduce(
-                (sum, u) => sum + u.stats.totalHours,
-                0
-            );
+            const relevantEvents = events.filter(e => e.city === chapter.name && e.report);
+            let totalHours = 0;
+            const chapterMembers = chapterToMembersMap.get(chapter.name) || [];
+            for (const event of relevantEvents) {
+                const attendingChapterMembers = chapterMembers.filter(
+                    user => event.report!.attendance[user.id] === 'Attended'
+                );
+                totalHours += event.report!.hours * attendingChapterMembers.length;
+            }
             return { chapter, value: Math.round(totalHours) };
         })
         .sort((a, b) => b.value - a.value)
@@ -214,19 +227,17 @@ export const calculateLeaderboards = (
         );
 
         for (const event of relevantEvents) {
-            if (event.report) {
-                // Only credit hours to the chapter that hosted the event (event.city)
-                const hostingChapterName = event.city;
-                if (chapterMap.has(hostingChapterName)) {
-                    // Add the event's hours to the hosting chapter's total.
-                    // This credits the chapter for the event duration itself, not per attendee.
-                    // NOTE: This logic credits the hosting chapter for the full event duration,
-                    // regardless of which chapters the attendees belong to. If the business
-                    // requirement is to credit chapters based on attendee contributions, this
-                    // would need to be refactored to sum individual member hours across all events.
-                    hourCounts[hostingChapterName] =
-                        (hourCounts[hostingChapterName] || 0) + event.report.hours;
-                }
+            // The event's city is the chapter name.
+            const chapterName = event.city;
+            if (chapterMap.has(chapterName) && event.report) {
+                // Get chapter members who attended this event using pre-built map
+                const chapterMembers = chapterToMembersMap.get(chapterName) || [];
+                const attendingChapterMembers = chapterMembers.filter(
+                    user => event.report!.attendance[user.id] === 'Attended'
+                );
+                // Multiply event hours by number of attending chapter members
+                const chapterHours = event.report.hours * attendingChapterMembers.length;
+                hourCounts[chapterName] = (hourCounts[chapterName] || 0) + chapterHours;
             }
         }
 

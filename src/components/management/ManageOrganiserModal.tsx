@@ -5,7 +5,7 @@ import { useChapters, useUsersActions } from '@/store';
 import { toast } from 'sonner';
 import Modal from '@/components/ui/Modal';
 import { PencilIcon, UsersIcon } from '@/icons';
-import { getAssignableRoles } from '@/utils/auth';
+import { getAssignableRoles } from '@/config/permissions';
 
 interface ManageOrganiserModalProps {
   organiser: User;
@@ -171,7 +171,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           <div>
             <h3 className="text-lg font-bold text-black">{organiser.name}</h3>
             <p className="text-sm text-red">{organiser.email}</p>
-            <p className="text-xs text-white0">
+            <p className="text-xs text-white">
               Current role: {organiser.role}
             </p>
           </div>
@@ -225,7 +225,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                   <span className="font-semibold text-black">
                     {chapter.name}
                   </span>
-                  <span className="text-sm text-white0">
+                  <span className="text-sm text-white">
                     ({chapter.country})
                   </span>
                 </label>
@@ -259,7 +259,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                       {chapterName}
                     </span>
                     {chapter && (
-                      <span className="text-xs text-white0">
+                      <span className="text-xs text-white">
                         {chapter.country}
                       </span>
                     )}

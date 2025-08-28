@@ -10,7 +10,7 @@ const BadgeList: React.FC<BadgeListProps> = ({ badges }) => {
   if (badges.length === 0) {
     return (
       <div className="card-brutal p-6 text-center">
-        <p className="text-white0">
+        <p className="text-white">
           No recognitions earned yet. Keep up the great work!
         </p>
       </div>

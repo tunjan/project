@@ -10,7 +10,7 @@ import AnnouncementCard from './AnnouncementCard';
 import { useCurrentUser } from '@/store/auth.store';
 import { useChapters } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
-import { hasOrganizerRole } from '@/utils/auth';
+import { can, Permission } from '@/config/permissions';
 
 interface AnnouncementsPageProps {
   onCreate: () => void;
@@ -73,11 +73,11 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
           <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             Announcements
           </h1>
-          <p className="text-grey-600 mx-auto mt-3 max-w-2xl text-lg">
+          <p className="text-neutral-600 mx-auto mt-3 max-w-2xl text-lg">
             Stay up to date with the latest news and updates.
           </p>
         </div>
-        {hasOrganizerRole(currentUser) && (
+        {can(currentUser, Permission.CREATE_ANNOUNCEMENT) && (
           <button
             onClick={onCreate}
             className="flex flex-shrink-0 items-center bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
@@ -87,8 +87,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
           </button>
         )}
       </div>
-      <p className="text-grey-600 mx-auto mt-3 max-w-2xl text-lg"></p>
-      {filteredAnnouncements.length > 0 ? (
+            {filteredAnnouncements.length > 0 ? (
         <div className="space-y-6">
           {filteredAnnouncements.map((announcement: Announcement) => (
             <AnnouncementCard
@@ -99,11 +98,11 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         </div>
       ) : (
         <div className="border-2 border-black bg-white p-8 text-center">
-          <MegaphoneIcon className="text-grey-500 mx-auto h-12 w-12" />
+          <MegaphoneIcon className="text-neutral-500 mx-auto h-12 w-12" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No announcements yet.
           </h3>
-          <p className="text-white0 mt-2">Check back later for updates.</p>
+          <p className="text-neutral-600 mt-2">Check back later for updates.</p>
         </div>
       )}
     </div>

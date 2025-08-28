@@ -41,7 +41,7 @@ const MemberRow: React.FC<{
           <p className="font-bold text-black transition-colors group-hover:text-primary">
             {user.name}
           </p>
-          <p className="text-sm text-white0">{chapterText}</p>
+          <p className="text-sm text-neutral-500">{chapterText}</p>
           {isPendingForCurrentChapter && (
             <p className="text-xs font-medium text-red">
               ⏳ Pending Chapter Join Request
@@ -50,9 +50,9 @@ const MemberRow: React.FC<{
         </div>
       </div>
       <div className="flex items-center space-x-4">
-        {user.onboardingStatus === 'Awaiting Verification' && (
+        {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE && (
           <span className="hidden bg-red px-2 py-1 text-xs font-bold text-white sm:block">
-            AWAITING VERIFICATION
+            AWAITING FIRST CUBE
           </span>
         )}
         <span className="hidden text-sm font-semibold text-black md:block">
@@ -193,7 +193,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       ) : (
         <div className="p-16 text-center">
           <p className="text-lg font-bold">No members found.</p>
-          <p className="mt-2 text-white0">
+          <p className="mt-2 text-white">
             Try adjusting your search or filter selection.
           </p>
         </div>

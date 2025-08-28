@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { type User, Role, OnboardingStatus, type OrganizerNote, NotificationType } from '@/types';
 import { persist } from 'zustand/middleware';
-import nacl from 'tweetnacl';
-import naclUtil from 'tweetnacl-util';
 import {
   processedUsers,
 } from './initialData';
@@ -28,14 +26,16 @@ export interface UsersActions {
     status: OnboardingStatus,
     approver?: User
   ) => void;
-  completeOnboardingCall: (userId: string) => void;
-  confirmUserIdentity: (userId: string) => void;
+  finalizeOnboarding: (userId: string) => void;
   updateUserRole: (userId: string, role: Role) => void;
   setChapterOrganiser: (userId: string, chaptersToOrganise: string[]) => void;
   updateUserChapters: (userId: string, newChapters: string[]) => void;
   updateUserOrganiserOf: (userId: string, newOrganiserOf: string[]) => void;
   updateProfile: (userId: string, updatedData: Partial<User>) => void;
-  deleteUser: (userIdToDelete: string) => void;
+  // Onboarding progress actions
+  confirmWatchedMasterclass: (userId: string) => void;
+  scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => void;
+  deleteUser: (userIdToDelete: string) => Promise<void>;
   addOrganizerNote: (targetUserId: string, noteContent: string, author: User) => void;
   editOrganizerNote: (
     targetUserId: string,
@@ -103,7 +103,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }
       },
 
-      register: (formData) => {
+              register: (formData) => {
         const newUser: User = {
           id: `user_${Date.now()}`,
           email: formData.email,
@@ -111,7 +111,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           instagram: formData.instagram || undefined,
           chapters: [formData.chapter],
           onboardingAnswers: formData.answers,
-          role: Role.ACTIVIST,
+          role: Role.APPLICANT,
           onboardingStatus: OnboardingStatus.PENDING_APPLICATION_REVIEW,
           stats: {
             totalHours: 0,
@@ -146,52 +146,140 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       },
 
       updateUserStatus: (userId, status, approver) => {
-        set((state) => ({
-          users: state.users.map((u) =>
+        set((state) => {
+          const updatedUsers = state.users.map((u) =>
             u.id === userId ? { ...u, onboardingStatus: status } : u
-          ),
-        }));
+          );
+
+          if (useAuthStore.getState().currentUser?.id === userId) {
+            useAuthStore.getState().updateCurrentUser({ onboardingStatus: status });
+          }
+
+          return { users: updatedUsers };
+        });
 
         const user = get().users.find((u) => u.id === userId);
         if (user && approver) {
-          if (status === OnboardingStatus.AWAITING_VERIFICATION) {
+          // Notify on key stage transitions
+          if (status === OnboardingStatus.PENDING_ONBOARDING_CALL) {
             useNotificationsStore.getState().addNotification({
               userId: user.id,
               type: NotificationType.REQUEST_ACCEPTED,
-              message: `Your application for ${user.chapters[0]} was approved by ${approver.name}! Get verified in person.`,
+              message: `Your application for ${user.chapters[0]} was approved by ${approver.name}! Next: schedule your onboarding call.`,
+              linkTo: '/dashboard',
+            });
+          }
+          if (status === OnboardingStatus.AWAITING_FIRST_CUBE) {
+            useNotificationsStore.getState().addNotification({
+              userId: user.id,
+              type: NotificationType.REQUEST_ACCEPTED,
+              message: `Great progress! Next: attend your first Cube with your chapter.`,
+              linkTo: '/dashboard',
+            });
+          }
+          if (status === OnboardingStatus.AWAITING_MASTERCLASS) {
+            useNotificationsStore.getState().addNotification({
+              userId: user.id,
+              type: NotificationType.REQUEST_ACCEPTED,
+              message: `Nice! You completed your first Cube. Next: complete the masterclass.`,
+              linkTo: '/dashboard',
+            });
+          }
+          if (status === OnboardingStatus.AWAITING_REVISION_CALL) {
+            useNotificationsStore.getState().addNotification({
+              userId: user.id,
+              type: NotificationType.REQUEST_ACCEPTED,
+              message: `Great! You completed the masterclass. Next: pass the revision call to get verified.`,
               linkTo: '/dashboard',
             });
           }
         }
       },
 
-      completeOnboardingCall: (userId) => {
-        set((state) => ({
-          users: state.users.map((u) =>
-            u.id === userId
-              ? { ...u, onboardingStatus: OnboardingStatus.AWAITING_VERIFICATION }
-              : u
-          ),
-        }));
-      },
-
-      confirmUserIdentity: (userId) => {
-        const keyPair = nacl.box.keyPair();
-        const secretKey = naclUtil.encodeBase64(keyPair.secretKey);
-        const publicKey = naclUtil.encodeBase64(keyPair.publicKey);
-
-        set((state) => ({
-          users: state.users.map((u) =>
-            u.id === userId
-              ? {
+      finalizeOnboarding: (userId) => {
+        set((state) => {
+          let userToUpdate: User | undefined;
+          const updatedUsers = state.users.map((u) => {
+            if (u.id === userId) {
+              userToUpdate = {
                 ...u,
                 onboardingStatus: OnboardingStatus.CONFIRMED,
-                role: Role.CONFIRMED_ACTIVIST,
-                cryptoId: { publicKey, secretKey },
-              }
-              : u
-          ),
-        }));
+                role: Role.ACTIVIST,
+              };
+              return userToUpdate;
+            }
+            return u;
+          });
+
+          if (userToUpdate) {
+            // Update auth store if verifying current user
+            if (useAuthStore.getState().currentUser?.id === userId) {
+              useAuthStore.getState().updateCurrentUser(userToUpdate);
+            }
+            // Notify user of confirmation
+            useNotificationsStore.getState().addNotification({
+              userId: userToUpdate.id,
+              type: NotificationType.REQUEST_ACCEPTED,
+              message: `You're fully confirmed! Welcome aboard.`,
+              linkTo: '/dashboard',
+            });
+          }
+
+          return { users: updatedUsers };
+        });
+      },
+
+      // Mark that the user has watched the masterclass. If they're already in
+      // AWAITING_MASTERCLASS, advance them to AWAITING_REVISION_CALL immediately.
+      confirmWatchedMasterclass: (userId: string) => {
+        set((state) => {
+          const updatedUsers = state.users.map((u) => {
+            if (u.id !== userId) return u;
+            const progress = {
+              ...(u.onboardingProgress || {}),
+              watchedMasterclass: true,
+            };
+
+            let onboardingStatus = u.onboardingStatus;
+            if (onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS) {
+              onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
+              useNotificationsStore.getState().addNotification({
+                userId: u.id,
+                type: NotificationType.REQUEST_ACCEPTED,
+                message: `Great! You completed the masterclass. Next: pass the revision call to get verified.`,
+                linkTo: '/dashboard',
+              });
+            }
+
+            const updatedUser = { ...u, onboardingProgress: progress, onboardingStatus };
+
+            if (useAuthStore.getState().currentUser?.id === userId) {
+              useAuthStore.getState().updateCurrentUser({ onboardingProgress: progress, onboardingStatus });
+            }
+            return updatedUser;
+          });
+          return { users: updatedUsers };
+        });
+      },
+
+      // Schedule a revision call with selected organiser and time
+      scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => {
+        set((state) => {
+          const updatedUsers = state.users.map((u) => {
+            if (u.id !== userId) return u;
+            const progress = {
+              ...(u.onboardingProgress || {}),
+              selectedOrganiserId: organiserId,
+              revisionCallScheduledAt: when,
+            };
+            const updatedUser = { ...u, onboardingProgress: progress };
+            if (useAuthStore.getState().currentUser?.id === userId) {
+              useAuthStore.getState().updateCurrentUser({ onboardingProgress: progress });
+            }
+            return updatedUser;
+          });
+          return { users: updatedUsers };
+        });
       },
 
       updateUserRole: (userId, role) =>
@@ -239,32 +327,86 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }),
 
       updateUserOrganiserOf: (userId, newOrganiserOf) =>
-        set((state) => ({
-          users: state.users.map((u) => (u.id === userId ? { ...u, organiserOf: newOrganiserOf } : u)),
-        })),
+        set((state) => {
+          const updatedUsers = state.users.map((u) =>
+            u.id === userId ? { ...u, organiserOf: newOrganiserOf } : u
+          );
+          if (useAuthStore.getState().currentUser?.id === userId) {
+            useAuthStore.getState().updateCurrentUser({ organiserOf: newOrganiserOf });
+          }
+          return { users: updatedUsers };
+        }),
 
       updateProfile: (userId, updatedData) => {
-        const fullUpdate = {
-          ...updatedData,
-          instagram: updatedData.instagram || undefined,
-        } as Partial<User>;
-        set((state) => ({
-          users: state.users.map((u) => (u.id === userId ? { ...u, ...fullUpdate } : u)),
-        }));
-        useAuthStore.getState().updateCurrentUser(fullUpdate);
+        set((state) => {
+          const fullUpdate = {
+            ...updatedData,
+            instagram: updatedData.instagram || undefined,
+          } as Partial<User>;
+          const updatedUsers = state.users.map((u) =>
+            u.id === userId ? { ...u, ...fullUpdate } : u
+          );
+
+          if (useAuthStore.getState().currentUser?.id === userId) {
+            useAuthStore.getState().updateCurrentUser(fullUpdate);
+          }
+
+          return { users: updatedUsers };
+        });
       },
 
-      deleteUser: (userIdToDelete) => {
-        set((state) => ({
-          users: state.users.filter((u) => u.id !== userIdToDelete),
-        }));
-        // Log out the user if they delete their own account
-        if (useAuthStore.getState().currentUser?.id === userIdToDelete) {
-          useAuthStore.getState().logout();
-        }
+      deleteUser: (userIdToDelete: string): Promise<void> => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const userToDelete = get().users.find((u) => u.id === userIdToDelete);
+            if (!userToDelete) {
+              console.error('User to delete not found');
+              return resolve();
+            }
+
+            // If the deleted user is the current user, log them out
+            if (useAuthStore.getState().currentUser?.id === userIdToDelete) {
+              useAuthStore.getState().logout();
+            }
+
+            // If the user is a chapter organizer, handle chapter re-assignment
+            if (userToDelete.role === Role.CHAPTER_ORGANISER && userToDelete.organiserOf && userToDelete.organiserOf.length > 0) {
+              const chaptersToReassign = userToDelete.organiserOf;
+              chaptersToReassign.forEach(chapterName => {
+                // Find another organizer for this chapter
+                const otherOrganiser = get().users.find(u => 
+                  u.id !== userIdToDelete && 
+                  u.role === Role.CHAPTER_ORGANISER && 
+                  u.organiserOf?.includes(chapterName)
+                );
+
+                if (!otherOrganiser) {
+                  // If no other organizer, find a global organizer or admin
+                  const fallbackOrganiser = get().users.find(u => u.role === Role.REGIONAL_ORGANISER || u.role === Role.GLOBAL_ADMIN);
+                  if (fallbackOrganiser) {
+                    // This is a simplified reassignment. A real app might have more complex logic.
+                    get().updateUserOrganiserOf(fallbackOrganiser.id, [...(fallbackOrganiser.organiserOf || []), chapterName]);
+                    // Also promote them to Chapter Organiser if they aren't already one
+                    if (fallbackOrganiser.role !== Role.CHAPTER_ORGANISER) {
+                      get().updateUserRole(fallbackOrganiser.id, Role.CHAPTER_ORGANISER);
+                    }
+                    console.log(`Chapter ${chapterName} has been reassigned to ${fallbackOrganiser.name}.`);
+                  } else {
+                    console.warn(`No fallback organizer found for chapter ${chapterName}.`);
+                  }
+                }
+              });
+            }
+
+            set((state) => ({
+              users: state.users.filter((u) => u.id !== userIdToDelete),
+            }));
+            resolve();
+          }, 500); // Simulate network delay for mock API
+        });
       },
 
-      addOrganizerNote: (targetUserId, noteContent, author) => {
+      addOrganizerNote: (targetUserId: string, noteContent: string, author: User) => {
         const newNote: OrganizerNote = {
           id: `note_${Date.now()}`,
           authorName: author.name,
@@ -303,18 +445,56 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }));
       },
       batchUpdateUserStats: (updates) => {
-        set((state) => ({
-          users: state.users.map((user) => {
+        set((state) => {
+          const updatedUsers = state.users.map((user) => {
             const update = updates.find((u) => u.userId === user.id);
-            if (update) {
-              return {
-                ...user,
-                stats: { ...user.stats, ...update.newStats },
-              };
+            if (!update) return user;
+
+            const prevCubes = user.stats?.cubesAttended ?? 0;
+            const newStats = { ...user.stats, ...update.newStats };
+
+            let onboardingStatus = user.onboardingStatus;
+            // Auto-transition: first Cube attended
+            if (
+              user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
+              prevCubes === 0 &&
+              (newStats.cubesAttended ?? 0) >= 1
+            ) {
+              const watched = user.onboardingProgress?.watchedMasterclass === true;
+              if (watched) {
+                onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
+                useNotificationsStore.getState().addNotification({
+                  userId: user.id,
+                  type: NotificationType.REQUEST_ACCEPTED,
+                  message: `Nice! You completed your first Cube and already watched the masterclass. Next: schedule your revision call.`,
+                  linkTo: '/dashboard',
+                });
+              } else {
+                onboardingStatus = OnboardingStatus.AWAITING_MASTERCLASS;
+                useNotificationsStore.getState().addNotification({
+                  userId: user.id,
+                  type: NotificationType.REQUEST_ACCEPTED,
+                  message: `Nice! You completed your first Cube. Next: complete the masterclass.`,
+                  linkTo: '/dashboard',
+                });
+              }
             }
-            return user;
-          }),
-        }));
+
+            const updatedUser = {
+              ...user,
+              stats: newStats,
+              onboardingStatus,
+            };
+
+            // Keep auth store in sync if this is the current user
+            if (useAuthStore.getState().currentUser?.id === user.id) {
+              useAuthStore.getState().updateCurrentUser({ stats: newStats, onboardingStatus });
+            }
+
+            return updatedUser;
+          });
+          return { users: updatedUsers };
+        });
       },
 
       resetToInitialData: () => {
@@ -367,8 +547,9 @@ export const useUsersActions = () =>
   useUsersStore((s) => ({
     register: s.register,
     updateUserStatus: s.updateUserStatus,
-    completeOnboardingCall: s.completeOnboardingCall,
-    confirmUserIdentity: s.confirmUserIdentity,
+    finalizeOnboarding: s.finalizeOnboarding,
+    confirmWatchedMasterclass: s.confirmWatchedMasterclass,
+    scheduleRevisionCall: s.scheduleRevisionCall,
     updateUserRole: s.updateUserRole,
     setChapterOrganiser: s.setChapterOrganiser,
     updateUserChapters: s.updateUserChapters,

@@ -11,6 +11,8 @@ interface CreateAnnouncementFormProps {
     content: string;
     scope: AnnouncementScope;
     target?: string;
+    ctaLink?: string;
+    ctaText?: string;
   }) => void;
   onCancel: () => void;
 }
@@ -47,6 +49,8 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
     postableScopes[0] || AnnouncementScope.GLOBAL
   );
   const [target, setTarget] = useState('');
+  const [ctaLink, setCtaLink] = useState('');
+  const [ctaText, setCtaText] = useState('');
 
   useEffect(() => {
     if (scope === AnnouncementScope.CHAPTER) {
@@ -70,7 +74,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
       alert(`Please select a target ${scope.toLowerCase()}.`);
       return;
     }
-    onCreate({ title, content, scope, target });
+    onCreate({ title, content, scope, target, ctaLink, ctaText });
   };
 
   return (
@@ -99,6 +103,31 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             onChange={(e) => setContent(e.target.value)}
             rows={8}
           />
+
+          <div className="space-y-6 border-t-2 border-black pt-6 mt-6">
+            <h2 className="text-xl font-bold text-black">
+              Optional: Call to Action
+            </h2>
+            <p className="text-sm text-gray-500">
+              Add a link to encourage users to take action. The button will only appear if a link is provided.
+            </p>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <InputField
+                label="CTA Link"
+                id="ctaLink"
+                value={ctaLink}
+                onChange={(e) => setCtaLink(e.target.value)}
+                placeholder="https://example.com/more-info"
+              />
+              <InputField
+                label="CTA Button Text"
+                id="ctaText"
+                value={ctaText}
+                onChange={(e) => setCtaText(e.target.value)}
+                placeholder="Learn More"
+              />
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <SelectField

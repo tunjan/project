@@ -98,21 +98,21 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="font-bold">{chapter.name}</span>
-                          <span className="ml-2 text-sm text-white0">
+                          <span className="ml-2 text-sm text-neutral-500">
                             ({chapter.country})
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => setEditingChapter(chapter)}
-                            className="p-1 text-white0 hover:text-black"
+                            className="p-1 text-neutral-500 hover:text-black"
                             aria-label="Edit Chapter"
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => openDeleteModal(chapter.name)}
-                            className="p-1 text-white0 hover:text-red"
+                            className="p-1 text-neutral-500 hover:text-red"
                             aria-label="Delete Chapter"
                           >
                             <TrashIcon className="h-4 w-4" />
@@ -120,7 +120,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                         </div>
                       </div>
                       <div className="mt-2 pl-2">
-                        <p className="text-xs font-bold uppercase text-white0">
+                        <p className="text-xs font-bold uppercase text-neutral-500">
                           Organizers ({organizers.length})
                         </p>
                         {organizers.length > 0 ? (
@@ -144,7 +144,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                             ))}
                           </div>
                         ) : (
-                          <p className="mt-1 text-xs text-white0">
+                          <p className="mt-1 text-xs text-neutral-500">
                             No organizers assigned.
                           </p>
                         )}

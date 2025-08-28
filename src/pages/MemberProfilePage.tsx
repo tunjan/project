@@ -37,7 +37,7 @@ const MemberProfilePage: React.FC = () => {
         <div className="mb-4">
           <LoadingSpinner size="lg" />
           <p className="text-grey-600 mt-4">Loading user profile...</p>
-          <p className="text-white0 mt-2 text-sm">
+          <p className="mt-2 text-sm text-neutral-500">
             User ID: {userId} | Total users: {users.length}
           </p>
 

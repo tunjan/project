@@ -1,6 +1,6 @@
 export enum Role {
+  APPLICANT = 'Applicant',
   ACTIVIST = 'Activist',
-  CONFIRMED_ACTIVIST = 'Activist (Confirmed)',
   CHAPTER_ORGANISER = 'Chapter Organiser',
   REGIONAL_ORGANISER = 'Regional Organiser',
   GLOBAL_ADMIN = 'Global Admin',
@@ -44,21 +44,6 @@ export enum NotificationType {
   NEW_APPLICANT = 'New Applicant', // NEW
 }
 
-export enum EventRole {
-  ORGANIZER = 'Organizer',
-  ACTIVIST = 'Activist',
-  VOLUNTEER = 'Volunteer',
-  OUTREACH = 'Outreach',
-  TRANSPORT = 'Transport',
-  EQUIPMENT = 'Equipment',
-}
-
-export interface EventRoleRequirement {
-  role: EventRole;
-  needed: number;
-  filled: number;
-  description?: string;
-}
 
 export interface BadgeTemplate {
   name: string;
@@ -88,8 +73,10 @@ export interface UserStats {
 
 export enum OnboardingStatus {
   PENDING_APPLICATION_REVIEW = 'Pending Application Review',
-  // REMOVED: PENDING_ONBOARDING_CALL = 'Pending Onboarding Call',
-  AWAITING_VERIFICATION = 'Awaiting Verification',
+  PENDING_ONBOARDING_CALL = 'Pending Onboarding Call',
+  AWAITING_FIRST_CUBE = 'Awaiting First Cube',
+  AWAITING_MASTERCLASS = 'Awaiting Masterclass',
+  AWAITING_REVISION_CALL = 'Awaiting Revision Call',
   CONFIRMED = 'Confirmed',
   DENIED = 'Denied',
   INACTIVE = 'Inactive',
@@ -132,19 +119,27 @@ export interface User {
   hostingCapacity?: number;
   onboardingStatus: OnboardingStatus;
   onboardingAnswers?: OnboardingAnswers;
-  joinDate?: Date;
-  cryptoId?: {
-    publicKey: string;
-    secretKey: string;
+  // Onboarding progress flags
+  onboardingProgress?: {
+    watchedMasterclass?: boolean;
+    selectedOrganiserId?: string;
+    revisionCallScheduledAt?: Date;
   };
+  joinDate?: Date;
   organizerNotes?: OrganizerNote[];
   lastLogin: Date;
   leaveDate?: Date;
 }
 
+export enum TourDutyRole {
+  OUTREACH = 'Outreach',
+  EQUIPMENT = 'Equipment',
+  TRANSPORT = 'Transport',
+}
+
 export interface TourDuty {
-  date: string; // YYYY-MM-DD format
-  role: EventRole;
+  date: string; // YYYY-MM-DD
+  role: TourDutyRole;
 }
 
 export enum ParticipantStatus {
@@ -154,7 +149,6 @@ export enum ParticipantStatus {
 
 export interface EventParticipant {
   user: User;
-  eventRole: EventRole;
   status: ParticipantStatus;
   tourDuties?: TourDuty[];
 }
@@ -185,7 +179,6 @@ export interface CubeEvent {
   status: EventStatus;
   report?: EventReport;
   cancellationReason?: string;
-  roleRequirements?: EventRoleRequirement[];
 }
 
 export enum AnnouncementScope {
@@ -203,6 +196,8 @@ export interface Announcement {
   createdAt: Date;
   chapter?: string;
   country?: string;
+  ctaLink?: string;
+  ctaText?: string;
 }
 
 export enum ResourceType {

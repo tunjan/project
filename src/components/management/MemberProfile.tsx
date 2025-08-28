@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type User, Role, OnboardingStatus, BadgeTemplate } from '@/types';
+import { type User, OnboardingStatus, BadgeTemplate } from '@/types';
 import { useCurrentUser, useChapters } from '@/store';
 import { useUsersActions } from '@/store/users.store';
 import { useAwardsActions } from '@/store/awards.store';
-import { ROLE_HIERARCHY, canVerifyUser } from '@/utils/auth';
+import { can, Permission } from '@/config/permissions';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import BadgeList from '@/components/dashboard/BadgeList';
 import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
@@ -35,7 +35,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     updateUserChapters,
     deleteUser,
     updateUserStatus,
-    confirmUserIdentity,
+    finalizeOnboarding,
     setChapterOrganiser,
   } = useUsersActions();
   const { awardBadge } = useAwardsActions();
@@ -50,10 +50,10 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     if (!currentUser) return;
     updateUserStatus(
       user.id,
-      OnboardingStatus.AWAITING_VERIFICATION,
+      OnboardingStatus.PENDING_ONBOARDING_CALL,
       currentUser
     );
-    toast.success(`${user.name} approved. Next step: In-person verification.`);
+    toast.success(`${user.name} approved. Next: schedule onboarding call.`);
     navigate('/manage');
   };
 
@@ -64,11 +64,30 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     navigate('/manage');
   };
 
-  const handleManualVerify = () => {
-    confirmUserIdentity(user.id);
-    toast.success(
-      `${user.name} has been manually verified and now has full access.`
+  const handleOnboardingCallPassed = () => {
+    if (!currentUser) return;
+    updateUserStatus(
+      user.id,
+      OnboardingStatus.AWAITING_FIRST_CUBE,
+      currentUser
     );
+    toast.success(`${user.name} passed the onboarding call. Next: attend first Cube.`);
+  };
+
+  const handleManualVerify = () => {
+    finalizeOnboarding(user.id);
+    toast.success(`${user.name} has been confirmed and now has full access.`);
+  };
+
+  const handleMasterclassCompleted = () => {
+    if (!currentUser) return;
+    updateUserStatus(user.id, OnboardingStatus.AWAITING_REVISION_CALL, currentUser);
+    toast.success(`${user.name} completed the masterclass. Next: revision call.`);
+  };
+
+  const handleRevisionCallPassed = () => {
+    finalizeOnboarding(user.id);
+    toast.success(`${user.name} passed the revision call and is now verified.`);
   };
 
   const handleConfirmOrganiserUpdate = (chaptersToOrganise: string[]) => {
@@ -111,50 +130,27 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     toast.success('Email client opened with pre-filled message');
   };
 
-  const canManageRole = useMemo(() => {
-    if (!currentUser) return false;
+  const canManageRole = can(currentUser, Permission.EDIT_USER_ROLES, {
+    targetUser: user,
+    allChapters,
+  });
 
-    const currentUserLevel = ROLE_HIERARCHY[currentUser.role];
-    const targetUserLevel = ROLE_HIERARCHY[user.role];
+  const canEditChapters = can(currentUser, Permission.EDIT_USER_CHAPTERS, {
+    targetUser: user,
+  });
 
-    if (currentUserLevel <= targetUserLevel) return false;
+  const canDeleteUser = can(currentUser, Permission.DELETE_USER, {
+    targetUser: user,
+    allChapters,
+  });
 
-    if (currentUserLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN]) {
-      return true;
-    }
+  const canManuallyVerify = can(currentUser, Permission.VERIFY_USER, {
+    targetUser: user,
+  });
 
-    if (
-      currentUser.role === Role.REGIONAL_ORGANISER &&
-      currentUser.managedCountry
-    ) {
-      const userInChapters = allChapters.filter((c) =>
-        user.chapters?.includes(c.name)
-      );
-      const userCountries = new Set(userInChapters.map((c) => c.country));
-      return userCountries.has(currentUser.managedCountry);
-    }
-
-    if (currentUser.role === Role.CHAPTER_ORGANISER) {
-      const managedChapters = new Set(currentUser.organiserOf || []);
-      return user.chapters?.some((chapter) => managedChapters.has(chapter));
-    }
-
-    return false;
-  }, [currentUser, user, allChapters]);
-
-  const canEditChapters =
-    !!currentUser &&
-    ROLE_HIERARCHY[currentUser.role] >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER];
-  const canDeleteUser = canManageRole;
-  const canManuallyVerify = currentUser
-    ? canVerifyUser(currentUser, user) &&
-      user.onboardingStatus === OnboardingStatus.AWAITING_VERIFICATION
-    : false;
-  const canAwardBadges =
-    !!currentUser &&
-    ROLE_HIERARCHY[currentUser.role] >=
-      ROLE_HIERARCHY[Role.CHAPTER_ORGANISER] &&
-    currentUser.id !== user.id;
+  const canAwardBadges = can(currentUser, Permission.AWARD_BADGE, {
+    targetUser: user,
+  });
 
   if (!currentUser) return null;
 
@@ -208,7 +204,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs font-bold uppercase text-white0">
+                  <p className="text-xs font-bold uppercase text-neutral-500">
                     Why did you go vegan?
                   </p>
                   <p className="text-sm text-black">
@@ -216,7 +212,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase text-white0">
+                  <p className="text-xs font-bold uppercase text-neutral-500">
                     Are you aligned with our abolitionist values?
                   </p>
                   <p className="text-sm text-black">
@@ -226,7 +222,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase text-white0">
+                  <p className="text-xs font-bold uppercase text-neutral-500">
                     How can you contribute?
                   </p>
                   <p className="text-sm text-black">
@@ -234,7 +230,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </p>
                 </div>
               </div>
-              <div className="mt-6 flex space-x-4 border-t border-white pt-4">
+              <div className="mt-6 flex space-x-4 border-t border-neutral-200 pt-4">
                 <button
                   onClick={handleDeny}
                   className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black"
@@ -250,6 +246,54 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               </div>
             </section>
           )}
+
+        {/* Onboarding Call Actions */}
+        {user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL && canManageRole && (
+          <section className="mb-8 border-2 border-primary bg-white p-6">
+            <h2 className="mb-4 text-2xl font-bold text-black">Onboarding Call</h2>
+            <p className="mb-4 text-sm text-black">Mark the outcome of the applicant's onboarding call.</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleOnboardingCallPassed}
+                className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
+              >
+                Mark Call as Passed
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Masterclass Actions */}
+        {user.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS && canManageRole && (
+          <section className="mb-8 border-2 border-primary bg-white p-6">
+            <h2 className="mb-4 text-2xl font-bold text-black">Masterclass</h2>
+            <p className="mb-4 text-sm text-black">Mark the masterclass as completed for this user.</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleMasterclassCompleted}
+                className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
+              >
+                Mark Masterclass Completed
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Revision Call Actions */}
+        {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL && canManageRole && (
+          <section className="mb-8 border-2 border-primary bg-white p-6">
+            <h2 className="mb-4 text-2xl font-bold text-black">Revision Call</h2>
+            <p className="mb-4 text-sm text-black">Mark the revision call as passed to fully verify the user.</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleRevisionCallPassed}
+                className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
+              >
+                Mark Revision Call Passed
+              </button>
+            </div>
+          </section>
+        )}
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
@@ -304,9 +348,9 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         isOpen={manualVerifyModalOpen}
         onClose={() => setManualVerifyModalOpen(false)}
         onConfirm={handleManualVerify}
-        title="Manual Verification"
-        message={`Are you sure you want to manually verify ${user.name}? This will grant them full activist permissions.`}
-        confirmText="Verify User"
+        title="Bypass Onboarding & Verify User"
+        message={`Are you sure you want to bypass the entire onboarding process for ${user.name}? This is an administrative override that should only be used for trusted individuals who don't need standard verification steps. This action cannot be undone and will immediately grant them full activist permissions.`}
+        confirmText="Bypass & Verify"
         variant="warning"
       />
     </>

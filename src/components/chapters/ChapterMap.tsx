@@ -28,11 +28,13 @@ const ChangeView: React.FC<{ bounds: L.LatLngBounds | null }> = ({
 interface ChapterMapProps {
   chapters: Chapter[];
   onSelectChapter: (chapter: Chapter) => void;
+  popupActionText?: string;
 }
 
 const ChapterMap: React.FC<ChapterMapProps> = ({
   chapters,
   onSelectChapter,
+  popupActionText = 'View Chapter',
 }) => {
   // Force remove rounded corners and shadows from Leaflet popups
   useEffect(() => {
@@ -43,26 +45,35 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
       popups.forEach((popup) => {
         if (popup instanceof HTMLElement) {
           popup.style.borderRadius = '0';
-          popup.style.webkitBorderRadius = '0';
-          popup.style.mozBorderRadius = '0';
-          popup.style.msBorderRadius = '0';
-          popup.style.oBorderRadius = '0';
           popup.style.boxShadow = 'none';
-          popup.style.webkitBoxShadow = 'none';
-          popup.style.mozBoxShadow = 'none';
-          popup.style.msBoxShadow = 'none';
-          popup.style.oBoxShadow = 'none';
           popup.style.filter = 'none';
-          popup.style.webkitFilter = 'none';
-          popup.style.mozFilter = 'none';
-          popup.style.msFilter = 'none';
-          popup.style.oFilter = 'none';
+          // Ensure popups don't have extremely high z-index
+          popup.style.zIndex = '30';
         }
       });
     };
 
     // Apply styles immediately
     forceLeafletStyles();
+
+    // Also ensure map tiles and other elements don't have extremely high z-index
+    const mapElements = document.querySelectorAll('.leaflet-tile, .leaflet-overlay-pane, .leaflet-marker-pane, .leaflet-pane');
+    mapElements.forEach((element) => {
+      if (element instanceof HTMLElement) {
+        element.style.zIndex = '30';
+      }
+    });
+
+    // Ensure all Leaflet elements within our container have appropriate z-index
+    const container = document.querySelector('.chapter-map-container');
+    if (container) {
+      const leafletElements = container.querySelectorAll('[class*="leaflet-"]');
+      leafletElements.forEach((element) => {
+        if (element instanceof HTMLElement) {
+          element.style.zIndex = '30';
+        }
+      });
+    }
 
     // Set up a mutation observer to catch dynamically created popups
     const observer = new MutationObserver((mutations) => {
@@ -84,6 +95,14 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
               if (popupElements.length > 0) {
                 forceLeafletStyles();
               }
+
+              // Check for any new Leaflet elements and set their z-index
+              const leafletElements = node.querySelectorAll('[class*="leaflet-"]');
+              leafletElements.forEach((element) => {
+                if (element instanceof HTMLElement) {
+                  element.style.zIndex = '30';
+                }
+              });
             }
           });
         }
@@ -122,7 +141,7 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
   }, [chapterMarkers]);
 
   return (
-    <div className="h-[600px] w-full border-2 border-black bg-white">
+    <div className="h-[600px] w-full border-2 border-black bg-white relative z-30 chapter-map-container">
       <MapContainer
         center={[20, 0] as [number, number]}
         zoom={2}
@@ -142,7 +161,7 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
                   <h3 className="text-lg font-bold leading-tight text-black">
                     {chapter.name}
                   </h3>
-                  <p className="text-sm font-semibold uppercase tracking-wide text-neutral-secondary">
+                  <p className="text-neutral-secondary text-sm font-semibold uppercase tracking-wide">
                     {chapter.country}
                   </p>
                 </div>
@@ -166,7 +185,7 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
                   onClick={() => onSelectChapter(chapter)}
                   className="w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:bg-black hover:shadow-brutal"
                 >
-                  View Chapter
+                  {popupActionText}
                 </button>
               </div>
             </Popup>

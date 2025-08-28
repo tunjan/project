@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Optional
 from faker import Faker
 from nanoid import generate
 
-from .config import GenerationConfig, BADGE_TEMPLATES, RESOURCE_CATEGORIES
+from .config import GenerationConfig, BADGE_TEMPLATES, RESOURCE_CATEGORIES, Role
 from .generators import BaseGenerator
 
 
@@ -21,7 +21,7 @@ class AnnouncementGenerator(BaseGenerator):
         self.users = users
         self.chapters = chapters
         self.organizers = [u for u in users if u['role'] in [
-            'Chapter Organiser', 'Regional Organiser', 'Global Admin', 'Godmode'
+            Role.CHAPTER_ORGANISER, Role.REGIONAL_ORGANISER, Role.GLOBAL_ADMIN, Role.GODMODE
         ]]
     
     def generate_announcements(self) -> List[Dict[str, Any]]:
@@ -42,9 +42,9 @@ class AnnouncementGenerator(BaseGenerator):
         author = random.choice(self.organizers)
         
         # Determine scope based on author's role
-        if author['role'] == 'Global Admin' or author['role'] == 'Godmode':
+        if author['role'] == Role.GLOBAL_ADMIN.value or author['role'] == Role.GODMODE.value:
             scope_weights = [('Global', 0.4), ('Regional', 0.3), ('Chapter', 0.3)]
-        elif author['role'] == 'Regional Organiser':
+        elif author['role'] == Role.REGIONAL_ORGANISER.value:
             scope_weights = [('Regional', 0.6), ('Chapter', 0.4)]
         else:  # Chapter Organiser
             scope_weights = [('Chapter', 0.8), ('Regional', 0.2)]
@@ -272,7 +272,7 @@ class NotificationGenerator(BaseGenerator):
         notifications = []
         
         applicants = [u for u in self.users if u['onboardingStatus'] == 'Pending Application Review']
-        organizers = [u for u in self.users if u['role'] == 'Chapter Organiser']
+        organizers = [u for u in self.users if u['role'] == Role.CHAPTER_ORGANISER.value]
         
         for applicant in applicants:
             for chapter_name in applicant['chapters']:
@@ -310,7 +310,7 @@ class BadgeGenerator(BaseGenerator):
         super().__init__(config)
         self.users = users
         self.organizers = [u for u in users if u['role'] in [
-            'Chapter Organiser', 'Regional Organiser', 'Global Admin'
+            Role.CHAPTER_ORGANISER, Role.REGIONAL_ORGANISER, Role.GLOBAL_ADMIN
         ]]
     
     def generate_badges_and_awards(self) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -551,3 +551,51 @@ class AccommodationGenerator(BaseGenerator):
             return None
         
         return random.choice(replies)
+
+
+class ChallengeGenerator(BaseGenerator):
+    """Generates challenges for users to complete."""
+
+    def __init__(self, config: GenerationConfig, users: List[Dict[str, Any]]):
+        super().__init__(config)
+        self.users = users
+
+    def generate(self, count: int) -> List[Dict[str, Any]]:
+        challenges = []
+        for _ in range(count):
+            challenge_type = random.choice(['event', 'outreach', 'community'])
+            if challenge_type == 'event':
+                criteria = {'cubes_attended': random.randint(3, 10)}
+                title = f"Attend {criteria['cubes_attended']} Cubes of Truth"
+                description = f"Participate in {criteria['cubes_attended']} Cube of Truth events to complete this challenge."
+            elif challenge_type == 'outreach':
+                criteria = {'total_conversations': random.randint(20, 50)}
+                title = f"Log {criteria['total_conversations']} Conversations"
+                description = f"Engage in {criteria['total_conversations']} conversations during outreach events."
+            else: # community
+                criteria = {'referrals': random.randint(1, 5)}
+                title = f"Recruit {criteria['referrals']} New Activists"
+                description = f"Bring {criteria['referrals']} new activists into the community."
+
+            challenge = {
+                'id': generate(),
+                'title': title,
+                'description': description,
+                'endDate': self.fake.future_datetime(end_date='+30d'),
+                'criteria': criteria,
+                'participants': self._get_participants(),
+            }
+            challenges.append(challenge)
+        return challenges
+
+    def _get_participants(self) -> List[Dict[str, Any]]:
+        num_participants = random.randint(5, len(self.users) // 2)
+        participants = random.sample(self.users, num_participants)
+        return [
+            {
+                'userId': p['id'],
+                'progress': random.uniform(0, 1),
+                'completed': random.choice([True, False])
+            }
+            for p in participants
+        ]

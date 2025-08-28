@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Role } from '@/types';
-import { getAssignableRoles } from '@/utils/auth';
+import { getAssignableRoles } from '@/config/permissions';
 import { toast } from 'sonner';
 import { PencilIcon, TrophyIcon, ChatBubbleLeftRightIcon } from '@/icons';
 

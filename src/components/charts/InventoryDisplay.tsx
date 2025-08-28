@@ -50,7 +50,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
         {canManageInventory && (
           <div className="mt-4">
             <Link
-              to={`/management/${chapterName}`}
+              to="/manage"
               className="btn-primary inline-flex items-center gap-2"
             >
               Manage Inventory
@@ -72,10 +72,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
             </p>
           </div>
           {canManageInventory && (
-            <Link
-              to={`/management/${chapterName}`}
-              className="btn-outline text-sm"
-            >
+            <Link to="/manage" className="btn-outline text-sm">
               Manage Inventory
             </Link>
           )}

@@ -4,12 +4,13 @@
 import { type User, type CubeEvent, type Chapter, OutreachLog } from '@/types';
 
 export interface ChapterStats {
-    name: string;
-    country: string;
-    memberCount: number;
-    totalHours: number;
-    totalConversations: number;
-    eventsHeld: number;
+  name: string;
+  country: string;
+  memberCount: number;
+  totalHours: number;
+  totalConversations: number;
+  eventsHeld: number;
+  conversationsPerHour: number;
 }
 
 // NEW: A dedicated type for our new efficiency metric
@@ -20,11 +21,12 @@ export interface ChapterOutreachStats {
 }
 
 export interface GlobalStats {
-    totalMembers: number;
-    totalHours: number;
-    totalConversations: number;
-    totalEvents: number;
-    chapterCount: number;
+  totalMembers: number;
+  totalHours: number;
+  totalConversations: number;
+  totalEvents: number;
+  chapterCount: number;
+  conversationsPerHour: number;
 }
 
 export interface MonthlyTrend {
@@ -35,36 +37,13 @@ export interface MonthlyTrend {
 const getConfirmedUsers = (users: User[]): User[] =>
     users.filter((u) => u.onboardingStatus === 'Confirmed');
 
-export const getGlobalStats = (
-    users: User[],
-    events: CubeEvent[],
-    chapters: Chapter[]
-): GlobalStats => {
-    const confirmedUsers = getConfirmedUsers(users);
-    const totalHours = confirmedUsers.reduce(
-        (sum, user) => sum + user.stats.totalHours,
-        0
-    );
-    const totalConversations = confirmedUsers.reduce(
-        (sum, user) => sum + user.stats.totalConversations,
-        0
-    );
-
-    return {
-        totalMembers: confirmedUsers.length,
-        totalHours: Math.round(totalHours),
-        totalConversations,
-        totalEvents: events.length,
-        chapterCount: chapters.length,
-    };
-};
-
-export const getChapterStats = (
+// Helper function to calculate chapter metrics (hours and conversations)
+const calculateChapterMetrics = (
     users: User[],
     events: CubeEvent[],
     chapters: Chapter[],
-    outreachLogs: OutreachLog[] // Add outreachLogs as a parameter
-): ChapterStats[] => {
+    outreachLogs: OutreachLog[]
+) => {
     const confirmedUsers = getConfirmedUsers(users);
     return chapters.map((chapter) => {
         const chapterUsers = confirmedUsers.filter((u) =>
@@ -73,22 +52,81 @@ export const getChapterStats = (
         const chapterEvents = events.filter((e) => e.city === chapter.name);
         const chapterEventIds = new Set(chapterEvents.map((e) => e.id));
 
-        const totalHours = chapterUsers.reduce(
-            (sum, user) => sum + user.stats.totalHours,
-            0
-        );
-        // Calculate from the source of truth (outreachLogs) instead of denormalized user stats
+        const totalHours = chapterEvents.reduce((sum, event) => {
+            if (!event.report) return sum;
+
+            // Find members of the current chapter who attended this event
+            const attendedChapterMembers = chapterUsers.filter(
+                (user) => event.report?.attendance[user.id] === 'Attended'
+            );
+
+            // Add hours for each attending member from this chapter
+            return sum + attendedChapterMembers.length * event.report.hours;
+        }, 0);
+
         const totalConversations = outreachLogs.filter((log) =>
             chapterEventIds.has(log.eventId)
         ).length;
 
         return {
-            name: chapter.name,
-            country: chapter.country,
-            memberCount: chapterUsers.length,
+            chapter,
+            chapterUsers,
+            chapterEvents,
             totalHours: Math.round(totalHours),
             totalConversations,
-            eventsHeld: chapterEvents.length,
+        };
+    });
+};
+
+export const getGlobalStats = (
+    users: User[],
+    events: CubeEvent[],
+    chapters: Chapter[],
+    outreachLogs: OutreachLog[]
+): GlobalStats => {
+    const confirmedUsers = getConfirmedUsers(users);
+    // Call calculateChapterMetrics directly to avoid redundant computation
+    const chapterMetrics = calculateChapterMetrics(users, events, chapters, outreachLogs);
+
+    const totalHours = chapterMetrics.reduce((sum, metric) => sum + metric.totalHours, 0);
+    const totalConversations = chapterMetrics.reduce(
+        (sum, metric) => sum + metric.totalConversations,
+        0
+    );
+
+    const conversationsPerHour =
+        totalHours > 0 ? totalConversations / totalHours : 0;
+
+    return {
+        totalMembers: confirmedUsers.length,
+        totalHours: Math.round(totalHours),
+        totalConversations,
+        totalEvents: events.length,
+        chapterCount: chapters.length,
+        conversationsPerHour,
+    };
+};
+
+export const getChapterStats = (
+    users: User[],
+    events: CubeEvent[],
+    chapters: Chapter[],
+    outreachLogs: OutreachLog[]
+): ChapterStats[] => {
+    const metrics = calculateChapterMetrics(users, events, chapters, outreachLogs);
+    
+    return metrics.map((metric) => {
+        const conversationsPerHour =
+            metric.totalHours > 0 ? metric.totalConversations / metric.totalHours : 0;
+
+        return {
+            name: metric.chapter.name,
+            country: metric.chapter.country,
+            memberCount: metric.chapterUsers.length,
+            totalHours: metric.totalHours,
+            totalConversations: metric.totalConversations,
+            eventsHeld: metric.chapterEvents.length,
+            conversationsPerHour,
         };
     });
 };
@@ -100,28 +138,13 @@ export const getChapterOutreachStats = (
     chapters: Chapter[],
     outreachLogs: OutreachLog[]
 ): ChapterOutreachStats[] => {
-    const confirmedUsers = getConfirmedUsers(users);
-    return chapters.map((chapter) => {
-        const chapterUsers = confirmedUsers.filter((u) =>
-            u.chapters.includes(chapter.name)
-        );
-        const chapterEvents = events.filter((e) => e.city === chapter.name);
-        const chapterEventIds = new Set(chapterEvents.map((e) => e.id));
-
-        const totalHours = chapterUsers.reduce(
-            (sum, user) => sum + user.stats.totalHours,
-            0
-        );
-        const totalConversations = outreachLogs.filter((log) =>
-            chapterEventIds.has(log.eventId)
-        ).length;
-
-        return {
-            name: chapter.name,
-            totalHours: Math.round(totalHours),
-            totalConversations,
-        };
-    });
+    const metrics = calculateChapterMetrics(users, events, chapters, outreachLogs);
+    
+    return metrics.map((metric) => ({
+        name: metric.chapter.name,
+        totalHours: metric.totalHours,
+        totalConversations: metric.totalConversations,
+    }));
 };
 
 export const getEventTrendsByMonth = (
@@ -193,10 +216,12 @@ export const getActivistRetention = (
 
     const recentEventParticipantIds = new Set<string>();
     events.forEach((event) => {
-        if (event.startDate >= retentionCutoff && event.participants) {
-            event.participants.forEach((attendee) =>
-                recentEventParticipantIds.add(attendee.user.id)
-            );
+        if (new Date(event.startDate) >= retentionCutoff && event.report) {
+            for (const userId in event.report.attendance) {
+                if (event.report.attendance[userId] === 'Attended') {
+                    recentEventParticipantIds.add(userId);
+                }
+            }
         }
     });
 
@@ -276,20 +301,33 @@ export const getTotalMembersByMonth = (
 
 export const getTopActivistsByHours = (
     users: User[],
+    allEvents: CubeEvent[],
     count: number = 5
 ): { name: string; value: number }[] => {
-    return [...getConfirmedUsers(users)]
-        .sort((a, b) => b.stats.totalHours - a.stats.totalHours)
+    const confirmedUsers = getConfirmedUsers(users);
+
+    const usersWithHours = confirmedUsers.map(user => {
+        const totalHours = allEvents
+            .filter(event => event.report?.attendance[user.id] === 'Attended')
+            .reduce((sum, event) => sum + (event.report?.hours || 0), 0);
+        return { ...user, totalHours };
+    });
+
+    return usersWithHours
+        .sort((a, b) => b.totalHours - a.totalHours)
         .slice(0, count)
-        .map((u) => ({ name: u.name, value: Math.round(u.stats.totalHours) }));
+        .map((u) => ({ name: u.name, value: Math.round(u.totalHours) }));
 };
 
 export const getAverageActivistsPerEvent = (events: CubeEvent[]): number => {
     if (events.length === 0) return 0;
-    const totalAttendees = events.reduce(
-        (sum, event) => sum + (event.participants ? event.participants.length : 0),
-        0
-    );
+    const totalAttendees = events.reduce((sum, event) => {
+        if (!event.report) return sum;
+        const attendedCount = Object.values(event.report.attendance).filter(
+            (status) => status === 'Attended'
+        ).length;
+        return sum + attendedCount;
+    }, 0);
     return totalAttendees / events.length;
 };
 
@@ -363,4 +401,72 @@ export const getCityAttendanceForUser = (
     return Object.entries(cityCounts)
         .map(([city, count]) => ({ city, count }))
         .sort((a, b) => b.count - a.count); // Sort by most visited
+};
+
+// A helper function to create bins for histogram data.
+const createHistogramData = (
+  values: number[],
+  numBins: number = 10
+): { range: string; count: number }[] => {
+  if (values.length === 0) return [];
+
+  const maxVal = Math.max(...values, 0);
+  if (maxVal === 0) return [{ range: '0', count: values.length }];
+
+  const binSize = Math.ceil(maxVal / numBins) || 1;
+
+  const bins: number[] = Array(numBins).fill(0);
+
+  values.forEach((value) => {
+    const binIndex = Math.min(Math.floor(value / binSize), numBins - 1);
+    bins[binIndex]++;
+  });
+
+  return bins.map((count, i) => {
+    const lower = i * binSize;
+    const upper = (i + 1) * binSize - 1;
+    return {
+      range: `${lower}-${upper}`,
+      count,
+    };
+  });
+};
+
+/**
+ * NEW: Generates data for activist performance distribution histograms.
+ */
+export const getActivistPerformanceDistribution = (
+  users: User[],
+  allEvents: CubeEvent[],
+  allLogs: OutreachLog[],
+  metric: 'totalHours' | 'totalConversations',
+  numBins: number = 10
+): { range: string; count: number }[] => {
+  const confirmedUsers = getConfirmedUsers(users);
+
+  const values = confirmedUsers.map(user => {
+      if (metric === 'totalHours') {
+          return allEvents
+              .filter(event => event.report?.attendance[user.id] === 'Attended')
+              .reduce((sum, event) => sum + (event.report?.hours || 0), 0);
+      }
+      // metric === 'totalConversations'
+      return allLogs.filter(log => log.userId === user.id).length;
+  });
+
+  return createHistogramData(values.map(v => Math.round(v)), numBins);
+};
+
+/**
+ * NEW: Generates data for event turnout distribution histogram.
+ */
+export const getEventTurnoutDistribution = (
+  events: CubeEvent[],
+  numBins: number = 10
+): { range: string; count: number }[] => {
+  const values = events.map((e) => {
+    if (!e.report) return 0;
+    return Object.values(e.report.attendance).filter(status => status === 'Attended').length;
+  });
+  return createHistogramData(values, numBins);
 };

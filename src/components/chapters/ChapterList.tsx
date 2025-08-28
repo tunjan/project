@@ -5,6 +5,7 @@ import { getChapterStats, ChapterStats } from '@/utils/analytics';
 import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
 import { SearchIcon } from '@/icons';
 import ChapterMap from './ChapterMap';
+import ChapterCard from './ChapterCard';
 
 // A small helper component for stats on mobile
 const Stat: React.FC<{ label: string; value: string | number }> = ({
@@ -13,7 +14,7 @@ const Stat: React.FC<{ label: string; value: string | number }> = ({
 }) => (
   <div className="text-center">
     <p className="font-mono text-xl font-bold">{value}</p>
-    <p className="text-white0 text-xs font-semibold uppercase">{label}</p>
+    <p className="text-xs font-semibold uppercase text-neutral-500">{label}</p>
   </div>
 );
 
@@ -23,7 +24,7 @@ const ChapterRow: React.FC<{
 }> = ({ chapterStats, onSelect }) => {
   return (
     <div
-      className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-white hover:bg-white hover:shadow-md md:grid md:grid-cols-6 md:items-center"
+      className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal md:grid md:grid-cols-6 md:items-center"
       onClick={onSelect}
     >
       {/* --- Mobile & Desktop: Chapter Name --- */}
@@ -35,7 +36,7 @@ const ChapterRow: React.FC<{
         >
           {chapterStats.name}
         </Link>
-        <p className="text-white0 text-sm transition-colors duration-300 group-hover:text-black">
+        <p className="text-sm text-neutral-500 transition-colors duration-300 group-hover:text-black">
           {chapterStats.country}
         </p>
       </div>
@@ -60,7 +61,7 @@ const ChapterRow: React.FC<{
       </p>
       <p className="hidden items-center justify-between font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:flex">
         {chapterStats.totalConversations}
-        <span className="text-grey-500 text-2xl transition-all duration-300 group-hover:translate-x-2 group-hover:text-primary">
+        <span className="text-2xl text-neutral-500 transition-all duration-300 group-hover:translate-x-2 group-hover:text-primary">
           →
         </span>
       </p>
@@ -80,7 +81,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
 
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'grid'>('list');
 
   const chapterStats = useMemo(
     () => getChapterStats(allUsers, allEvents, allChapters, allOutreachLogs),
@@ -124,13 +125,13 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Global Chapters
         </h1>
-        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
+        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
           An operational directory of our global network of activist chapters.
         </p>
       </div>
 
       {/* Search and Filter Controls */}
-      <div className="card-brutal mb-8 p-4">
+      <div className="mb-8 border-2 border-black bg-white p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="md:col-span-1">
             <label
@@ -141,7 +142,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             </label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="text-grey-500 h-5 w-5" />
+                <SearchIcon className="h-5 w-5 text-neutral-500" />
               </div>
               <input
                 id="search-filter"
@@ -149,7 +150,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="Search by chapter..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="placeholder:text-grey-400 block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black focus:outline-none focus:ring-2 focus:ring-primary"
+                className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -190,6 +191,16 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 List
               </button>
               <button
+                onClick={() => setViewMode('grid')}
+                className={`flex-1 p-2 text-sm font-bold transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-black text-white'
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`}
+              >
+                Grid
+              </button>
+              <button
                 onClick={() => setViewMode('map')}
                 className={`flex-1 p-2 text-sm font-bold transition-colors ${
                   viewMode === 'map'
@@ -206,7 +217,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
 
       {/* Map View */}
       {viewMode === 'map' && (
-        <div className="card-brutal mb-8">
+        <div className="mb-8 border-2 border-black bg-white">
           <ChapterMap
             chapters={filteredChapters}
             onSelectChapter={onNavigateToChapter}
@@ -214,11 +225,11 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
         </div>
       )}
 
-      {/* Chapters Table */}
+      {/* List View */}
       {viewMode === 'list' && (
-        <div className="card-brutal">
+        <div className="border-2 border-black bg-white">
           {/* Desktop Header */}
-          <div className="text-white0 hidden grid-cols-6 items-center border-b-2 border-black bg-white p-4 text-xs font-bold uppercase tracking-wider md:grid">
+          <div className="hidden grid-cols-6 items-center border-b-2 border-black bg-white p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
             <p className="col-span-2">Chapter</p>
             <p>Members</p>
             <p>Events</p>
@@ -243,12 +254,41 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               <h3 className="text-xl font-bold text-black">
                 No chapters found.
               </h3>
-              <p className="text-white0 mt-2">
+              <p className="mt-2 text-neutral-500">
                 Try adjusting your search or filters.
               </p>
             </div>
           )}
         </div>
+      )}
+
+      {/* Grid View */}
+      {viewMode === 'grid' && (
+        <>
+          {filteredAndSortedStats.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredAndSortedStats.map((stat) => {
+                const chapter = allChapters.find((c) => c.name === stat.name)!;
+                return (
+                  <ChapterCard
+                    key={stat.name}
+                    chapterStats={stat}
+                    onSelect={() => onNavigateToChapter(chapter)}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="border-2 border-black bg-white p-8 text-center">
+              <h3 className="text-xl font-bold text-black">
+                No chapters found.
+              </h3>
+              <p className="mt-2 text-neutral-500">
+                Try adjusting your search or filters.
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

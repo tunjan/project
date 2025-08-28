@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { type User } from '@/types';
 
 interface OnboardingQueueProps {
-  pendingUsers: User[];
+  applicants: User[];
   onApprove: (userId: string) => void;
   onDeny: (userId: string) => void;
 }
@@ -29,7 +29,7 @@ const ApplicantCard: React.FC<{
           />
           <div>
             <p className="font-bold text-black">{user.name}</p>
-            <p className="text-sm text-white0">{chapterText}</p>
+            <p className="text-sm text-neutral-500">{chapterText}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -58,7 +58,7 @@ const ApplicantCard: React.FC<{
       {isExpanded && user.onboardingAnswers && (
         <div className="space-y-3 border-t-2 border-black bg-white p-4">
           <div>
-            <p className="text-xs font-bold uppercase text-white0">
+            <p className="text-xs font-bold uppercase text-neutral-500">
               Why did you go vegan?
             </p>
             <p className="text-sm text-black">
@@ -66,7 +66,7 @@ const ApplicantCard: React.FC<{
             </p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-white0">
+            <p className="text-xs font-bold uppercase text-neutral-500">
               Are you aligned with our abolitionist values?
             </p>
             <p className="text-sm text-black">
@@ -74,7 +74,7 @@ const ApplicantCard: React.FC<{
             </p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-white0">
+            <p className="text-xs font-bold uppercase text-neutral-500">
               Chapter Question: How can you contribute?
             </p>
             <p className="text-sm text-black">
@@ -88,15 +88,15 @@ const ApplicantCard: React.FC<{
 };
 
 const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
-  pendingUsers,
+  applicants,
   onApprove,
   onDeny,
 }) => {
-  if (pendingUsers.length === 0) {
+  if (applicants.length === 0) {
     return (
       <div className="border-2 border-black bg-white p-8 text-center">
         <h3 className="text-xl font-bold text-black">The queue is empty.</h3>
-        <p className="mt-2 text-white0">
+        <p className="mt-2 text-neutral-500">
           There are no new applicants to review at this time.
         </p>
       </div>
@@ -105,7 +105,7 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
 
   return (
     <div className="space-y-4">
-      {pendingUsers.map((user) => (
+              {applicants.map((user) => (
         <ApplicantCard
           key={user.id}
           user={user}

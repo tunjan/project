@@ -8,6 +8,11 @@
       }
     }
   ],
+  "functions": {
+    "api/mock-data/index.py": {
+      "runtime": "python3.9"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

@@ -1,10 +1,19 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useCurrentUser } from '@/store/auth.store';
+import LandingPage from '@/pages/LandingPage';
+import { OnboardingStatus } from '@/types';
 
 const IndexRedirect = () => {
   const currentUser = useCurrentUser();
-  return <Navigate to={currentUser ? '/dashboard' : '/login'} replace />;
+  if (!currentUser) {
+    return <LandingPage />;
+  }
+
+  if (currentUser.onboardingStatus !== OnboardingStatus.CONFIRMED) {
+    return <Navigate to="/onboarding-status" replace />;
+  }
+
+  return <Navigate to="/dashboard" replace />;
 };
 
 export default IndexRedirect;

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { EventRole, User, CubeEvent } from '@/types';
+import { TourDutyRole, User, CubeEvent } from '@/types';
 import { Link } from 'react-router-dom';
 
 interface EventRosterProps {
@@ -24,18 +24,17 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
   }, [event.startDate, event.endDate]);
 
   const rosterByDay = useMemo(() => {
-    const roster: Record<string, Record<EventRole, User[]>> = {};
+    const roster: Record<string, Record<TourDutyRole, User[]>> = {};
 
     for (const day of eventDays) {
       const dateString = new Date(day).toISOString().split('T')[0];
-      roster[dateString] = {
-        [EventRole.ORGANIZER]: [],
-        [EventRole.ACTIVIST]: [],
-        [EventRole.VOLUNTEER]: [],
-        [EventRole.OUTREACH]: [],
-        [EventRole.EQUIPMENT]: [],
-        [EventRole.TRANSPORT]: [],
-      };
+      roster[dateString] = Object.values(TourDutyRole).reduce(
+        (acc, role) => {
+          acc[role] = [];
+          return acc;
+        },
+        {} as Record<TourDutyRole, User[]>
+      );
     }
 
     for (const participant of event.participants) {
@@ -77,7 +76,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
               <div className="mt-2 space-y-3">
                 {Object.entries(dailyRoster).map(([role, users]) => (
                   <div key={role}>
-                    <p className="text-sm font-semibold uppercase tracking-wider text-white0">
+                    <p className="text-sm font-semibold uppercase tracking-wider text-white">
                       {role} ({users.length})
                     </p>
                     {users.length > 0 ? (

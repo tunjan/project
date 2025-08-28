@@ -52,7 +52,7 @@ const LineChart: React.FC<LineChartProps> = ({
     return (
       <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-        <div className="text-white0 flex h-[300px] items-center justify-center">
+        <div className="text-neutral-500 flex h-[300px] items-center justify-center">
           Not enough data to display chart.
         </div>
       </div>
@@ -79,7 +79,7 @@ const LineChart: React.FC<LineChartProps> = ({
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
               dataKey="name"
               tick={{ fontSize: 12, fill: '#000000' }}

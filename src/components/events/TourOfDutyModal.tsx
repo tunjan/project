@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { type CubeEvent, type TourDuty, EventRole } from '@/types';
+import { type CubeEvent, type TourDuty, TourDutyRole } from '@/types';
 import Modal from '@/components/ui/Modal';
 import { toast } from 'sonner';
 
@@ -12,7 +12,7 @@ interface TourOfDutyModalProps {
 
 const getDatesBetween = (start: Date, end: Date): Date[] => {
   const dates = [];
-  const currentDate = new Date();
+  const currentDate = new Date(new Date(start).toISOString().split('T')[0]);
   const lastDate = new Date(new Date(end).toISOString().split('T')[0]);
 
   while (currentDate <= lastDate) {
@@ -31,13 +31,9 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
   const [duties, setDuties] = useState<TourDuty[]>(existingDuties);
   const eventDays = getDatesBetween(event.startDate, event.endDate!);
 
-  const availableRoles = [
-    EventRole.OUTREACH,
-    EventRole.EQUIPMENT,
-    EventRole.TRANSPORT,
-  ];
+  const availableRoles = Object.values(TourDutyRole);
 
-  const handleDutyChange = (date: string, role: EventRole) => {
+  const handleDutyChange = (date: string, role: TourDutyRole) => {
     setDuties((prev) => {
       const existing = prev.find((d) => d.date === date && d.role === role);
       if (existing) {

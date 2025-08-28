@@ -4,7 +4,7 @@ import {
   type ChapterLeaderboardEntry,
   calculateRanks,
 } from '@/utils/leaderboard';
-import { BuildingOfficeIcon } from '@/icons';
+import { BuildingOfficeIcon, TrophyIcon } from '@/icons';
 
 interface ChapterLeaderboardProps {
   title: string;
@@ -12,10 +12,23 @@ interface ChapterLeaderboardProps {
   unit: string;
 }
 
-const rankClasses: { [key: number]: string } = {
-  1: 'bg-primary text-white',
-  2: 'bg-black text-white',
-  3: 'bg-white text-black',
+const ChapterRankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
+  const rankStyles = {
+    1: 'bg-yellow text-black border-black',
+    2: 'bg-grey-300 text-black border-black',
+    3: 'bg-yellow-700 text-white border-black', // Bronze color
+  };
+
+  const baseStyle =
+    'flex w-16 flex-shrink-0 items-center justify-center border-r-2 border-black text-2xl font-black';
+  const rankClass =
+    rank <= 3 ? rankStyles[rank as 1 | 2 | 3] : 'bg-white text-black';
+
+  return (
+    <div className={`${baseStyle} ${rankClass}`}>
+      {rank <= 3 ? <TrophyIcon className="h-6 w-6" /> : <span>{rank}</span>}
+    </div>
+  );
 };
 
 const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
@@ -33,55 +46,56 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
   };
 
   return (
-    <div className="border-2 border-black bg-white">
+    <div className="flex h-full flex-col border-2 border-black bg-white">
       <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
-      {rankedData.length > 0 ? (
-        <ul className="divide-y-2 divide-black">
-          {rankedData.map(({ chapter, value, rank }) => {
-            const rankBG = rankClasses[rank] || 'bg-white text-black';
-            return (
-              <li
-                key={chapter.name}
-                onClick={() => handleChapterClick(chapter.name)}
-                className="flex cursor-pointer items-stretch"
-              >
-                <div
-                  className={`flex w-16 flex-shrink-0 items-center justify-center border-r-2 border-black text-2xl font-black ${rankBG}`}
+      <div className="flex-grow overflow-y-auto">
+        {rankedData.length > 0 ? (
+          <ul className="space-y-3 p-4">
+            {rankedData.map(({ chapter, value, rank }) => {
+              return (
+                <li
+                  key={chapter.name}
+                  onClick={() => handleChapterClick(chapter.name)}
+                  className="flex transform-gpu cursor-pointer items-stretch border-2 border-black bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-brutal"
                 >
-                  {rank}
-                </div>
-                <div className="flex flex-grow items-center p-4 transition-colors hover:bg-white">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-black bg-black">
-                    <BuildingOfficeIcon className="h-6 w-6 text-white" />
+                  <ChapterRankIndicator rank={rank} />
+                  <div className="flex flex-grow items-center p-3">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-black bg-black">
+                      <BuildingOfficeIcon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="ml-4 flex-grow">
+                      <p className="truncate font-bold text-black">
+                        {chapter.name}
+                      </p>
+                      <p className="text-sm text-neutral-500">
+                        {chapter.country}
+                      </p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0 text-right">
+                      <p className="text-2xl font-extrabold text-black">
+                        {value.toLocaleString()}
+                      </p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+                        {unit}
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-4 flex-grow lg:max-w-none">
-                    <p className="truncate font-bold text-black sm:max-w-xs">
-                      {chapter.name}
-                    </p>
-                    <p className="text-white0 text-sm">{chapter.country}</p>
-                  </div>
-                  <div className="ml-2 flex-shrink-0 text-right">
-                    <p className="text-xl font-extrabold text-black sm:text-2xl">
-                      {value.toLocaleString()}
-                    </p>
-                    <p className="text-grey-600 text-xs font-semibold uppercase tracking-wider">
-                      {unit}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <div className="text-white0 p-8 text-center">
-          <BuildingOfficeIcon className="text-grey-500 mx-auto h-12 w-12" />
-          <p className="mt-2 font-semibold">No data available.</p>
-          <p className="text-sm">There is no activity for this time period.</p>
-        </div>
-      )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center p-8 text-center text-neutral-500">
+            <BuildingOfficeIcon className="h-12 w-12" />
+            <p className="mt-2 font-semibold text-black">No data available.</p>
+            <p className="text-sm">
+              There is no activity for this time period.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

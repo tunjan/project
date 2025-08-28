@@ -70,7 +70,7 @@ const BarChart: React.FC<BarChartProps> = ({
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
               dataKey="name"
               tick={{ fontSize: 12, fill: '#000000' }}
@@ -88,7 +88,7 @@ const BarChart: React.FC<BarChartProps> = ({
               fill={barColor}
               stroke="#000000"
               strokeWidth={1}
-              radius={[2, 2, 0, 0]}
+              radius={[0, 0, 0, 0]}
             />
           </RechartsBarChart>
         </ResponsiveContainer>
