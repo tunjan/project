@@ -44,7 +44,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
   };
 
   return (
-    <section>
+    <div>
       <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
         Manage User
       </h2>
@@ -55,13 +55,13 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
               <ChatBubbleLeftRightIcon className="mt-1 h-6 w-6 flex-shrink-0 text-black" />
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-black">Send Message</h3>
-                <p className="text-sm text-red leading-relaxed">
+                <p className="text-red text-sm leading-relaxed">
                   Reach out to this member directly via email
                 </p>
               </div>
             </div>
-            <button 
-              onClick={onSendMessage} 
+            <button
+              onClick={onSendMessage}
               className="btn-info whitespace-nowrap px-6 py-3 text-sm font-semibold"
             >
               Send Email
@@ -70,7 +70,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         </div>
 
         <div className="pt-4">
-          <div className="flex items-center space-x-3 mb-3">
+          <div className="mb-3 flex items-center space-x-3">
             <PencilIcon className="h-6 w-6 flex-shrink-0 text-black" />
             <h3 className="text-xl font-bold text-black">Assign Role</h3>
           </div>
@@ -78,49 +78,50 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
             id="role-select"
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="block w-full border-2 border-black bg-white p-3 text-black text-sm"
+            className="block w-full border-2 border-black bg-white p-3 text-sm text-black"
           >
-          <option value={user.role} disabled>
-            {user.role} (Current)
-          </option>
-          {assignableRoles.map((r) => (
-            <option key={r} value={r}>
-              {r}
+            <option value={user.role} disabled>
+              {user.role} (Current)
             </option>
-          ))}
-        </select>
-        <button
-          onClick={handleSaveRole}
-          disabled={
-            selectedRole === user.role && user.role !== Role.CHAPTER_ORGANISER
-          }
-          className="w-full bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50 text-sm"
-        >
-          {user.role === Role.CHAPTER_ORGANISER &&
-          selectedRole === Role.CHAPTER_ORGANISER
-            ? 'Edit Organised Chapters'
-            : 'Save Role'}
-        </button>
+            {assignableRoles.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleSaveRole}
+            disabled={
+              selectedRole === user.role && user.role !== Role.CHAPTER_ORGANISER
+            }
+            className="w-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {user.role === Role.CHAPTER_ORGANISER &&
+            selectedRole === Role.CHAPTER_ORGANISER
+              ? 'Edit Organised Chapters'
+              : 'Save Role'}
+          </button>
 
-        {canEditChapters && (
-          <button
-            onClick={onOpenEditChaptersModal}
-            className="mt-4 w-full border-2 border-black bg-black px-6 py-3 text-sm font-semibold text-white hover:bg-black transition-colors"
-          >
-            Edit Chapter Memberships
-          </button>
-        )}
-        {canAwardBadges && (
-          <button
-            onClick={onOpenAwardBadgeModal}
-            className="mt-4 flex w-full items-center justify-center border-2 border-red bg-white px-6 py-3 font-bold text-black hover:bg-red transition-colors"
-          >
-            <TrophyIcon className="mr-2 h-6 w-6" />
-            Award Recognition
-          </button>
-        )}
+          {canEditChapters && (
+            <button
+              onClick={onOpenEditChaptersModal}
+              className="mt-4 w-full border-2 border-black bg-black px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-black"
+            >
+              Edit Chapter Memberships
+            </button>
+          )}
+          {canAwardBadges && (
+            <button
+              onClick={onOpenAwardBadgeModal}
+              className="border-red hover:bg-red mt-4 flex w-full items-center justify-center border-2 bg-white px-6 py-3 font-bold text-black transition-colors"
+            >
+              <TrophyIcon className="mr-2 h-6 w-6" />
+              Award Recognition
+            </button>
+          )}
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
 
