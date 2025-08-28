@@ -42,23 +42,17 @@ class MockDataService {
     }
 
     try {
-      // In development, use localhost
+      // In development, use localhost, in production use current domain
       const baseUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : '';
-
-      // Skip API call in production if we don't have a baseUrl (Vercel API not working)
-      if (!baseUrl) {
-        console.log('🌐 Production environment detected, using fallback data');
-        return this.getFallbackData();
-      }
+        : window.location.origin;
 
       console.log('🚀 Fetching fresh mock data from API...');
       const url = `${baseUrl}/api/mock-data?scenario=${scenario}`;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -66,7 +60,7 @@ class MockDataService {
         },
         signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
 
       if (!response.ok) {

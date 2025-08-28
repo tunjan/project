@@ -6,40 +6,28 @@ This replaces the need to store large mockData.ts files in the repository.
 
 import json
 import sys
-import os
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler
-from typing import Dict, Any
+from urllib.parse import urlparse, parse_qs
 
-# Add the project root to Python path
-project_root = Path(__file__).parent.parent.parent
+# Add the project root to Python path for Vercel's environment
+# When this file runs, its path is /var/task/api/mock_data.py
+# The project root is /var/task/, so we go up two levels.
+project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# Import the generation logic from your existing scripts
 try:
     from mock_data.config import GenerationConfig
     from mock_data.export_formats import ScenarioManager
     from generate_mock_data_enhanced import EnhancedMockDataGenerator
 except ImportError as e:
-    print(f"Import error: {e}")
-    # Fallback configuration for when imports fail
-    class FallbackConfig:
-        def __init__(self):
-            self.chapters = 10
-            self.users = 100
-            self.seed = 42
-            self.scenario_name = 'small_test'
-            self.export_formats = ['json']
-            self.output_path = None
-            self.enable_performance_profiling = False
-            self.enable_data_repair = True
-            self.include_edge_cases = False
-            self.validate = lambda: True
-    
-    GenerationConfig = FallbackConfig
-    ScenarioManager = None
-    EnhancedMockDataGenerator = None
+    print(f"❌ Could not import mock data generator: {e}")
+    # Define a dummy function if import fails, so the server doesn't crash
+    def generate_mock_data(scenario='minimal'):
+        return {"error": "Failed to import generator", "details": str(e)}
 
-def generate_mock_data(scenario: str = 'small_test') -> Dict[str, Any]:
+def generate_mock_data(scenario: str = 'minimal'):
     """
     Generate mock data using the existing generator infrastructure.
     
@@ -93,98 +81,43 @@ def generate_mock_data(scenario: str = 'small_test') -> Dict[str, Any]:
             "error": str(e)
         }
 
-def handle_request(method: str, path: str, headers: Dict[str, str], body: str = None) -> tuple[int, Dict[str, str], str]:
-    """
-    Handle HTTP request and return response.
-    
-    Args:
-        method: HTTP method (GET, POST, etc.)
-        path: Request path
-        headers: Request headers
-        body: Request body
-        
-    Returns:
-        Tuple of (status_code, headers, body)
-    """
-    # Set CORS headers
-    response_headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    }
-    
-    # Handle preflight OPTIONS request
-    if method == 'OPTIONS':
-        return 200, response_headers, ''
-    
-    # Only allow GET requests
-    if method != 'GET':
-        return 405, response_headers, json.dumps({'error': 'Method not allowed'})
-    
-    # Parse query parameters
-    scenario = 'minimal'  # Default to minimal data for faster response
-    if 'scenario' in headers.get('query', {}):
-        scenario = headers['query']['scenario']
-    
-    try:
-        # Generate mock data
-        data = generate_mock_data(scenario)
-        
-        # Return the data as JSON
-        return 200, response_headers, json.dumps(data, default=str)
-        
-    except Exception as e:
-        error_response = {
-            'error': 'Failed to generate mock data',
-            'message': str(e),
-            'fallback_data': generate_mock_data('minimal')
-        }
-        return 500, response_headers, json.dumps(error_response, default=str)
+# Vercel expects a class named "handler" that inherits from BaseHTTPRequestHandler
+class handler(BaseHTTPRequestHandler):
+    """Handles incoming requests for the mock data API on Vercel."""
 
-# Vercel serverless function entry point
-def handler(request, context):
-    """Main handler for Vercel serverless function."""
-    try:
-        # Extract request details
-        method = request.method
-        path = request.url.split('/')[-1] if request.url else '/'
-        headers = dict(request.headers) if hasattr(request, 'headers') else {}
-        body = request.body.decode('utf-8') if hasattr(request, 'body') and request.body else None
+    def do_GET(self):
+        """Handle GET requests."""
+        parsed_url = urlparse(self.path)
+        query_params = parse_qs(parsed_url.query)
         
-        # Handle the request
-        status_code, response_headers, response_body = handle_request(method, path, headers, body)
+        # Get scenario from query params, default to 'minimal' for speed
+        scenario = query_params.get('scenario', ['minimal'])[0]
         
-        # Return response in Vercel format
-        return {
-            'statusCode': status_code,
-            'headers': response_headers,
-            'body': response_body
-        }
-        
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Internal server error', 'message': str(e)})
-        }
+        try:
+            # Generate mock data
+            data = generate_mock_data(scenario)
+            
+            # Send success response
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            response_body = json.dumps(data, default=str)
+            self.wfile.write(response_body.encode('utf-8'))
+            
+        except Exception as e:
+            # Send error response
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            error_response = json.dumps({'error': 'Failed to generate data', 'details': str(e)})
+            self.wfile.write(error_response.encode('utf-8'))
 
-# For local testing
-if __name__ == '__main__':
-    class MockRequest:
-        def __init__(self):
-            self.method = 'GET'
-            self.url = '/'
-            self.headers = {}
-            self.body = None
-    
-    class MockContext:
-        pass
-    
-    request = MockRequest()
-    context = MockContext()
-    
-    result = handler(request, context)
-    print(f"Status: {result['statusCode']}")
-    print(f"Headers: {result['headers']}")
-    print(f"Body: {result['body'][:500]}...")
+    def do_OPTIONS(self):
+        """Handle preflight OPTIONS requests for CORS."""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
