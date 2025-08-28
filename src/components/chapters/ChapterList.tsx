@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { type Chapter } from '@/types';
+import { type Chapter, Role } from '@/types';
 import { getChapterStats, ChapterStats } from '@/utils/analytics';
 import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
 import { SearchIcon } from '@/icons';
 import ChapterMap from './ChapterMap';
 import ChapterCard from './ChapterCard';
+import RegionalOrganiserCard from './RegionalOrganiserCard';
 
 // A small helper component for stats on mobile
 const Stat: React.FC<{ label: string; value: string | number }> = ({
@@ -93,6 +94,17 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
     return ['all', ...Array.from(regions).sort()];
   }, [allChapters]);
 
+  const regionalOrganiser = useMemo(() => {
+    if (selectedRegion === 'all' || !selectedRegion) {
+      return null;
+    }
+    return allUsers.find(
+      (u) =>
+        u.role === Role.REGIONAL_ORGANISER &&
+        u.managedCountry === selectedRegion
+    );
+  }, [selectedRegion, allUsers]);
+
   const filteredAndSortedStats = useMemo(() => {
     return chapterStats
       .filter((stat) => {
@@ -123,7 +135,9 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
     <div className="py-8 md:py-12">
       <div className="mb-8 md:mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          Global Chapters
+          {selectedRegion === 'all'
+            ? 'Global Chapters'
+            : `${selectedRegion} Chapters`}
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-neutral-600">
           An operational directory of our global network of activist chapters.
@@ -214,6 +228,8 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
           </div>
         </div>
       </div>
+
+      {regionalOrganiser && <RegionalOrganiserCard user={regionalOrganiser} />}
 
       {/* Map View */}
       {viewMode === 'map' && (

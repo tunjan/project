@@ -430,9 +430,7 @@ export const CheckCircleIcon: React.FC<IconProps> = ({ className }) => (
   </svg>
 );
 
-export const ExclamationTriangleIcon: React.FC<IconProps> = ({
-  className,
-}) => (
+export const ExclamationTriangleIcon: React.FC<IconProps> = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -782,9 +780,7 @@ export const BellIcon: React.FC<IconProps> = ({ className }) => (
   </svg>
 );
 
-export const ChatBubbleLeftRightIcon: React.FC<IconProps> = ({
-  className,
-}) => (
+export const ChatBubbleLeftRightIcon: React.FC<IconProps> = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
