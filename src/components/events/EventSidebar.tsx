@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, CubeEvent, EventParticipant, ParticipantStatus } from '@/types';
+import { User, CubeEvent, ParticipantStatus } from '@/types';
 import { Link } from 'react-router-dom';
 import Widget from '@/components/dashboard/Widget';
 

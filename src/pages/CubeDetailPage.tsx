@@ -8,7 +8,7 @@ import {
   useAccommodationsActions,
 } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
-import { CubeEvent, TourDuty, ParticipantStatus, User } from '@/types';
+import { TourDuty, ParticipantStatus, User, AccommodationRequest } from '@/types';
 import { can, Permission } from '@/config/permissions';
 import { toast } from 'sonner';
 
@@ -61,6 +61,19 @@ const CubeDetailPage: React.FC = () => {
 
   const event = useEventById(eventId!);
 
+  // Move useMemo before early return to follow React Hooks rules
+  const availableHosts = React.useMemo(() => {
+    if (!event) return [];
+    return allUsers.filter(
+      (u: User) =>
+        u.id !== currentUser?.id &&
+        u.chapters?.includes(event.city) &&
+        u.hostingAvailability &&
+        u.hostingCapacity &&
+        u.hostingCapacity > 0
+    );
+  }, [allUsers, event?.city, currentUser, event]);
+
   if (!event) {
     return (
       <div className="py-16 text-center">
@@ -91,17 +104,6 @@ const CubeDetailPage: React.FC = () => {
   const canEditEvent = can(currentUser, Permission.EDIT_EVENT, { event });
   const canCancelEvent = can(currentUser, Permission.CANCEL_EVENT, { event });
   const isRegionalEvent = event.scope === 'Regional' && !!event.endDate;
-
-  const availableHosts = React.useMemo(() => {
-    return allUsers.filter(
-      (u: User) =>
-        u.id !== currentUser?.id &&
-        u.chapters?.includes(event.city) &&
-        u.hostingAvailability &&
-        u.hostingCapacity &&
-        u.hostingCapacity > 0
-    );
-  }, [allUsers, event.city, currentUser]);
 
   const handleRsvpClick = () => {
     if (!currentUser) return navigate('/login');
@@ -153,7 +155,10 @@ const CubeDetailPage: React.FC = () => {
   };
 
   const handleCreateRequest = (
-    requestData: Omit<any, 'id' | 'requester' | 'host' | 'event' | 'status'>
+    requestData: Omit<
+      AccommodationRequest,
+      'id' | 'requester' | 'host' | 'event' | 'status'
+    >
   ) => {
     if (!selectedHost || !currentUser) return;
     createAccommodationRequest(
