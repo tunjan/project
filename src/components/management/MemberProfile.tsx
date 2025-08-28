@@ -37,6 +37,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     updateUserStatus,
     finalizeOnboarding,
     setChapterOrganiser,
+    confirmFirstCubeAttended,
   } = useUsersActions();
   const { awardBadge } = useAwardsActions();
 
@@ -72,6 +73,11 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
       currentUser
     );
     toast.success(`${user.name} passed the onboarding call. Next: attend first Cube.`);
+  };
+
+  const handleConfirmFirstCube = () => {
+    confirmFirstCubeAttended(user.id);
+    toast.success(`${user.name}'s first cube attendance has been manually confirmed.`);
   };
 
   const handleManualVerify = () => {
@@ -258,6 +264,19 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                 className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
               >
                 Mark Call as Passed
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* First Cube Confirmation Actions */}
+        {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE && canManageRole && (
+          <section className="mb-8 border-2 border-primary bg-white p-6">
+            <h2 className="mb-4 text-2xl font-bold text-black">First Cube Attendance</h2>
+            <p className="mb-4 text-sm text-black">This user needs to attend their first Cube. If the automated system fails after you log an event report, you can manually confirm their attendance here.</p>
+            <div className="flex space-x-4">
+              <button onClick={handleConfirmFirstCube} className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover">
+                Manually Confirm First Cube Attended
               </button>
             </div>
           </section>

@@ -1,15 +1,22 @@
 import React from 'react';
-import { type User, OnboardingStatus } from '@/types';
+import { type User, OnboardingStatus, EventStatus } from '@/types';
+import { useEvents } from '@/store';
+import Tag from '@/components/ui/Tag';
 
 interface OnboardingCardProps {
   user: User;
   onNavigate: (user: User) => void;
 }
 
-const OnboardingCard: React.FC<OnboardingCardProps> = ({
-  user,
-  onNavigate,
-}) => {
+const OnboardingCard: React.FC<OnboardingCardProps> = ({ user, onNavigate }) => {
+  const allEvents = useEvents();
+
+  const upcomingRsvp = allEvents.find(
+    (e) =>
+      e.status === EventStatus.UPCOMING &&
+      e.participants.some((p) => p.user.id === user.id)
+  );
+
   return (
     <div
       onClick={() => onNavigate(user)}
@@ -27,6 +34,19 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
             <p className="truncate text-sm text-neutral-500">
               {user.chapters?.join(', ') || 'No chapters'}
             </p>
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL &&
+                user.onboardingProgress?.revisionCallScheduledAt && (
+                  <Tag variant="info" size="sm">Call Scheduled</Tag>
+                )}
+              {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE && upcomingRsvp && (
+                <Tag variant="success" size="sm">RSVP'd</Tag>
+              )}
+              {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
+                user.onboardingProgress?.revisionCallScheduledAt && (
+                  <Tag variant="info" size="sm">Call Scheduled</Tag>
+                )}
+            </div>
           </div>
         </div>
       </div>

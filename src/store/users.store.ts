@@ -96,6 +96,7 @@ export interface UsersActions {
   batchUpdateUserStats: (
     updates: { userId: string; newStats: Partial<User['stats']> }[]
   ) => void;
+  confirmFirstCubeAttended: (userId: string) => void; // NEW ACTION
   validateUserOnboarding: (userId: string) => { isValid: boolean; issues: string[] };
   autoAdvanceOnboarding: (userId: string) => void;
   fixOnboardingIssues: () => void;
@@ -413,7 +414,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => {
         const currentUser = get().users.find((u) => u.id === userId);
         const organiser = get().users.find((u) => u.id === organiserId);
-        
+
         if (!currentUser) {
           console.error(`User ${userId} not found`);
           return;
@@ -461,6 +462,43 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           message: `${currentUser.name} has scheduled a revision call with you for ${when.toLocaleString()}.`,
           linkTo: `/manage/member/${userId}`,
           relatedUser: currentUser,
+        });
+      },
+
+      // Manually confirm first cube attendance as a fallback
+      confirmFirstCubeAttended: (userId: string) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        if (!currentUser || currentUser.onboardingStatus !== OnboardingStatus.AWAITING_FIRST_CUBE) {
+          return;
+        }
+
+        set((state) => {
+          const watchedMasterclass = currentUser.onboardingProgress?.watchedMasterclass;
+          const nextStatus = watchedMasterclass
+            ? OnboardingStatus.AWAITING_REVISION_CALL
+            : OnboardingStatus.AWAITING_MASTERCLASS;
+
+          const updatedUsers = state.users.map((u) =>
+            u.id === userId ? { ...u, onboardingStatus: nextStatus } : u
+          );
+
+          if (useAuthStore.getState().currentUser?.id === userId) {
+            useAuthStore.getState().updateCurrentUser({ onboardingStatus: nextStatus });
+          }
+
+          // Send appropriate notification
+          const message = watchedMasterclass
+            ? `Great! Your first Cube attendance is confirmed. Next: schedule your revision call.`
+            : `Nice! You completed your first Cube. Next: complete the masterclass.`;
+
+          useNotificationsStore.getState().addNotification({
+            userId: userId,
+            type: NotificationType.REQUEST_ACCEPTED,
+            message,
+            linkTo: '/dashboard',
+          });
+
+          return { users: updatedUsers };
         });
       },
 
@@ -714,6 +752,7 @@ export const useUsersActions = () =>
     updateUserStatus: s.updateUserStatus,
     finalizeOnboarding: s.finalizeOnboarding,
     confirmWatchedMasterclass: s.confirmWatchedMasterclass,
+    confirmFirstCubeAttended: s.confirmFirstCubeAttended,
     validateUserOnboarding: s.validateUserOnboarding,
     autoAdvanceOnboarding: s.autoAdvanceOnboarding,
     fixOnboardingIssues: s.fixOnboardingIssues,
