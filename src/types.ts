@@ -131,6 +131,7 @@ export interface User {
   joinDate?: Date;
   organizerNotes?: OrganizerNote[];
   lastLogin: Date;
+  activityLevel?: 'high' | 'medium' | 'low'; // NEW: For more realistic participation
   leaveDate?: Date;
 }
 

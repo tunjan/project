@@ -3,6 +3,7 @@ import {
   User,
   Chapter,
   CubeEvent,
+  Challenge,
   Role,
   OnboardingStatus,
   EventStatus,
@@ -17,21 +18,62 @@ import {
   Resource,
   Notification,
   NotificationType,
+  BadgeAward,
+  InventoryItem,
 } from '../src/types';
+import { BADGE_TEMPLATES } from '../src/constants';
 import { nanoid } from 'nanoid';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// --- CONFIGURATION ---
-const NUM_CHAPTERS = 25;
-const NUM_USERS = 400;
-const EVENTS_PER_CHAPTER_MIN = 5;
-const EVENTS_PER_CHAPTER_MAX = 15;
-const ANNOUNCEMENTS = 30;
-const RESOURCES = 20;
+console.log('--- Starting Mock Data Generation ---');
 
-faker.seed(42);
+// --- CONFIGURATION (ENVIRONMENT-BASED) ---
+
+const env = process.env.NODE_ENV || 'development';
+
+const ENV_CONFIG = {
+  development: {
+    NUM_CHAPTERS: 5,
+    NUM_USERS: 50,
+    EVENTS_PER_CHAPTER_MIN: 2,
+    EVENTS_PER_CHAPTER_MAX: 5,
+    ANNOUNCEMENTS: 5,
+    RESOURCES: 10,
+    CHALLENGES: 1,
+    REALISTIC_DATES: false,
+  },
+  staging: {
+    NUM_CHAPTERS: 15,
+    NUM_USERS: 200,
+    EVENTS_PER_CHAPTER_MIN: 3,
+    EVENTS_PER_CHAPTER_MAX: 10,
+    ANNOUNCEMENTS: 20,
+    RESOURCES: 15,
+    CHALLENGES: 2,
+    REALISTIC_DATES: true,
+  },
+  production: {
+    NUM_CHAPTERS: 25,
+    NUM_USERS: 400,
+    EVENTS_PER_CHAPTER_MIN: 5,
+    EVENTS_PER_CHAPTER_MAX: 15,
+    ANNOUNCEMENTS: 30,
+    RESOURCES: 20,
+    CHALLENGES: 3,
+    REALISTIC_DATES: true,
+  },
+};
+
+const config = ENV_CONFIG[env as keyof typeof ENV_CONFIG] || ENV_CONFIG.development;
+console.log(`🌱 Using '${env}' environment config.`);
+
+faker.seed(123); // Consistent seed for reproducibility
+
+// --- SEEDS FOR DIFFERENT DATA TYPES ---
+const CHAPTER_SEED = 1;
+const EVENT_SEED = 3;
 
 // --- HELPERS ---
 const writeDataToFile = (data: Record<string, unknown[]>) => {
@@ -70,7 +112,7 @@ ${Object.entries(data)
       })
       .join('\n\n')}
 `;
-  const __filename = fileURLToPath(import.meta.url);
+  const __filename = fileURLToPath(import.meta.url); // eslint-disable-line
   const __dirname = path.dirname(__filename);
   const outputPath = path.join(__dirname, '../src/data/mockData.ts');
 
@@ -95,47 +137,32 @@ const processDataForExport = (data: unknown[]): Record<string, unknown>[] => {
         if (key === 'role') {
           // Convert role strings to enum values
           processed[key] = value;
-        } else if (key === 'onboardingStatus') {
+        } else if (key === 'activityLevel') {
+          processed[key] = value;
+        } else if (
+          key === 'onboardingStatus' ||
+          key === 'status' || // This should be more specific, but it works for now
+          key === 'outcome' ||
+          key === 'scope'
+        ) {
           // Convert onboarding status strings to enum values
           processed[key] = value;
         } else if (key === 'startDate' || key === 'joinDate' || key === 'lastLogin' || key === 'createdAt') {
           // Convert date strings back to Date objects
           processed[key] = new Date(value as string);
-        } else if (key === 'status') {
-          // Convert event status strings to enum values
-          processed[key] = value;
-        } else if (key === 'outcome') {
-          // Convert outreach outcome strings to enum values
-          processed[key] = value;
-        } else if (key === 'scope') {
-          // Convert announcement scope strings to enum values
-          processed[key] = value;
-        } else if (key === 'type') {
-          // Convert resource type strings to enum values
-          processed[key] = value;
         } else if (key === 'skillLevel') {
           // Convert skill level strings to enum values
           processed[key] = value;
         } else if (key === 'participants') {
-          // Handle nested participants array
-          if (Array.isArray(value)) {
-            processed[key] = value.map((participant: Record<string, unknown>) => ({
-              ...participant,
-              user: participant.user,
-              status: participant.status,
-              tourDuties: participant.tourDuties || []
-            }));
-          } else {
-            processed[key] = value;
-          }
-        } else if (key === 'organizer') {
-          // Handle organizer object
-          processed[key] = value;
-        } else if (key === 'author') {
-          // Handle author object
-          processed[key] = value;
+          processed[key] = (value as Record<string, unknown>[]).map(p => ({
+            ...p,
+            user: p.user, // Keep nested user object
+            status: p.status,
+            tourDuties: p.tourDuties || []
+          }));
+        } else if (key === 'organizer' || key === 'author' || key === 'relatedUser') {
+          processed[key] = value; // Keep nested user object
         } else {
-          // Keep other values as-is
           processed[key] = value;
         }
       }
@@ -145,15 +172,58 @@ const processDataForExport = (data: unknown[]): Record<string, unknown>[] => {
   });
 };
 
+// A predefined list of cities and their countries for better geographic coherence
+const CITIES_COUNTRIES = [
+  { city: 'London', country: 'United Kingdom' }, { city: 'Manchester', country: 'United Kingdom' }, { city: 'Bristol', country: 'United Kingdom' },
+  { city: 'Berlin', country: 'Germany' }, { city: 'Munich', country: 'Germany' }, { city: 'Hamburg', country: 'Germany' },
+  { city: 'Paris', country: 'France' }, { city: 'Lyon', country: 'France' },
+  { city: 'New York', country: 'USA' }, { city: 'Los Angeles', country: 'USA' }, { city: 'Chicago', country: 'USA' }, { city: 'Miami', country: 'USA' },
+  { city: 'Toronto', country: 'Canada' }, { city: 'Vancouver', country: 'Canada' }, { city: 'Montreal', country: 'Canada' },
+  { city: 'Sydney', country: 'Australia' }, { city: 'Melbourne', country: 'Australia' }, { city: 'Brisbane', country: 'Australia' },
+  { city: 'Auckland', country: 'New Zealand' }, { city: 'Wellington', country: 'New Zealand' },
+  { city: 'Stockholm', country: 'Sweden' }, { city: 'Oslo', country: 'Norway' },
+  { city: 'Amsterdam', country: 'Netherlands' }, { city: 'Brussels', country: 'Belgium' },
+  { city: 'Tel Aviv', country: 'Israel' }
+];
+
+// Holiday list to avoid generating events on these days
+const HOLIDAYS = [
+  '2024-01-01', // New Year's Day
+  '2024-12-25', // Christmas Day
+  '2024-07-04', // US Independence Day
+];
+
+// Helper to generate realistic event dates (weekends, not holidays)
+const generateRealisticEventDate = () => {
+  let date: Date;
+  do {
+    date = faker.date.between({
+      from: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+      to: new Date(new Date().setMonth(new Date().getMonth() + 2)),
+    });
+    // Force date to be a Saturday (6) or Sunday (0)
+    const day = date.getDay();
+    if (config.REALISTIC_DATES && day !== 0 && day !== 6) {
+      const adjustment = day === 5 ? 1 : 6 - day;
+      date.setDate(date.getDate() + adjustment);
+    }
+  } while (config.REALISTIC_DATES && HOLIDAYS.includes(date.toISOString().split('T')[0]));
+  // Set time to be between 12 PM and 4 PM
+  date.setHours(faker.number.int({ min: 12, max: 16 }), 0, 0, 0);
+  return date;
+};
+
 // --- GENERATORS ---
 
 const generateChapters = (count: number): Chapter[] => {
-  return Array.from({ length: count }, () => ({
-    name: faker.location.city(),
-    country: faker.location.country(),
+  faker.seed(CHAPTER_SEED);
+  const selectedCities = faker.helpers.arrayElements(CITIES_COUNTRIES, Math.min(count, CITIES_COUNTRIES.length));
+  return selectedCities.map(c => ({
+    name: c.city,
+    country: c.country,
     lat: faker.location.latitude(),
     lng: faker.location.longitude(),
-    instagram: `@av_${faker.lorem.word()}`,
+    instagram: `@av_${c.city.toLowerCase().replace(/ /g, '')}`,
   }));
 };
 
@@ -161,7 +231,7 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
   const users: User[] = [];
   for (let i = 0; i < count; i++) {
     const name = faker.person.fullName();
-    const userChapters = faker.helpers.arrayElements(
+    let userChapters = faker.helpers.arrayElements(
       chapters.map((c) => c.name),
       { min: 1, max: 2 }
     );
@@ -176,28 +246,33 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
     const role =
       onboardingStatus === OnboardingStatus.CONFIRMED
         ? faker.helpers.weightedArrayElement([
-          { weight: 80, value: Role.ACTIVIST },
+          { weight: 75, value: Role.ACTIVIST },
           { weight: 15, value: Role.CHAPTER_ORGANISER },
-          { weight: 5, value: Role.REGIONAL_ORGANISER },
+          { weight: 8, value: Role.REGIONAL_ORGANISER },
+          { weight: 2, value: Role.GLOBAL_ADMIN },
         ])
         : Role.APPLICANT;
+
+    const activityLevel = faker.helpers.weightedArrayElement([
+      { weight: 20, value: 'high' as const },
+      { weight: 50, value: 'medium' as const },
+      { weight: 30, value: 'low' as const },
+    ]);
 
     const user: User = {
       id: nanoid(),
       name,
       email: faker.internet.email({ firstName: name.split(' ')[0] }),
       role,
-      chapters: userChapters,
+      chapters: userChapters, // Will be replaced by more realistic distribution
       onboardingStatus,
+      activityLevel,
       profilePictureUrl: `https://i.pravatar.cc/150?u=${nanoid()}`,
       joinDate: faker.date.past({ years: 3 }),
       lastLogin: faker.date.recent({ days: 90 }),
       stats: {
-        totalHours: faker.number.int({ min: 0, max: 500 }),
-        cubesAttended: faker.number.int({ min: 0, max: 100 }),
-        veganConversions: faker.number.int({ min: 0, max: 50 }),
-        totalConversations: faker.number.int({ min: 0, max: 1000 }),
-        cities: userChapters,
+        totalHours: 0, cubesAttended: 0, veganConversions: 0,
+        totalConversations: 0, cities: [],
       },
       badges: [],
       hostingAvailability: faker.datatype.boolean(),
@@ -217,10 +292,24 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
       user.organiserOf = [userChapters[0]];
     }
     if (user.role === Role.REGIONAL_ORGANISER) {
+      user.organiserOf = []; // Regional organisers don't organize specific chapters
       const chapter = chapters.find((c) => c.name === userChapters[0]);
       if (chapter) user.managedCountry = chapter.country;
+      // Assign all chapters from their managed country
+      if (user.managedCountry) {
+        userChapters = chapters.filter(c => c.country === user.managedCountry).map(c => c.name);
+      }
+    }
+    // Ensure chapter organizers are members of the chapters they organize
+    if (user.role === Role.CHAPTER_ORGANISER && user.organiserOf) {
+      user.chapters = [...new Set([...user.chapters, ...user.organiserOf])];
+    }
+    // Global Admins are members of all chapters for visibility
+    if (user.role === Role.GLOBAL_ADMIN) {
+      user.chapters = chapters.map(c => c.name);
     }
 
+    user.chapters = userChapters;
     users.push(user);
   }
   return users;
@@ -234,37 +323,47 @@ const generateEvents = (
   const confirmedUsers = users.filter(
     (u) => u.onboardingStatus === OnboardingStatus.CONFIRMED
   );
+  faker.seed(EVENT_SEED);
 
   chapters.forEach((chapter) => {
     const eventCount = faker.number.int({
-      min: EVENTS_PER_CHAPTER_MIN,
-      max: EVENTS_PER_CHAPTER_MAX,
+      min: config.EVENTS_PER_CHAPTER_MIN,
+      max: config.EVENTS_PER_CHAPTER_MAX,
     });
     const chapterMembers = confirmedUsers.filter((u) =>
       u.chapters.includes(chapter.name)
     );
     const chapterOrganiser =
-      chapterMembers.find((u) => u.role === Role.CHAPTER_ORGANISER) ||
+      chapterMembers.find((u) => u.role === Role.CHAPTER_ORGANISER && u.organiserOf?.includes(chapter.name)) ||
+      chapterMembers.find(u => u.role === Role.REGIONAL_ORGANISER && u.managedCountry === chapter.country) ||
+      chapterMembers.find(u => u.role === Role.GLOBAL_ADMIN) ||
       chapterMembers[0];
 
     if (!chapterOrganiser) return;
 
     for (let i = 0; i < eventCount; i++) {
-      const startDate = faker.date.between({
-        from: new Date().setFullYear(new Date().getFullYear() - 1),
-        to: new Date().setMonth(new Date().getMonth() + 2),
-      });
+      const startDate = generateRealisticEventDate();
       const isPast = startDate < new Date();
-      const participants = faker.helpers
-        .arrayElements(chapterMembers, {
-          min: 5,
-          max: Math.min(30, chapterMembers.length),
-        })
+
+      const highActivity = chapterMembers.filter(u => u.activityLevel === 'high');
+      const mediumActivity = chapterMembers.filter(u => u.activityLevel === 'medium');
+      const lowActivity = chapterMembers.filter(u => u.activityLevel === 'low');
+
+      const participants = [
+        ...faker.helpers.arrayElements(highActivity, { min: Math.min(1, highActivity.length), max: Math.min(10, highActivity.length) }),
+        ...faker.helpers.arrayElements(mediumActivity, { min: Math.min(2, mediumActivity.length), max: Math.min(15, mediumActivity.length) }),
+        ...faker.helpers.arrayElements(lowActivity, { min: 0, max: Math.min(3, lowActivity.length) }),
+      ]
         .map((user) => ({
           user,
           status: ParticipantStatus.ATTENDING,
           tourDuties: [] as TourDuty[],
         }));
+
+      const uniqueParticipants = Array.from(new Map(participants.map(p => [p.user.id, p])).values());
+      if (!uniqueParticipants.some(p => p.user.id === chapterOrganiser.id)) {
+        uniqueParticipants.push({ user: chapterOrganiser, status: ParticipantStatus.ATTENDING, tourDuties: [] });
+      }
 
       const event: CubeEvent = {
         id: nanoid(),
@@ -272,7 +371,7 @@ const generateEvents = (
         city: chapter.name,
         location: faker.location.streetAddress(),
         startDate,
-        scope: 'Chapter',
+        scope: 'Chapter', // Can be enhanced later
         organizer: chapterOrganiser,
         participants,
         status: isPast ? EventStatus.FINISHED : EventStatus.UPCOMING,
@@ -280,7 +379,7 @@ const generateEvents = (
           ? {
             hours: faker.number.int({ min: 2, max: 6 }),
             attendance: Object.fromEntries(
-              participants.map((p) => [
+              uniqueParticipants.map((p) => [
                 p.user.id,
                 faker.helpers.weightedArrayElement([
                   { weight: 9, value: 'Attended' },
@@ -304,11 +403,11 @@ const generateOutreachLogs = (users: User[], events: CubeEvent[]) => {
 
   pastEvents.forEach((event) => {
     event.participants.forEach((participant) => {
-      if (
-        event.report?.attendance[participant.user.id] === 'Attended' &&
-        faker.datatype.boolean(0.8)
-      ) {
-        const logCount = faker.number.int({ min: 1, max: 15 });
+      const attended = event.report?.attendance[participant.user.id] === 'Attended';
+      const shouldLog = faker.datatype.boolean({ probability: 0.8 });
+      if (attended && shouldLog) {
+        const activityMultiplier = participant.user.activityLevel === 'high' ? 2 : (participant.user.activityLevel === 'medium' ? 1 : 0.5);
+        const logCount = faker.number.int({ min: 1, max: 10 * activityMultiplier });
         for (let i = 0; i < logCount; i++) {
           logs.push({
             id: nanoid(),
@@ -348,7 +447,7 @@ const generateAnnouncements = (
       id: nanoid(),
       author,
       scope,
-      title: faker.lorem.sentence(),
+      title: faker.lorem.sentence({ min: 3, max: 7 }),
       content: faker.lorem.paragraphs(2),
       createdAt: faker.date.past({ years: 1 }),
     };
@@ -384,6 +483,78 @@ const generateResources = (count: number) => {
   return resources;
 };
 
+const generateInventory = (chapters: Chapter[]): InventoryItem[] => {
+  const inventory: InventoryItem[] = [];
+  chapters.forEach(chapter => {
+    inventory.push({
+      id: nanoid(),
+      chapterName: chapter.name,
+      category: 'Masks',
+      quantity: faker.number.int({ min: 10, max: 50 }),
+    });
+    inventory.push({
+      id: nanoid(),
+      chapterName: chapter.name,
+      category: 'TVs',
+      quantity: faker.number.int({ min: 1, max: 4 }),
+    });
+    inventory.push({
+      id: nanoid(),
+      chapterName: chapter.name,
+      category: 'Signs',
+      quantity: faker.number.int({ min: 5, max: 20 }),
+    });
+  });
+  return inventory;
+};
+
+const generateChallenges = (count: number, chapters: Chapter[]): Challenge[] => {
+  const challenges: Challenge[] = [];
+  for (let i = 0; i < count; i++) {
+    challenges.push({
+      id: nanoid(),
+      title: faker.company.catchPhrase(),
+      description: faker.lorem.paragraph(),
+      metric: faker.helpers.arrayElement(['Conversations', 'Hours']),
+      goal: faker.number.int({ min: 100, max: 1000 }),
+      endDate: faker.date.future({ years: 0.17 }),
+      participants: faker.helpers.arrayElements(chapters, { min: 3, max: 10 }).map(c => ({
+        id: c.name,
+        name: c.name,
+        progress: faker.number.int({ min: 0, max: 800 })
+      }))
+    });
+  }
+  return challenges;
+};
+
+const awardBadges = (users: User[], admin: User): { updatedUsers: User[], badgeAwards: BadgeAward[] } => {
+  const badgeAwards: BadgeAward[] = [];
+
+  const updatedUsers = users.map(user => {
+    const earnedBadges = user.badges || [];
+
+    const checkAndAward = (badgeName: string, condition: boolean) => {
+      if (condition && !earnedBadges.some(b => b.name === badgeName)) {
+        const template = BADGE_TEMPLATES.find(t => t.name === badgeName);
+        if (template) {
+          earnedBadges.push({ ...template, id: nanoid(), awardedAt: new Date() });
+        }
+      }
+    };
+
+    checkAndAward('First Cube', user.stats.cubesAttended >= 1);
+    checkAndAward('Road Warrior', new Set(user.stats.cities).size >= 5);
+    checkAndAward('Top Orator', user.stats.totalConversations >= 100);
+    checkAndAward('Veteran Activist', user.stats.totalHours >= 100);
+    checkAndAward('Community Pillar', user.stats.cubesAttended >= 25);
+
+    return { ...user, badges: earnedBadges };
+  });
+
+  return { updatedUsers, badgeAwards };
+};
+
 const generateNotificationsForApplicants = (users: User[]): Notification[] => {
   const notifications: Notification[] = [];
   const applicants = users.filter(
@@ -414,17 +585,82 @@ const generateNotificationsForApplicants = (users: User[]): Notification[] => {
   return notifications;
 };
 
-// --- MAIN ---
+// --- DATA POST-PROCESSING ---
+
+const calculateAllStats = (users: User[], events: CubeEvent[], outreachLogs: OutreachLog[]): User[] => {
+  console.log('📊 Calculating user stats from generated data...');
+  const userStatsMap: Record<string, User['stats']> = {};
+
+  // Initialize stats for all users
+  users.forEach(u => {
+    userStatsMap[u.id] = {
+      totalHours: 0, cubesAttended: 0, totalConversations: 0,
+      veganConversions: 0, cities: [],
+    };
+  });
+
+  // Calculate hours, cubes, and cities from event reports
+  events.forEach(event => {
+    if (event.status === 'Finished' && event.report) {
+      Object.entries(event.report.attendance).forEach(([userId, status]) => {
+        if (status === 'Attended' && userStatsMap[userId]) {
+          userStatsMap[userId].totalHours += event.report!.hours;
+          userStatsMap[userId].cubesAttended += 1;
+          userStatsMap[userId].cities.push(event.city);
+        }
+      });
+    }
+  });
+
+  // Calculate conversations and conversions from outreach logs
+  outreachLogs.forEach(log => {
+    if (userStatsMap[log.userId]) {
+      userStatsMap[log.userId].totalConversations += 1;
+      if ([OutreachOutcome.BECAME_VEGAN, OutreachOutcome.BECAME_VEGAN_ACTIVIST].includes(log.outcome)) {
+        userStatsMap[log.userId].veganConversions += 1;
+      }
+    }
+  });
+
+  // Apply calculated stats to users
+  return users.map(user => ({
+    ...user,
+    stats: {
+      ...userStatsMap[user.id],
+      cities: [...new Set(userStatsMap[user.id].cities)], // Dedupe cities
+    },
+  }));
+};
+
+// --- MAIN GENERATION LOGIC ---
 
 const generateAll = () => {
-  const chapters = generateChapters(NUM_CHAPTERS);
-  const users = generateUsers(NUM_USERS, chapters);
+  console.log('1. Generating Chapters...');
+  const chapters = generateChapters(config.NUM_CHAPTERS);
+
+  console.log('2. Generating Users (without stats)...');
+  let users = generateUsers(config.NUM_USERS, chapters);
+
+  console.log('3. Generating Events and Outreach Logs...');
   const events = generateEvents(chapters, users);
   const outreachLogs = generateOutreachLogs(users, events);
-  const announcements = generateAnnouncements(ANNOUNCEMENTS, users, chapters);
-  const resources = generateResources(RESOURCES);
-  const notifications = generateNotificationsForApplicants(users);
 
+  console.log('4. Calculating derived User Stats...');
+  users = calculateAllStats(users, events, outreachLogs);
+
+  console.log('5. Awarding Badges...');
+  const admin = users.find(u => u.role === Role.GLOBAL_ADMIN);
+  const { updatedUsers, badgeAwards } = awardBadges(users, admin || users[0]);
+  users = updatedUsers;
+
+  console.log('6. Generating remaining data...');
+  const announcements = generateAnnouncements(config.ANNOUNCEMENTS, users, chapters);
+  const resources = generateResources(config.RESOURCES);
+  const notifications = generateNotificationsForApplicants(users);
+  const inventory = generateInventory(chapters);
+  const challenges = generateChallenges(config.CHALLENGES, chapters);
+
+  console.log('7. Writing data to file...');
   writeDataToFile({
     chapters,
     users,
@@ -432,14 +668,16 @@ const generateAll = () => {
     outreachLogs,
     announcements,
     resources,
-    // Add empty arrays for other types to prevent import errors
+    notifications,
+    badgeAwards,
+    inventory,
+    challenges,
+    // Add empty arrays for other types to prevent type errors on import
     accommodationRequests: [],
     eventComments: [],
-    challenges: [],
-    notifications,
-    badgeAwards: [],
-    inventory: [],
   });
+
+  console.log(`\n🎉 Success! Generated mock data for '${env}' environment.`);
 };
 
 generateAll();
