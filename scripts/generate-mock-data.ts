@@ -52,10 +52,10 @@ ${Object.entries(data)
           inventory: 'InventoryItem',
         };
         const type = typeMap[key] || 'any';
-        
+
         // Convert the data to use proper enum values and date objects
         const processedValue = processDataForExport(value);
-        
+
         return `export const ${key}: ${type}[] = ${JSON.stringify(
           processedValue,
           null,
@@ -67,14 +67,14 @@ ${Object.entries(data)
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const outputPath = path.join(__dirname, '../src/data/mockData.ts');
-  
+
   // Ensure the directory exists before writing the file
   const outputDir = path.dirname(outputPath);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
     console.log(`📁 Created directory: ${outputDir}`);
   }
-  
+
   fs.writeFileSync(outputPath, content);
   console.log(`✅ Mock data written to ${outputPath}`);
 };

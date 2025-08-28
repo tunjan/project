@@ -7,8 +7,8 @@ import * as L from 'leaflet';
 import { type Chapter } from '@/types';
 
 const CustomMarkerIcon = L.divIcon({
-  html: `<div class="w-5 h-5 bg-red border-2 border-black"></div>`,
-  className: '',
+  html: `<div style="width: 20px; height: 20px; background-color: #ef4444; border: 2px solid #000000; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+  className: 'custom-marker-icon',
   iconSize: L.point(20, 20),
   iconAnchor: L.point(10, 10),
 });

@@ -100,6 +100,32 @@
     color: white !important;
   }
 
+  /* Custom Marker Styling - Ensure visibility and proper z-index */
+  .custom-marker-icon {
+    z-index: 1000 !important;
+  }
+
+  .custom-marker-icon div {
+    z-index: 1000 !important;
+    position: relative !important;
+  }
+
+  /* Ensure marker pane has proper z-index */
+  .leaflet-marker-pane {
+    z-index: 1000 !important;
+  }
+
+  /* Ensure individual markers are visible */
+  .leaflet-marker {
+    z-index: 1000 !important;
+  }
+
+  /* Force marker visibility */
+  .leaflet-marker-icon {
+    z-index: 1000 !important;
+    position: relative !important;
+  }
+
   /* Ensure popup content follows brutalist design */
   .leaflet-popup-content h3 {
     font-weight: bold !important;
