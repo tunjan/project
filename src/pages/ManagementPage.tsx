@@ -33,7 +33,7 @@ import {
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { isUserInactive } from '@/utils/user';
 import Widget from '@/components/dashboard/Widget';
-import DynamicGreeting from '@/components/dashboard/DynamicGreeting';
+
 import LeaderboardSnapshot from '@/components/dashboard/LeaderboardSnapshot';
 import ChapterHealthSnapshot from '@/components/dashboard/ChapterHealthSnapshot';
 import AtRiskMembersSnapshot from '@/components/dashboard/AtRiskMembersSnapshot';
@@ -122,9 +122,8 @@ const Dashboard: React.FC<{
 }> = ({ tasks, showChapterHealth }) => {
   const layout = useMemo(() => {
     const baseLayout = [
-      { i: 'greeting', x: 0, y: 0, w: 2, h: 1, isResizable: false, isDraggable: false },
-      { i: 'tasks', x: 0, y: 1, w: 1, h: 2, minH: 2, minW: 1 },
-      { i: 'events', x: 1, y: 1, w: 1, h: 2, minH: 2, minW: 1 },
+      { i: 'tasks', x: 0, y: 0, w: 1, h: 2, minH: 2, minW: 1 },
+      { i: 'events', x: 1, y: 0, w: 1, h: 2, minH: 2, minW: 1 },
       { i: 'leaderboard', x: 0, y: 2, w: 1, h: 2, minH: 2, minW: 1 },
     ];
 
@@ -145,9 +144,7 @@ const Dashboard: React.FC<{
       rowHeight={200}
       draggableHandle=".h-card-brutal"
     >
-      <div key="greeting">
-        <DynamicGreeting />
-      </div>
+
       <div key="tasks">
         <Widget title="Actionable Tasks">
           <div className="space-y-4">

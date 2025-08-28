@@ -8,7 +8,12 @@ import {
   useAccommodationsActions,
 } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
-import { TourDuty, ParticipantStatus, User, AccommodationRequest } from '@/types';
+import {
+  TourDuty,
+  ParticipantStatus,
+  User,
+  AccommodationRequest,
+} from '@/types';
 import { can, Permission } from '@/config/permissions';
 import { toast } from 'sonner';
 
