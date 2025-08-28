@@ -29,6 +29,9 @@ The API will be available at `http://localhost:3000/api/mock-data`
 ### 3. Test the API
 
 ```bash
+# Get minimal data (default - fastest)
+curl "http://localhost:3000/api/mock-data"
+
 # Get small test data
 curl "http://localhost:3000/api/mock-data?scenario=small_test"
 
@@ -43,6 +46,7 @@ curl "http://localhost:3000/api/mock-data?scenario=high_activity"
 
 | Scenario | Description | Chapters | Users | Events |
 |----------|-------------|----------|-------|---------|
+| `minimal` | **Default - Fastest response** | 1 | 1 | 1 |
 | `small_test` | Minimal data for quick testing | 5 | 50 | 20 |
 | `medium_test` | Balanced data for development | 15 | 200 | 100 |
 | `high_activity` | High-volume data for stress testing | 30 | 500 | 300 |

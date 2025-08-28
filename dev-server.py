@@ -31,7 +31,7 @@ class MockDataHandler(BaseHTTPRequestHandler):
         query_params = parse_qs(parsed_url.query)
         
         # Get scenario from query params
-        scenario = query_params.get('scenario', ['small_test'])[0]
+        scenario = query_params.get('scenario', ['minimal'])[0]
         
         # Set CORS headers
         self.send_response(200)
@@ -80,12 +80,13 @@ def main():
         server = HTTPServer(('localhost', port), MockDataHandler)
         print(f"🚀 Mock Data API server starting on http://localhost:{port}")
         print(f"📊 Available endpoints:")
+        print(f"   GET /?scenario=minimal (default - fastest)")
         print(f"   GET /?scenario=small_test")
         print(f"   GET /?scenario=medium_test")
         print(f"   GET /?scenario=high_activity")
         print(f"   GET /?scenario=stress_test")
         print(f"   GET /?scenario=realistic")
-        print(f"\n💡 Test with: curl 'http://localhost:{port}/?scenario=small_test'")
+        print(f"\n💡 Test with: curl 'http://localhost:{port}/?scenario=minimal'")
         print(f"🔄 Press Ctrl+C to stop the server")
         print("=" * 60)
         

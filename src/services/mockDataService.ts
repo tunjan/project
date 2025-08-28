@@ -1,4 +1,4 @@
-import { type Chapter, type User, type CubeEvent, type OutreachLog, type Announcement, type Resource, type Notification, type Badge, type InventoryItem, type Challenge } from '@/types';
+import { type Chapter, type User, type CubeEvent, type OutreachLog, type Announcement, type Resource, type Notification, type BadgeAward, type InventoryItem, type Challenge, Role, OnboardingStatus, EventStatus } from '@/types';
 
 export interface MockDataResponse {
   chapters: Chapter[];
@@ -8,7 +8,7 @@ export interface MockDataResponse {
   announcements: Announcement[];
   resources: Resource[];
   notifications: Notification[];
-  badges: Badge[];
+  badges: BadgeAward[];
   inventory: InventoryItem[];
   challenges: Challenge[];
   error?: string;
@@ -26,9 +26,10 @@ class MockDataService {
 
   /**
    * Fetch mock data from the Vercel API
+   * Defaults to 'minimal' scenario for fastest response
    */
   async fetchMockData(options: MockDataOptions = {}): Promise<MockDataResponse> {
-    const { scenario = 'small_test', cache = true } = options;
+    const { scenario = 'minimal', cache = true } = options;
     const cacheKey = `mock_data_${scenario}`;
 
     // Check cache first
@@ -101,33 +102,19 @@ class MockDataService {
 
   /**
    * Get fallback data when API is unavailable
+   * This provides minimal data for development and testing
    */
   private getFallbackData(): MockDataResponse {
-    console.log('🔄 Using fallback mock data');
+    console.log('🔄 Using minimal fallback mock data');
     
     return {
       chapters: [
         {
-          id: '1',
           name: 'London',
           country: 'United Kingdom',
           lat: 51.5074,
           lng: -0.1278,
           instagram: '@london_activists',
-          description: 'London chapter for animal rights activism',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'New York',
-          country: 'United States',
-          lat: 40.7128,
-          lng: -74.0060,
-          instagram: '@nyc_activists',
-          description: 'New York chapter for animal rights activism',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         }
       ],
       users: [
@@ -137,38 +124,54 @@ class MockDataService {
           email: 'john@example.com',
           instagram: '@johndoe',
           chapters: ['London'],
-          onboardingStatus: 'Confirmed',
-          role: 'Member',
-          joinDate: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          instagram: '@janesmith',
-          chapters: ['New York'],
-          onboardingStatus: 'Confirmed',
-          role: 'Organizer',
-          joinDate: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          onboardingStatus: OnboardingStatus.CONFIRMED,
+          role: Role.ACTIVIST,
+          joinDate: new Date(),
+          stats: {
+            totalHours: 0,
+            cubesAttended: 0,
+            veganConversions: 0,
+            totalConversations: 0,
+            cities: ['London'],
+          },
+          profilePictureUrl: '',
+          badges: [],
+          hostingAvailability: false,
+          lastLogin: new Date(),
         }
       ],
       events: [
         {
           id: '1',
-          title: 'Sample Cube Event',
-          description: 'A sample cube event for testing',
-          startDate: new Date().toISOString(),
-          endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+          name: 'Sample Cube Event',
           city: 'London',
-          status: 'UPCOMING',
-          organizerId: '2',
-          maxParticipants: 20,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          location: 'Central London',
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 2 * 60 * 60 * 1000),
+          scope: 'Chapter' as const,
+          organizer: {
+            id: '1',
+            name: 'John Doe',
+            email: 'john@example.com',
+            instagram: '@johndoe',
+            chapters: ['London'],
+            onboardingStatus: OnboardingStatus.CONFIRMED,
+            role: Role.ACTIVIST,
+            joinDate: new Date(),
+            stats: {
+              totalHours: 0,
+              cubesAttended: 0,
+              veganConversions: 0,
+              totalConversations: 0,
+              cities: ['London'],
+            },
+            profilePictureUrl: '',
+            badges: [],
+            hostingAvailability: false,
+            lastLogin: new Date(),
+          },
+          participants: [],
+          status: EventStatus.UPCOMING,
         }
       ],
       outreachLogs: [],
@@ -219,7 +222,7 @@ class MockDataService {
     return data.notifications;
   }
 
-  async getBadges(): Promise<Badge[]> {
+  async getBadges(): Promise<BadgeAward[]> {
     const data = await this.fetchMockData();
     return data.badges;
   }

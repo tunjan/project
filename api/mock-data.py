@@ -123,7 +123,7 @@ def handle_request(method: str, path: str, headers: Dict[str, str], body: str = 
         return 405, response_headers, json.dumps({'error': 'Method not allowed'})
     
     # Parse query parameters
-    scenario = 'small_test'  # Default scenario
+    scenario = 'minimal'  # Default to minimal data for faster response
     if 'scenario' in headers.get('query', {}):
         scenario = headers['query']['scenario']
     
@@ -138,7 +138,7 @@ def handle_request(method: str, path: str, headers: Dict[str, str], body: str = 
         error_response = {
             'error': 'Failed to generate mock data',
             'message': str(e),
-            'fallback_data': generate_mock_data('small_test')
+            'fallback_data': generate_mock_data('minimal')
         }
         return 500, response_headers, json.dumps(error_response, default=str)
 
