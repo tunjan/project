@@ -42,21 +42,32 @@ class MockDataService {
     }
 
     try {
-      console.log('🚀 Fetching fresh mock data from API...');
-
       // In development, use localhost
       const baseUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
         : '';
 
+      // Skip API call in production if we don't have a baseUrl (Vercel API not working)
+      if (!baseUrl) {
+        console.log('🌐 Production environment detected, using fallback data');
+        return this.getFallbackData();
+      }
+
+      console.log('🚀 Fetching fresh mock data from API...');
       const url = `${baseUrl}/api/mock-data?scenario=${scenario}`;
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -74,7 +85,15 @@ class MockDataService {
       return data;
 
     } catch (error) {
-      console.error('❌ Failed to fetch mock data:', error);
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          console.error('⏰ API request timed out, using fallback data');
+        } else {
+          console.error('❌ Failed to fetch mock data:', error.message);
+        }
+      } else {
+        console.error('❌ Failed to fetch mock data:', error);
+      }
 
       // Return fallback data if API fails
       return this.getFallbackData();
