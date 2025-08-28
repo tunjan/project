@@ -11,6 +11,10 @@ import {
   AnnouncementScope,
   ResourceType,
   SkillLevel,
+  TourDuty,
+  OutreachLog,
+  Announcement,
+  Resource,
 } from '../src/types';
 import { nanoid } from 'nanoid';
 import fs from 'fs';
@@ -248,7 +252,7 @@ const generateEvents = (
         .map((user) => ({
           user,
           status: ParticipantStatus.ATTENDING,
-          tourDuties: [] as any[],
+          tourDuties: [] as TourDuty[],
         }));
 
       const event: CubeEvent = {
@@ -284,7 +288,7 @@ const generateEvents = (
 };
 
 const generateOutreachLogs = (users: User[], events: CubeEvent[]) => {
-  const logs: any[] = [];
+  const logs: OutreachLog[] = [];
   const pastEvents = events.filter((e) => e.status === EventStatus.FINISHED);
 
   pastEvents.forEach((event) => {
@@ -317,7 +321,7 @@ const generateAnnouncements = (
   users: User[],
   chapters: Chapter[]
 ) => {
-  const announcements: any[] = [];
+  const announcements: Announcement[] = [];
   const organizers = users.filter((u) =>
     [Role.CHAPTER_ORGANISER, Role.REGIONAL_ORGANISER, Role.GLOBAL_ADMIN].includes(
       u.role
@@ -329,7 +333,7 @@ const generateAnnouncements = (
     const scope = faker.helpers.arrayElement(
       Object.values(AnnouncementScope)
     );
-    const announcement: any = {
+    const announcement: Announcement = {
       id: nanoid(),
       author,
       scope,
@@ -349,7 +353,7 @@ const generateAnnouncements = (
 };
 
 const generateResources = (count: number) => {
-  const resources: any[] = [];
+  const resources: Resource[] = [];
   for (let i = 0; i < count; i++) {
     resources.push({
       id: nanoid(),
