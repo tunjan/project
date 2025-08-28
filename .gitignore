@@ -98,6 +98,9 @@ lerna-debug.log*
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
+
+# Generated mock data
+src/data/mockData.ts
 .pnp.*
 
 

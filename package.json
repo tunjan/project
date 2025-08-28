@@ -9,6 +9,7 @@
     "generate-data:dev": "NODE_ENV=development tsx ./scripts/generate-mock-data.ts",
     "generate-data:staging": "NODE_ENV=staging tsx ./scripts/generate-mock-data.ts",
     "generate-data:prod": "NODE_ENV=production tsx ./scripts/generate-mock-data.ts",
+    "prebuild": "npm run generate-data:prod",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
