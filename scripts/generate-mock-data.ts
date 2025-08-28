@@ -15,6 +15,8 @@ import {
   OutreachLog,
   Announcement,
   Resource,
+  Notification,
+  NotificationType,
 } from '../src/types';
 import { nanoid } from 'nanoid';
 import fs from 'fs';
@@ -202,6 +204,14 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
       hostingCapacity: faker.number.int({ min: 1, max: 5 }),
     };
 
+    if (onboardingStatus !== OnboardingStatus.CONFIRMED) {
+      user.onboardingAnswers = {
+        veganReason: faker.lorem.paragraph(),
+        abolitionistAlignment: faker.datatype.boolean({ probability: 0.8 }), // 80% chance of being true
+        customAnswer: faker.lorem.paragraph(),
+      };
+    }
+
     if (user.role === Role.CHAPTER_ORGANISER) {
       user.organiserOf = [userChapters[0]];
     }
@@ -373,6 +383,36 @@ const generateResources = (count: number) => {
   return resources;
 };
 
+const generateNotificationsForApplicants = (users: User[]): Notification[] => {
+  const notifications: Notification[] = [];
+  const applicants = users.filter(
+    (u) => u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+  );
+  const organizers = users.filter((u) => u.role === Role.CHAPTER_ORGANISER);
+
+  applicants.forEach((applicant) => {
+    applicant.chapters.forEach((chapterName) => {
+      const chapterOrganizers = organizers.filter((org) =>
+        org.organiserOf?.includes(chapterName)
+      );
+
+      chapterOrganizers.forEach((organizer) => {
+        notifications.push({
+          id: nanoid(),
+          userId: organizer.id,
+          type: NotificationType.NEW_APPLICANT,
+          message: `${applicant.name} has applied to join the ${chapterName} chapter.`,
+          linkTo: '/manage',
+          isRead: false,
+          createdAt: applicant.joinDate || new Date(),
+          relatedUser: applicant,
+        });
+      });
+    });
+  });
+  return notifications;
+};
+
 // --- MAIN ---
 
 const generateAll = () => {
@@ -382,6 +422,7 @@ const generateAll = () => {
   const outreachLogs = generateOutreachLogs(users, events);
   const announcements = generateAnnouncements(ANNOUNCEMENTS, users, chapters);
   const resources = generateResources(RESOURCES);
+  const notifications = generateNotificationsForApplicants(users);
 
   writeDataToFile({
     chapters,
@@ -394,7 +435,7 @@ const generateAll = () => {
     accommodationRequests: [],
     eventComments: [],
     challenges: [],
-    notifications: [],
+    notifications,
     badgeAwards: [],
     inventory: [],
   });
