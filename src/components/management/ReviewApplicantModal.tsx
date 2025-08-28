@@ -9,9 +9,10 @@ interface ReviewApplicantModalProps {
 }
 
 const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants, onClose }) => {
-  const { updateUserStatus } = useUsersActions();
+  const { updateUserStatus, addOrganizerNote } = useUsersActions();
   const currentUser = useCurrentUser();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [note, setNote] = useState('');
 
   if (applicants.length === 0) {
     return null; // Or a message indicating no applicants
@@ -26,6 +27,11 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants,
   const handleApprove = () => {
     if (currentUser) {
       updateUserStatus(currentApplicant.id, OnboardingStatus.PENDING_ONBOARDING_CALL, currentUser);
+      
+      // Add note if provided
+      if (note.trim()) {
+        addOrganizerNote(currentApplicant.id, note, currentUser);
+      }
     }
     handleNext();
   };
@@ -33,6 +39,11 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants,
   const handleReject = () => {
     if (currentUser) {
       updateUserStatus(currentApplicant.id, OnboardingStatus.DENIED, currentUser);
+      
+      // Add note if provided
+      if (note.trim()) {
+        addOrganizerNote(currentApplicant.id, note, currentUser);
+      }
     }
     handleNext();
   };
@@ -40,6 +51,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants,
   const handleNext = () => {
     if (currentIndex < applicants.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setNote(''); // Clear note for next applicant
     } else {
       onClose(); // Close modal when all applicants are reviewed
     }
@@ -60,8 +72,59 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({ applicants,
 
         <div className="mt-6 bg-gray-50 p-4 border border-gray-200 rounded-lg">
             <h4 className="font-bold mb-2">Application Details</h4>
-            <p><strong>Email:</strong> {currentApplicant.email}</p>
-            <p><strong>Join Date:</strong> {currentApplicant.joinDate ? new Date(currentApplicant.joinDate).toLocaleDateString() : 'N/A'}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p><strong>Email:</strong> {currentApplicant.email}</p>
+                <p><strong>Instagram:</strong> {currentApplicant.instagram || 'Not provided'}</p>
+              </div>
+              <div>
+                <p><strong>Join Date:</strong> {currentApplicant.joinDate ? new Date(currentApplicant.joinDate).toLocaleDateString() : 'N/A'}</p>
+                <p><strong>Status:</strong> <span className="font-semibold text-primary">{currentApplicant.onboardingStatus}</span></p>
+              </div>
+            </div>
+        </div>
+
+        {/* Onboarding Answers */}
+        {currentApplicant.onboardingAnswers ? (
+          <div className="mt-6 bg-blue-50 p-4 border border-blue-200 rounded-lg">
+            <h4 className="font-bold mb-3 text-blue-800">Onboarding Questions</h4>
+            
+            <div className="space-y-3">
+              <div>
+                <p className="font-semibold text-sm text-blue-700">Why did you go vegan?</p>
+                <p className="text-sm text-blue-800 bg-white p-2 rounded border">{currentApplicant.onboardingAnswers.veganReason}</p>
+              </div>
+              
+              <div>
+                <p className="font-semibold text-sm text-blue-700">Are you aligned with our abolitionist values?</p>
+                <p className="text-sm text-blue-800 bg-white p-2 rounded border">
+                  {currentApplicant.onboardingAnswers.abolitionistAlignment ? 'Yes' : 'No / Unsure'}
+                </p>
+              </div>
+              
+              <div>
+                <p className="font-semibold text-sm text-blue-700">How can you best contribute to your local chapter?</p>
+                <p className="text-sm text-blue-800 bg-white p-2 rounded border">{currentApplicant.onboardingAnswers.customAnswer}</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6 bg-yellow-50 p-4 border border-yellow-200 rounded-lg">
+            <h4 className="font-bold mb-2 text-yellow-800">⚠️ No Onboarding Answers</h4>
+            <p className="text-sm text-yellow-700">This applicant doesn't have onboarding answers recorded. This might indicate an issue with the signup process.</p>
+          </div>
+        )}
+
+        {/* Organizer Note */}
+        <div className="mt-6 bg-gray-50 p-4 border border-gray-200 rounded-lg">
+          <h4 className="font-bold mb-2">Add Note (Optional)</h4>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Add any notes about this applicant..."
+            className="w-full p-2 border border-gray-300 rounded text-sm"
+            rows={3}
+          />
         </div>
 
         <div className="mt-6 flex justify-between space-x-4">

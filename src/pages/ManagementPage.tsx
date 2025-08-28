@@ -79,7 +79,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
 
   return (
     <button
-      className={`card-brutal card-padding ${priorityStyles[priority]} cursor-pointer text-left transition-all hover:scale-[1.02] hover:shadow-brutal-lg`}
+      className={`card-brutal card-padding ${priorityStyles[priority]} w-full cursor-pointer text-left transition-all hover:scale-[1.02] hover:shadow-brutal-lg`}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -264,14 +264,48 @@ const ManagementPage: React.FC = () => {
 
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 
-  const newApplicants = useMemo(
-    () =>
-      allUsers.filter(
+  const newApplicants = useMemo(() => {
+    if (!currentUser) return [];
+
+    // Get the chapters this user can manage
+    const managedChapterNames = new Set<string>(
+      currentUser.role === 'Global Admin'
+        ? allChapters.map((c) => c.name)
+        : currentUser.organiserOf || []
+    );
+
+    // Add chapters from managed country for Regional Organisers
+    if (
+      currentUser.role === Role.REGIONAL_ORGANISER &&
+      currentUser.managedCountry
+    ) {
+      allChapters
+        .filter((c) => c.country === currentUser.managedCountry)
+        .forEach((c) => managedChapterNames.add(c.name));
+    }
+
+    const filteredApplicants = allUsers.filter(
+      (u) =>
+        u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW &&
+        // Only show applicants for chapters the current user can manage
+        u.chapters?.some((c) => managedChapterNames.has(c))
+    );
+
+    // Debug logging
+    console.log('New Applicants Debug:', {
+      currentUser: currentUser.name,
+      role: currentUser.role,
+      managedChapters: Array.from(managedChapterNames),
+      totalUsers: allUsers.length,
+      pendingReviewUsers: allUsers.filter(
         (u) =>
           u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
       ),
-    [allUsers]
-  );
+      filteredApplicants: filteredApplicants,
+    });
+
+    return filteredApplicants;
+  }, [currentUser, allUsers, allChapters]);
 
   const dashboardTasks: ManagementTaskProps[] = useMemo(() => {
     if (!currentUser || newApplicants.length === 0) return [];
