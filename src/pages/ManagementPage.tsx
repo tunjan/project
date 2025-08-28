@@ -14,6 +14,7 @@ import OnboardingPipeline from '@/components/management/OnboardingPipeline';
 import MemberDirectory from '@/components/management/MemberDirectory';
 import ChapterManagement from '@/components/management/ChapterManagement';
 import ChapterInventory from '@/components/management/ChapterInventory';
+import OnboardingHealthCheck from '@/components/management/OnboardingHealthCheck';
 import {
   BuildingOfficeIcon,
   ClipboardCheckIcon,
@@ -45,7 +46,8 @@ type ManagementView =
   | 'pipeline'
   | 'members'
   | 'chapters'
-  | 'inventory';
+  | 'inventory'
+  | 'onboarding-health';
 
 interface MemberFilter {
   status?: OnboardingStatus;
@@ -76,9 +78,15 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
   };
 
   return (
-    <div
-      className={`card-brutal card-padding ${priorityStyles[priority]} cursor-pointer transition-all hover:scale-[1.02] hover:shadow-brutal-lg`}
+    <button
+      className={`card-brutal card-padding ${priorityStyles[priority]} cursor-pointer text-left transition-all hover:scale-[1.02] hover:shadow-brutal-lg`}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
@@ -92,10 +100,9 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
-
 
 const TabButton: React.FC<{
   onClick: () => void;
@@ -128,8 +135,24 @@ const Dashboard: React.FC<{
     ];
 
     if (showChapterHealth) {
-      baseLayout.push({ i: 'chapterHealth', x: 1, y: 2, w: 1, h: 2, minH: 2, minW: 1 });
-      baseLayout.push({ i: 'atRiskMembers', x: 0, y: 3, w: 2, h: 2, minH: 2, minW: 1 });
+      baseLayout.push({
+        i: 'chapterHealth',
+        x: 1,
+        y: 2,
+        w: 1,
+        h: 2,
+        minH: 2,
+        minW: 1,
+      });
+      baseLayout.push({
+        i: 'atRiskMembers',
+        x: 0,
+        y: 3,
+        w: 2,
+        h: 2,
+        minH: 2,
+        minW: 1,
+      });
     }
 
     return baseLayout;
@@ -144,14 +167,15 @@ const Dashboard: React.FC<{
       rowHeight={200}
       draggableHandle=".h-card-brutal"
     >
-
       <div key="tasks">
         <Widget title="Actionable Tasks">
           <div className="space-y-4">
             {tasks.length > 0 ? (
               tasks.map((task) => <ManagementTask key={task.title} {...task} />)
             ) : (
-              <p className="text-grey-600">No actionable tasks at the moment.</p>
+              <p className="text-grey-600">
+                No actionable tasks at the moment.
+              </p>
             )}
           </div>
         </Widget>
@@ -240,10 +264,14 @@ const ManagementPage: React.FC = () => {
 
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 
-  const newApplicants = useMemo(() => 
-    allUsers.filter(
-      (u) => u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
-    ), [allUsers]);
+  const newApplicants = useMemo(
+    () =>
+      allUsers.filter(
+        (u) =>
+          u.onboardingStatus === OnboardingStatus.PENDING_APPLICATION_REVIEW
+      ),
+    [allUsers]
+  );
 
   const dashboardTasks: ManagementTaskProps[] = useMemo(() => {
     if (!currentUser || newApplicants.length === 0) return [];
@@ -259,7 +287,6 @@ const ManagementPage: React.FC = () => {
       },
     ];
   }, [currentUser, newApplicants.length]);
-
 
   const {
     visibleMembers,
@@ -459,7 +486,6 @@ const ManagementPage: React.FC = () => {
         return (
           <div>
             <div className="mb-6 flex items-center justify-between">
-
               {manageableChapters.length > 1 && (
                 <select
                   value={selectedChapterForInventory}
@@ -504,6 +530,12 @@ const ManagementPage: React.FC = () => {
                 </p>
               </div>
             )}
+          </div>
+        );
+      case 'onboarding-health':
+        return (
+          <div className="space-y-6">
+            <OnboardingHealthCheck />
           </div>
         );
       default:
@@ -569,14 +601,21 @@ const ManagementPage: React.FC = () => {
             <ClipboardListIcon className="h-5 w-5 flex-shrink-0" />
             <span className="flex-grow">Inventory</span>
           </TabButton>
+          <TabButton
+            onClick={() => handleViewChange('onboarding-health')}
+            isActive={view === 'onboarding-health'}
+          >
+            <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
+            <span className="flex-grow">Onboarding Health</span>
+          </TabButton>
         </nav>
       </div>
       <div>
         {renderContent()}
         {isReviewModalOpen && (
-          <ReviewApplicantModal 
-            applicants={newApplicants} 
-            onClose={() => setReviewModalOpen(false)} 
+          <ReviewApplicantModal
+            applicants={newApplicants}
+            onClose={() => setReviewModalOpen(false)}
           />
         )}
       </div>

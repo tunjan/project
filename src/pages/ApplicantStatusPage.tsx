@@ -43,7 +43,7 @@ const ProgressStep: React.FC<{
       {/* Content */}
       <div className="flex-1 pb-8">
         <h3 className="text-lg font-bold text-black">{title}</h3>
-        <p className="text-neutral-600 mt-1">{description}</p>
+        <p className="mt-1 text-neutral-600">{description}</p>
 
         {/* Status badge */}
         {isComplete && (
@@ -159,6 +159,7 @@ const ApplicantStatusPage: React.FC = () => {
             'Complete the masterclass to deepen your understanding before finalizing.',
           type: 'info' as const,
         };
+        break;
       case OnboardingStatus.AWAITING_REVISION_CALL:
         return {
           title: 'Final Revision Call',
@@ -185,7 +186,7 @@ const ApplicantStatusPage: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-black">
             Your Application Status
           </h1>
-          <p className="text-neutral-600 mt-2">
+          <p className="mt-2 text-neutral-600">
             Welcome, {currentUser.name}! Here's the current status of your
             application.
           </p>
@@ -197,7 +198,7 @@ const ApplicantStatusPage: React.FC = () => {
             <h2 className="mb-4 text-xl font-bold text-black">
               Application Not Approved
             </h2>
-            <p className="text-neutral-600 mb-6">
+            <p className="mb-6 text-neutral-600">
               Unfortunately, your application to join has not been approved at
               this time. Please contact your local chapter organizer for more
               information.
@@ -219,7 +220,7 @@ const ApplicantStatusPage: React.FC = () => {
               >
                 {statusInfo.title.toUpperCase()}
               </div>
-              <p className="text-neutral-600 mt-4">{statusInfo.message}</p>
+              <p className="mt-4 text-neutral-600">{statusInfo.message}</p>
             </div>
 
             {/* Progress Steps */}
@@ -242,11 +243,11 @@ const ApplicantStatusPage: React.FC = () => {
             {/* Waiting State */}
             {status === OnboardingStatus.PENDING_APPLICATION_REVIEW && (
               <div className="border-t-2 border-black pt-6 text-center">
-                <ClockIcon className="text-neutral-500 mx-auto h-10 w-10" />
+                <ClockIcon className="mx-auto h-10 w-10 text-neutral-500" />
                 <h3 className="mt-2 font-bold text-black">
                   Patience is a virtue!
                 </h3>
-                <p className="text-neutral-600 mt-1 text-sm">
+                <p className="mt-1 text-sm text-neutral-600">
                   An organizer from your chapter is reviewing your application.
                   You will receive a notification here once it's been approved.
                 </p>

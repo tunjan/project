@@ -9,6 +9,55 @@ import { type OnboardingAnswers } from '@/types';
 import { useNotificationsStore } from './notifications.store';
 import { useAuthStore } from './auth.store';
 
+// Helper function to validate onboarding status transitions
+const isValidStatusTransition = (fromStatus: OnboardingStatus, toStatus: OnboardingStatus): boolean => {
+  const validTransitions: Record<OnboardingStatus, OnboardingStatus[]> = {
+    [OnboardingStatus.PENDING_APPLICATION_REVIEW]: [
+      OnboardingStatus.PENDING_ONBOARDING_CALL,
+      OnboardingStatus.DENIED
+    ],
+    [OnboardingStatus.PENDING_ONBOARDING_CALL]: [
+      OnboardingStatus.AWAITING_FIRST_CUBE,
+      OnboardingStatus.DENIED
+    ],
+    [OnboardingStatus.AWAITING_FIRST_CUBE]: [
+      OnboardingStatus.AWAITING_MASTERCLASS,
+      OnboardingStatus.AWAITING_REVISION_CALL
+    ],
+    [OnboardingStatus.AWAITING_MASTERCLASS]: [
+      OnboardingStatus.AWAITING_REVISION_CALL
+    ],
+    [OnboardingStatus.AWAITING_REVISION_CALL]: [
+      OnboardingStatus.CONFIRMED
+    ],
+    [OnboardingStatus.CONFIRMED]: [],
+    [OnboardingStatus.DENIED]: [],
+    [OnboardingStatus.INACTIVE]: []
+  };
+
+  return validTransitions[fromStatus]?.includes(toStatus) ?? false;
+};
+
+// Helper function to validate onboarding state
+const validateOnboardingState = (user: User): { isValid: boolean; issues: string[] } => {
+  const issues: string[] = [];
+
+  // Check for invalid status combinations
+  if (user.onboardingStatus === OnboardingStatus.CONFIRMED && !user.onboardingProgress?.watchedMasterclass) {
+    issues.push('Confirmed user has not watched masterclass');
+  }
+
+  if (user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL && user.stats.cubesAttended === 0) {
+    issues.push('User awaiting revision call has not attended any cubes');
+  }
+
+  if (user.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS && user.onboardingProgress?.watchedMasterclass) {
+    issues.push('User awaiting masterclass has already watched it');
+  }
+
+  return { isValid: issues.length === 0, issues };
+};
+
 export interface UsersState {
   users: User[];
 }
@@ -46,6 +95,9 @@ export interface UsersActions {
   batchUpdateUserStats: (
     updates: { userId: string; newStats: Partial<User['stats']> }[]
   ) => void;
+  validateUserOnboarding: (userId: string) => { isValid: boolean; issues: string[] };
+  autoAdvanceOnboarding: (userId: string) => void;
+  fixOnboardingIssues: () => void;
   resetToInitialData: () => void;
   getUsers: () => User[];
   clearPersistedData: () => void;
@@ -67,9 +119,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         return state.users;
       },
 
-      init: () => {},
+      init: () => { },
 
-              register: (formData) => {
+      register: (formData) => {
         const newUser: User = {
           id: `user_${Date.now()}`,
           email: formData.email,
@@ -112,6 +164,18 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       },
 
       updateUserStatus: (userId, status, approver) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        if (!currentUser) {
+          console.error(`User ${userId} not found`);
+          return;
+        }
+
+        // Validate the status transition
+        if (!isValidStatusTransition(currentUser.onboardingStatus, status)) {
+          console.error(`Invalid status transition from ${currentUser.onboardingStatus} to ${status}`);
+          return;
+        }
+
         set((state) => {
           const updatedUsers = state.users.map((u) =>
             u.id === userId ? { ...u, onboardingStatus: status } : u
@@ -163,6 +227,25 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       },
 
       finalizeOnboarding: (userId) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        if (!currentUser) {
+          console.error(`User ${userId} not found`);
+          return;
+        }
+
+        // Validate that user can be finalized
+        if (currentUser.onboardingStatus !== OnboardingStatus.AWAITING_REVISION_CALL) {
+          console.warn(`User ${userId} cannot be finalized from status ${currentUser.onboardingStatus}`);
+          return;
+        }
+
+        // Validate onboarding state
+        const validation = validateOnboardingState(currentUser);
+        if (!validation.isValid) {
+          console.warn(`Cannot finalize user ${userId}: ${validation.issues.join(', ')}`);
+          return;
+        }
+
         set((state) => {
           let userToUpdate: User | undefined;
           const updatedUsers = state.users.map((u) => {
@@ -198,6 +281,18 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       // Mark that the user has watched the masterclass. If they're already in
       // AWAITING_MASTERCLASS, advance them to AWAITING_REVISION_CALL immediately.
       confirmWatchedMasterclass: (userId: string) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        if (!currentUser) {
+          console.error(`User ${userId} not found`);
+          return;
+        }
+
+        // Only allow this if user is in appropriate status
+        if (currentUser.onboardingStatus !== OnboardingStatus.AWAITING_MASTERCLASS) {
+          console.warn(`User ${userId} cannot confirm masterclass in status ${currentUser.onboardingStatus}`);
+          return;
+        }
+
         set((state) => {
           const updatedUsers = state.users.map((u) => {
             if (u.id !== userId) return u;
@@ -206,16 +301,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               watchedMasterclass: true,
             };
 
-            let onboardingStatus = u.onboardingStatus;
-            if (onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS) {
-              onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
-              useNotificationsStore.getState().addNotification({
-                userId: u.id,
-                type: NotificationType.REQUEST_ACCEPTED,
-                message: `Great! You completed the masterclass. Next: pass the revision call to get verified.`,
-                linkTo: '/dashboard',
-              });
-            }
+            const onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
 
             const updatedUser = { ...u, onboardingProgress: progress, onboardingStatus };
 
@@ -226,10 +312,92 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           });
           return { users: updatedUsers };
         });
+
+        // Add notification
+        useNotificationsStore.getState().addNotification({
+          userId: userId,
+          type: NotificationType.REQUEST_ACCEPTED,
+          message: `Great! You completed the masterclass. Next: pass the revision call to get verified.`,
+          linkTo: '/dashboard',
+        });
+      },
+
+      // Validate a user's onboarding state
+      validateUserOnboarding: (userId: string) => {
+        const user = get().users.find((u) => u.id === userId);
+        if (!user) {
+          return { isValid: false, issues: ['User not found'] };
+        }
+        return validateOnboardingState(user);
+      },
+
+      // Auto-advance user when they meet requirements for next status
+      autoAdvanceOnboarding: (userId: string) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        if (!currentUser) {
+          console.error(`User ${userId} not found`);
+          return;
+        }
+
+        let newStatus: OnboardingStatus | null = null;
+
+        // Check if user can advance from AWAITING_FIRST_CUBE
+        if (currentUser.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
+          currentUser.stats.cubesAttended > 0) {
+          if (currentUser.onboardingProgress?.watchedMasterclass) {
+            newStatus = OnboardingStatus.AWAITING_REVISION_CALL;
+          } else {
+            newStatus = OnboardingStatus.AWAITING_MASTERCLASS;
+          }
+        }
+
+        // Check if user can advance from AWAITING_REVISION_CALL
+        if (currentUser.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
+          currentUser.onboardingProgress?.revisionCallScheduledAt) {
+          newStatus = OnboardingStatus.CONFIRMED;
+        }
+
+        if (newStatus && newStatus !== currentUser.onboardingStatus) {
+          // Use updateUserStatus to ensure proper validation and notifications
+          get().updateUserStatus(userId, newStatus);
+        }
+      },
+
+      // Fix common onboarding issues across all users
+      fixOnboardingIssues: () => {
+        const users = get().users;
+        let fixedCount = 0;
+
+        users.forEach((user) => {
+          const validation = validateOnboardingState(user);
+          if (!validation.isValid) {
+            console.warn(`User ${user.name} has onboarding issues: ${validation.issues.join(', ')}`);
+
+            // Try to auto-advance the user
+            get().autoAdvanceOnboarding(user.id);
+            fixedCount++;
+          }
+        });
+
+        if (fixedCount > 0) {
+          console.log(`Fixed onboarding issues for ${fixedCount} users`);
+        }
       },
 
       // Schedule a revision call with selected organiser and time
       scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        if (!currentUser) {
+          console.error(`User ${userId} not found`);
+          return;
+        }
+
+        // Only allow this if user is in appropriate status
+        if (currentUser.onboardingStatus !== OnboardingStatus.AWAITING_REVISION_CALL) {
+          console.warn(`User ${userId} cannot schedule revision call in status ${currentUser.onboardingStatus}`);
+          return;
+        }
+
         set((state) => {
           const updatedUsers = state.users.map((u) => {
             if (u.id !== userId) return u;
@@ -245,6 +413,14 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             return updatedUser;
           });
           return { users: updatedUsers };
+        });
+
+        // Add notification
+        useNotificationsStore.getState().addNotification({
+          userId: userId,
+          type: NotificationType.REQUEST_ACCEPTED,
+          message: `Revision call scheduled! Please attend the call to complete your onboarding.`,
+          linkTo: '/dashboard',
         });
       },
 
@@ -340,9 +516,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               const chaptersToReassign = userToDelete.organiserOf;
               chaptersToReassign.forEach(chapterName => {
                 // Find another organizer for this chapter
-                const otherOrganiser = get().users.find(u => 
-                  u.id !== userIdToDelete && 
-                  u.role === Role.CHAPTER_ORGANISER && 
+                const otherOrganiser = get().users.find(u =>
+                  u.id !== userIdToDelete &&
+                  u.role === Role.CHAPTER_ORGANISER &&
                   u.organiserOf?.includes(chapterName)
                 );
 
@@ -498,6 +674,9 @@ export const useUsersActions = () =>
     updateUserStatus: s.updateUserStatus,
     finalizeOnboarding: s.finalizeOnboarding,
     confirmWatchedMasterclass: s.confirmWatchedMasterclass,
+    validateUserOnboarding: s.validateUserOnboarding,
+    autoAdvanceOnboarding: s.autoAdvanceOnboarding,
+    fixOnboardingIssues: s.fixOnboardingIssues,
     scheduleRevisionCall: s.scheduleRevisionCall,
     updateUserRole: s.updateUserRole,
     setChapterOrganiser: s.setChapterOrganiser,
