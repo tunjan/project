@@ -43,14 +43,14 @@ class MockDataService {
 
     try {
       console.log('🚀 Fetching fresh mock data from API...');
-      
+
       // In development, use localhost
-      const baseUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:3000' 
+      const baseUrl = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
         : '';
-      
+
       const url = `${baseUrl}/api/mock-data?scenario=${scenario}`;
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -75,7 +75,7 @@ class MockDataService {
 
     } catch (error) {
       console.error('❌ Failed to fetch mock data:', error);
-      
+
       // Return fallback data if API fails
       return this.getFallbackData();
     }
@@ -87,7 +87,7 @@ class MockDataService {
   private isCacheValid(cacheKey: string): boolean {
     const timestamp = this.cacheTimestamps.get(cacheKey);
     if (!timestamp) return false;
-    
+
     return Date.now() - timestamp < this.cacheTimeout;
   }
 
@@ -106,7 +106,7 @@ class MockDataService {
    */
   private getFallbackData(): MockDataResponse {
     console.log('🔄 Using minimal fallback mock data');
-    
+
     return {
       chapters: [
         {

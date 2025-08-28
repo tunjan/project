@@ -241,6 +241,19 @@ class ScenarioManager:
     """Manages predefined data generation scenarios for testing."""
     
     SCENARIOS = {
+        'minimal': {
+            'description': 'Minimal dataset for fastest response - 1 chapter, 1 user, 1 event',
+            'config_overrides': {
+                'chapters': 1,
+                'users': 1,
+                'events_per_chapter': 1,
+                'announcements': 0,
+                'resources': 0,
+                'badge_awards': 0,
+                'chapter_join_requests': 0,
+                'challenges': 0
+            }
+        },
         'default': {
             'description': 'Standard balanced dataset for general use',
             'config_overrides': {}
