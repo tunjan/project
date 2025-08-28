@@ -62,7 +62,9 @@ const CubeMap: React.FC<CubeMapProps> = ({
     forceLeafletStyles();
 
     // Also ensure map tiles and other elements don't have extremely high z-index
-    const mapElements = document.querySelectorAll('.leaflet-tile, .leaflet-overlay-pane, .leaflet-marker-pane, .leaflet-pane');
+    const mapElements = document.querySelectorAll(
+      '.leaflet-tile, .leaflet-overlay-pane, .leaflet-marker-pane, .leaflet-pane'
+    );
     mapElements.forEach((element) => {
       if (element instanceof HTMLElement) {
         element.style.zIndex = '30';
@@ -113,7 +115,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
         // Find the chapter for this event to get coordinates
         const chapter = chapters.find((c) => c.name === event.city);
         if (!chapter) return null;
-        
+
         const coords: [number, number] = [chapter.lat, chapter.lng];
         return { event, coords };
       })
@@ -153,16 +155,16 @@ const CubeMap: React.FC<CubeMapProps> = ({
   };
 
   return (
-    <div className="h-[600px] w-full border-2 border-black bg-white relative z-30">
+    <div className="relative z-30 h-[600px] w-full border-2 border-black bg-white">
       {!mapReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-40">
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-gray-100">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-black"></div>
             <p className="text-gray-600">Loading map...</p>
           </div>
         </div>
       )}
-      
+
       <MapContainer
         center={[20, 0] as [number, number]}
         zoom={2}
@@ -204,9 +206,9 @@ const CubeMap: React.FC<CubeMapProps> = ({
           </Marker>
         ))}
       </MapContainer>
-      
+
       {tileError && (
-        <div className="absolute top-2 right-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-2 rounded text-sm z-50">
+        <div className="absolute right-2 top-2 z-50 rounded border border-yellow-400 bg-yellow-100 px-3 py-2 text-sm text-yellow-700">
           ⚠️ Using fallback map tiles
         </div>
       )}
