@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -36,6 +36,9 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
   onSelectChapter,
   popupActionText = 'View Chapter',
 }) => {
+  const [tileError, setTileError] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+
   // Force remove rounded corners and shadows from Leaflet popups
   useEffect(() => {
     const forceLeafletStyles = () => {
@@ -140,18 +143,53 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
     return new L.LatLngBounds(allCoords);
   }, [chapterMarkers]);
 
+  // Handle tile loading errors
+  const handleTileError = () => {
+    console.warn('Primary tile provider failed, map may not display correctly');
+    setTileError(true);
+  };
+
+  // Handle map ready
+  const handleMapReady = () => {
+    setMapReady(true);
+    console.log('Map initialized successfully');
+  };
+
+  // Fallback tile provider if primary fails
+  const getTileUrl = () => {
+    if (tileError) {
+      // Use OpenStreetMap directly as fallback
+      return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    }
+    // Primary: CARTO basemaps (HTTPS compatible)
+    return 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+  };
+
   return (
     <div className="h-[600px] w-full border-2 border-black bg-white relative z-30 chapter-map-container">
+      {!mapReady && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-40">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading map...</p>
+          </div>
+        </div>
+      )}
+      
       <MapContainer
         center={[20, 0] as [number, number]}
         zoom={2}
         scrollWheelZoom={false}
         style={{ height: '100%', width: '100%' }}
+        whenReady={handleMapReady}
       >
         <ChangeView bounds={bounds} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+          url={getTileUrl()}
+          eventHandlers={{
+            tileerror: handleTileError,
+          }}
         />
         {chapterMarkers.map(({ chapter, coords }) => (
           <Marker key={chapter.name} position={coords} icon={CustomMarkerIcon}>
@@ -192,6 +230,12 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
           </Marker>
         ))}
       </MapContainer>
+      
+      {tileError && (
+        <div className="absolute top-2 right-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-3 py-2 rounded text-sm z-50">
+          ⚠️ Using fallback map tiles
+        </div>
+      )}
     </div>
   );
 };
