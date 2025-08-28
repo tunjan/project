@@ -83,6 +83,7 @@ export interface UsersActions {
   updateUserOrganiserOf: (userId: string, newOrganiserOf: string[]) => void;
   updateProfile: (userId: string, updatedData: Partial<User>) => void;
   // Onboarding progress actions
+  scheduleOnboardingCall: (userId: string, organiserId: string, when: Date) => void;
   confirmWatchedMasterclass: (userId: string) => void;
   scheduleRevisionCall: (userId: string, organiserId: string, when: Date) => void;
   deleteUser: (userIdToDelete: string) => Promise<void>;
@@ -465,6 +466,49 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         });
       },
 
+      // Schedule the initial onboarding call
+      scheduleOnboardingCall: (userId, organiserId, when) => {
+        const currentUser = get().users.find((u) => u.id === userId);
+        const organiser = get().users.find((u) => u.id === organiserId);
+        if (!currentUser || !organiser || currentUser.onboardingStatus !== OnboardingStatus.PENDING_ONBOARDING_CALL) {
+          return;
+        }
+
+        set((state) => {
+          const updatedUsers = state.users.map((u) => {
+            if (u.id !== userId) return u;
+            const progress = {
+              ...(u.onboardingProgress || {}),
+              selectedOrganiserId: organiserId,
+              onboardingCallScheduledAt: when,
+            };
+            const updatedUser = { ...u, onboardingProgress: progress };
+            if (useAuthStore.getState().currentUser?.id === userId) {
+              useAuthStore.getState().updateCurrentUser({ onboardingProgress: progress });
+            }
+            return updatedUser;
+          });
+          return { users: updatedUsers };
+        });
+
+        // Notify the applicant
+        useNotificationsStore.getState().addNotification({
+          userId: userId,
+          type: NotificationType.REQUEST_ACCEPTED,
+          message: `Onboarding call scheduled! Please attend to continue your onboarding.`,
+          linkTo: '/dashboard',
+        });
+
+        // Notify the organizer
+        useNotificationsStore.getState().addNotification({
+          userId: organiserId,
+          type: NotificationType.EVENT_UPDATED,
+          message: `${currentUser.name} has scheduled an onboarding call with you for ${when.toLocaleString()}.`,
+          linkTo: `/manage/member/${userId}`,
+          relatedUser: currentUser,
+        });
+      },
+
       // Manually confirm first cube attendance as a fallback
       confirmFirstCubeAttended: (userId: string) => {
         const currentUser = get().users.find((u) => u.id === userId);
@@ -756,6 +800,7 @@ export const useUsersActions = () =>
     validateUserOnboarding: s.validateUserOnboarding,
     autoAdvanceOnboarding: s.autoAdvanceOnboarding,
     fixOnboardingIssues: s.fixOnboardingIssues,
+    scheduleOnboardingCall: s.scheduleOnboardingCall,
     scheduleRevisionCall: s.scheduleRevisionCall,
     updateUserRole: s.updateUserRole,
     setChapterOrganiser: s.setChapterOrganiser,

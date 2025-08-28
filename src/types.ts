@@ -123,6 +123,7 @@ export interface User {
   onboardingProgress?: {
     watchedMasterclass?: boolean;
     selectedOrganiserId?: string;
+    onboardingCallScheduledAt?: Date;
     revisionCallScheduledAt?: Date;
   };
   joinDate?: Date;

@@ -87,7 +87,7 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const allUsers = useUsers();
-  const { confirmWatchedMasterclass, scheduleRevisionCall } = useUsersActions();
+  const { confirmWatchedMasterclass, scheduleRevisionCall, scheduleOnboardingCall } = useUsersActions();
   const allEvents = useEvents();
   const announcements = useAnnouncementsState();
   const notifications = useNotificationsState();
@@ -95,9 +95,9 @@ const DashboardPage: React.FC = () => {
 
   // Local UI state for onboarding modals
   const [showMasterclassModal, setShowMasterclassModal] = useState(false);
-  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [showScheduleCallModal, setShowScheduleCallModal] = useState(false);
   const [selectedOrganiserId, setSelectedOrganiserId] = useState<string>('');
-  const [revisionWhen, setRevisionWhen] = useState<string>(''); // datetime-local string
+  const [callWhen, setCallWhen] = useState<string>(''); // datetime-local string
 
   useEffect(() => {
     if (!currentUser) {
@@ -121,11 +121,13 @@ const DashboardPage: React.FC = () => {
 
     // After first cube and masterclass confirmed => prompt to schedule revision call
     if (
-      currentUser.onboardingStatus ===
+      (currentUser.onboardingStatus ===
         OnboardingStatus.AWAITING_REVISION_CALL &&
-      !progress.revisionCallScheduledAt
+      !progress.revisionCallScheduledAt) || 
+      (currentUser.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL &&
+      !progress.onboardingCallScheduledAt)
     ) {
-      setShowRevisionModal(true);
+      setShowScheduleCallModal(true);
       return;
     }
 
@@ -139,7 +141,7 @@ const DashboardPage: React.FC = () => {
     }
 
     setShowMasterclassModal(false);
-    setShowRevisionModal(false);
+    setShowScheduleCallModal(false);
   }, [currentUser]);
 
   const dashboardData = useMemo(() => {
@@ -326,7 +328,11 @@ const DashboardPage: React.FC = () => {
                     confirmWatchedMasterclass(currentUser.id);
                     setShowMasterclassModal(false);
                     // If this advances to revision phase, open scheduling
-                    setTimeout(() => setShowRevisionModal(true), 0);
+                    setTimeout(() => {
+                      if (currentUser?.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL) {
+                        setShowScheduleCallModal(true);
+                      }
+                    }, 0);
                   }}
                   className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover"
                 >
@@ -343,11 +349,11 @@ const DashboardPage: React.FC = () => {
           </Modal>
         )}
 
-        {showRevisionModal && currentUser && (
+        {showScheduleCallModal && currentUser && (
           <Modal
-            title="Schedule Revision Call"
-            description="Pick an organiser and time for your revision call."
-            onClose={() => setShowRevisionModal(false)}
+            title={currentUser.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL ? "Schedule Revision Call" : "Schedule Onboarding Call"}
+            description="Pick an organiser and time for your call."
+            onClose={() => setShowScheduleCallModal(false)}
             size="md"
           >
             <div className="space-y-4">
@@ -382,39 +388,40 @@ const DashboardPage: React.FC = () => {
               </div>
               <div>
                 <label
-                  htmlFor="revision-datetime"
+                  htmlFor="call-datetime"
                   className="mb-1 block text-sm font-semibold text-black"
                 >
                   Date & Time
                 </label>
                 <input
-                  id="revision-datetime"
+                  id="call-datetime"
                   type="datetime-local"
-                  value={revisionWhen}
-                  onChange={(e) => setRevisionWhen(e.target.value)}
+                  value={callWhen}
+                  onChange={(e) => setCallWhen(e.target.value)}
                   className="w-full border-2 border-black bg-white p-2"
                 />
               </div>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
-                    if (!selectedOrganiserId || !revisionWhen) return;
-                    scheduleRevisionCall(
-                      currentUser.id,
-                      selectedOrganiserId,
-                      new Date(revisionWhen)
-                    );
-                    setShowRevisionModal(false);
+                    if (!selectedOrganiserId || !callWhen) return;
+                    if(currentUser.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL){
+                      scheduleRevisionCall(
+                        currentUser.id,
+                        selectedOrganiserId,
+                        new Date(callWhen)
+                      );
+                    } else {
+                       scheduleOnboardingCall(currentUser.id, selectedOrganiserId, new Date(callWhen));
+                    }
+                    setShowScheduleCallModal(false);
                   }}
-                  disabled={!selectedOrganiserId || !revisionWhen}
+                  disabled={!selectedOrganiserId || !callWhen}
                   className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover disabled:opacity-50"
                 >
                   Schedule
                 </button>
-                <button
-                  onClick={() => setShowRevisionModal(false)}
-                  className="border-2 border-black bg-white px-4 py-2 font-semibold"
-                >
+                <button onClick={() => setShowScheduleCallModal(false)} className="border-2 border-black bg-white px-4 py-2 font-semibold">
                   Cancel
                 </button>
               </div>
