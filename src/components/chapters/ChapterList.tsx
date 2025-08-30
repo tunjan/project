@@ -195,7 +195,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             <div className="mb-1 block text-sm font-bold text-black">
               View Mode
             </div>
-            <div className="flex h-[42px] border-2 border-black">
+            <div className="flex border-2 border-black">
               <button
                 onClick={() => setViewMode('list')}
                 className={`flex-1 p-2 text-sm font-bold transition-colors ${

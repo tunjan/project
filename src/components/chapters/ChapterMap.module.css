@@ -1,42 +1,6 @@
 /* CRITICAL FIX: Replace brittle DOM manipulation with proper CSS modules */
 
-/* Custom Leaflet popup styles */
-.chapterMapContainer :global(.leaflet-popup) {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  filter: none !important;
-  z-index: 30 !important;
-}
-
-.chapterMapContainer :global(.leaflet-popup-content-wrapper) {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-.chapterMapContainer :global(.leaflet-popup-tip) {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-/* Ensure proper z-index for map elements */
-.chapterMapContainer :global(.leaflet-tile),
-.chapterMapContainer :global(.leaflet-overlay-pane),
-.chapterMapContainer :global(.leaflet-marker-pane),
-.chapterMapContainer :global(.leaflet-pane) {
-  z-index: 30 !important;
-}
-
-/* Custom marker icon styles */
-.chapterMapContainer :global(.custom-marker-icon) {
-  background: transparent !important;
-  border: none !important;
-}
-
-/* Popup content styling */
-.chapterMapContainer :global(.leaflet-popup-content) {
-  margin: 0 !important;
-  padding: 0 !important;
-  min-width: 200px;
+/* Map container styling */
+.chapterMapContainer {
+  /* Add any container-specific styles here if needed */
 }
