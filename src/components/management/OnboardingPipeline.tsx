@@ -2,13 +2,17 @@ import React from 'react';
 import { type User, OnboardingStatus, EventStatus } from '@/types';
 import { useEvents } from '@/store';
 import Tag from '@/components/ui/Tag';
+import Avatar from '@/components/ui/Avatar';
 
 interface OnboardingCardProps {
   user: User;
   onNavigate: (user: User) => void;
 }
 
-const OnboardingCard: React.FC<OnboardingCardProps> = ({ user, onNavigate }) => {
+const OnboardingCard: React.FC<OnboardingCardProps> = ({
+  user,
+  onNavigate,
+}) => {
   const allEvents = useEvents();
 
   const upcomingRsvp = allEvents.find(
@@ -20,11 +24,19 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({ user, onNavigate }) => 
   return (
     <div
       onClick={() => onNavigate(user)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onNavigate(user);
+        }
+      }}
+      role="button"
+      tabIndex={0}
       className="cursor-pointer border-2 border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal"
     >
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center space-x-3">
-          <img
+          <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
             className="h-10 w-10 flex-shrink-0 object-cover"
@@ -35,16 +47,25 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({ user, onNavigate }) => 
               {user.chapters?.join(', ') || 'No chapters'}
             </p>
             <div className="mt-1.5 flex flex-wrap gap-1">
-              {user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL &&
+              {user.onboardingStatus ===
+                OnboardingStatus.PENDING_ONBOARDING_CALL &&
                 user.onboardingProgress?.revisionCallScheduledAt && (
-                  <Tag variant="info" size="sm">Call Scheduled</Tag>
+                  <Tag variant="info" size="sm">
+                    Call Scheduled
+                  </Tag>
                 )}
-              {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE && upcomingRsvp && (
-                <Tag variant="success" size="sm">RSVP'd</Tag>
-              )}
-              {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
+              {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
+                upcomingRsvp && (
+                  <Tag variant="success" size="sm">
+                    RSVP'd
+                  </Tag>
+                )}
+              {user.onboardingStatus ===
+                OnboardingStatus.AWAITING_REVISION_CALL &&
                 user.onboardingProgress?.revisionCallScheduledAt && (
-                  <Tag variant="info" size="sm">Call Scheduled</Tag>
+                  <Tag variant="info" size="sm">
+                    Call Scheduled
+                  </Tag>
                 )}
             </div>
           </div>
@@ -70,7 +91,7 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
       {title}{' '}
       <span className="font-normal text-neutral-500">({users.length})</span>
     </h3>
-    <div className="h-[60vh] space-y-2 overflow-y-auto p-2">
+    <div className="max-h-[60vh] min-h-[40vh] space-y-2 overflow-y-auto p-2">
       {users.length > 0 ? (
         users.map((user) => (
           <OnboardingCard key={user.id} user={user} onNavigate={onNavigate} />
@@ -108,10 +129,12 @@ const OnboardingPipeline: React.FC<OnboardingPipelineProps> = ({
   const awaitingRevisionCall = users.filter(
     (u) => u.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
   );
-  const denied = users.filter((u) => u.onboardingStatus === OnboardingStatus.DENIED);
+  const denied = users.filter(
+    (u) => u.onboardingStatus === OnboardingStatus.DENIED
+  );
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6">
       <PipelineColumn
         title="Application Review"
         users={pendingReview}

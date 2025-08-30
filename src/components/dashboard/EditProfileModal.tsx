@@ -4,6 +4,7 @@ import Modal from '@/components/ui/Modal';
 import { UsersIcon } from '@/icons';
 import { InputField } from '@/components/ui/Form';
 import Avatar from '@/components/ui/Avatar';
+import { generateRandomAvatarUrl } from '../../utils/user';
 
 interface EditProfileModalProps {
   user: User;
@@ -37,7 +38,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   );
 
   const handleGenerateAvatar = () => {
-    const newUrl = `https://i.pravatar.cc/150?u=${Date.now()}`;
+    const newUrl = generateRandomAvatarUrl(150);
     setProfilePictureUrl(newUrl);
   };
 
@@ -92,7 +93,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setName(e.target.value)
           }
-          autoFocus
         />
         <InputField
           label="Instagram Handle"
@@ -149,7 +149,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             Permanently delete your account and all associated data. This action
             cannot be undone.
           </p>
-          <button onClick={onDeactivate} className="btn-danger w-full">
+          <button onClick={onDeactivate} className="btn-outline w-full">
             Delete My Account
           </button>
         </div>

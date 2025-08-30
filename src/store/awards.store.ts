@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { type BadgeAward, type BadgeTemplate, type User, type EarnedBadge, NotificationType } from '@/types';
+import {
+  type BadgeAward,
+  type BadgeTemplate,
+  type User,
+  type EarnedBadge,
+  NotificationType,
+} from '@/types';
 import { processedBadgeAwards } from './initialData';
 import { useNotificationsStore } from './notifications.store';
 
@@ -9,8 +15,15 @@ export interface AwardsState {
 }
 
 export interface AwardsActions {
-  awardBadge: (awarder: User, recipient: User, badgeTemplate: BadgeTemplate) => void;
-  respondToBadgeAward: (awardId: string, response: 'Accepted' | 'Rejected') => void;
+  awardBadge: (
+    awarder: User,
+    recipient: User,
+    badgeTemplate: BadgeTemplate
+  ) => void;
+  respondToBadgeAward: (
+    awardId: string,
+    response: 'Accepted' | 'Rejected'
+  ) => void;
 }
 
 export const useAwardsStore = create<AwardsState & AwardsActions>()(
@@ -51,7 +64,9 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
             // Add badge to user - handled via cross-store communication
             import('./users.store').then(({ useUsersStore }) => {
               const usersStore = useUsersStore.getState();
-              const user = usersStore.users.find(u => u.id === award!.recipient.id);
+              const user = usersStore.users.find(
+                (u) => u.id === award!.recipient.id
+              );
               if (user) {
                 const newBadge: EarnedBadge = {
                   id: `badge_${Date.now()}`,
@@ -71,9 +86,10 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
         if (award) {
           useNotificationsStore.getState().addNotification({
             userId: award.awarder.id,
-            type: response === 'Accepted'
-              ? NotificationType.BADGE_AWARD_ACCEPTED
-              : NotificationType.BADGE_AWARD_REJECTED,
+            type:
+              response === 'Accepted'
+                ? NotificationType.BADGE_AWARD_ACCEPTED
+                : NotificationType.BADGE_AWARD_REJECTED,
             message: `${award.recipient.name} has ${response.toLowerCase()} the "${award.badge.name}" badge.`,
             linkTo: `/members/${award.recipient.id}`,
             relatedUser: award.recipient,
@@ -87,7 +103,10 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
 
 export const useAwardsState = () => useAwardsStore((s) => s.badgeAwards);
 export const useAwardsActions = () =>
-  useAwardsStore((s) => ({ awardBadge: s.awardBadge, respondToBadgeAward: s.respondToBadgeAward }));
+  useAwardsStore((s) => ({
+    awardBadge: s.awardBadge,
+    respondToBadgeAward: s.respondToBadgeAward,
+  }));
 
 // Selectors
 export const useBadgeAwardsForUser = (userId?: string) =>
@@ -97,5 +116,3 @@ export const useBadgeAwardsForUser = (userId?: string) =>
       (award) => award.recipient.id === userId && award.status === 'Pending'
     );
   });
-
-

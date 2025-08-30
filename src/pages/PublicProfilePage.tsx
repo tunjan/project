@@ -31,10 +31,6 @@ const PublicProfilePage: React.FC = () => {
   };
 
   // Debug logging
-  console.log('PublicProfilePage - userId:', userId);
-  console.log('PublicProfilePage - user found:', user);
-  console.log('PublicProfilePage - all users count:', allUsers.length);
-  console.log('PublicProfilePage - all users:', allUsers);
 
   if (!user) {
     return (
@@ -42,7 +38,7 @@ const PublicProfilePage: React.FC = () => {
         <div className="text-center">
           <LoadingSpinner size="lg" />
           <p className="text-grey-600 mt-4">Loading profile...</p>
-          <p className="text-white mt-2 text-sm">
+          <p className="mt-2 text-sm text-white">
             User ID: {userId} | Total users: {allUsers.length}
           </p>
 

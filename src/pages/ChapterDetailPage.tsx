@@ -24,6 +24,7 @@ import {
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
 import InventoryDisplay from '@/components/charts/InventoryDisplay';
+import Avatar from '@/components/ui/Avatar';
 import { toast } from 'sonner';
 
 const StatCard: React.FC<{
@@ -51,7 +52,7 @@ const MemberCard: React.FC<{
     onClick={() => onMemberClick(member)}
     className="flex w-full items-center space-x-3 p-2 text-left transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-black"
   >
-    <img
+    <Avatar
       src={member.profilePictureUrl}
       alt={member.name}
       className="h-10 w-10 object-cover"

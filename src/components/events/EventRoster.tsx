@@ -1,21 +1,12 @@
 import React, { useMemo } from 'react';
 import { TourDutyRole, User, CubeEvent } from '@/types';
 import { Link } from 'react-router-dom';
+import { getDatesBetween } from '@/utils/date';
+import Avatar from '@/components/ui/Avatar';
 
 interface EventRosterProps {
   event: CubeEvent;
 }
-
-const getDatesBetween = (start: Date, end: Date): Date[] => {
-  const dates = [];
-  const currentDate = new Date(new Date(start).toISOString().split('T')[0]);
-  const lastDate = new Date(new Date(end).toISOString().split('T')[0]);
-  while (currentDate <= lastDate) {
-    dates.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  return dates;
-};
 
 const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
   const eventDays = useMemo(() => {
@@ -87,7 +78,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
                             to={`/members/${user.id}`}
                             className="flex items-center space-x-1.5 rounded-none bg-white p-1 transition-colors hover:bg-white"
                           >
-                            <img
+                            <Avatar
                               src={user.profilePictureUrl}
                               alt={user.name}
                               className="h-5 w-5 object-cover"

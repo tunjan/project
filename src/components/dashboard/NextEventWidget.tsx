@@ -14,11 +14,17 @@ const Countdown: React.FC<{ date: Date }> = ({ date }) => {
       setCountdown(distance);
     };
 
+    // Calculate immediately
     calculateCountdown();
+
+    // Set up interval
     const interval = setInterval(calculateCountdown, 1000 * 60); // Update every minute
 
-    return () => clearInterval(interval);
-  }, [date]);
+    // CRITICAL FIX: Ensure interval is cleared on cleanup or when date changes
+    return () => {
+      clearInterval(interval);
+    };
+  }, [date]); // date dependency ensures effect runs when date changes
 
   return <span className="font-bold text-primary">{countdown}</span>;
 };
@@ -29,14 +35,24 @@ const UpcomingEventCard: React.FC<{
   isNext?: boolean;
 }> = ({ event, onManage, isNext }) => (
   <div
-    className={`card-brutal card-padding ${isNext ? 'bg-primary-lightest' : ''}`}
+    className={`card-brutal card-padding cursor-pointer transition-all hover:scale-[1.02] hover:shadow-brutal-lg ${isNext ? 'bg-primary-lightest' : ''}`}
+    onClick={onManage}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onManage();
+      }
+    }}
+    role="button"
+    tabIndex={0}
+    aria-label={`Manage event: ${event.location} in ${event.city}`}
   >
     {isNext && (
       <div className="mb-2 text-sm font-bold text-primary">
         NEXT EVENT <ClockIcon className="ml-1 inline-block h-4 w-4" />
       </div>
     )}
-    <div className="flex items-start justify-between">
+    <div className="flex justify-between">
       <div className="flex items-start gap-4">
         <CalendarIcon className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
         <div>
@@ -63,9 +79,6 @@ const UpcomingEventCard: React.FC<{
           </div>
         </div>
       </div>
-      <button onClick={onManage} className="btn-primary btn-sm self-center">
-        Manage
-      </button>
     </div>
   </div>
 );

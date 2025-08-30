@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { type Chapter, type ChapterJoinRequest, type User, NotificationType } from '@/types';
+import {
+  type Chapter,
+  type ChapterJoinRequest,
+  type User,
+  NotificationType,
+} from '@/types';
 import { initialChapters } from './initialData';
 import { useNotificationsStore } from './notifications.store';
 import { useUsersStore } from './users.store';
@@ -42,17 +47,23 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
         // Clean up user references to the deleted chapter
         const usersStore = useUsersStore.getState();
         const usersToUpdate = usersStore.users.filter(
-          (u) => u.chapters.includes(chapterName) || u.organiserOf?.includes(chapterName)
+          (u) =>
+            u.chapters.includes(chapterName) ||
+            u.organiserOf?.includes(chapterName)
         );
 
         usersToUpdate.forEach((user) => {
           // Remove chapter from user's chapters array
-          const updatedChapters = user.chapters.filter((c) => c !== chapterName);
+          const updatedChapters = user.chapters.filter(
+            (c) => c !== chapterName
+          );
           usersStore.updateUserChapters(user.id, updatedChapters);
 
           // Remove chapter from user's organiserOf array if it exists
           if (user.organiserOf && user.organiserOf.includes(chapterName)) {
-            const updatedOrganiserOf = user.organiserOf.filter((c) => c !== chapterName);
+            const updatedOrganiserOf = user.organiserOf.filter(
+              (c) => c !== chapterName
+            );
             usersStore.updateUserOrganiserOf(user.id, updatedOrganiserOf);
           }
         });
@@ -79,10 +90,12 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
         // Notify chapter organizers instead of the requesting user
         const allUsers = useUsersStore.getState().users;
         const chapterOrganizers = allUsers.filter(
-          (u) => u.role === 'Chapter Organiser' && u.organiserOf?.includes(chapterName)
+          (u) =>
+            u.role === 'Chapter Organiser' &&
+            u.organiserOf?.includes(chapterName)
         );
 
-        const notificationsToCreate = chapterOrganizers.map(org => ({
+        const notificationsToCreate = chapterOrganizers.map((org) => ({
           userId: org.id,
           type: NotificationType.CHAPTER_JOIN_REQUEST,
           message: `${user.name} has requested to join the ${chapterName} chapter.`,
@@ -91,24 +104,32 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
         }));
 
         if (notificationsToCreate.length > 0) {
-          useNotificationsStore.getState().addNotifications(notificationsToCreate);
+          useNotificationsStore
+            .getState()
+            .addNotifications(notificationsToCreate);
         }
       },
 
       approveChapterJoinRequest: (requestId, approver) => {
-        const request = get().chapterJoinRequests.find((r) => r.id === requestId);
+        const request = get().chapterJoinRequests.find(
+          (r) => r.id === requestId
+        );
         if (!request) return;
 
         // Remove the request from the queue after approving it to reflect a processed queue
         set((state) => ({
-          chapterJoinRequests: state.chapterJoinRequests.filter((r) => r.id !== requestId),
+          chapterJoinRequests: state.chapterJoinRequests.filter(
+            (r) => r.id !== requestId
+          ),
         }));
 
         // Update user's chapters
         const usersStore = useUsersStore.getState();
-        const user = usersStore.users.find(u => u.id === request.user.id);
+        const user = usersStore.users.find((u) => u.id === request.user.id);
         if (user) {
-          const newChapters = [...new Set([...user.chapters, request.chapterName])];
+          const newChapters = [
+            ...new Set([...user.chapters, request.chapterName]),
+          ];
           usersStore.updateUserChapters(user.id, newChapters);
         }
 
@@ -138,7 +159,8 @@ export const useChaptersStore = create<ChaptersState & ChaptersActions>()(
 );
 
 export const useChaptersState = () => useChaptersStore((s) => s.chapters);
-export const useChapterJoinRequests = () => useChaptersStore((s) => s.chapterJoinRequests);
+export const useChapterJoinRequests = () =>
+  useChaptersStore((s) => s.chapterJoinRequests);
 export const useChaptersActions = () =>
   useChaptersStore((s) => ({
     createChapter: s.createChapter,
@@ -155,9 +177,7 @@ export const useChapterByName = (chapterName?: string) =>
   useChaptersStore((s) =>
     chapterName
       ? s.chapters.find(
-        (c) => c.name.toLowerCase() === chapterName.toLowerCase()
-      )
+          (c) => c.name.toLowerCase() === chapterName.toLowerCase()
+        )
       : undefined
   );
-
-

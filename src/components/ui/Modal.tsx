@@ -39,6 +39,12 @@ const Modal: React.FC<ModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            onClose();
+          }
+        }}
+        tabIndex={-1}
       >
         <div
           className={`relative my-4 w-full border-2 border-black bg-white ${
@@ -55,8 +61,10 @@ const Modal: React.FC<ModalProps> = ({
                       : 'max-w-lg'
           }`}
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          role="document"
         >
-          <div className="flex items-start justify-between border-b border-black p-6">
+          <div className="flex justify-between border-b border-black p-6">
             <div>
               <h2
                 id="modal-title"

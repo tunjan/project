@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Global Search */}
-        <div className="px-4 mb-4">
+        <div className="mb-4 px-4">
           <SidebarSearch />
         </div>
 

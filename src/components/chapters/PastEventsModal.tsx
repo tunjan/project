@@ -44,7 +44,10 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
           </h4>
           <ul className="max-h-48 space-y-3 overflow-y-auto">
             {event.participants.map((p) => (
-              <li key={p.user.id} className="flex items-center space-x-3">
+              <li
+                key={`${event.id}-${p.user.id}`}
+                className="flex items-center space-x-3"
+              >
                 <img
                   src={p.user.profilePictureUrl}
                   alt={p.user.name}
@@ -54,7 +57,7 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
                   <p className="text-sm font-semibold text-black">
                     {p.user.name}
                   </p>
-                                    <p className="text-xs text-neutral-500">{p.user.role}</p>
+                  <p className="text-xs text-neutral-500">{p.user.role}</p>
                 </div>
               </li>
             ))}

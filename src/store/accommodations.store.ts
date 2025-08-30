@@ -51,13 +51,22 @@ export const useAccommodationsStore = create<
         });
       },
 
-      respondToAccommodationRequest: (requestId, response, host, replyMessage) => {
+      respondToAccommodationRequest: (
+        requestId,
+        response,
+        host,
+        replyMessage
+      ) => {
         set((state) => ({
           accommodationRequests: state.accommodationRequests.map((req) =>
-            req.id === requestId ? { ...req, status: response, hostReply: replyMessage } : req
+            req.id === requestId
+              ? { ...req, status: response, hostReply: replyMessage }
+              : req
           ),
         }));
-        const request = get().accommodationRequests.find((r) => r.id === requestId);
+        const request = get().accommodationRequests.find(
+          (r) => r.id === requestId
+        );
         if (request) {
           const notifType =
             response === 'Accepted'
@@ -84,5 +93,3 @@ export const useAccommodationsActions = () =>
     createAccommodationRequest: s.createAccommodationRequest,
     respondToAccommodationRequest: s.respondToAccommodationRequest,
   }));
-
-

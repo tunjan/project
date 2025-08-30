@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   type User,
   type Chapter,
@@ -8,6 +8,7 @@ import {
 } from '@/types';
 import { SearchIcon, ChevronRightIcon } from '@/icons';
 import { SelectField } from '@/components/ui/Form';
+import Avatar from '@/components/ui/Avatar';
 
 interface MemberDirectoryProps {
   members: User[];
@@ -32,7 +33,7 @@ const MemberRow: React.FC<{
       className="group flex w-full items-center justify-between p-4 text-left transition-colors duration-200 hover:bg-neutral-100"
     >
       <div className="flex items-center space-x-4">
-        <img
+        <Avatar
           src={user.profilePictureUrl}
           alt={user.name}
           className="h-10 w-10 object-cover"
@@ -77,34 +78,52 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
     OnboardingStatus | 'all'
   >('all');
 
-  const filteredMembers = members
-    .filter((member) =>
-      member.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter((member) => {
-      if (selectedChapter === 'all') return true;
+  // ✨ PERFORMANCE OPTIMIZATION: Memoize the filtered members list
+  const filteredMembers = useMemo(() => {
+    // Combine members with pending request users
+    const allUsers = [
+      ...members,
+      ...pendingRequests
+        .filter((req) => req.status === 'Pending')
+        .map((req) => req.user),
+    ];
 
-      // Check if user is already a member of the selected chapter
-      const isAlreadyMember = member.chapters?.includes(selectedChapter);
+    return allUsers
+      .filter((user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .filter((user) => {
+        if (selectedChapter === 'all') return true;
 
-      // Check if there's a pending request for this member and chapter
-      const hasPendingRequestForChapter = pendingRequests.some(
-        (req) =>
-          req.user.id === member.id &&
-          req.chapterName === selectedChapter &&
-          req.status === 'Pending'
-      );
+        // Check if user is already a member of the selected chapter
+        const isAlreadyMember = user.chapters?.includes(selectedChapter);
 
-      return isAlreadyMember || hasPendingRequestForChapter;
-    })
-    .filter((member) => {
-      if (selectedRole === 'all') return true;
-      return member.role === selectedRole;
-    })
-    .filter((member) => {
-      if (selectedStatus === 'all') return true;
-      return member.onboardingStatus === selectedStatus;
-    });
+        // Check if there's a pending request for this user and chapter
+        const hasPendingRequestForChapter = pendingRequests.some(
+          (req) =>
+            req.user.id === user.id &&
+            req.chapterName === selectedChapter &&
+            req.status === 'Pending'
+        );
+
+        return isAlreadyMember || hasPendingRequestForChapter;
+      })
+      .filter((user) => {
+        if (selectedRole === 'all') return true;
+        return user.role === selectedRole;
+      })
+      .filter((user) => {
+        if (selectedStatus === 'all') return true;
+        return user.onboardingStatus === selectedStatus;
+      });
+  }, [
+    members,
+    searchTerm,
+    selectedChapter,
+    selectedRole,
+    selectedStatus,
+    pendingRequests,
+  ]);
 
   return (
     <div className="border-2 border-black bg-white">
@@ -171,7 +190,11 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       </div>
       <div className="border-b-2 border-black bg-neutral-100 p-2 text-center text-sm font-semibold">
         <p>
-          Showing {filteredMembers.length} of {members.length} members
+          Showing {filteredMembers.length} of{' '}
+          {members.length +
+            pendingRequests.filter((req) => req.status === 'Pending')
+              .length}{' '}
+          members
         </p>
       </div>
       {filteredMembers.length > 0 ? (
@@ -181,8 +204,9 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
               const isPendingForCurrentChapter = pendingRequests.some(
                 (req) =>
                   req.user.id === user.id &&
-                  req.chapterName === selectedChapter &&
-                  req.status === 'Pending'
+                  req.status === 'Pending' &&
+                  (selectedChapter === 'all' ||
+                    req.chapterName === selectedChapter)
               );
               return (
                 <MemberRow

@@ -31,7 +31,7 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
 }) => {
   return (
     <div className="p-4 transition-colors hover:bg-neutral-50">
-      <div className="flex items-start justify-between">
+      <div className="flex justify-between">
         <div className="flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <p className="font-bold text-black">

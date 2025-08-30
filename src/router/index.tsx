@@ -27,7 +27,7 @@ const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
 const SignUpPage = React.lazy(() => import('@/pages/SignUpPage'));
 const SignUpSuccessPage = React.lazy(() => import('@/pages/SignUpSuccessPage'));
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
-const VerificationPage = React.lazy(() => import('@/pages/VerificationPage'));
+
 const LeaderboardPage = React.lazy(() => import('@/pages/LeaderboardPage'));
 const PublicProfilePage = React.lazy(() => import('@/pages/PublicProfilePage'));
 const ApplicantStatusPage = React.lazy(
@@ -134,14 +134,7 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-          {
-            path: 'verify/:userId',
-            element: (
-              <ProtectedRoute requiredRole="organizer" requireFullAccess>
-                <VerificationPage />
-              </ProtectedRoute>
-            ),
-          },
+
           {
             path: 'outreach',
             element: (

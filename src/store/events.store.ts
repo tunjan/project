@@ -21,20 +21,34 @@ export interface EventsState {
 
 export interface EventsActions {
   createEvent: (
-    eventData: Omit<CubeEvent, 'id' | 'organizer' | 'participants' | 'status' | 'report'>,
+    eventData: Omit<
+      CubeEvent,
+      'id' | 'organizer' | 'participants' | 'status' | 'report'
+    >,
     organizer: User
   ) => void;
   updateEvent: (
     eventId: string,
-    updateData: Partial<Pick<CubeEvent, 'city' | 'location' | 'startDate' | 'endDate'>>,
+    updateData: Partial<
+      Pick<CubeEvent, 'city' | 'location' | 'startDate' | 'endDate'>
+    >,
     currentUser?: User
   ) => void;
   cancelEvent: (eventId: string, reason: string, currentUser: User) => void;
-  rsvp: (eventId: string, currentUser: User, isGuest: boolean, duties?: TourDuty[]) => void;
+  rsvp: (
+    eventId: string,
+    currentUser: User,
+    isGuest: boolean,
+    duties?: TourDuty[]
+  ) => void;
   cancelRsvp: (eventId: string, currentUser: User) => void;
   approveRsvp: (eventId: string, guestId: string, currentUser: User) => void;
   denyRsvp: (eventId: string, guestId: string, currentUser: User) => void;
-  removeParticipant: (eventId: string, participantUserId: string, currentUser: User) => void;
+  removeParticipant: (
+    eventId: string,
+    participantUserId: string,
+    currentUser: User
+  ) => void;
   logEventReport: (eventId: string, report: EventReport) => void;
 }
 
@@ -58,7 +72,9 @@ export const useEventsStore = create<EventsState & EventsActions>()(
 
       updateEvent: (eventId, updateData, currentUser) => {
         set((state) => ({
-          events: state.events.map((e) => (e.id === eventId ? { ...e, ...updateData } : e)),
+          events: state.events.map((e) =>
+            e.id === eventId ? { ...e, ...updateData } : e
+          ),
         }));
 
         const event = get().events.find((e) => e.id === eventId);
@@ -70,7 +86,13 @@ export const useEventsStore = create<EventsState & EventsActions>()(
       cancelEvent: (eventId, reason, currentUser) => {
         set((state) => ({
           events: state.events.map((e) =>
-            e.id === eventId ? { ...e, status: EventStatus.CANCELLED, cancellationReason: reason } : e
+            e.id === eventId
+              ? {
+                  ...e,
+                  status: EventStatus.CANCELLED,
+                  cancellationReason: reason,
+                }
+              : e
           ),
         }));
 
@@ -86,15 +108,21 @@ export const useEventsStore = create<EventsState & EventsActions>()(
             linkTo: `/cubes/${event.id}`,
             relatedUser: currentUser,
           }));
-        useNotificationsStore.getState().addNotifications(notificationsToCreate);
+        useNotificationsStore
+          .getState()
+          .addNotifications(notificationsToCreate);
       },
 
       rsvp: (eventId, currentUser, isGuest, duties) => {
-        const status = isGuest ? ParticipantStatus.PENDING : ParticipantStatus.ATTENDING;
+        const status = isGuest
+          ? ParticipantStatus.PENDING
+          : ParticipantStatus.ATTENDING;
         set((state) => ({
           events: state.events.map((event) => {
             if (event.id !== eventId) return event;
-            const idx = event.participants.findIndex((p) => p.user.id === currentUser.id);
+            const idx = event.participants.findIndex(
+              (p) => p.user.id === currentUser.id
+            );
             if (idx !== -1) {
               const participants = [...event.participants];
               participants[idx] = { ...participants[idx], tourDuties: duties };
@@ -127,7 +155,14 @@ export const useEventsStore = create<EventsState & EventsActions>()(
       cancelRsvp: (eventId, currentUser) => {
         set((state) => ({
           events: state.events.map((e) =>
-            e.id === eventId ? { ...e, participants: e.participants.filter((p) => p.user.id !== currentUser.id) } : e
+            e.id === eventId
+              ? {
+                  ...e,
+                  participants: e.participants.filter(
+                    (p) => p.user.id !== currentUser.id
+                  ),
+                }
+              : e
           ),
         }));
       },
@@ -142,7 +177,9 @@ export const useEventsStore = create<EventsState & EventsActions>()(
             return {
               ...e,
               participants: e.participants.map((p) =>
-                p.user.id === guestId ? { ...p, status: ParticipantStatus.ATTENDING } : p
+                p.user.id === guestId
+                  ? { ...p, status: ParticipantStatus.ATTENDING }
+                  : p
               ),
             };
           }),
@@ -163,7 +200,14 @@ export const useEventsStore = create<EventsState & EventsActions>()(
 
         set((state) => ({
           events: state.events.map((e) =>
-            e.id === eventId ? { ...e, participants: e.participants.filter((p) => p.user.id !== guestId) } : e
+            e.id === eventId
+              ? {
+                  ...e,
+                  participants: e.participants.filter(
+                    (p) => p.user.id !== guestId
+                  ),
+                }
+              : e
           ),
         }));
 
@@ -186,7 +230,9 @@ export const useEventsStore = create<EventsState & EventsActions>()(
               }
               return {
                 ...e,
-                participants: e.participants.filter((p) => p.user.id !== participantUserId),
+                participants: e.participants.filter(
+                  (p) => p.user.id !== participantUserId
+                ),
               };
             }
             return e;
@@ -194,7 +240,9 @@ export const useEventsStore = create<EventsState & EventsActions>()(
         }));
 
         const event = get().events.find((e) => e.id === eventId);
-        const removedUser = useUsersStore.getState().users.find((u) => u.id === participantUserId);
+        const removedUser = useUsersStore
+          .getState()
+          .users.find((u) => u.id === participantUserId);
         if (event && removedUser) {
           useNotificationsStore.getState().addNotification({
             userId: participantUserId,
@@ -212,8 +260,14 @@ export const useEventsStore = create<EventsState & EventsActions>()(
           const event = state.events.find((e) => e.id === eventId);
           if (!event) return state;
 
-          const updatedEvent = { ...event, report, status: EventStatus.FINISHED };
-          const updatedEvents = state.events.map((e) => (e.id === eventId ? updatedEvent : e));
+          const updatedEvent = {
+            ...event,
+            report,
+            status: EventStatus.FINISHED,
+          };
+          const updatedEvents = state.events.map((e) =>
+            e.id === eventId ? updatedEvent : e
+          );
 
           handleEventReportLogging(updatedEvent, report);
 
@@ -242,5 +296,3 @@ export const useEventsActions = () =>
 // Selectors
 export const useEventById = (eventId?: string) =>
   useEventsStore((s) => s.events.find((e) => e.id === eventId));
-
-

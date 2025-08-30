@@ -1,12 +1,25 @@
-// no React import needed with automatic JSX runtime
-import { useChallenges } from '@/store';
-import { useCurrentUser } from '@/store/auth.store';
-import ProgressBar from '@/components/ui/ProgressBar';
+import { useMemo } from 'react';
 import { TrophyIcon, CalendarIcon } from '@/icons';
+import ProgressBar from '@/components/ui/ProgressBar';
+import { Challenge } from '@/types';
+import { useCurrentUser } from '@/store/auth.store';
 
-const Challenges = () => {
-  const challenges = useChallenges();
+interface ChallengesProps {
+  challenges: Challenge[];
+}
+
+const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
   const currentUser = useCurrentUser();
+
+  // FIX: Memoize sorted participants to avoid re-sorting on every render
+  const challengesWithSortedParticipants = useMemo(() => {
+    return challenges.map((challenge) => ({
+      ...challenge,
+      sortedParticipants: [...challenge.participants].sort(
+        (a, b) => b.progress - a.progress
+      ),
+    }));
+  }, [challenges]);
 
   if (challenges.length === 0) {
     return (
@@ -19,7 +32,7 @@ const Challenges = () => {
           <h3 className="mt-4 text-xl font-bold text-black">
             No Active Challenges
           </h3>
-          <p className="text-neutral-600 mt-2">
+          <p className="mt-2 text-neutral-600">
             Check back later for new team-based challenges!
           </p>
         </div>
@@ -33,10 +46,7 @@ const Challenges = () => {
         Team-Based Challenges
       </h2>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        {challenges.map((challenge) => {
-          const sortedParticipants = [...challenge.participants].sort(
-            (a, b) => b.progress - a.progress
-          );
+        {challengesWithSortedParticipants.map((challenge) => {
           const userChapters = currentUser?.chapters || [];
 
           return (
@@ -51,7 +61,7 @@ const Challenges = () => {
                 <p className="text-grey-600 mb-4 mt-2 text-sm">
                   {challenge.description}
                 </p>
-                <div className="text-neutral-600 flex items-center text-sm">
+                <div className="flex items-center text-sm text-neutral-600">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   <span>
                     Ends: {new Date(challenge.endDate).toLocaleDateString()}
@@ -64,7 +74,7 @@ const Challenges = () => {
                   Leaderboard
                 </h4>
                 <div className="space-y-4">
-                  {sortedParticipants.map((p, index) => {
+                  {challenge.sortedParticipants.map((p, index) => {
                     const isUserChapter = userChapters.includes(p.name);
                     return (
                       <div

@@ -24,9 +24,11 @@ const ChapterRow: React.FC<{
   onSelect: () => void;
 }> = ({ chapterStats, onSelect }) => {
   return (
-    <div
+    <button
       className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal md:grid md:grid-cols-6 md:items-center"
       onClick={onSelect}
+      type="button"
+      aria-label={`View details for ${chapterStats.name} chapter`}
     >
       {/* --- Mobile & Desktop: Chapter Name --- */}
       <div className="md:col-span-2">
@@ -66,7 +68,7 @@ const ChapterRow: React.FC<{
           →
         </span>
       </p>
-    </div>
+    </button>
   );
 };
 
@@ -164,7 +166,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="Search by chapter..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="block h-[42px] w-full rounded-none border-2 border-black bg-white p-2 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -180,7 +182,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               name="region-filter"
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block w-full border-2 border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block h-[42px] w-full border-2 border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             >
               {availableRegions.map((region) => (
                 <option key={region} value={region}>
@@ -190,10 +192,10 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             </select>
           </div>
           <div className="md:col-span-1">
-            <label className="mb-1 block text-sm font-bold text-black">
+            <div className="mb-1 block text-sm font-bold text-black">
               View Mode
-            </label>
-            <div className="flex border-2 border-black">
+            </div>
+            <div className="flex h-[42px] border-2 border-black">
               <button
                 onClick={() => setViewMode('list')}
                 className={`flex-1 p-2 text-sm font-bold transition-colors ${
@@ -252,6 +254,40 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             <p>Hours</p>
             <p>Conversations</p>
           </div>
+
+          {/* Mobile Header - Show labels for mobile users */}
+          <div className="border-b-2 border-black bg-neutral-50 p-3 text-xs font-semibold text-neutral-600 md:hidden">
+            <p className="text-center">
+              Tap on a chapter row to view details. Data shown: Members, Events,
+              Hours, Conversations
+            </p>
+          </div>
+
+          {/* CRITICAL FIX: Add semantic table structure for screen readers */}
+          <table className="sr-only">
+            <thead>
+              <tr>
+                <th scope="col">Chapter</th>
+                <th scope="col">Country</th>
+                <th scope="col">Members</th>
+                <th scope="col">Events</th>
+                <th scope="col">Hours</th>
+                <th scope="col">Conversations</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAndSortedStats.map((stat) => (
+                <tr key={stat.name}>
+                  <td>{stat.name}</td>
+                  <td>{stat.country}</td>
+                  <td>{stat.memberCount}</td>
+                  <td>{stat.eventsHeld}</td>
+                  <td>{Math.round(stat.totalHours)}</td>
+                  <td>{stat.totalConversations}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           {filteredAndSortedStats.length > 0 ? (
             <div className="divide-y-2 divide-black">
               {filteredAndSortedStats.map((stat) => {

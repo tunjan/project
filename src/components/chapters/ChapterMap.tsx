@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 // Import specific functions from leaflet to avoid module issues
 import * as L from 'leaflet';
 import { type Chapter } from '@/types';
+import styles from './ChapterMap.module.css';
 
 const CustomMarkerIcon = L.divIcon({
   html: `<div style="width: 20px; height: 20px; background-color: #ef4444; border: 2px solid #000000; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
@@ -39,94 +40,8 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
   const [tileError, setTileError] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
-  // Force remove rounded corners and shadows from Leaflet popups
-  useEffect(() => {
-    const forceLeafletStyles = () => {
-      const popups = document.querySelectorAll(
-        '.leaflet-popup, .leaflet-popup-content-wrapper, .leaflet-popup-tip'
-      );
-      popups.forEach((popup) => {
-        if (popup instanceof HTMLElement) {
-          popup.style.borderRadius = '0';
-          popup.style.boxShadow = 'none';
-          popup.style.filter = 'none';
-          // Ensure popups don't have extremely high z-index
-          popup.style.zIndex = '30';
-        }
-      });
-    };
-
-    // Apply styles immediately
-    forceLeafletStyles();
-
-    // Also ensure map tiles and other elements don't have extremely high z-index
-    const mapElements = document.querySelectorAll(
-      '.leaflet-tile, .leaflet-overlay-pane, .leaflet-marker-pane, .leaflet-pane'
-    );
-    mapElements.forEach((element) => {
-      if (element instanceof HTMLElement) {
-        element.style.zIndex = '30';
-      }
-    });
-
-    // Ensure all Leaflet elements within our container have appropriate z-index
-    const container = document.querySelector('.chapter-map-container');
-    if (container) {
-      const leafletElements = container.querySelectorAll('[class*="leaflet-"]');
-      leafletElements.forEach((element) => {
-        if (element instanceof HTMLElement) {
-          element.style.zIndex = '30';
-        }
-      });
-    }
-
-    // Set up a mutation observer to catch dynamically created popups
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach((node) => {
-            if (node instanceof HTMLElement) {
-              if (
-                node.classList.contains('leaflet-popup') ||
-                node.classList.contains('leaflet-popup-content-wrapper') ||
-                node.classList.contains('leaflet-popup-tip')
-              ) {
-                forceLeafletStyles();
-              }
-              // Also check child elements
-              const popupElements = node.querySelectorAll(
-                '.leaflet-popup, .leaflet-popup-content-wrapper, .leaflet-popup-tip'
-              );
-              if (popupElements.length > 0) {
-                forceLeafletStyles();
-              }
-
-              // Check for any new Leaflet elements and set their z-index
-              const leafletElements = node.querySelectorAll(
-                '[class*="leaflet-"]'
-              );
-              leafletElements.forEach((element) => {
-                if (element instanceof HTMLElement) {
-                  element.style.zIndex = '30';
-                }
-              });
-            }
-          });
-        }
-      });
-    });
-
-    // Start observing
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Cleanup
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  // CRITICAL FIX: Removed brittle DOM manipulation and style injection
+  // Custom styles are now handled through CSS modules
 
   const chapterMarkers = useMemo(() => {
     return chapters
@@ -156,7 +71,6 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
   // Handle map ready
   const handleMapReady = () => {
     setMapReady(true);
-    console.log('Map initialized successfully');
   };
 
   // Fallback tile provider if primary fails
@@ -170,7 +84,9 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
   };
 
   return (
-    <div className="chapter-map-container relative z-30 h-[600px] w-full border-2 border-black bg-white">
+    <div
+      className={`${styles.chapterMapContainer} chapter-map-container relative z-30 h-[600px] w-full border-2 border-black bg-white`}
+    >
       {!mapReady && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-gray-100">
           <div className="text-center">

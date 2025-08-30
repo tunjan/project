@@ -112,9 +112,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
                 </div>
                 <div>
                   <p className="font-bold text-black">{badge.name}</p>
-                  <p className="text-sm text-red">
-                    {badge.description}
-                  </p>
+                  <p className="text-red text-sm">{badge.description}</p>
                 </div>
               </button>
             );

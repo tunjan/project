@@ -2,6 +2,7 @@ import { type CubeEvent, EventStatus } from '@/types';
 
 import { CalendarIcon, ClockIcon, UsersIcon } from '@/icons';
 import { safeFormatDate, safeParseDate } from '@/utils/date';
+import Avatar from '@/components/ui/Avatar';
 
 interface CubeCardProps {
   event: CubeEvent;
@@ -58,7 +59,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
         ></div>
       )}
       <div className={`p-6 ${event.scope !== 'Chapter' ? 'pt-10' : ''}`}>
-        <div className="flex items-start justify-between">
+        <div className="flex justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-primary">
               {event.city}
@@ -99,10 +100,10 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
         </div>
 
         <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
-          <img
-            className="h-10 w-10 object-cover"
+          <Avatar
             src={event.organizer.profilePictureUrl}
             alt={event.organizer.name}
+            className="h-10 w-10 object-cover"
           />
           <div className="ml-3">
             <p className="text-sm font-semibold text-black">

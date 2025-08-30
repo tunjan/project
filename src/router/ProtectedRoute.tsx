@@ -30,7 +30,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     OnboardingStatus.INACTIVE,
   ].includes(currentUser.onboardingStatus);
 
-  const isConfirmed = currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
+  const isConfirmed =
+    currentUser.onboardingStatus === OnboardingStatus.CONFIRMED;
 
   if (requireCoreAccess && !canAccessCoreApp) {
     return <Navigate to="/onboarding-status" replace />;

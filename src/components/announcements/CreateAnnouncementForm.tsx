@@ -95,7 +95,6 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            autoFocus
           />
           <TextAreaField
             label="Content"
@@ -105,12 +104,13 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             rows={8}
           />
 
-          <div className="space-y-6 border-t-2 border-black pt-6 mt-6">
+          <div className="mt-6 space-y-6 border-t-2 border-black pt-6">
             <h2 className="text-xl font-bold text-black">
               Optional: Call to Action
             </h2>
             <p className="text-sm text-gray-500">
-              Add a link to encourage users to take action. The button will only appear if a link is provided.
+              Add a link to encourage users to take action. The button will only
+              appear if a link is provided.
             </p>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <InputField

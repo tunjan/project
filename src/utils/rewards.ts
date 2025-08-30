@@ -33,6 +33,17 @@ const TIER_CONFIG: TierConfig[] = [
   },
 ];
 
+// FIX: Cache the reversed array to avoid recreating it on every function call
+const REVERSED_TIER_CONFIG = [...TIER_CONFIG].reverse();
+
+// CRITICAL FIX: Pre-compute tier progression to avoid repeated filtering/sorting
+const TIER_PROGRESSION = new Map<DiscountTierLevel, DiscountTierLevel | null>();
+TIER_CONFIG.forEach((tier, index) => {
+  const nextTier =
+    index < TIER_CONFIG.length - 1 ? TIER_CONFIG[index + 1].level : null;
+  TIER_PROGRESSION.set(tier.level, nextTier);
+});
+
 export const calculateDiscountTier = (user: User) => {
   const { stats } = user;
   const userStats = {
@@ -41,9 +52,8 @@ export const calculateDiscountTier = (user: User) => {
     hours: stats.totalHours,
   };
 
-  // FIX: Reverse the array to find the highest-ranking tier first
-  // This ensures users get the highest tier they qualify for, not just Tier 1
-  const currentTier = [...TIER_CONFIG].reverse().find((tier) =>
+  // FIX: Use cached reversed array instead of creating new one each time
+  const currentTier = REVERSED_TIER_CONFIG.find((tier) =>
     Object.entries(tier.requirements).every(([key, requiredValue]) => {
       const userValue = userStats[key as RequirementKey];
       return userValue !== undefined && userValue >= requiredValue;
@@ -56,14 +66,15 @@ export const calculateDiscountTier = (user: User) => {
     return { level, nextTier: null, progress: null };
   }
 
-  // Find the next tier using explicit rank system
-  const currentTierRank = TIER_CONFIG.find(t => t.level === level)?.rank || 0;
-  const nextTierConfig = TIER_CONFIG
-    .filter(t => t.rank > currentTierRank)
-    .sort((a, b) => a.rank - b.rank)[0];
-
-  if (!nextTierConfig) {
+  // CRITICAL FIX: Use pre-computed tier progression instead of filtering/sorting
+  const nextTierLevel = TIER_PROGRESSION.get(level);
+  if (!nextTierLevel) {
     return { level, nextTier: null, progress: null }; // Already at the highest tier
+  }
+
+  const nextTierConfig = TIER_CONFIG.find((t) => t.level === nextTierLevel);
+  if (!nextTierConfig) {
+    return { level, nextTier: null, progress: null };
   }
 
   const progress = Object.entries(nextTierConfig.requirements).reduce(

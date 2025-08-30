@@ -17,7 +17,24 @@ export const convertFileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const validateImageFile = (file: File): { isValid: boolean; error?: string } => {
+export const createImagePreview = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to create image preview'));
+      }
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
+export const validateImageFile = (
+  file: File
+): { isValid: boolean; error?: string } => {
   // Check file type
   if (!file.type.startsWith('image/')) {
     return { isValid: false, error: 'Please select an image file' };
@@ -31,19 +48,4 @@ export const validateImageFile = (file: File): { isValid: boolean; error?: strin
 
   // Check image dimensions (optional - can be implemented later)
   return { isValid: true };
-};
-
-export const createImagePreview = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        resolve(e.target.result as string);
-      } else {
-        reject(new Error('Failed to create preview'));
-      }
-    };
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsDataURL(file);
-  });
 };

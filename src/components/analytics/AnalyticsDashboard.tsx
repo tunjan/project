@@ -1,10 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
+import { useChallenges } from '@/store';
 import BarChart from './BarChart';
 import LineChart from './LineChart';
 import ScatterPlot from './ScatterPlot';
-import Histogram from './Histogram';
+import Histogram, { HistogramData } from './Histogram';
 import ChapterScorecard from './ChapterScorecard';
+import Challenges from '@/components/challenges/Challenges';
 import {
   ClockIcon,
   UsersIcon,
@@ -13,7 +15,6 @@ import {
   UserGroupIcon,
   TrendingUpIcon,
 } from '@/icons';
-import Challenges from '@/components/challenges/Challenges';
 
 interface AnalyticsDashboardProps {}
 
@@ -24,7 +25,7 @@ const TabButton: React.FC<{
 }> = ({ onClick, isActive, children }) => (
   <button
     onClick={onClick}
-    className={`-mb-px border-b-4 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors duration-200 ${
+    className={`-mb-px w-full border-b-4 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors duration-200 ${
       isActive
         ? 'border-primary text-primary'
         : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-black'
@@ -43,7 +44,7 @@ const StatCard: React.FC<{
   <div className="group relative border-2 border-black bg-white p-4">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
-      <p className="text-neutral-600 ml-3 text-sm font-semibold uppercase tracking-wider">
+      <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
         {title}
       </p>
     </div>
@@ -58,6 +59,7 @@ const StatCard: React.FC<{
 
 const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const challenges = useChallenges();
   const {
     selectedCountry,
     selectedChapter,
@@ -76,11 +78,71 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
     activistRetention,
     avgActivistsPerEvent,
     topActivists,
-        chapterOutreachStats,
+    chapterOutreachStats,
     activistHoursDistribution,
     activistConversationsDistribution,
     eventTurnoutDistribution,
   } = useAnalyticsData();
+
+  // Create proper histogram data from activist performance data
+  const activistHoursHistogramData = useMemo((): HistogramData[] => {
+    if (!activistHoursDistribution || activistHoursDistribution.length === 0)
+      return [];
+
+    // Create bins for hours distribution
+    const maxHours = Math.max(...activistHoursDistribution.map((d) => d.value));
+    if (maxHours === 0)
+      return [{ range: '0', count: activistHoursDistribution.length }];
+
+    const binSize = Math.ceil(maxHours / 5) || 1;
+    const bins = Array(5).fill(0);
+
+    activistHoursDistribution.forEach((item) => {
+      const binIndex = Math.min(Math.floor(item.value / binSize), 4);
+      bins[binIndex]++;
+    });
+
+    return bins.map((count, i) => {
+      const lower = i * binSize;
+      const upper = (i + 1) * binSize - 1;
+      return {
+        range: `${lower}-${upper}`,
+        count,
+      };
+    });
+  }, [activistHoursDistribution]);
+
+  const activistConversationsHistogramData = useMemo((): HistogramData[] => {
+    if (
+      !activistConversationsDistribution ||
+      activistConversationsDistribution.length === 0
+    )
+      return [];
+
+    // Create bins for conversations distribution
+    const maxConversations = Math.max(
+      ...activistConversationsDistribution.map((d) => d.value)
+    );
+    if (maxConversations === 0)
+      return [{ range: '0', count: activistConversationsDistribution.length }];
+
+    const binSize = Math.ceil(maxConversations / 5) || 1;
+    const bins = Array(5).fill(0);
+
+    activistConversationsDistribution.forEach((item) => {
+      const binIndex = Math.min(Math.floor(item.value / binSize), 4);
+      bins[binIndex]++;
+    });
+
+    return bins.map((count, i) => {
+      const lower = i * binSize;
+      const upper = (i + 1) * binSize - 1;
+      return {
+        range: `${lower}-${upper}`,
+        count,
+      };
+    });
+  }, [activistConversationsDistribution]);
 
   const topChaptersByHours = useMemo(
     () =>
@@ -99,7 +161,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
         <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
           Analytics: {viewTitle}
         </h1>
-        <p className="text-neutral-600 mt-3 max-w-2xl text-lg">
+        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
           Organization performance metrics and impact tracking. Use the filters
           to drill down.
         </p>
@@ -107,7 +169,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
 
       {/* Filters */}
       {/* Filters */}
-      <div className="border-2 border-black bg-white mb-8 p-6">
+      <div className="mb-8 border-2 border-black bg-white p-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label
@@ -156,7 +218,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="mb-8 border-b-2 border-black">
+      <div className="mb-8 flex border-b-2 border-black">
         <TabButton
           onClick={() => setActiveTab('overview')}
           isActive={activeTab === 'overview'}
@@ -318,7 +380,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
                 />
               </section>
             )}
-            <Challenges />
+            <Challenges challenges={challenges} />
           </div>
         )}
 
@@ -329,14 +391,14 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
             </h2>
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
               <Histogram
-                data={activistHoursDistribution}
+                data={activistHoursHistogramData}
                 title="Activist Hours Distribution"
                 xAxisLabel="Total Hours"
                 yAxisLabel="Number of Activists"
                 barColor="#ef4444" // danger-500
               />
               <Histogram
-                data={activistConversationsDistribution}
+                data={activistConversationsHistogramData}
                 title="Activist Conversations Distribution"
                 xAxisLabel="Total Conversations"
                 yAxisLabel="Number of Activists"

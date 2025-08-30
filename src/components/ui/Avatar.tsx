@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { CameraIcon } from '@/icons';
 import { validateImageFile, createImagePreview } from '@/utils/fileUpload';
 import { toast } from 'sonner';
@@ -11,20 +11,52 @@ interface AvatarProps {
   onImageChange?: (imageUrl: string) => void;
 }
 
-const DefaultAvatar: React.FC<{ className?: string }> = ({ className }) => (
-  <div
-    className={`flex items-center justify-center bg-grey-200 text-white ${className}`}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-3/5 w-3/5"
-      viewBox="0 0 24 24"
-      fill="currentColor"
+/**
+ * Generate initials from a name (e.g. "Courtney Gusikowski" -> "CG")
+ */
+const getInitials = (name?: string) => {
+  if (!name) return '';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+/**
+ * Deterministic background color generator based on name string
+ */
+const stringToColor = (str?: string) => {
+  if (!str) return '#CBD5E1'; // neutral if no name
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue} 60% 50%)`;
+};
+
+const DefaultAvatar: React.FC<{ name?: string; className?: string }> = ({
+  name,
+  className,
+}) => {
+  const initials = getInitials(name);
+  const bg = stringToColor(name);
+  return (
+    <div
+      className={`flex items-center justify-center rounded-full text-white ${className}`}
+      role="img"
+      aria-label={name ? `${name} avatar` : 'Default user avatar'}
+      style={{
+        backgroundColor: bg,
+        width: '40px',
+        height: '40px',
+        fontWeight: 700,
+        fontSize: 12,
+      }}
     >
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-    </svg>
-  </div>
-);
+      <span>{initials || 'U'}</span>
+    </div>
+  );
+};
 
 const Avatar: React.FC<AvatarProps> = ({
   src,
@@ -34,6 +66,21 @@ const Avatar: React.FC<AvatarProps> = ({
   onImageChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageErrorCount, setImageErrorCount] = useState(0);
+  const [currentSrc, setCurrentSrc] = useState<string | null | undefined>(src);
+
+  // Keep currentSrc in sync if the src prop changes (e.g., after async load or update)
+  useEffect(() => {
+    setCurrentSrc(src);
+    setImageErrorCount(0);
+  }, [src]);
+
+  const handleImageError = () => {
+    // Increment error count; after first failure we stop attempting remote loads
+    setImageErrorCount((c) => c + 1);
+    // Clear currentSrc so we render the local inline SVG fallback (initials)
+    setCurrentSrc(null);
+  };
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -67,11 +114,18 @@ const Avatar: React.FC<AvatarProps> = ({
     fileInputRef.current?.click();
   };
 
-  const avatarContent = src ? (
-    <img src={src} alt={alt} className={className} />
-  ) : (
-    <DefaultAvatar className={className} />
-  );
+  const avatarContent =
+    currentSrc && imageErrorCount === 0 ? (
+      <img
+        src={currentSrc}
+        alt={alt}
+        className={`h-10 w-10 rounded-full object-cover ${className}`}
+        onError={handleImageError}
+      />
+    ) : (
+      // Use inline initials-based fallback to avoid CORS
+      <DefaultAvatar name={alt} className={className} />
+    );
 
   if (!editable) {
     return avatarContent;

@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
 
 export const useCurrentUser = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
-  console.log('useCurrentUser called, currentUser:', currentUser);
+
   return currentUser;
 };
 export const useAuthActions = () =>

@@ -23,11 +23,14 @@ export function useAsync<T>(
     try {
       const result = await asyncFunction();
       setState({ data: result, loading: false, error: null });
-    } catch (error) { // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      setState({ data: null, loading: false, error: error as Error });
+    } catch (error) {
+      setState({
+        data: null,
+        loading: false,
+        error: error instanceof Error ? error : new Error(String(error)),
+      });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asyncFunction, ...dependencies]);
 
   useEffect(() => {
@@ -45,15 +48,17 @@ export function useAsyncCallback<T>(asyncFunction: AsyncFunction<T>) {
   });
 
   const execute = useCallback(async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const result = await asyncFunction();
       setState({ data: result, loading: false, error: null });
       return result;
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      setState({ data: null, loading: false, error: error as Error });
+      setState({
+        data: null,
+        loading: false,
+        error: error instanceof Error ? error : new Error(String(error)),
+      });
       throw error;
     }
   }, [asyncFunction]);

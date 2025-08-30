@@ -65,8 +65,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     <Modal title={title} onClose={onClose}>
       <div className="p-6">
         <div className="flex items-start space-x-4">
-          <div className={`flex-shrink-0 ${variantStyles.icon}`}>
-            <ShieldExclamationIcon className="h-6 w-6" />
+          <div className="flex-shrink-0">
+            <ShieldExclamationIcon
+              className={`h-6 w-6 ${variantStyles.icon}`}
+            />
           </div>
           <div className="flex-1">
             <p className={`mt-2 text-sm ${variantStyles.messageText}`}>

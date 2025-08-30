@@ -103,7 +103,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
             alt={currentApplicant.name}
             className="h-24 w-24 flex-shrink-0 border-2 border-black object-cover"
           />
-          <div className="grid w-full grid-cols-1 gap-4 ">
+          <div className="grid w-full grid-cols-1 gap-4">
             <ApplicantDetail
               icon={<UserCircleIcon className="h-5 w-5" />}
               label="Name"

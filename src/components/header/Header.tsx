@@ -106,8 +106,6 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-
-
       {isMenuOpen && (
         <div
           id="mobile-menu"

@@ -26,11 +26,8 @@ interface UserManagementPanelProps {
 
 const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
   user,
-  currentUser,
   canEditChapters,
   canAwardBadges,
-  onUpdateRole,
-  onSetChapterOrganiser,
   onOpenPromoteModal,
   onOpenEditChaptersModal,
   onOpenAwardBadgeModal,

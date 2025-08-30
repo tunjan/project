@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCurrentUser, useAuthActions } from '@/store/auth.store';
-import { useUsersActions } from '@/store';
 import { OnboardingStatus } from '@/types';
 import Avatar from '@/components/ui/Avatar';
 import { LogoutIcon } from '@/icons';
@@ -15,7 +14,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const { logout } = useAuthActions();
-  const { updateProfile } = useUsersActions();
 
   if (!currentUser) return null;
 
@@ -23,10 +21,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
     onLinkClick?.();
     logout();
     navigate('/login');
-  };
-
-  const handleAvatarChange = (newImageUrl: string) => {
-    updateProfile(currentUser.id, { profilePictureUrl: newImageUrl });
   };
 
   const profileLink =
@@ -64,8 +58,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
             src={currentUser.profilePictureUrl}
             alt="User profile"
             className="h-10 w-10 rounded-none border-2 border-black object-cover"
-            editable={true}
-            onImageChange={handleAvatarChange}
           />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-black">
@@ -76,12 +68,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
             </p>
           </div>
         </Link>
-        <div className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="whitespace-nowrap rounded-none bg-black px-2 py-1 text-xs text-white">
-            Click avatar to upload
-          </div>
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black"></div>
-        </div>
       </div>
       <button
         onClick={handleLogout}

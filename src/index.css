@@ -97,106 +97,106 @@
 }
 
 @layer components {
-  /* Brutalist Leaflet Popup Styling - Force Override Default Styles */
-  .leaflet-popup,
-  .leaflet-popup-content-wrapper,
-  .leaflet-popup-tip {
-    background: white !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    border: 2px solid #000000 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
+  /* Brutalist Leaflet Popup Styling - Use higher specificity instead of !important */
+  #root .leaflet-popup,
+  #root .leaflet-popup-content-wrapper,
+  #root .leaflet-popup-tip {
+    background: white;
+    box-shadow: none;
+    border-radius: 0;
+    border: 2px solid #000000;
+    padding: 0;
+    overflow: hidden;
   }
 
   /* Force remove all default shadows and borders */
-  .leaflet-popup {
-    box-shadow: none !important;
-    border: none !important;
-    background: transparent !important;
+  #root .leaflet-popup {
+    box-shadow: none;
+    border: none;
+    background: transparent;
   }
 
-  .leaflet-popup-content-wrapper {
-    box-shadow: none !important;
-    border: 2px solid #000000 !important;
-    background: white !important;
-    border-radius: 0 !important;
-    overflow: hidden !important;
+  #root .leaflet-popup-content-wrapper {
+    box-shadow: none;
+    border: 2px solid #000000;
+    background: white;
+    border-radius: 0;
+    overflow: hidden;
   }
 
-  .leaflet-popup-tip {
-    box-shadow: none !important;
-    border: 2px solid #000000 !important;
-    background: white !important;
-    border-radius: 0 !important;
+  #root .leaflet-popup-tip {
+    box-shadow: none;
+    border: 2px solid #000000;
+    background: white;
+    border-radius: 0;
   }
 
-  .leaflet-popup-content {
-    margin: 0 !important;
-    padding: 16px !important;
-    font-family: 'Libre Franklin', sans-serif !important;
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-    color: #000000 !important;
-    min-width: 200px !important;
+  #root .leaflet-popup-content {
+    margin: 0;
+    padding: 16px;
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #000000;
+    min-width: 200px;
   }
 
-  .leaflet-popup-close-button {
-    color: #000000 !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
-    padding: 8px !important;
-    right: 8px !important;
-    top: 8px !important;
-    background: white !important;
-    border: 2px solid #000000 !important;
-    border-radius: 0 !important;
-    width: 32px !important;
-    height: 32px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.2s ease !important;
-    box-shadow: none !important;
+  #root .leaflet-popup-close-button {
+    color: #000000;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px;
+    right: 8px;
+    top: 8px;
+    background: white;
+    border: 2px solid #000000;
+    border-radius: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: none;
   }
 
-  .leaflet-popup-close-button:hover {
-    background: #000000 !important;
-    color: white !important;
+  #root .leaflet-popup-close-button:hover {
+    background: #000000;
+    color: white;
   }
 
-  /* Custom Marker Styling - Ensure visibility and proper z-index */
-  .custom-marker-icon {
-    z-index: 1000 !important;
+  /* Custom Marker Styling - Use higher specificity for z-index */
+  #root .custom-marker-icon {
+    z-index: 1000;
   }
 
-  .custom-marker-icon div {
-    z-index: 1000 !important;
-    position: relative !important;
+  #root .custom-marker-icon div {
+    z-index: 1000;
+    position: relative;
   }
 
   /* Ensure marker pane has proper z-index */
-  .leaflet-marker-pane {
-    z-index: 1000 !important;
+  #root .leaflet-marker-pane {
+    z-index: 1000;
   }
 
   /* Ensure individual markers are visible */
-  .leaflet-marker {
-    z-index: 1000 !important;
+  #root .leaflet-marker {
+    z-index: 1000;
   }
 
   /* Force marker visibility */
-  .leaflet-marker-icon {
-    z-index: 1000 !important;
-    position: relative !important;
+  #root .leaflet-marker-icon {
+    z-index: 1000;
+    position: relative;
   }
 
   /* Ensure popup content follows brutalist design */
-  .leaflet-popup-content h3 {
-    font-weight: bold !important;
-    font-size: 16px !important;
-    margin: 0 0 8px 0 !important;
-    color: #000000 !important;
+  #root .leaflet-popup-content h3 {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0 0 8px 0;
+    color: #000000;
   }
 
   .leaflet-popup-content p {
@@ -463,7 +463,7 @@
     @apply bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-600;
   }
   .btn-outline {
-    @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-black hover:text-white;
+    @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-0 hover:bg-black hover:text-white;
   }
   .btn-danger {
     @apply bg-danger px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-danger-hover;

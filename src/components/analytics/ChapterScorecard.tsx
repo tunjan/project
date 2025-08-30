@@ -55,9 +55,7 @@ const ChapterScorecard: React.FC = () => {
                 <td className="p-3 text-center font-mono">
                   {data.memberCount}
                 </td>
-                <td className="p-3 text-center font-mono">
-                  {data.eventsHeld}
-                </td>
+                <td className="p-3 text-center font-mono">{data.eventsHeld}</td>
                 <td className="p-3 text-center font-mono">
                   {data.totalConversations}
                 </td>

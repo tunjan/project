@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { type User } from '@/types';
+import Avatar from '@/components/ui/Avatar';
 
 interface OnboardingQueueProps {
   applicants: User[];
@@ -22,7 +23,7 @@ const ApplicantCard: React.FC<{
     <div className="border-2 border-black bg-white">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-4">
-          <img
+          <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
             className="h-12 w-12 object-cover"
@@ -105,7 +106,7 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
 
   return (
     <div className="space-y-4">
-              {applicants.map((user) => (
+      {applicants.map((user) => (
         <ApplicantCard
           key={user.id}
           user={user}

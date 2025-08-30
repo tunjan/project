@@ -8,10 +8,14 @@ import { type User, type CubeEvent, NotificationType } from '@/types';
  * @param event - The event that has finished.
  * @param report - The event report containing attendance and hours.
  */
-export const handleEventReportLogging = (event: CubeEvent, report: CubeEvent['report']) => {
+export const handleEventReportLogging = (
+  event: CubeEvent,
+  report: CubeEvent['report']
+) => {
   // Prepare batch update for user stats
   const usersStore = useUsersStore.getState();
-  const statsUpdates: { userId: string; newStats: Partial<User['stats']> }[] = [];
+  const statsUpdates: { userId: string; newStats: Partial<User['stats']> }[] =
+    [];
 
   event.participants.forEach((participant) => {
     if (report?.attendance[participant.user.id] === 'Attended') {
@@ -35,7 +39,7 @@ export const handleEventReportLogging = (event: CubeEvent, report: CubeEvent['re
     usersStore.batchUpdateUserStats(statsUpdates);
 
     // Check for users who just completed their first cube and advance their onboarding
-    statsUpdates.forEach(update => {
+    statsUpdates.forEach((update) => {
       if (update.newStats.cubesAttended === 1) {
         usersStore.advanceOnboardingAfterEvent(update.userId);
       }

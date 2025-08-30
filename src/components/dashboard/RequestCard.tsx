@@ -5,6 +5,7 @@ import { useCurrentUser } from '@/store/auth.store';
 import { useAccommodationsActions } from '@/store';
 import { safeParseDate, safeFormatLocaleDate } from '@/utils/date';
 import Tag from '@/components/ui/Tag';
+import Avatar from '@/components/ui/Avatar';
 
 interface RequestCardProps {
   request: AccommodationRequest;
@@ -64,7 +65,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
             {isHostView ? 'Request From' : 'Request To'}
           </p>
           <div className="flex items-center space-x-2">
-            <img
+            <Avatar
               src={otherUser.profilePictureUrl}
               alt={otherUser.name}
               className="h-8 w-8 object-cover"

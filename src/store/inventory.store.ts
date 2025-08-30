@@ -4,37 +4,40 @@ import { type InventoryItem } from '@/types';
 import { initialInventory } from './initialData';
 
 interface InventoryState {
-    inventory: InventoryItem[];
+  inventory: InventoryItem[];
 }
 
 interface InventoryActions {
-    updateChapterInventory: (chapterName: string, items: InventoryItem[]) => void;
+  updateChapterInventory: (chapterName: string, items: InventoryItem[]) => void;
 }
 
 export const useInventoryStore = create<InventoryState & InventoryActions>()(
-    persist(
-        (set) => ({
-            inventory: initialInventory, // Start with initial inventory data
+  persist(
+    (set) => ({
+      inventory: initialInventory, // Start with initial inventory data
 
-            updateChapterInventory: (chapterName: string, items: InventoryItem[]) => {
-                set((state) => ({
-                    inventory: [
-                        ...state.inventory.filter(item => item.chapterName !== chapterName),
-                        ...items.map(item => ({ ...item, chapterName }))
-                    ]
-                }));
-            },
-        }),
-        { name: 'inventory-store' }
-    )
+      updateChapterInventory: (chapterName: string, items: InventoryItem[]) => {
+        set((state) => ({
+          inventory: [
+            ...state.inventory.filter(
+              (item) => item.chapterName !== chapterName
+            ),
+            ...items.map((item) => ({ ...item, chapterName })),
+          ],
+        }));
+      },
+    }),
+    { name: 'inventory-store' }
+  )
 );
 
 export const useInventoryState = () => useInventoryStore((s) => s.inventory);
-export const useInventoryActions = () => useInventoryStore((s) => ({
+export const useInventoryActions = () =>
+  useInventoryStore((s) => ({
     updateChapterInventory: s.updateChapterInventory,
-}));
+  }));
 
 export const useChapterInventory = (chapterName: string) =>
-    useInventoryStore((state) =>
-        state.inventory.filter(item => item.chapterName === chapterName)
-    );
+  useInventoryStore((state) =>
+    state.inventory.filter((item) => item.chapterName === chapterName)
+  );

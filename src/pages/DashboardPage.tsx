@@ -29,6 +29,8 @@ import {
 
 import { safeFormatLocaleDate } from '@/utils/date';
 import { toast } from 'sonner';
+import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
+import { getCityAttendanceForUser } from '@/utils/analytics';
 
 interface TaskItemProps {
   icon: React.ReactNode;
@@ -52,7 +54,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   <div
     className={`border-2 border-black bg-white p-4 ${urgent ? 'border-red bg-white' : ''}`}
   >
-    <div className="flex items-start justify-between">
+    <div className="flex justify-between">
       <div className="flex items-start gap-3">
         <div className={`${urgent ? 'text-red' : 'text-primary'}`}>{icon}</div>
         <div className="flex-1">
@@ -74,7 +76,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
       {action && (
         <button
           onClick={action}
-          className="bg-primary px-3 py-1 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+          className="bg-black px-3 py-1 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
         >
           {actionText}
         </button>
@@ -103,6 +105,7 @@ const DashboardPage: React.FC = () => {
   const [selectedOrganiserId, setSelectedOrganiserId] = useState<string>('');
   const [callWhen, setCallWhen] = useState<string>(''); // datetime-local string
   const [contactInfo, setContactInfo] = useState('');
+  const [showCityAttendanceModal, setShowCityAttendanceModal] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -149,6 +152,11 @@ const DashboardPage: React.FC = () => {
     setShowMasterclassModal(false);
     setShowScheduleCallModal(false);
   }, [currentUser]);
+
+  const cityAttendanceData = useMemo(
+    () => getCityAttendanceForUser(currentUser?.id || '', allEvents),
+    [currentUser?.id, allEvents]
+  );
 
   const dashboardData = useMemo(() => {
     if (!currentUser) return null;
@@ -483,7 +491,7 @@ const DashboardPage: React.FC = () => {
             </h2>
             {nextEvent ? (
               <div className="border-2 border-black bg-white p-6">
-                <div className="flex items-start justify-between">
+                <div className="flex justify-between">
                   <div className="flex items-start gap-4">
                     <CalendarIcon className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
                     <div>
@@ -560,16 +568,7 @@ const DashboardPage: React.FC = () => {
               stats={currentUser.stats}
               showPrivateStats={true}
               onCityClick={() => {
-                if (currentUser.stats.cities.length === 0) {
-                  toast.info(
-                    "You haven't been to any cities yet. Attend your first cube to start building your impact!"
-                  );
-                } else {
-                  toast.info(
-                    `You've been to ${currentUser.stats.cities.length} cities: ${currentUser.stats.cities.join(', ')}`
-                  );
-                  navigate('/chapters');
-                }
+                setShowCityAttendanceModal(true);
               }}
             />
           </section>
@@ -664,6 +663,15 @@ const DashboardPage: React.FC = () => {
           </section>
         </div>
       </div>
+
+      {/* City Attendance Modal */}
+      {showCityAttendanceModal && currentUser && (
+        <CityAttendanceModal
+          userName={currentUser.name}
+          attendanceData={cityAttendanceData}
+          onClose={() => setShowCityAttendanceModal(false)}
+        />
+      )}
     </div>
   );
 };

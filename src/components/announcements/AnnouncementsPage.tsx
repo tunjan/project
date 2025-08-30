@@ -73,7 +73,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
           <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
             Announcements
           </h1>
-          <p className="text-neutral-600 mx-auto mt-3 max-w-2xl text-lg">
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600">
             Stay up to date with the latest news and updates.
           </p>
         </div>
@@ -87,7 +87,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
           </button>
         )}
       </div>
-            {filteredAnnouncements.length > 0 ? (
+      {filteredAnnouncements.length > 0 ? (
         <div className="space-y-6">
           {filteredAnnouncements.map((announcement: Announcement) => (
             <AnnouncementCard
@@ -98,11 +98,11 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         </div>
       ) : (
         <div className="border-2 border-black bg-white p-8 text-center">
-          <MegaphoneIcon className="text-neutral-500 mx-auto h-12 w-12" />
+          <MegaphoneIcon className="mx-auto h-12 w-12 text-neutral-500" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No announcements yet.
           </h3>
-          <p className="text-neutral-600 mt-2">Check back later for updates.</p>
+          <p className="mt-2 text-neutral-600">Check back later for updates.</p>
         </div>
       )}
     </div>

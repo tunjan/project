@@ -8,12 +8,9 @@ export interface ChallengesState {
 }
 
 export const useChallengesStore = create<ChallengesState>()(
-  persist(
-    () => ({ challenges: processedChallenges }),
-    { name: 'challenges-store' }
-  )
+  persist(() => ({ challenges: processedChallenges }), {
+    name: 'challenges-store',
+  })
 );
 
 export const useChallengesState = () => useChallengesStore((s) => s.challenges);
-
-

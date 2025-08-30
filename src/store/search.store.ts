@@ -15,4 +15,5 @@ export const useSearchStore = create<SearchState>((set) => ({
 }));
 
 export const useIsSearchOpen = () => useSearchStore((s) => s.isOpen);
-export const useSearchActions = () => useSearchStore((s) => ({ open: s.open, close: s.close, toggle: s.toggle }));
+export const useSearchActions = () =>
+  useSearchStore((s) => ({ open: s.open, close: s.close, toggle: s.toggle }));

@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './MorphingFarmLoader.module.css';
 
 interface MorphingFarmLoaderProps {
   size?: 'sm' | 'md' | 'lg' | number; // tailwind sizes or explicit px
@@ -28,57 +29,18 @@ const MorphingFarmLoader: React.FC<MorphingFarmLoaderProps> = ({
         viewBox="0 0 128 128"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
+        style={
+          {
+            '--spin-duration': `${dur / 1200}s`,
+            '--cycle-duration': `${dur}ms`,
+            '--blink-duration': `${Math.max(1800, dur / 2)}ms`,
+            '--bob-duration': `${dur / 6}ms`,
+            '--pulse-duration': `${dur / 4}ms`,
+          } as React.CSSProperties
+        }
       >
-        <style>{`
-          .ring { transform-origin: 64px 64px; animation: spin ${dur / 1200}s linear infinite; }
-          @keyframes spin { to { transform: rotate(360deg); } }
-
-          .phase { opacity: 0; transform-origin: 64px 64px; }
-          .pig { animation: pigPhase ${dur}ms ease-in-out infinite; }
-          .cow { animation: cowPhase ${dur}ms ease-in-out infinite; }
-          .sheep { animation: sheepPhase ${dur}ms ease-in-out infinite; }
-
-          @keyframes pigPhase {
-            0% { opacity: 1; transform: scale(1); }
-            28% { opacity: 1; transform: scale(1); }
-            33% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 0; transform: scale(0.9); }
-          }
-          @keyframes cowPhase {
-            0% { opacity: 0; transform: scale(0.9); }
-            33% { opacity: 1; transform: scale(1); }
-            61% { opacity: 1; transform: scale(1); }
-            66% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 0; transform: scale(0.9); }
-          }
-          @keyframes sheepPhase {
-            0% { opacity: 0; transform: scale(0.9); }
-            66% { opacity: 1; transform: scale(1); }
-            95% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.95); }
-          }
-
-          .blinkL, .blinkR { transform-origin: center; animation: blink ${Math.max(1800, dur / 2)}ms ease-in-out infinite; }
-          @keyframes blink {
-            0%, 46%, 48%, 100% { transform: scaleY(1); }
-            47% { transform: scaleY(0.1); }
-          }
-
-          .bob { transform-origin: 64px 64px; animation: bob ${dur / 6}ms ease-in-out infinite; }
-          @keyframes bob {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-1.5px); }
-          }
-
-          .pulse { transform-origin: 64px 64px; animation: pulse ${dur / 4}ms ease-in-out infinite; }
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.35; }
-            50% { transform: scale(1.05); opacity: 0.55; }
-          }
-        `}</style>
-
         {/* Outer rotating ring for "loading" affordance */}
-        <g className="ring">
+        <g className={styles.ring}>
           <circle
             cx="64"
             cy="64"
@@ -102,12 +64,12 @@ const MorphingFarmLoader: React.FC<MorphingFarmLoaderProps> = ({
         </g>
 
         {/* Soft glow behind face */}
-        <g className="pulse">
+        <g className={styles.pulse}>
           <circle cx="64" cy="64" r="34" fill="#F3F4F680" />
         </g>
 
         {/* Pig Phase */}
-        <g className="phase pig bob">
+        <g className={`${styles.phase} ${styles.pig} ${styles.bob}`}>
           {/* head */}
           <ellipse
             cx="64"
@@ -144,15 +106,15 @@ const MorphingFarmLoader: React.FC<MorphingFarmLoaderProps> = ({
           <circle cx="58" cy="76" r="2" fill="#F48CA3" />
           <circle cx="70" cy="76" r="2" fill="#F48CA3" />
           {/* eyes */}
-          <circle className="blinkL" cx="54" cy="60" r="2" fill="#333" />
-          <circle className="blinkR" cx="74" cy="60" r="2" fill="#333" />
+          <circle className={styles.blinkL} cx="54" cy="60" r="2" fill="#333" />
+          <circle className={styles.blinkR} cx="74" cy="60" r="2" fill="#333" />
           {/* blush */}
           <circle cx="48" cy="70" r="3" fill="#F9A8D4" opacity="0.75" />
           <circle cx="80" cy="70" r="3" fill="#F9A8D4" opacity="0.75" />
         </g>
 
         {/* Cow Phase */}
-        <g className="phase cow bob">
+        <g className={`${styles.phase} ${styles.cow} ${styles.bob}`}>
           {/* head */}
           <ellipse
             cx="64"
@@ -205,8 +167,8 @@ const MorphingFarmLoader: React.FC<MorphingFarmLoaderProps> = ({
           <circle cx="60" cy="78" r="2" fill="#9A7758" />
           <circle cx="68" cy="78" r="2" fill="#9A7758" />
           {/* eyes */}
-          <circle className="blinkL" cx="54" cy="60" r="2" fill="#333" />
-          <circle className="blinkR" cx="74" cy="60" r="2" fill="#333" />
+          <circle className={styles.blinkL} cx="54" cy="60" r="2" fill="#333" />
+          <circle className={styles.blinkR} cx="74" cy="60" r="2" fill="#333" />
           {/* spots */}
           <path
             d="M76 56 C86 58, 86 70, 74 68 C70 64, 72 54, 76 56 Z"
@@ -221,7 +183,7 @@ const MorphingFarmLoader: React.FC<MorphingFarmLoaderProps> = ({
         </g>
 
         {/* Sheep Phase */}
-        <g className="phase sheep bob">
+        <g className={`${styles.phase} ${styles.sheep} ${styles.bob}`}>
           {/* fluffy head */}
           <ellipse
             cx="64"
@@ -265,8 +227,8 @@ const MorphingFarmLoader: React.FC<MorphingFarmLoaderProps> = ({
           <circle cx="60" cy="76" r="2" fill="#B79F83" />
           <circle cx="68" cy="76" r="2" fill="#B79F83" />
           {/* eyes */}
-          <circle className="blinkL" cx="54" cy="60" r="2" fill="#333" />
-          <circle className="blinkR" cx="74" cy="60" r="2" fill="#333" />
+          <circle className={styles.blinkL} cx="54" cy="60" r="2" fill="#333" />
+          <circle className={styles.blinkR} cx="74" cy="60" r="2" fill="#333" />
         </g>
       </svg>
       <span className="sr-only">Loading...</span>

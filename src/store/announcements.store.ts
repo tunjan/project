@@ -28,7 +28,9 @@ export interface AnnouncementsActions {
   deleteAnnouncement: (announcementId: string) => void;
 }
 
-export const useAnnouncementsStore = create<AnnouncementsState & AnnouncementsActions>()(
+export const useAnnouncementsStore = create<
+  AnnouncementsState & AnnouncementsActions
+>()(
   persist(
     (set) => ({
       announcements: processedAnnouncements,
@@ -68,7 +70,9 @@ export const useAnnouncementsStore = create<AnnouncementsState & AnnouncementsAc
         })),
       deleteAnnouncement: (announcementId) =>
         set((state) => ({
-          announcements: state.announcements.filter((a) => a.id !== announcementId),
+          announcements: state.announcements.filter(
+            (a) => a.id !== announcementId
+          ),
         })),
     }),
     { name: 'announcements-store' }
@@ -83,5 +87,3 @@ export const useAnnouncementsActions = () =>
     updateAnnouncement: s.updateAnnouncement,
     deleteAnnouncement: s.deleteAnnouncement,
   }));
-
-

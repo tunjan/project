@@ -94,7 +94,10 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                   const organizers =
                     chapterOrganizersMap.get(chapter.name) || [];
                   return (
-                    <li key={chapter.name} className="p-4 transition-colors hover:bg-primary-lightest">
+                    <li
+                      key={chapter.name}
+                      className="p-4 transition-colors hover:bg-primary-lightest"
+                    >
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="font-bold">{chapter.name}</span>

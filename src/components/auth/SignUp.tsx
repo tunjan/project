@@ -52,37 +52,16 @@ const SignUp: React.FC<SignUpProps> = ({
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors, touchedFields, dirtyFields },
+    formState: { errors },
   } = useForm<SignUpFormSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       chapter: defaultChapter || chapters[0]?.name || '',
     },
-    mode: 'onChange', // Enable validation on change
+    mode: 'onChange', // Change back to onChange to enable real-time validation
   });
 
-  // Watch field values to determine validation states
-  const watchedFields = watch();
-
   // Helper function to check if a field is valid using react-hook-form state
-  const isFieldValid = (fieldName: keyof SignUpFormSchema) => {
-    const fieldValue = watchedFields[fieldName];
-    const hasError = !!errors[fieldName];
-    const isTouched = touchedFields[fieldName];
-    const isDirty = dirtyFields[fieldName];
-
-    // Field is valid if it has a value, is touched/dirty, and has no errors
-    const hasValue =
-      fieldValue !== undefined && fieldValue !== '' && fieldValue !== null;
-
-    // Special case for optional instagram field
-    if (fieldName === 'instagram') {
-      return !hasError; // Always valid if no error (since it's optional)
-    }
-
-    return hasValue && (isTouched || isDirty) && !hasError;
-  };
 
   // 4. Create a submit handler that receives validated data
   const onSubmit: SubmitHandler<SignUpFormSchema> = (data) => {
@@ -107,7 +86,7 @@ const SignUp: React.FC<SignUpProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Join the Movement
           </h1>
-          <p className="text-neutral-600 mt-2">
+          <p className="mt-2 text-neutral-600">
             Complete the application below. An organizer from your selected
             chapter will review it.
           </p>
@@ -120,7 +99,6 @@ const SignUp: React.FC<SignUpProps> = ({
             id="name"
             {...register('name')}
             error={errors.name?.message}
-            isValid={isFieldValid('name')}
           />
           <InputField
             label="Email Address"
@@ -128,21 +106,18 @@ const SignUp: React.FC<SignUpProps> = ({
             type="email"
             {...register('email')}
             error={errors.email?.message}
-            isValid={isFieldValid('email')}
           />
           <InputField
             label="Instagram Handle (Optional)"
             id="instagram"
             {...register('instagram')}
             error={errors.instagram?.message}
-            isValid={isFieldValid('instagram')}
           />
           <SelectField
             label="Local Chapter"
             id="chapter"
             {...register('chapter')}
             error={errors.chapter?.message}
-            isValid={isFieldValid('chapter')}
           >
             {chapters.map((ch) => (
               <option key={ch.name} value={ch.name}>
@@ -159,7 +134,6 @@ const SignUp: React.FC<SignUpProps> = ({
             {...register('veganReason')}
             rows={3}
             error={errors.veganReason?.message}
-            isValid={isFieldValid('veganReason')}
           />
 
           <fieldset className="relative">
@@ -193,13 +167,12 @@ const SignUp: React.FC<SignUpProps> = ({
               </p>
             )}
             {/* Show checkmark for radio button selection */}
-            {isFieldValid('abolitionistAlignment') &&
-              !errors.abolitionistAlignment && (
-                <div className="absolute right-0 top-0 flex items-center text-success">
-                  <CheckIcon className="mr-1 h-4 w-4" />
-                  <span className="text-xs font-medium">✓</span>
-                </div>
-              )}
+            {!errors.abolitionistAlignment && (
+              <div className="absolute right-0 top-0 flex items-center text-success">
+                <CheckIcon className="mr-1 h-4 w-4" />
+                <span className="text-xs font-medium">✓</span>
+              </div>
+            )}
           </fieldset>
 
           <TextAreaField
@@ -208,19 +181,19 @@ const SignUp: React.FC<SignUpProps> = ({
             {...register('customAnswer')}
             rows={3}
             error={errors.customAnswer?.message}
-            isValid={isFieldValid('customAnswer')}
           />
 
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+              disabled={Object.keys(errors).length > 0}
+              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               Submit Application
             </button>
           </div>
 
-          <p className="text-neutral-600 text-center text-sm">
+          <p className="text-center text-sm text-neutral-600">
             Already have an account?{' '}
             <button
               type="button"

@@ -18,6 +18,7 @@ The application is built with a modern, brutalist design aesthetic and features 
 ## ✨ Key Features
 
 ### For All Users
+
 - **Event Discovery:** Find "Cube of Truth" events via an interactive list, map, or calendar view.
 - **Personalized Dashboard:** A central hub to view upcoming events, stats, and pending tasks.
 - **Profile Management:** Users can manage their profile, including a custom avatar upload feature.
@@ -29,6 +30,7 @@ The application is built with a modern, brutalist design aesthetic and features 
 - **Notifications:** Receive alerts for event updates, requests, and badge awards.
 
 ### For Organizers (Role-Based)
+
 - **Comprehensive Management Dashboard:** A central panel to manage members, chapters, and onboarding.
 - **Onboarding Pipeline:** Review and approve new applicants through a multi-stage process.
 - **Member Directory:** A searchable directory of all members within your scope of management.
@@ -63,24 +65,28 @@ Follow these instructions to set up and run the project locally.
 ### Installation & Setup
 
 1.  **Clone the repository:**
+
     ```bash
     git clone https://github.com/your-username/vegan-action-hub.git
     cd vegan-action-hub
     ```
 
 2.  **Install frontend dependencies:**
+
     ```bash
     npm install
     ```
 
 3.  **Set up environment variables:**
-    -   There are no required environment variables to run the application locally as it uses mock data. If you add services that require API keys, create a `.env.local` file.
+    - There are no required environment variables to run the application locally as it uses mock data. If you add services that require API keys, create a `.env.local` file.
 
 4.  **Generate mock data:**
-    -   The application relies on a generated TypeScript file for all its data. Run the TypeScript script to create it.
+    - The application relies on a generated TypeScript file for all its data. Run the TypeScript script to create it.
+
     ```bash
     npm run generate-data
     ```
+
     This will create `src/data/mockData.ts` which is imported by the application's state management.
 
 5.  **Run the development server:**
@@ -91,44 +97,47 @@ Follow these instructions to set up and run the project locally.
 
 ## ⚙️ Available Scripts
 
--   `npm run dev`: Starts the development server with Hot Module Replacement.
--   `npm run build`: Builds the app for production.
--   `npm run preview`: Serves the production build locally.
--   `npm run test`: Runs the test suite using Vitest.
--   `npm run coverage`: Runs tests and generates a coverage report.
--   `npm run lint`: Lints the codebase using ESLint.
--   `npm run format`: Formats all files using Prettier.
--   `npm run generate-data`: Generates mock data using the TypeScript script.
+- `npm run dev`: Starts the development server with Hot Module Replacement.
+- `npm run build`: Builds the app for production.
+- `npm run preview`: Serves the production build locally.
+- `npm run test`: Runs the test suite using Vitest.
+- `npm run coverage`: Runs tests and generates a coverage report.
+- `npm run lint`: Lints the codebase using ESLint.
+- `npm run format`: Formats all files using Prettier.
+- `npm run generate-data`: Generates mock data using the TypeScript script.
 
 ## 📊 Mock Data Generation
 
 This project includes a sophisticated TypeScript script (`scripts/generate-mock-data.ts`) to create realistic and deeply interconnected mock data using `@faker-js/faker`.
 
 **Key Features:**
--   **Realistic Data:** Generates users with varied activity levels, roles, and chapter affiliations.
--   **Data Relationships:** Creates logical connections between users, events, and chapters.
--   **TypeScript Native:** Runs directly within your Node.js environment without needing Python.
--   **Typed Output:** Generates a fully typed `mockData.ts` file, ensuring type safety throughout the application.
+
+- **Realistic Data:** Generates users with varied activity levels, roles, and chapter affiliations.
+- **Data Relationships:** Creates logical connections between users, events, and chapters.
+- **TypeScript Native:** Runs directly within your Node.js environment without needing Python.
+- **Typed Output:** Generates a fully typed `mockData.ts` file, ensuring type safety throughout the application.
 
 For more details, see the [Mock Data Documentation](./README_MOCK_DATA.md).
 
 ## 🎨 Design System
 
 The application features a "Modern Brutalism" design system implemented with Tailwind CSS. Key characteristics include:
--   Sharp corners (no border-radius).
--   Strong, 2px black borders on most elements.
--   Bold typography using the "Libre Franklin" font.
--   A high-contrast, limited color palette with semantic color names (`primary`, `success`, `danger`).
--   Brutal-style box shadows (`4px 4px 0 #000`).
--   A library of reusable UI components in `src/components/ui`.
+
+- Sharp corners (no border-radius).
+- Strong, 2px black borders on most elements.
+- Bold typography using the "Libre Franklin" font.
+- A high-contrast, limited color palette with semantic color names (`primary`, `success`, `danger`).
+- Brutal-style box shadows (`4px 4px 0 #000`).
+- A library of reusable UI components in `src/components/ui`.
 
 For more details on its implementation, see the [Design System Updates Summary](./DESIGN_SYSTEM_UPDATES.md).
 
 ## ☁️ Deployment
 
 The project is configured for deployment on [Vercel](https://vercel.com/). The `vercel.json` file includes:
--   Build configurations for a standard Vite/React project.
--   Robust security headers, including a Content Security Policy (CSP), to enhance application security.
+
+- Build configurations for a standard Vite/React project.
+- Robust security headers, including a Content Security Policy (CSP), to enhance application security.
 
 ## 🤝 Contributing
 

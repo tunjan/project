@@ -22,7 +22,9 @@ const LogHistory: React.FC<LogHistoryProps> = ({
   const [endDate, setEndDate] = useState('');
   const [editingLog, setEditingLog] = useState<OutreachLog | null>(null);
   // Track pending deletions to support Undo without immediate data mutation
-  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set());
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
+    new Set()
+  );
   const deleteTimersRef = useRef<Record<string, number>>({});
 
   const filteredLogs = useMemo(() => {

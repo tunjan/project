@@ -111,7 +111,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                           <div className="mt-2 flex items-center space-x-2">
                             <button
                               onClick={handleCancelEdit}
-                              className="text-xs font-semibold text-red hover:underline"
+                              className="text-red text-xs font-semibold hover:underline"
                             >
                               Cancel
                             </button>

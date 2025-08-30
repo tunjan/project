@@ -1,4 +1,10 @@
-import { type User, type CubeEvent, Role, OnboardingStatus, type Chapter } from '@/types';
+import {
+  type User,
+  type CubeEvent,
+  Role,
+  OnboardingStatus,
+  type Chapter,
+} from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 
 // 1. Define every possible action in the system
@@ -39,11 +45,11 @@ export enum Permission {
 // 2. Map roles to their permissions
 const ROLES_TO_PERMISSIONS: Record<Role, Permission[]> = {
   [Role.GODMODE]: Object.values(Permission).filter(
-    (p) => typeof p === 'number'
-  ) as Permission[], // Godmode can do everything
+    (p): p is Permission => typeof p === 'number'
+  ), // FIX: Use type guard instead of type assertion
   [Role.GLOBAL_ADMIN]: Object.values(Permission).filter(
-    (p) => typeof p === 'number'
-  ) as Permission[],
+    (p): p is Permission => typeof p === 'number'
+  ), // FIX: Use type guard instead of type assertion
   [Role.REGIONAL_ORGANISER]: [
     Permission.VIEW_MEMBER_DIRECTORY,
     Permission.VIEW_MANAGEMENT_DASHBOARD,
@@ -114,12 +120,110 @@ export const getAssignableRoles = (user: User): Role[] => {
   // Chapter Organisers can only assign roles below their own.
   if (user.role === Role.CHAPTER_ORGANISER) {
     return Object.values(Role).filter(
-      (role) =>
-        role !== Role.GODMODE && ROLE_HIERARCHY[role] < userLevel
+      (role) => role !== Role.GODMODE && ROLE_HIERARCHY[role] < userLevel
     );
   }
 
   return [];
+};
+
+// Helper for user-related scope and hierarchy checks
+const canManageTargetUser = (
+  user: User,
+  context: PermissionContext
+): boolean => {
+  if (!context.targetUser) return false;
+
+  // Rule 1: Hierarchy check
+  if (ROLE_HIERARCHY[user.role] <= ROLE_HIERARCHY[context.targetUser.role])
+    return false;
+
+  // Rule 2: Regional Organisers can only manage users within their country.
+  if (user.role === Role.REGIONAL_ORGANISER) {
+    if (
+      !user.managedCountry ||
+      !context.allChapters ||
+      !context.targetUser?.chapters
+    )
+      return false;
+    const targetUser = context.targetUser; // Type guard to ensure targetUser is defined
+    const targetUserCountries = new Set(
+      context.allChapters
+        .filter((c) => targetUser.chapters.includes(c.name))
+        .map((c) => c.country)
+    );
+    return targetUserCountries.has(user.managedCountry);
+  }
+
+  // Rule 3: Chapter Organisers can only manage users within their chapters.
+  if (user.role === Role.CHAPTER_ORGANISER) {
+    const managedChapters = new Set(user.organiserOf || []);
+    return context.targetUser.chapters.some((chapter) =>
+      managedChapters.has(chapter)
+    );
+  }
+
+  return true; // GODMODE and GLOBAL_ADMIN pass if hierarchy is respected
+};
+
+// Helper for event management permissions
+const canManageEvent = (user: User, context: PermissionContext): boolean => {
+  const { event, allChapters } = context;
+  if (!event) return false;
+
+  // Rule 1: The event's designated organizer can always manage it.
+  if (user.id === event.organizer.id) return true;
+
+  // Rule 1.5: Any organizer of the event's chapter can manage it.
+  if (
+    user.role === Role.CHAPTER_ORGANISER &&
+    (user.organiserOf || []).includes(event.city)
+  ) {
+    return true;
+  }
+
+  // Rule 2: Higher-level organizers can manage events based on their scope.
+  const userLevel = ROLE_HIERARCHY[user.role];
+  if (userLevel >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER]) {
+    const eventChapter = allChapters?.find((c) => c.name === event.city);
+    if (!eventChapter) return false; // Cannot determine event location
+
+    // Regional Organisers can manage events within their country.
+    if (user.role === Role.REGIONAL_ORGANISER) {
+      return user.managedCountry === eventChapter.country;
+    }
+
+    // Global Admins and Godmode have universal access.
+    if (userLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN]) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+// Helper for chapter management permissions
+const canManageChapter = (user: User, context: PermissionContext): boolean => {
+  if (!context.chapterName || !context.allChapters) return false;
+
+  const targetChapter = context.allChapters.find(
+    (c) => c.name === context.chapterName
+  );
+  if (!targetChapter) return false;
+
+  // Regional Organisers can only manage chapters in their country
+  if (user.role === Role.REGIONAL_ORGANISER) {
+    if (!user.managedCountry) return false;
+    return targetChapter.country === user.managedCountry;
+  }
+
+  // Chapter Organisers can only manage chapters they organize
+  if (user.role === Role.CHAPTER_ORGANISER) {
+    return (user.organiserOf || []).includes(context.chapterName);
+  }
+
+  // Global Admins can manage any chapter
+  return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
 };
 
 export const can = (
@@ -150,58 +254,11 @@ export const can = (
   switch (permission) {
     case Permission.EDIT_USER_ROLES:
     case Permission.DELETE_USER: {
-      if (!context.targetUser) return false;
-
-      // Rule 1: A user cannot edit someone with an equal or higher role.
-      const hasHigherRole = ROLE_HIERARCHY[user.role] > ROLE_HIERARCHY[context.targetUser.role];
-      if (!hasHigherRole) return false;
-
-      // Rule 2: Regional Organisers can only manage users within their country.
-      if (user.role === Role.REGIONAL_ORGANISER) {
-        if (!user.managedCountry || !context.allChapters) return false;
-        const targetUserCountries = new Set(
-          context.allChapters
-            .filter((c) => context.targetUser!.chapters.includes(c.name))
-            .map((c) => c.country)
-        );
-        return targetUserCountries.has(user.managedCountry);
-      }
-
-      // Rule 3: Chapter Organisers can only manage users within their chapters.
-      if (user.role === Role.CHAPTER_ORGANISER) {
-        const managedChapters = new Set(user.organiserOf || []);
-        return context.targetUser.chapters.some(chapter => managedChapters.has(chapter));
-      }
-
-      return true; // GODMODE and GLOBAL_ADMIN pass if hierarchy is respected
+      return canManageTargetUser(user, context);
     }
 
     case Permission.EDIT_USER_CHAPTERS: {
-      if (!context.targetUser) return false;
-
-      // FIX: Apply a consistent and stricter hierarchy check for all roles.
-      // A user cannot edit someone with an equal or higher role.
-      const hasHigherRole = ROLE_HIERARCHY[user.role] > ROLE_HIERARCHY[context.targetUser.role];
-      if (!hasHigherRole) return false;
-
-      // Regional Organisers can only manage users within their country.
-      if (user.role === Role.REGIONAL_ORGANISER) {
-        if (!user.managedCountry || !context.allChapters) return false;
-        const targetUserCountries = new Set(
-          context.allChapters
-            .filter((c) => context.targetUser!.chapters.includes(c.name))
-            .map((c) => c.country)
-        );
-        return targetUserCountries.has(user.managedCountry);
-      }
-
-      // Chapter Organisers can only manage users within their chapters.
-      if (user.role === Role.CHAPTER_ORGANISER) {
-        const managedChapters = new Set(user.organiserOf || []);
-        return context.targetUser.chapters.some(chapter => managedChapters.has(chapter));
-      }
-
-      return true; // GODMODE and GLOBAL_ADMIN pass if hierarchy is respected
+      return canManageTargetUser(user, context);
     }
     case Permission.VERIFY_USER: {
       if (!context.targetUser) return false;
@@ -225,68 +282,11 @@ export const can = (
     case Permission.EDIT_EVENT:
     case Permission.CANCEL_EVENT:
     case Permission.LOG_EVENT_REPORT: {
-      const { event, allChapters } = context;
-      if (!event) return false;
-
-      // Rule 1: The event's designated organizer can always manage it.
-      if (user.id === event.organizer.id) return true;
-
-      // FIX: Add this rule to allow other chapter organizers to also manage the event.
-      // Rule 1.5: Any organizer of the event's chapter can manage it.
-      if (user.role === Role.CHAPTER_ORGANISER && (user.organiserOf || []).includes(event.city)) {
-        return true;
-      }
-
-      // Rule 2: Higher-level organizers can manage events based on their scope.
-      const userLevel = ROLE_HIERARCHY[user.role];
-      if (userLevel >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER]) {
-        const eventChapter = allChapters?.find((c) => c.name === event.city);
-        if (!eventChapter) return false; // Cannot determine event location
-
-        // Regional Organisers can manage events within their country.
-        if (user.role === Role.REGIONAL_ORGANISER) {
-          return user.managedCountry === eventChapter.country;
-        }
-
-        // Global Admins and Godmode have universal access.
-        if (userLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN]) {
-          return true;
-        }
-      }
-
-      return false;
+      return canManageEvent(user, context);
     }
 
     case Permission.MANAGE_EVENT_PARTICIPANTS: {
-      const { event, allChapters } = context;
-      if (!event) return false;
-
-      const userLevel = ROLE_HIERARCHY[user.role];
-
-      // Event organizer can always manage participants
-      if (user.id === event.organizer.id) return true;
-
-      // FIX: Add this rule to allow other chapter organizers to also manage event participants.
-      // Any organizer of the event's chapter can manage participants
-      if (user.role === Role.CHAPTER_ORGANISER && (user.organiserOf || []).includes(event.city)) {
-        return true;
-      }
-
-      // Higher-level organizers can manage participants based on their scope
-      if (userLevel >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER]) {
-        const eventChapter = allChapters?.find((c) => c.name === event.city);
-        if (!eventChapter) return false;
-
-        if (user.role === Role.REGIONAL_ORGANISER) {
-          return user.managedCountry === eventChapter.country;
-        }
-        // Global Admins and Godmode have universal access
-        if (userLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN]) {
-          return true;
-        }
-      }
-
-      return false;
+      return canManageEvent(user, context);
     }
 
     case Permission.AWARD_BADGE: {
@@ -295,29 +295,8 @@ export const can = (
       // Rule 1: A user cannot award a badge to themselves.
       if (user.id === context.targetUser.id) return false;
 
-      // FIX: Add hierarchy and scope checks for consistency
-      // Rule 2: A user cannot award a badge to someone with an equal or higher role.
-      const hasHigherRole = ROLE_HIERARCHY[user.role] > ROLE_HIERARCHY[context.targetUser.role];
-      if (!hasHigherRole) return false;
-
-      // Rule 3: Regional Organisers can only manage users within their country.
-      if (user.role === Role.REGIONAL_ORGANISER) {
-        if (!user.managedCountry || !context.allChapters) return false;
-        const targetUserCountries = new Set(
-          context.allChapters
-            .filter((c) => context.targetUser!.chapters.includes(c.name))
-            .map((c) => c.country)
-        );
-        return targetUserCountries.has(user.managedCountry);
-      }
-
-      // Rule 4: Chapter Organisers can only manage users within their chapters.
-      if (user.role === Role.CHAPTER_ORGANISER) {
-        const managedChapters = new Set(user.organiserOf || []);
-        return context.targetUser.chapters.some(chapter => managedChapters.has(chapter));
-      }
-
-      return true; // GODMODE and GLOBAL_ADMIN pass if hierarchy is respected
+      // Use the same hierarchy and scope checks as other user management permissions
+      return canManageTargetUser(user, context);
     }
 
     // Add explicit cases for permissions that don't need fine-grained checks
@@ -331,66 +310,19 @@ export const can = (
 
     // CRITICAL FIX: Add explicit cases for destructive permissions that need context validation
     case Permission.DELETE_CHAPTER: {
-      if (!context.chapterName || !context.allChapters) return false;
-
-      const targetChapter = context.allChapters.find(c => c.name === context.chapterName);
-      if (!targetChapter) return false;
-
-      // Regional Organisers can only delete chapters in their country
-      if (user.role === Role.REGIONAL_ORGANISER) {
-        if (!user.managedCountry) return false;
-        return targetChapter.country === user.managedCountry;
-      }
-
       // Chapter Organisers cannot delete chapters (they can only manage their own)
       if (user.role === Role.CHAPTER_ORGANISER) {
         return false;
       }
-
-      // Global Admins can delete any chapter
-      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
+      return canManageChapter(user, context);
     }
 
     case Permission.EDIT_CHAPTER: {
-      if (!context.chapterName || !context.allChapters) return false;
-
-      const targetChapter = context.allChapters.find(c => c.name === context.chapterName);
-      if (!targetChapter) return false;
-
-      // Regional Organisers can only edit chapters in their country
-      if (user.role === Role.REGIONAL_ORGANISER) {
-        if (!user.managedCountry) return false;
-        return targetChapter.country === user.managedCountry;
-      }
-
-      // Chapter Organisers can only edit chapters they organize
-      if (user.role === Role.CHAPTER_ORGANISER) {
-        return (user.organiserOf || []).includes(context.chapterName);
-      }
-
-      // Global Admins can edit any chapter
-      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
+      return canManageChapter(user, context);
     }
 
     case Permission.MANAGE_INVENTORY: {
-      if (!context.chapterName || !context.allChapters) return false;
-
-      const targetChapter = context.allChapters.find(c => c.name === context.chapterName);
-      if (!targetChapter) return false;
-
-      // Regional Organisers can manage inventory in their country
-      if (user.role === Role.REGIONAL_ORGANISER) {
-        if (!user.managedCountry) return false;
-        return targetChapter.country === user.managedCountry;
-      }
-
-      // Chapter Organisers can manage inventory in their chapters
-      if (user.role === Role.CHAPTER_ORGANISER) {
-        return (user.organiserOf || []).includes(context.chapterName);
-      }
-
-      // Global Admins can manage any inventory
-      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
+      return canManageChapter(user, context);
     }
 
     default:

@@ -139,7 +139,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Create New Event
           </h1>
-          <p className="mt-2 text-red">
+          <p className="text-red mt-2">
             Schedule a standard chapter cube or organize a special multi-day
             regional event.
           </p>

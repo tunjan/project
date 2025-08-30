@@ -40,7 +40,7 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
             {event.targetRegion} Regional Event
           </div>
         )}
-        <div className="flex items-start justify-between">
+        <div className="flex justify-between">
           <p className="font-semibold uppercase tracking-wide text-primary">
             <MapPinIcon className="mr-1 inline-block h-4 w-4" />
             {event.city}
@@ -68,9 +68,7 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
         </div>
 
         <div className="mt-8 border-t border-neutral-200 pt-6">
-          <h3 className="mb-2 text-lg font-bold text-black">
-            Organizer
-          </h3>
+          <h3 className="mb-2 text-lg font-bold text-black">Organizer</h3>
           <div className="flex items-center">
             <img
               className="h-12 w-12 object-cover"
@@ -81,9 +79,7 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
               <p className="text-base font-semibold text-black">
                 {event.organizer.name}
               </p>
-              <p className="text-sm text-neutral-500">
-                {event.organizer.role}
-              </p>
+              <p className="text-sm text-neutral-500">{event.organizer.role}</p>
             </div>
           </div>
         </div>

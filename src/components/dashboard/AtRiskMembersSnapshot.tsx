@@ -4,6 +4,7 @@ import { useUsers, useEvents } from '@/store';
 import { isUserInactive } from '@/utils/user';
 import { User } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import Avatar from '@/components/ui/Avatar';
 
 const AtRiskMembersSnapshot: React.FC = () => {
   const currentUser = useCurrentUser();
@@ -14,15 +15,18 @@ const AtRiskMembersSnapshot: React.FC = () => {
   const atRiskMembers = useMemo(() => {
     if (!currentUser) return [];
 
-    // Determine the members this user can see
-    const visibleMembers = allUsers.filter(
-      (user) =>
+    // CRITICAL FIX: Combine filtering operations for better performance
+    return allUsers.filter((user) => {
+      // Check if user is visible to current user
+      const isVisible =
         currentUser.role === 'Global Admin' ||
-        user.chapters?.some((c) => currentUser.organiserOf?.includes(c))
-    );
+        user.chapters?.some((c) => currentUser.organiserOf?.includes(c));
 
-    // Filter for inactive members among the visible ones
-    return visibleMembers.filter((user) => isUserInactive(user, allEvents));
+      if (!isVisible) return false;
+
+      // Check if user is at risk (inactive)
+      return isUserInactive(user, allEvents);
+    });
   }, [currentUser, allUsers, allEvents]);
 
   const handleSelectUser = (user: User) => {
@@ -38,7 +42,10 @@ const AtRiskMembersSnapshot: React.FC = () => {
   }
 
   return (
-    <div className="divide-y-2 divide-black overflow-y-auto" style={{ maxHeight: '300px' }}>
+    <div
+      className="divide-y-2 divide-black overflow-y-auto"
+      style={{ maxHeight: '300px' }}
+    >
       {atRiskMembers.map((user) => (
         <button
           key={user.id}
@@ -46,7 +53,11 @@ const AtRiskMembersSnapshot: React.FC = () => {
           onClick={() => handleSelectUser(user)}
         >
           <div className="flex items-center gap-3">
-            <img src={user.profilePictureUrl} alt={user.name} className="h-8 w-8 object-cover" />
+            <Avatar
+              src={user.profilePictureUrl}
+              alt={user.name}
+              className="h-8 w-8 object-cover"
+            />
             <div>
               <p className="font-semibold">{user.name}</p>
               <p className="text-xs text-neutral-500">
@@ -54,7 +65,9 @@ const AtRiskMembersSnapshot: React.FC = () => {
               </p>
             </div>
           </div>
-          <p className="text-sm font-semibold text-neutral-600">{user.chapters?.join(', ')}</p>
+          <p className="text-sm font-semibold text-neutral-600">
+            {user.chapters?.join(', ')}
+          </p>
         </button>
       ))}
     </div>

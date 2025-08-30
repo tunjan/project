@@ -49,4 +49,3 @@ export const BADGE_TEMPLATES: BadgeTemplate[] = [
     icon: 'AcademicCapIcon',
   },
 ];
-

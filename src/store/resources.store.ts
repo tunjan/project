@@ -21,5 +21,3 @@ export const useResourcesStore = create<ResourcesState & ResourcesActions>()(
 );
 
 export const useResourcesState = () => useResourcesStore((s) => s.resources);
-
-

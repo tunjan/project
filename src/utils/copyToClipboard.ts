@@ -21,7 +21,8 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     textarea.style.left = '-9999px';
     document.body.appendChild(textarea);
     const selection = document.getSelection();
-    const previousRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    const previousRange =
+      selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
     textarea.select();
     const success = document.execCommand('copy');

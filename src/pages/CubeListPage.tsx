@@ -220,7 +220,7 @@ const CubeListPage: React.FC = () => {
           <h3 className="text-xl font-bold">
             No {eventTimeView} events found for this region.
           </h3>
-          <p className="text-white mt-2">
+          <p className="mt-2 text-white">
             Check back later or change your filter selection.
           </p>
         </div>

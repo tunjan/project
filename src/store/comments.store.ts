@@ -23,14 +23,16 @@ export const useCommentsStore = create<CommentsState & CommentsActions>()(
           author,
           createdAt: new Date(),
         };
-        set((state) => ({ eventComments: [...state.eventComments, newComment] }));
+        set((state) => ({
+          eventComments: [...state.eventComments, newComment],
+        }));
       },
     }),
     { name: 'comments-store' }
   )
 );
 
-export const useEventCommentsState = () => useCommentsStore((s) => s.eventComments);
-export const useCommentsActions = () => useCommentsStore((s) => ({ postComment: s.postComment }));
-
-
+export const useEventCommentsState = () =>
+  useCommentsStore((s) => s.eventComments);
+export const useCommentsActions = () =>
+  useCommentsStore((s) => ({ postComment: s.postComment }));

@@ -22,7 +22,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     users.length > 0 || chapters.length > 0 || events.length > 0;
 
   return (
-    <div className="shadow-brutal absolute left-0 top-full mt-2 w-full rounded-none border-2 border-black bg-white">
+    <div className="absolute left-0 top-full mt-2 w-full rounded-none border-2 border-black bg-white shadow-brutal">
       <div className="max-h-96 overflow-y-auto p-4">
         {loading && <LoadingSpinner />}
         {!loading && !hasResults && (
@@ -34,9 +34,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="space-y-4">
             {users.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase text-red">
-                  Users
-                </h3>
+                <h3 className="text-red text-xs font-bold uppercase">Users</h3>
                 <ul className="mt-2 space-y-1">
                   {users.map((user) => (
                     <li key={user.id}>
@@ -54,7 +52,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
             {chapters.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase text-red">
+                <h3 className="text-red text-xs font-bold uppercase">
                   Chapters
                 </h3>
                 <ul className="mt-2 space-y-1">
@@ -74,9 +72,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
             {events.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase text-red">
-                  Events
-                </h3>
+                <h3 className="text-red text-xs font-bold uppercase">Events</h3>
                 <ul className="mt-2 space-y-1">
                   {events.map((event) => (
                     <li key={event.id}>

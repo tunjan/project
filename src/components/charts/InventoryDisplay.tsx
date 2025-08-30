@@ -146,7 +146,7 @@ const InventoryItemCard: React.FC<{
 
   return (
     <div className="card-brutal card-padding">
-      <div className="flex items-start justify-between">
+      <div className="flex justify-between">
         <div className="flex-1">
           <div className="mb-3">
             <h3 className="h-card">{item.category}</h3>

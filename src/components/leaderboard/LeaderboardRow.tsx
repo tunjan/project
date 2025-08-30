@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { type User } from '@/types';
 import { TrophyIcon } from '@/icons';
 import Tag from '@/components/ui/Tag';
+import Avatar from '@/components/ui/Avatar';
 
 interface LeaderboardRowProps {
   rank: number;
   user: User;
   value: number;
   unit: string;
+  topValue?: number;
   isCurrentUser: boolean;
   rankChange?: 'up' | 'down' | 'same';
 }
@@ -81,6 +83,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
   user,
   value,
   unit,
+  topValue,
   isCurrentUser,
   rankChange,
 }) => {
@@ -99,7 +102,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
       >
         <RankIndicator rank={rank} />
         <div className="flex min-w-0 flex-grow items-center p-3">
-          <img
+          <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
             className="h-12 w-12 flex-shrink-0 border-2 border-black object-cover"
@@ -112,7 +115,21 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
             <p className="truncate text-sm text-neutral-600">
               {primaryChapter}
             </p>
+
+            {/* Compact progress bar to give visual weight to higher ranks */}
+            <div className="mt-2 h-2 w-full rounded-sm bg-neutral-200">
+              <div
+                className="h-2 bg-primary"
+                style={{
+                  width: `${Math.max(
+                    3,
+                    Math.round(((value || 0) / (topValue || value || 1)) * 100)
+                  )}%`,
+                }}
+              />
+            </div>
           </div>
+
           <div className="ml-4 hidden flex-shrink-0 items-center gap-2 sm:flex">
             <RankChangeIndicator change={rankChange} />
             <div className="text-right">

@@ -33,9 +33,7 @@ export const LoadingOverlay: React.FC<{ children?: React.ReactNode }> = ({
       <div className="text-center">
         <LoadingSpinner size="lg" />
         {children && (
-          <p className="mt-4 text-sm font-semibold text-black">
-            {children}
-          </p>
+          <p className="mt-4 text-sm font-semibold text-black">{children}</p>
         )}
       </div>
     </div>

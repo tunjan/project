@@ -1,30 +1,25 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { type User, OnboardingStatus, BadgeTemplate } from '@/types';
 import { useCurrentUser, useChapters } from '@/store';
 import { useUsersActions } from '@/store/users.store';
 import { useAwardsActions } from '@/store/awards.store';
 import { can, Permission } from '@/config/permissions';
-import StatsGrid from '@/components/dashboard/StatsGrid';
-import BadgeList from '@/components/dashboard/BadgeList';
-import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
 import PromoteToOrganiserModal from './PromoteToOrganiserModal';
 import EditChaptersModal from './EditChaptersModal';
 import DeleteUserModal from './DeleteUserModal';
 import OrganizerNotes from './OrganizerNotes';
 import AwardBadgeModal from './AwardBadgeModal';
-// --- NEW COMPONENT IMPORTS ---
 import MemberProfileHeader from './MemberProfileHeader';
 import UserManagementPanel from './UserManagementPanel';
 import UserDangerZone from './UserDangerZone';
+import OnboardingActions from './OnboardingActions';
+import UserStats from './UserStats';
 import {
   ChevronLeftIcon,
   CalendarIcon,
   ClockIcon,
   ChatBubbleLeftRightIcon,
 } from '@/icons';
-import { toast } from 'sonner';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 interface MemberProfileProps {
   user: User;
@@ -32,17 +27,13 @@ interface MemberProfileProps {
 }
 
 const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
-  const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const allChapters = useChapters();
   const {
     updateUserRole,
     updateUserChapters,
     deleteUser,
-    updateUserStatus,
-    finalizeOnboarding,
     setChapterOrganiser,
-    confirmFirstCubeAttended,
   } = useUsersActions();
   const { awardBadge } = useAwardsActions();
 
@@ -50,58 +41,31 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   const [editChaptersModalOpen, setEditChaptersModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [awardBadgeModalOpen, setAwardBadgeModalOpen] = useState(false);
-  const [manualVerifyModalOpen, setManualVerifyModalOpen] = useState(false);
-
-  const handleApprove = () => {
-    if (!currentUser) return;
-    updateUserStatus(
-      user.id,
-      OnboardingStatus.PENDING_ONBOARDING_CALL,
-      currentUser
-    );
-    toast.success(`${user.name} approved. Next: schedule onboarding call.`);
-    navigate('/manage');
-  };
-
-  const handleDeny = () => {
-    if (!currentUser) return;
-    updateUserStatus(user.id, OnboardingStatus.DENIED, currentUser);
-    toast.error(`${user.name} has been denied.`);
-    navigate('/manage');
-  };
-
-  const handleOnboardingCallPassed = () => {
-    if (!currentUser) return;
-    updateUserStatus(
-      user.id,
-      OnboardingStatus.AWAITING_FIRST_CUBE,
-      currentUser
-    );
-    toast.success(
-      `${user.name} passed the onboarding call. Next: attend first Cube.`
-    );
-  };
-
-  const handleConfirmFirstCube = () => {
-    confirmFirstCubeAttended(user.id);
-    toast.success(
-      `${user.name}'s first cube attendance has been manually confirmed.`
-    );
-  };
-
-  const handleManualVerify = () => {
-    finalizeOnboarding(user.id);
-    toast.success(`${user.name} has been confirmed and now has full access.`);
-  };
-
-  const handleRevisionCallPassed = () => {
-    finalizeOnboarding(user.id);
-    toast.success(`${user.name} passed the revision call and is now verified.`);
-  };
 
   const handleConfirmOrganiserUpdate = (chaptersToOrganise: string[]) => {
     setChapterOrganiser(user.id, chaptersToOrganise);
     setPromoteModalOpen(false);
+  };
+
+  const handleSetChapterOrganiser = (
+    userId: string,
+    chapterName: string,
+    isOrganiser: boolean
+  ) => {
+    if (isOrganiser) {
+      // Add chapter to organiserOf array
+      const currentOrganiserOf = user.organiserOf || [];
+      if (!currentOrganiserOf.includes(chapterName)) {
+        setChapterOrganiser(userId, [...currentOrganiserOf, chapterName]);
+      }
+    } else {
+      // Remove chapter from organiserOf array
+      const currentOrganiserOf = user.organiserOf || [];
+      setChapterOrganiser(
+        userId,
+        currentOrganiserOf.filter((ch) => ch !== chapterName)
+      );
+    }
   };
 
   const handleConfirmChapterUpdate = (newChapters: string[]) => {
@@ -118,7 +82,6 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   const handleAwardBadge = (badge: BadgeTemplate) => {
     if (!currentUser) return;
     awardBadge(currentUser, user, badge);
-    toast.success(`Recognition "${badge.name}" sent to ${user.name}.`);
     setAwardBadgeModalOpen(false);
   };
 
@@ -135,8 +98,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     // Open the user's default email client
     window.open(mailtoLink, '_blank');
 
-    // Show a toast for feedback
-    toast.success('Email client opened with pre-filled message');
+    // Email client opened
   };
 
   const canManageRole = can(currentUser, Permission.EDIT_USER_ROLES, {
@@ -204,57 +166,8 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
 
         <MemberProfileHeader user={user} />
 
-        {user.onboardingStatus ===
-          OnboardingStatus.PENDING_APPLICATION_REVIEW &&
-          user.onboardingAnswers && (
-            <section className="border-warning mb-8 border-2 bg-white p-6">
-              <h2 className="mb-4 text-2xl font-bold text-black">
-                Applicant Review
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs font-bold uppercase text-neutral-500">
-                    Why did you go vegan?
-                  </p>
-                  <p className="text-sm text-black">
-                    {user.onboardingAnswers.veganReason}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase text-neutral-500">
-                    Are you aligned with our abolitionist values?
-                  </p>
-                  <p className="text-sm text-black">
-                    {user.onboardingAnswers.abolitionistAlignment
-                      ? 'Yes'
-                      : 'No / Unsure'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase text-neutral-500">
-                    How can you contribute?
-                  </p>
-                  <p className="text-sm text-black">
-                    {user.onboardingAnswers.customAnswer}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-6 flex space-x-4 border-t border-neutral-200 pt-4">
-                <button
-                  onClick={handleDeny}
-                  className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black"
-                >
-                  Deny
-                </button>
-                <button
-                  onClick={handleApprove}
-                  className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-                >
-                  Approve Application
-                </button>
-              </div>
-            </section>
-          )}
+        {/* Onboarding Actions */}
+        {canManageRole && <OnboardingActions user={user} />}
 
         {/* Onboarding Call Scheduled Info */}
         {(user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL ||
@@ -341,108 +254,12 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
             </section>
           )}
 
-        {/* Onboarding Call Actions */}
-        {user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL &&
-          canManageRole && (
-            <section className="mb-8 border-2 border-primary bg-white p-6">
-              <h2 className="mb-4 text-2xl font-bold text-black">
-                Onboarding Call
-              </h2>
-              <p className="mb-4 text-sm text-black">
-                Mark the outcome of the applicant's onboarding call. Passing
-                them will move them to the "Awaiting First Cube" stage.
-              </p>
-              <div className="flex space-x-4 border-t border-neutral-200 pt-4">
-                <button
-                  onClick={handleDeny}
-                  className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black"
-                >
-                  Deny Application
-                </button>
-                <button
-                  onClick={handleOnboardingCallPassed}
-                  className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-                >
-                  Mark Call as Passed
-                </button>
-              </div>
-            </section>
-          )}
-
-        {/* Revision Call Actions */}
-        {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
-          canManageRole && (
-            <section className="mb-8 border-2 border-primary bg-white p-6">
-              <h2 className="mb-4 text-2xl font-bold text-black">
-                Revision Call
-              </h2>
-              <p className="mb-4 text-sm text-black">
-                This is the final step. Passing them will fully confirm their
-                account and grant activist permissions.
-              </p>
-              <div className="flex space-x-4 border-t border-neutral-200 pt-4">
-                <button
-                  onClick={handleDeny}
-                  className="w-full bg-black px-4 py-3 font-bold text-white hover:bg-black"
-                >
-                  Deny Application
-                </button>
-                <button
-                  onClick={handleRevisionCallPassed}
-                  className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-                >
-                  Mark Revision Call Passed & Confirm
-                </button>
-              </div>
-            </section>
-          )}
-
-        {/* First Cube Confirmation Actions */}
-        {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
-          canManageRole && (
-            <section className="mb-8 border-2 border-primary bg-white p-6">
-              <h2 className="mb-4 text-2xl font-bold text-black">
-                First Cube Attendance
-              </h2>
-              <p className="mb-4 text-sm text-black">
-                This user needs to attend their first Cube. If the automated
-                system fails after you log an event report, you can manually
-                confirm their attendance here.
-              </p>
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleConfirmFirstCube}
-                  className="w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover"
-                >
-                  Manually Confirm First Cube Attended
-                </button>
-              </div>
-            </section>
-          )}
-
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
-            <section>
-              <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                Activity Statistics
-              </h2>
-              <StatsGrid stats={user.stats} />
-            </section>
-            <section>
-              <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                Recognitions
-              </h2>
-              <BadgeList badges={user.badges} />
-            </section>
+            <UserStats user={user} />
             <OrganizerNotes user={user} />
           </div>
           <div className="space-y-8 lg:col-span-1">
-            <section>
-              <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                Reward Tier
-              </h2>
-              <DiscountTierProgress user={user} />
-            </section>
             {canManageRole && (
               <UserManagementPanel
                 user={user}
@@ -450,7 +267,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                 canEditChapters={canEditChapters}
                 canAwardBadges={canAwardBadges}
                 onUpdateRole={updateUserRole}
-                onSetChapterOrganiser={setChapterOrganiser}
+                onSetChapterOrganiser={handleSetChapterOrganiser}
                 onOpenPromoteModal={() => setPromoteModalOpen(true)}
                 onOpenEditChaptersModal={() => setEditChaptersModalOpen(true)}
                 onOpenAwardBadgeModal={() => setAwardBadgeModalOpen(true)}
@@ -461,23 +278,11 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               user={user}
               canManuallyVerify={canManuallyVerify}
               canDeleteUser={canDeleteUser}
-              onManualVerify={() => setManualVerifyModalOpen(true)}
               onOpenDeleteModal={() => setDeleteModalOpen(true)}
             />
           </div>
         </div>
       </div>
-
-      {/* Manual Verification Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={manualVerifyModalOpen}
-        onClose={() => setManualVerifyModalOpen(false)}
-        onConfirm={handleManualVerify}
-        title="Bypass Onboarding & Verify User"
-        message={`Are you sure you want to bypass the entire onboarding process for ${user.name}? This is an administrative override that should only be used for trusted individuals who don't need standard verification steps. This action cannot be undone and will immediately grant them full activist permissions.`}
-        confirmText="Bypass & Verify"
-        variant="warning"
-      />
     </>
   );
 };

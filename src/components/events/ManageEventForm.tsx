@@ -67,7 +67,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
           <h1 className="text-3xl font-extrabold text-black">
             Log Event Report
           </h1>
-          <p className="mt-2 text-red">
+          <p className="text-red mt-2">
             Submit the final details for{' '}
             <span className="font-bold">{event.location}</span> in{' '}
             <span className="font-bold">{event.city}</span>. This will update
@@ -122,7 +122,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                   >
                     <p className="font-semibold">{log.outcome}</p>
                     {log.notes && (
-                      <p className="text-sm text-red">{log.notes}</p>
+                      <p className="text-red text-sm">{log.notes}</p>
                     )}
                   </div>
                 ))}
@@ -133,7 +133,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                 participants yet.
               </p>
             )}
-            <p className="mt-4 text-sm text-red">
+            <p className="text-red mt-4 text-sm">
               Note: Individual activists log their own outreach outcomes from
               the 'Outreach' page. This is a summary.
             </p>

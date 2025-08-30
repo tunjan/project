@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUsers, useChapters, useEvents } from '@/store';
 import { type User, type Chapter, type CubeEvent } from '@/types';
 
@@ -13,38 +13,49 @@ const useSearch = (query: string) => {
   const chapters = useChapters();
   const events = useEvents();
 
-  useEffect(() => {
-    if (!query) {
-      setResults({ users: [], chapters: [], events: [] });
-      return;
-    }
+  // Debounced search function
+  const performSearch = useCallback(
+    (searchQuery: string) => {
+      if (!searchQuery) {
+        setResults({ users: [], chapters: [], events: [] });
+        return;
+      }
 
-    setLoading(true);
-    const lowerCaseQuery = query.toLowerCase();
+      setLoading(true);
+      const lowerCaseQuery = searchQuery.toLowerCase();
 
-    const filteredUsers = users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(lowerCaseQuery) ||
-        user.email.toLowerCase().includes(lowerCaseQuery)
-    );
+      const filteredUsers = users.filter(
+        (user) =>
+          user.name.toLowerCase().includes(lowerCaseQuery) ||
+          user.email.toLowerCase().includes(lowerCaseQuery)
+      );
 
-    const filteredChapters = chapters.filter((chapter) =>
-      chapter.name.toLowerCase().includes(lowerCaseQuery)
-    );
+      const filteredChapters = chapters.filter((chapter) =>
+        chapter.name.toLowerCase().includes(lowerCaseQuery)
+      );
 
-    const filteredEvents = events.filter((event) =>
-      event.location.toLowerCase().includes(lowerCaseQuery)
-    );
+      const filteredEvents = events.filter((event) =>
+        event.location.toLowerCase().includes(lowerCaseQuery)
+      );
 
-    setTimeout(() => {
       setResults({
         users: filteredUsers,
         chapters: filteredChapters,
         events: filteredEvents,
       });
       setLoading(false);
-    }, 300); // Simulate network delay
-  }, [query, users, chapters, events]);
+    },
+    [users, chapters, events]
+  );
+
+  useEffect(() => {
+    // Debounce search with 300ms delay
+    const timeoutId = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [query, performSearch]);
 
   return { ...results, loading };
 };

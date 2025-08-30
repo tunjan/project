@@ -60,5 +60,3 @@ export const useOutreachLogsForUser = (userId?: string) =>
   useOutreachStore((s) =>
     userId ? s.outreachLogs.filter((log) => log.userId === userId) : []
   );
-
-

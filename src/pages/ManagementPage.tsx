@@ -87,7 +87,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
       }}
       aria-label={`${title}: ${description}`}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex justify-between">
         <div className="flex items-start gap-4">
           <div className="text-2xl text-primary" aria-hidden="true">
             {icon}
@@ -583,7 +583,7 @@ const ManagementPage: React.FC = () => {
 
       <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-4">
         <aside className="md:col-span-1">
-          <nav className="flex flex-row border-b-2 border-black bg-white md:flex-col md:border-2">
+          <nav className="flex flex-row gap-4 border-b-2 border-black bg-white p-4 md:flex-col md:border-2">
             <TabButton
               onClick={() => handleViewChange('dashboard')}
               isActive={view === 'dashboard'}
@@ -596,7 +596,9 @@ const ManagementPage: React.FC = () => {
               isActive={view === 'pipeline'}
             >
               <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
-              <span className="hidden md:inline">Onboarding & Requests</span>
+              <span className="hidden truncate md:inline">
+                Onboarding & Requests
+              </span>
             </TabButton>
             <TabButton
               onClick={() => handleViewChange('members')}

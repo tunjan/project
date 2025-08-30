@@ -1,3 +1,4 @@
+// FILE: src/types.ts
 export enum Role {
   APPLICANT = 'Applicant',
   ACTIVIST = 'Activist',
@@ -44,7 +45,6 @@ export enum NotificationType {
   NEW_APPLICANT = 'New Applicant', // NEW
 }
 
-
 export interface BadgeTemplate {
   name: string;
   description: string;
@@ -78,6 +78,7 @@ export enum OnboardingStatus {
   AWAITING_MASTERCLASS = 'Awaiting Masterclass',
   AWAITING_REVISION_CALL = 'Awaiting Revision Call',
   CONFIRMED = 'Confirmed',
+  COMPLETED = 'Completed',
   DENIED = 'Denied',
   INACTIVE = 'Inactive',
 }
@@ -149,6 +150,7 @@ export interface TourDuty {
 export enum ParticipantStatus {
   PENDING = 'Pending',
   ATTENDING = 'Attending',
+  DECLINED = 'Declined',
 }
 
 export interface EventParticipant {
@@ -208,6 +210,7 @@ export enum ResourceType {
   DOCUMENT = 'Document',
   VIDEO = 'Video',
   GUIDE = 'Guide',
+  LINK = 'Link',
 }
 
 export enum SkillLevel {

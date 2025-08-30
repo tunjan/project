@@ -37,10 +37,18 @@ const CommandPalette: React.FC = () => {
       onClick={close}
       role="dialog"
       aria-modal="true"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          close();
+        }
+      }}
+      tabIndex={-1}
     >
       <div
         className="animate-scale-in w-full max-w-xl"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+        onKeyDown={(e) => e.stopPropagation()}
+        role="document"
       >
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
@@ -51,8 +59,7 @@ const CommandPalette: React.FC = () => {
             placeholder="Search for activists, chapters, events..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-none border-2 border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder-neutral-500 focus:border-primary focus:outline-none"
-            autoFocus
+            className="w-full rounded-none border-2 border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder-neutral-500 focus:border-black focus:outline-none"
           />
         </div>
 

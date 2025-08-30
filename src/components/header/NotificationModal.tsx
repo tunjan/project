@@ -72,59 +72,67 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      }}
+      tabIndex={-1}
     >
-        <div 
+              <div
           className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-white shadow-brutal"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          role="document"
         >
-          <div className="flex items-center justify-between border-b-2 border-black p-3">
-            <h3 className="font-bold text-black">Notifications</h3>
-            <div className="flex items-center space-x-2">
-              {unreadCount > 0 && (
-                <button
-                  onClick={onMarkAllRead}
-                  className="text-xs font-semibold text-primary hover:underline"
-                >
-                  Mark all as read
-                </button>
-              )}
-              <button onClick={onClose} className="p-1 hover:bg-white">
-                <XIcon className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-
-          <div className="max-h-96 divide-y divide-neutral-200 overflow-y-auto">
-            {notifications.length > 0 ? (
-              notifications
-                .slice(0, 5)
-                .map((n) => (
-                  <NotificationItem
-                    key={n.id}
-                    notification={n}
-                    onNotificationClick={onNotificationClick}
-                  />
-                ))
-            ) : (
-              <div className="p-8 text-center text-neutral-500">
-                <BellIcon className="mx-auto h-8 w-8 text-neutral-400" />
-                <p className="mt-2 text-sm">You have no notifications.</p>
-              </div>
-            )}
-          </div>
-          {notifications.length > 0 && (
-            <div className="border-t-2 border-black p-2 text-center">
-              <Link
-                to="/notifications"
-                onClick={onClose}
-                className="text-sm font-bold text-primary hover:underline"
+        <div className="flex items-center justify-between border-b-2 border-black p-3">
+          <h3 className="font-bold text-black">Notifications</h3>
+          <div className="flex items-center space-x-2">
+            {unreadCount > 0 && (
+              <button
+                onClick={onMarkAllRead}
+                className="text-xs font-semibold text-primary hover:underline"
               >
-                View All Notifications
-              </Link>
+                Mark all as read
+              </button>
+            )}
+            <button onClick={onClose} className="p-1 hover:bg-white">
+              <XIcon className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="max-h-96 divide-y divide-neutral-200 overflow-y-auto">
+          {notifications.length > 0 ? (
+            notifications
+              .slice(0, 5)
+              .map((n) => (
+                <NotificationItem
+                  key={n.id}
+                  notification={n}
+                  onNotificationClick={onNotificationClick}
+                />
+              ))
+          ) : (
+            <div className="p-8 text-center text-neutral-500">
+              <BellIcon className="mx-auto h-8 w-8 text-neutral-400" />
+              <p className="mt-2 text-sm">You have no notifications.</p>
             </div>
           )}
         </div>
+        {notifications.length > 0 && (
+          <div className="border-t-2 border-black p-2 text-center">
+            <Link
+              to="/notifications"
+              onClick={onClose}
+              className="text-sm font-bold text-primary hover:underline"
+            >
+              View All Notifications
+            </Link>
+          </div>
+        )}
       </div>
+    </div>
   );
 };
 

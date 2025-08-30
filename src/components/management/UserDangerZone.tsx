@@ -6,12 +6,11 @@ interface UserDangerZoneProps {
   user: User;
   canManuallyVerify: boolean;
   canDeleteUser: boolean;
-  onManualVerify: () => void;
+  onManualVerify?: () => void;
   onOpenDeleteModal: () => void;
 }
 
 const UserDangerZone: React.FC<UserDangerZoneProps> = ({
-  user,
   canManuallyVerify,
   canDeleteUser,
   onManualVerify,
@@ -24,7 +23,7 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
       </h2>
       <div className="space-y-4 border-2 border-danger bg-white p-4">
         {/* Manual Verification */}
-        {canManuallyVerify && (
+        {canManuallyVerify && onManualVerify && (
           <div className="border-2 border-warning bg-warning/10 p-4">
             <h3 className="text-warning-700 mb-2 flex items-center gap-2 text-lg font-bold">
               <ExclamationTriangleIcon className="h-5 w-5" />

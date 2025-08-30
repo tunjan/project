@@ -18,8 +18,16 @@ const MetaTag: React.FC<{ text: string; className?: string }> = ({
 );
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
-  const IconComponent =
-    Icons[resource.icon as keyof typeof Icons] || Icons.BookOpenIcon; // Fallback to a default icon
+  // CRITICAL FIX: Add type safety for dynamic icon components
+  const IconComponent = (() => {
+    // Check if the icon exists in the Icons object
+    if (resource.icon && resource.icon in Icons) {
+      return Icons[resource.icon as keyof typeof Icons];
+    }
+    // Fallback to a default icon if the specified icon doesn't exist
+    return Icons.BookOpenIcon;
+  })();
+
   return (
     <div className="card-brutal-hover hover-raise flex flex-col justify-between border-2 border-black bg-white transition-transform">
       <div className="p-5">

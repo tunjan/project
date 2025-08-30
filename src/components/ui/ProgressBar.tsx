@@ -9,9 +9,7 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({ value, max, className }) => {
   const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div
-      className={`h-2.5 w-full border border-black bg-white ${className}`}
-    >
+    <div className={`h-2.5 w-full border border-black bg-white ${className}`}>
       <div
         className="h-2 bg-primary"
         style={{ width: `${percentage}%` }}
@@ -19,6 +17,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ value, max, className }) => {
         aria-valuenow={value}
         aria-valuemin={0}
         aria-valuemax={max}
+        aria-valuetext={`${value} of ${max}`}
       ></div>
     </div>
   );

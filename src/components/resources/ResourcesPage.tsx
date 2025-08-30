@@ -72,8 +72,12 @@ const ResourcesPage: React.FC = () => {
         ) : (
           <div className="card-brutal card-padding text-center">
             <BookOpenIcon className="text-grey-500 mx-auto h-12 w-12" />
-            <h3 className="mt-4 text-xl font-bold text-black">No resources found</h3>
-            <p className="mt-2 text-neutral-500">Try adjusting your search or reset filters to see everything.</p>
+            <h3 className="mt-4 text-xl font-bold text-black">
+              No resources found
+            </h3>
+            <p className="mt-2 text-neutral-500">
+              Try adjusting your search or reset filters to see everything.
+            </p>
             <div className="mt-4 flex justify-center">
               <button
                 type="button"

@@ -1,63 +1,23 @@
 import { create } from 'zustand';
-import { type User, Role, OnboardingStatus, type OrganizerNote, NotificationType } from '@/types';
-import { persist } from 'zustand/middleware';
 import {
-  processedUsers,
-} from './initialData';
-import { ROLE_HIERARCHY } from '@/utils/auth';
+  type User,
+  Role,
+  OnboardingStatus,
+  type OrganizerNote,
+  NotificationType,
+} from '@/types';
+import { persist } from 'zustand/middleware';
+import { processedUsers } from './initialData';
 import { type OnboardingAnswers } from '@/types';
+import {
+  isValidStatusTransition,
+  validateOnboardingState,
+  createNewUser,
+  handleNewApplicationNotifications,
+} from '@/services/onboardingService';
 import { useNotificationsStore } from './notifications.store';
-import { useChaptersStore } from './chapters.store';
 import { useAuthStore } from './auth.store';
-
-// Helper function to validate onboarding status transitions
-const isValidStatusTransition = (fromStatus: OnboardingStatus, toStatus: OnboardingStatus): boolean => {
-  const validTransitions: Record<OnboardingStatus, OnboardingStatus[]> = {
-    [OnboardingStatus.PENDING_APPLICATION_REVIEW]: [
-      OnboardingStatus.PENDING_ONBOARDING_CALL,
-      OnboardingStatus.DENIED
-    ],
-    [OnboardingStatus.PENDING_ONBOARDING_CALL]: [
-      OnboardingStatus.AWAITING_FIRST_CUBE,
-      OnboardingStatus.DENIED
-    ],
-    [OnboardingStatus.AWAITING_FIRST_CUBE]: [
-      OnboardingStatus.AWAITING_MASTERCLASS,
-      OnboardingStatus.AWAITING_REVISION_CALL
-    ],
-    [OnboardingStatus.AWAITING_MASTERCLASS]: [
-      OnboardingStatus.AWAITING_REVISION_CALL
-    ],
-    [OnboardingStatus.AWAITING_REVISION_CALL]: [
-      OnboardingStatus.CONFIRMED
-    ],
-    [OnboardingStatus.CONFIRMED]: [],
-    [OnboardingStatus.DENIED]: [],
-    [OnboardingStatus.INACTIVE]: []
-  };
-
-  return validTransitions[fromStatus]?.includes(toStatus) ?? false;
-};
-
-// Helper function to validate onboarding state
-const validateOnboardingState = (user: User): { isValid: boolean; issues: string[] } => {
-  const issues: string[] = [];
-
-  // Check for invalid status combinations
-  if (user.onboardingStatus === OnboardingStatus.CONFIRMED && !user.onboardingProgress?.watchedMasterclass) {
-    issues.push('Confirmed user has not watched masterclass');
-  }
-
-  if (user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL && user.stats.cubesAttended === 0) {
-    issues.push('User awaiting revision call has not attended any cubes');
-  }
-
-  if (user.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS && user.onboardingProgress?.watchedMasterclass) {
-    issues.push('User awaiting masterclass has already watched it');
-  }
-
-  return { isValid: issues.length === 0, issues };
-};
+import { ROLE_HIERARCHY } from '@/utils/auth';
 
 export interface UsersState {
   users: User[];
@@ -83,11 +43,25 @@ export interface UsersActions {
   updateUserOrganiserOf: (userId: string, newOrganiserOf: string[]) => void;
   updateProfile: (userId: string, updatedData: Partial<User>) => void;
   // Onboarding progress actions
-  scheduleOnboardingCall: (userId: string, organiserId: string, when: Date, contactInfo: string) => void;
+  scheduleOnboardingCall: (
+    userId: string,
+    organiserId: string,
+    when: Date,
+    contactInfo: string
+  ) => void;
   confirmWatchedMasterclass: (userId: string) => void;
-  scheduleRevisionCall: (userId: string, organiserId: string, when: Date, contactInfo: string) => void;
+  scheduleRevisionCall: (
+    userId: string,
+    organiserId: string,
+    when: Date,
+    contactInfo: string
+  ) => void;
   deleteUser: (userIdToDelete: string) => Promise<void>;
-  addOrganizerNote: (targetUserId: string, noteContent: string, author: User) => void;
+  addOrganizerNote: (
+    targetUserId: string,
+    noteContent: string,
+    author: User
+  ) => void;
   editOrganizerNote: (
     targetUserId: string,
     noteId: string,
@@ -98,7 +72,10 @@ export interface UsersActions {
     updates: { userId: string; newStats: Partial<User['stats']> }[]
   ) => void;
   confirmFirstCubeAttended: (userId: string) => void; // NEW ACTION
-  validateUserOnboarding: (userId: string) => { isValid: boolean; issues: string[] };
+  validateUserOnboarding: (userId: string) => {
+    isValid: boolean;
+    issues: string[];
+  };
   autoAdvanceOnboarding: (userId: string) => void;
   fixOnboardingIssues: () => void;
   resetToInitialData: () => void;
@@ -123,71 +100,12 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         return state.users;
       },
 
-      init: () => { },
+      init: () => {},
 
       register: (formData) => {
-        const newUser: User = {
-          id: `user_${Date.now()}`,
-          email: formData.email,
-          name: formData.name,
-          instagram: formData.instagram || undefined,
-          chapters: [formData.chapter],
-          onboardingAnswers: formData.answers,
-          role: Role.APPLICANT,
-          onboardingStatus: OnboardingStatus.PENDING_APPLICATION_REVIEW,
-          stats: {
-            totalHours: 0,
-            cubesAttended: 0,
-            veganConversions: 0,
-            totalConversations: 0,
-            cities: [],
-          },
-          profilePictureUrl: `https://i.pravatar.cc/100?u=${Date.now()}`,
-          badges: [],
-          hostingAvailability: false,
-          joinDate: new Date(),
-          lastLogin: new Date(),
-        };
+        const newUser = createNewUser(formData);
         set((state) => ({ users: [...state.users, newUser] }));
-
-        // Find organizers of the chapter and notify them
-        let organizersToNotify = get().users.filter(
-          (u) =>
-            u.role === Role.CHAPTER_ORGANISER &&
-            u.organiserOf?.includes(formData.chapter)
-        );
-
-        // **FIX: Application Black Hole Escalation Logic**
-        if (organizersToNotify.length === 0) {
-          const allChapters = useChaptersStore.getState().chapters;
-          const chapterData = allChapters.find(c => c.name === formData.chapter);
-          if (chapterData) {
-            // Escalate to Regional Organiser
-            organizersToNotify = get().users.filter(u => u.role === Role.REGIONAL_ORGANISER && u.managedCountry === chapterData.country);
-          }
-        }
-
-        if (organizersToNotify.length === 0) {
-          // Escalate to Global Admins if no regional organizer is found
-          organizersToNotify = get().users.filter(u => u.role === Role.GLOBAL_ADMIN);
-        }
-
-        const notificationsToCreate = organizersToNotify.map((org) => ({
-          userId: org.id,
-          type: NotificationType.NEW_APPLICANT,
-          message: `${formData.name} has applied to join the ${formData.chapter} chapter.`,
-          linkTo: '/manage',
-          relatedUser: newUser,
-        }));
-        useNotificationsStore.getState().addNotifications(notificationsToCreate);
-
-        // FIX: Add notification for the newly registered user
-        useNotificationsStore.getState().addNotification({
-          userId: newUser.id,
-          type: NotificationType.NEW_ANNOUNCEMENT, // Using existing type for now
-          message: `Welcome, ${formData.name}! Your application for ${formData.chapter} has been submitted for review.`,
-          linkTo: '/onboarding-status',
-        });
+        handleNewApplicationNotifications(newUser, get().users);
       },
 
       updateUserStatus: (userId, status, approver) => {
@@ -199,7 +117,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
 
         // Validate the status transition
         if (!isValidStatusTransition(currentUser.onboardingStatus, status)) {
-          console.error(`Invalid status transition from ${currentUser.onboardingStatus} to ${status}`);
+          console.error(
+            `Invalid status transition from ${currentUser.onboardingStatus} to ${status}`
+          );
           return;
         }
 
@@ -209,7 +129,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           );
 
           if (useAuthStore.getState().currentUser?.id === userId) {
-            useAuthStore.getState().updateCurrentUser({ onboardingStatus: status });
+            useAuthStore
+              .getState()
+              .updateCurrentUser({ onboardingStatus: status });
           }
 
           return { users: updatedUsers };
@@ -270,15 +192,22 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }
 
         // Validate that user can be finalized
-        if (currentUser.onboardingStatus !== OnboardingStatus.AWAITING_REVISION_CALL) {
-          console.warn(`User ${userId} cannot be finalized from status ${currentUser.onboardingStatus}`);
+        if (
+          currentUser.onboardingStatus !==
+          OnboardingStatus.AWAITING_REVISION_CALL
+        ) {
+          console.warn(
+            `User ${userId} cannot be finalized from status ${currentUser.onboardingStatus}`
+          );
           return;
         }
 
         // Validate onboarding state
         const validation = validateOnboardingState(currentUser);
         if (!validation.isValid) {
-          console.warn(`Cannot finalize user ${userId}: ${validation.issues.join(', ')}`);
+          console.warn(
+            `Cannot finalize user ${userId}: ${validation.issues.join(', ')}`
+          );
           return;
         }
 
@@ -324,8 +253,12 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }
 
         // Only allow this if user is in appropriate status
-        if (currentUser.onboardingStatus !== OnboardingStatus.AWAITING_MASTERCLASS) {
-          console.warn(`User ${userId} cannot confirm masterclass in status ${currentUser.onboardingStatus}`);
+        if (
+          currentUser.onboardingStatus !== OnboardingStatus.AWAITING_MASTERCLASS
+        ) {
+          console.warn(
+            `User ${userId} cannot confirm masterclass in status ${currentUser.onboardingStatus}`
+          );
           return;
         }
 
@@ -339,10 +272,17 @@ export const useUsersStore = create<UsersState & UsersActions>()(
 
             const onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
 
-            const updatedUser = { ...u, onboardingProgress: progress, onboardingStatus };
+            const updatedUser = {
+              ...u,
+              onboardingProgress: progress,
+              onboardingStatus,
+            };
 
             if (useAuthStore.getState().currentUser?.id === userId) {
-              useAuthStore.getState().updateCurrentUser({ onboardingProgress: progress, onboardingStatus });
+              useAuthStore.getState().updateCurrentUser({
+                onboardingProgress: progress,
+                onboardingStatus,
+              });
             }
             return updatedUser;
           });
@@ -378,8 +318,11 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         let newStatus: OnboardingStatus | null = null;
 
         // Check if user can advance from AWAITING_FIRST_CUBE
-        if (currentUser.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
-          currentUser.stats.cubesAttended > 0) {
+        if (
+          currentUser.onboardingStatus ===
+            OnboardingStatus.AWAITING_FIRST_CUBE &&
+          currentUser.stats.cubesAttended > 0
+        ) {
           if (currentUser.onboardingProgress?.watchedMasterclass) {
             newStatus = OnboardingStatus.AWAITING_REVISION_CALL;
           } else {
@@ -388,8 +331,11 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }
 
         // Check if user can advance from AWAITING_REVISION_CALL
-        if (currentUser.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
-          currentUser.onboardingProgress?.revisionCallScheduledAt) {
+        if (
+          currentUser.onboardingStatus ===
+            OnboardingStatus.AWAITING_REVISION_CALL &&
+          currentUser.onboardingProgress?.revisionCallScheduledAt
+        ) {
           newStatus = OnboardingStatus.CONFIRMED;
         }
 
@@ -402,26 +348,27 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       // Fix common onboarding issues across all users
       fixOnboardingIssues: () => {
         const users = get().users;
-        let fixedCount = 0;
 
         users.forEach((user) => {
           const validation = validateOnboardingState(user);
           if (!validation.isValid) {
-            console.warn(`User ${user.name} has onboarding issues: ${validation.issues.join(', ')}`);
+            console.warn(
+              `User ${user.name} has onboarding issues: ${validation.issues.join(', ')}`
+            );
 
             // Try to auto-advance the user
             get().autoAdvanceOnboarding(user.id);
-            fixedCount++;
           }
         });
-
-        if (fixedCount > 0) {
-          console.log(`Fixed onboarding issues for ${fixedCount} users`);
-        }
       },
 
       // Schedule a revision call with selected organiser and time
-      scheduleRevisionCall: (userId: string, organiserId: string, when: Date, contactInfo: string) => {
+      scheduleRevisionCall: (
+        userId: string,
+        organiserId: string,
+        when: Date,
+        contactInfo: string
+      ) => {
         const currentUser = get().users.find((u) => u.id === userId);
         const organiser = get().users.find((u) => u.id === organiserId);
 
@@ -435,8 +382,13 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         }
 
         // Only allow this if user is in appropriate status
-        if (currentUser.onboardingStatus !== OnboardingStatus.AWAITING_REVISION_CALL) {
-          console.warn(`User ${userId} cannot schedule revision call in status ${currentUser.onboardingStatus}`);
+        if (
+          currentUser.onboardingStatus !==
+          OnboardingStatus.AWAITING_REVISION_CALL
+        ) {
+          console.warn(
+            `User ${userId} cannot schedule revision call in status ${currentUser.onboardingStatus}`
+          );
           return;
         }
 
@@ -451,7 +403,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             };
             const updatedUser = { ...u, onboardingProgress: progress };
             if (useAuthStore.getState().currentUser?.id === userId) {
-              useAuthStore.getState().updateCurrentUser({ onboardingProgress: progress });
+              useAuthStore
+                .getState()
+                .updateCurrentUser({ onboardingProgress: progress });
             }
             return updatedUser;
           });
@@ -480,7 +434,12 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       scheduleOnboardingCall: (userId, organiserId, when, contactInfo) => {
         const currentUser = get().users.find((u) => u.id === userId);
         const organiser = get().users.find((u) => u.id === organiserId);
-        if (!currentUser || !organiser || currentUser.onboardingStatus !== OnboardingStatus.PENDING_ONBOARDING_CALL) {
+        if (
+          !currentUser ||
+          !organiser ||
+          currentUser.onboardingStatus !==
+            OnboardingStatus.PENDING_ONBOARDING_CALL
+        ) {
           return;
         }
 
@@ -495,7 +454,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             };
             const updatedUser = { ...u, onboardingProgress: progress };
             if (useAuthStore.getState().currentUser?.id === userId) {
-              useAuthStore.getState().updateCurrentUser({ onboardingProgress: progress });
+              useAuthStore
+                .getState()
+                .updateCurrentUser({ onboardingProgress: progress });
             }
             return updatedUser;
           });
@@ -523,12 +484,16 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       // Manually confirm first cube attendance as a fallback
       confirmFirstCubeAttended: (userId: string) => {
         const currentUser = get().users.find((u) => u.id === userId);
-        if (!currentUser || currentUser.onboardingStatus !== OnboardingStatus.AWAITING_FIRST_CUBE) {
+        if (
+          !currentUser ||
+          currentUser.onboardingStatus !== OnboardingStatus.AWAITING_FIRST_CUBE
+        ) {
           return;
         }
 
         set((state) => {
-          const watchedMasterclass = currentUser.onboardingProgress?.watchedMasterclass;
+          const watchedMasterclass =
+            currentUser.onboardingProgress?.watchedMasterclass;
           const nextStatus = watchedMasterclass
             ? OnboardingStatus.AWAITING_REVISION_CALL
             : OnboardingStatus.AWAITING_MASTERCLASS;
@@ -538,7 +503,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           );
 
           if (useAuthStore.getState().currentUser?.id === userId) {
-            useAuthStore.getState().updateCurrentUser({ onboardingStatus: nextStatus });
+            useAuthStore
+              .getState()
+              .updateCurrentUser({ onboardingStatus: nextStatus });
           }
 
           // Send appropriate notification
@@ -581,10 +548,10 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           users: state.users.map((u) =>
             u.id === userId
               ? {
-                ...u,
-                role: Role.CHAPTER_ORGANISER,
-                organiserOf: [...new Set(chaptersToOrganise)],
-              }
+                  ...u,
+                  role: Role.CHAPTER_ORGANISER,
+                  organiserOf: [...new Set(chaptersToOrganise)],
+                }
               : u
           ),
         })),
@@ -596,7 +563,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           );
           // If this is the current user, also update the auth store
           if (useAuthStore.getState().currentUser?.id === userId) {
-            useAuthStore.getState().updateCurrentUser({ chapters: newChapters });
+            useAuthStore
+              .getState()
+              .updateCurrentUser({ chapters: newChapters });
           }
           return { users: updatedUsers };
         }),
@@ -607,7 +576,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             u.id === userId ? { ...u, organiserOf: newOrganiserOf } : u
           );
           if (useAuthStore.getState().currentUser?.id === userId) {
-            useAuthStore.getState().updateCurrentUser({ organiserOf: newOrganiserOf });
+            useAuthStore
+              .getState()
+              .updateCurrentUser({ organiserOf: newOrganiserOf });
           }
           return { users: updatedUsers };
         }),
@@ -633,7 +604,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       deleteUser: (userIdToDelete: string): Promise<void> => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            const userToDelete = get().users.find((u) => u.id === userIdToDelete);
+            const userToDelete = get().users.find(
+              (u) => u.id === userIdToDelete
+            );
             if (!userToDelete) {
               console.error('User to delete not found');
               return resolve();
@@ -645,29 +618,45 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             }
 
             // If the user is a chapter organizer, handle chapter re-assignment
-            if (userToDelete.role === Role.CHAPTER_ORGANISER && userToDelete.organiserOf && userToDelete.organiserOf.length > 0) {
+            if (
+              userToDelete.role === Role.CHAPTER_ORGANISER &&
+              userToDelete.organiserOf &&
+              userToDelete.organiserOf.length > 0
+            ) {
               const chaptersToReassign = userToDelete.organiserOf;
-              chaptersToReassign.forEach(chapterName => {
+              chaptersToReassign.forEach((chapterName) => {
                 // Find another organizer for this chapter
-                const otherOrganiser = get().users.find(u =>
-                  u.id !== userIdToDelete &&
-                  u.role === Role.CHAPTER_ORGANISER &&
-                  u.organiserOf?.includes(chapterName)
+                const otherOrganiser = get().users.find(
+                  (u) =>
+                    u.id !== userIdToDelete &&
+                    u.role === Role.CHAPTER_ORGANISER &&
+                    u.organiserOf?.includes(chapterName)
                 );
 
                 if (!otherOrganiser) {
                   // If no other organizer, find a global organizer or admin
-                  const fallbackOrganiser = get().users.find(u => u.role === Role.REGIONAL_ORGANISER || u.role === Role.GLOBAL_ADMIN);
+                  const fallbackOrganiser = get().users.find(
+                    (u) =>
+                      u.role === Role.REGIONAL_ORGANISER ||
+                      u.role === Role.GLOBAL_ADMIN
+                  );
                   if (fallbackOrganiser) {
                     // This is a simplified reassignment. A real app might have more complex logic.
-                    get().updateUserOrganiserOf(fallbackOrganiser.id, [...(fallbackOrganiser.organiserOf || []), chapterName]);
+                    get().updateUserOrganiserOf(fallbackOrganiser.id, [
+                      ...(fallbackOrganiser.organiserOf || []),
+                      chapterName,
+                    ]);
                     // Also promote them to Chapter Organiser if they aren't already one
                     if (fallbackOrganiser.role !== Role.CHAPTER_ORGANISER) {
-                      get().updateUserRole(fallbackOrganiser.id, Role.CHAPTER_ORGANISER);
+                      get().updateUserRole(
+                        fallbackOrganiser.id,
+                        Role.CHAPTER_ORGANISER
+                      );
                     }
-                    console.log(`Chapter ${chapterName} has been reassigned to ${fallbackOrganiser.name}.`);
                   } else {
-                    console.warn(`No fallback organizer found for chapter ${chapterName}.`);
+                    console.warn(
+                      `No fallback organizer found for chapter ${chapterName}.`
+                    );
                   }
                 }
               });
@@ -681,7 +670,11 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         });
       },
 
-      addOrganizerNote: (targetUserId: string, noteContent: string, author: User) => {
+      addOrganizerNote: (
+        targetUserId: string,
+        noteContent: string,
+        author: User
+      ) => {
         const newNote: OrganizerNote = {
           id: `note_${Date.now()}`,
           authorName: author.name,
@@ -714,7 +707,9 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         set((state) => ({
           users: state.users.map((u) => {
             if (u.id !== targetUserId) return u;
-            const updatedNotes = u.organizerNotes?.filter((n) => n.id !== noteId);
+            const updatedNotes = u.organizerNotes?.filter(
+              (n) => n.id !== noteId
+            );
             return { ...u, organizerNotes: updatedNotes };
           }),
         }));
@@ -757,7 +752,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
       // FIX: Added new action to decouple onboarding logic from stats updates
       advanceOnboardingAfterEvent: (userId: string) => {
         set((state) => {
-          const user = state.users.find(u => u.id === userId);
+          const user = state.users.find((u) => u.id === userId);
           if (!user) return state;
 
           const prevCubes = user.stats?.cubesAttended ?? 0;
@@ -765,7 +760,8 @@ export const useUsersStore = create<UsersState & UsersActions>()(
 
           // Only advance if this is the first cube
           if (prevCubes === 0 && newCubes === 1) {
-            const watched = user.onboardingProgress?.watchedMasterclass === true;
+            const watched =
+              user.onboardingProgress?.watchedMasterclass === true;
             let newOnboardingStatus = user.onboardingStatus;
 
             if (watched) {
@@ -796,36 +792,39 @@ export const useUsersStore = create<UsersState & UsersActions>()(
             if (useAuthStore.getState().currentUser?.id === user.id) {
               useAuthStore.getState().updateCurrentUser({
                 stats: updatedUser.stats,
-                onboardingStatus: newOnboardingStatus
+                onboardingStatus: newOnboardingStatus,
               });
             }
 
             return {
-              users: state.users.map(u => u.id === userId ? updatedUser : u)
+              users: state.users.map((u) =>
+                u.id === userId ? updatedUser : u
+              ),
             };
           }
 
           return state;
         });
       },
-
     }),
     {
-      name: 'users-store', onRehydrateStorage: () => (rehydrated, error) => {
+      name: 'users-store',
+      onRehydrateStorage: () => (rehydrated) => {
         if (rehydrated) {
-          console.log('Users store rehydrated successfully');
+          // Store rehydrated successfully
         } else {
-          console.log('Users store rehydration failed', error);
+          // Store rehydration failed
         }
-      }
+      },
     }
   )
 );
 
-export const useUsersState = () => useUsersStore((s) => {
-  // Ensure users are available
-  return s.users && s.users.length > 0 ? s.users : s.getUsers();
-});
+export const useUsersState = () =>
+  useUsersStore((s) => {
+    // Ensure users are available
+    return s.users && s.users.length > 0 ? s.users : s.getUsers();
+  });
 export const useUsersActions = () =>
   useUsersStore((s) => ({
     register: s.register,
@@ -851,7 +850,7 @@ export const useUsersActions = () =>
     resetToInitialData: s.resetToInitialData,
     clearPersistedData: s.clearPersistedData,
     init: s.init,
-    advanceOnboardingAfterEvent: s.advanceOnboardingAfterEvent
+    advanceOnboardingAfterEvent: s.advanceOnboardingAfterEvent,
   }));
 
 // Selectors
@@ -864,5 +863,3 @@ export const useUserById = (userId?: string) => {
   });
   return user;
 };
-
-

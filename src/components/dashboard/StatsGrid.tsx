@@ -27,10 +27,18 @@ const StatCard: React.FC<{
         : 'cursor-default'
     }`}
     onClick={onClick}
+    onKeyDown={onClick ? (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    } : undefined}
+    role={onClick ? 'button' : undefined}
+    tabIndex={onClick ? 0 : undefined}
   >
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
-      <p className="ml-3 truncate text-sm font-semibold uppercase tracking-wider text-red">
+      <p className="text-red ml-3 truncate text-sm font-semibold uppercase tracking-wider">
         {title}
       </p>
     </div>

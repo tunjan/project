@@ -44,22 +44,24 @@ const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
           rows={8}
         />
 
-        <div className="space-y-4 border-t-2 border-black pt-4 mt-4">
-            <h3 className="text-lg font-bold text-black">Optional: Call to Action</h3>
-             <InputField
-              label="CTA Link"
-              id="edit-ctaLink"
-              value={ctaLink}
-              onChange={(e) => setCtaLink(e.target.value)}
-              placeholder="https://example.com/more-info"
-            />
-            <InputField
-              label="CTA Button Text"
-              id="edit-ctaText"
-              value={ctaText}
-              onChange={(e) => setCtaText(e.target.value)}
-              placeholder="Learn More"
-            />
+        <div className="mt-4 space-y-4 border-t-2 border-black pt-4">
+          <h3 className="text-lg font-bold text-black">
+            Optional: Call to Action
+          </h3>
+          <InputField
+            label="CTA Link"
+            id="edit-ctaLink"
+            value={ctaLink}
+            onChange={(e) => setCtaLink(e.target.value)}
+            placeholder="https://example.com/more-info"
+          />
+          <InputField
+            label="CTA Button Text"
+            id="edit-ctaText"
+            value={ctaText}
+            onChange={(e) => setCtaText(e.target.value)}
+            placeholder="Learn More"
+          />
         </div>
         <div className="flex items-center space-x-4 pt-4">
           <button

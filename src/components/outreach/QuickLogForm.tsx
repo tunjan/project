@@ -26,7 +26,7 @@ const TabButton: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`-mb-px border-b-2 px-4 py-2 text-sm font-bold ${
+    className={`-mb-px w-full border-b-2 px-4 py-2 text-sm font-bold ${
       isActive
         ? 'border-primary text-primary'
         : 'border-transparent text-neutral-500 hover:text-black'
@@ -188,7 +188,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
         </div>
 
         <div className="border-t-2 border-black">
-          <div className="border-b border-black">
+          <div className="flex justify-between border-b border-black">
             <TabButton
               isActive={mode === 'single'}
               onClick={() => setMode('single')}

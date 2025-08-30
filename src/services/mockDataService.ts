@@ -1,4 +1,18 @@
-import { type Chapter, type User, type CubeEvent, type OutreachLog, type Announcement, type Resource, type Notification, type BadgeAward, type InventoryItem, type Challenge, Role, OnboardingStatus } from '@/types';
+import {
+  type Chapter,
+  type User,
+  type CubeEvent,
+  type OutreachLog,
+  type Announcement,
+  type Resource,
+  type Notification,
+  type BadgeAward,
+  type InventoryItem,
+  type Challenge,
+  Role,
+  OnboardingStatus,
+} from '@/types';
+import { generateAvatarUrl } from '../utils/user';
 
 export interface MockDataResponse {
   chapters: Chapter[];
@@ -28,7 +42,9 @@ class MockDataService {
    * Fetch mock data from static generated data
    * No more broken API calls - uses local data directly
    */
-  async fetchMockData(options: MockDataOptions = {}): Promise<MockDataResponse> {
+  async fetchMockData(
+    options: MockDataOptions = {}
+  ): Promise<MockDataResponse> {
     const { scenario = 'default', cache = true } = options;
     const cacheKey = `mock_data_${scenario}`;
 
@@ -36,14 +52,11 @@ class MockDataService {
     if (cache && this.isCacheValid(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (cached) {
-        console.log('📦 Using cached mock data');
         return cached;
       }
     }
 
     try {
-      console.log('📊 Loading mock data from static files...');
-
       // Import the static mock data directly
       const mockData = await import('../data/mockData');
 
@@ -64,12 +77,9 @@ class MockDataService {
       if (cache) {
         this.cache.set(cacheKey, data);
         this.cacheTimestamps.set(cacheKey, Date.now());
-        console.log('💾 Mock data cached');
       }
 
-      console.log(`✅ Loaded ${data.users.length} users, ${data.chapters.length} chapters, ${data.events.length} events`);
       return data;
-
     } catch (error) {
       console.error('❌ Failed to load mock data:', error);
 
@@ -94,24 +104,21 @@ class MockDataService {
   clearCache(): void {
     this.cache.clear();
     this.cacheTimestamps.clear();
-    console.log('🗑️ Mock data cache cleared');
   }
 
   /**
    * Get fallback data if everything else fails
    */
   private getFallbackData(): MockDataResponse {
-    console.log('🔄 Using fallback mock data');
-
     return {
       chapters: [
         {
           name: 'Fallback Chapter',
           country: 'United States',
           lat: 40.7128,
-          lng: -74.0060,
-          instagram: '@fallback_chapter'
-        }
+          lng: -74.006,
+          instagram: '@fallback_chapter',
+        },
       ],
       users: [
         {
@@ -121,7 +128,7 @@ class MockDataService {
           role: Role.ACTIVIST,
           chapters: ['Fallback Chapter'],
           onboardingStatus: OnboardingStatus.CONFIRMED,
-          profilePictureUrl: 'https://i.pravatar.cc/150?u=fallback',
+          profilePictureUrl: generateAvatarUrl('fallback'),
           joinDate: new Date('2023-01-01'),
           lastLogin: new Date(),
           stats: {
@@ -129,12 +136,12 @@ class MockDataService {
             cubesAttended: 2,
             veganConversions: 1,
             totalConversations: 5,
-            cities: ['Fallback Chapter']
+            cities: ['Fallback Chapter'],
           },
           badges: [],
           hostingAvailability: false,
-          hostingCapacity: 1
-        }
+          hostingCapacity: 1,
+        },
       ],
       events: [],
       outreachLogs: [],
@@ -143,7 +150,7 @@ class MockDataService {
       notifications: [],
       badges: [],
       inventory: [],
-      challenges: []
+      challenges: [],
     };
   }
 

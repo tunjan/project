@@ -197,7 +197,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           <button
             onClick={handleRoleChange}
             disabled={selectedRole === organiser.role || isLoading}
-            className="mt-2 w-full bg-black px-4 py-2 font-bold text-white hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:bg-red mt-2 w-full bg-black px-4 py-2 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? 'Updating...' : 'Update Role'}
           </button>

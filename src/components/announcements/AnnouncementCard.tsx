@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { PencilIcon, TrashIcon, ChevronRightIcon } from '@/icons';
 import EditAnnouncementModal from './EditAnnouncementModal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import Avatar from '@/components/ui/Avatar';
 
 const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
   scope,
@@ -99,7 +100,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
 
       <div className="overflow-hidden border-2 border-black bg-white">
         <div className="p-6">
-          <div className="mb-4 flex items-start justify-between">
+          <div className="mb-4 flex justify-between">
             <ScopeBadge
               scope={announcement.scope}
               target={announcement.country || announcement.chapter}
@@ -151,10 +152,10 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           )}
 
           <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
-            <img
-              className="h-10 w-10 object-cover"
+            <Avatar
               src={announcement.author.profilePictureUrl}
               alt={announcement.author.name}
+              className="h-10 w-10 object-cover"
             />
             <div className="ml-3">
               <p className="text-sm font-semibold text-black">

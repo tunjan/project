@@ -25,7 +25,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
           </label>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="text-neutral-500 h-5 w-5" />
+              <SearchIcon className="h-5 w-5 text-neutral-500" />
             </div>
             <input
               type="text"
@@ -33,7 +33,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               placeholder="Search by keyword..."
               value={props.searchTerm}
               onChange={(e) => props.setSearchTerm(e.target.value)}
-              className="placeholder:text-neutral-500 block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block w-full rounded-none border border-black bg-white py-2 pl-10 pr-3 text-black placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
             />
           </div>
         </div>

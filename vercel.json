@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://i.pravatar.cc https://picsum.photos https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://*.tiles.stadiamaps.com https://*.tile.thunderforest.com; connect-src 'self' ws:; frame-src 'self'; object-src 'none'; base-uri 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://i.pravatar.cc https://picsum.photos https://cors-anywhere.herokuapp.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://*.tiles.stadiamaps.com https://*.tile.thunderforest.com; connect-src 'self' ws:; frame-src 'self'; object-src 'none'; base-uri 'self';"
         },
         {
           "key": "X-Frame-Options",

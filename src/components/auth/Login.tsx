@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { type User, Role, OnboardingStatus } from '@/types';
 import { can, Permission } from '@/config/permissions';
 import Tag from '@/components/ui/Tag';
 import { ChevronRightIcon } from '@/icons';
+import Avatar from '@/components/ui/Avatar';
 
 interface LoginProps {
   users: User[];
@@ -128,26 +129,41 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
     count: number;
     openKey: 'organizers' | 'activists' | 'applicants'; // FIX: Updated type to match actual usage
     children: React.ReactNode;
-  }> = ({ title, count, openKey, children }) => (
-    <div className="border-2 border-black bg-white">
-      <button
-        type="button"
-        onClick={() => toggle(openKey)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-neutral-100"
-      >
-        <div>
-          <p className="font-extrabold">{title}</p>
-          <p className="text-xs text-neutral-600">
-            {count.toLocaleString()} profiles
-          </p>
-        </div>
-        <ChevronRightIcon
-          className={`h-4 w-4 transition-transform ${open[openKey] ? 'rotate-90' : ''}`}
-        />
-      </button>
-      {open[openKey] && <div className="px-3 pb-3">{children}</div>}
-    </div>
-  );
+  }> = ({ title, count, openKey, children }) => {
+    const contentId = `section-${openKey}-content`;
+
+    return (
+      <div className="border-2 border-black bg-white">
+        <button
+          type="button"
+          onClick={() => toggle(openKey)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-neutral-100"
+          aria-expanded={open[openKey]}
+          aria-controls={contentId}
+        >
+          <div>
+            <p className="font-extrabold">{title}</p>
+            <p className="text-xs text-neutral-600">
+              {count.toLocaleString()} profiles
+            </p>
+          </div>
+          <ChevronRightIcon
+            className={`h-4 w-4 transition-transform ${open[openKey] ? 'rotate-90' : ''}`}
+          />
+        </button>
+        {open[openKey] && (
+          <div
+            id={contentId}
+            className="px-3 pb-3"
+            role="region"
+            aria-label={`${title} profiles`}
+          >
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const UserButton: React.FC<{ user: User }> = ({ user }) => (
     <button
@@ -155,7 +171,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       onClick={() => onLogin(user)}
       className={`flex w-full items-center gap-4 border-2 border-black ${borderClassFor(user)} bg-white p-3 text-left transition-colors duration-200 hover:bg-neutral-100`}
     >
-      <img
+      <Avatar
         src={user.profilePictureUrl}
         alt={user.name}
         className="h-12 w-12 border-2 border-black object-cover"

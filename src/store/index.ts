@@ -38,32 +38,33 @@ export { useChapterJoinRequests, useChapterByName } from './chapters.store';
 export { useBadgeAwardsForUser } from './awards.store';
 export { useEventById } from './events.store';
 export { useUserById, useUsersActions } from './users.store';
-export { useNotificationsForUser, useUnreadNotificationCount } from './notifications.store';
+export {
+  useNotificationsForUser,
+  useUnreadNotificationCount,
+} from './notifications.store';
 export { useLogsForEvent } from './outreach.store';
 
 // Combined actions hook for backward compatibility
 export const useAppActions = () => {
-    const usersActions = useUsersActions();
-    const eventsActions = useEventsActions();
-    const chaptersActions = useChaptersActions();
-    const announcementsActions = useAnnouncementsActions();
-    const notificationsActions = useNotificationsActions();
-    const outreachActions = useOutreachActions();
-    const awardsActions = useAwardsActions();
-    const accommodationsActions = useAccommodationsActions();
-    const commentsActions = useCommentsActions();
+  const usersActions = useUsersActions();
+  const eventsActions = useEventsActions();
+  const chaptersActions = useChaptersActions();
+  const announcementsActions = useAnnouncementsActions();
+  const notificationsActions = useNotificationsActions();
+  const outreachActions = useOutreachActions();
+  const awardsActions = useAwardsActions();
+  const accommodationsActions = useAccommodationsActions();
+  const commentsActions = useCommentsActions();
 
-    return {
-        ...usersActions,
-        ...eventsActions,
-        ...chaptersActions,
-        ...announcementsActions,
-        ...notificationsActions,
-        ...outreachActions,
-        ...awardsActions,
-        ...accommodationsActions,
-        ...commentsActions,
-    };
+  return {
+    ...usersActions,
+    ...eventsActions,
+    ...chaptersActions,
+    ...announcementsActions,
+    ...notificationsActions,
+    ...outreachActions,
+    ...awardsActions,
+    ...accommodationsActions,
+    ...commentsActions,
+  };
 };
-
-

@@ -54,7 +54,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     return (
       <div className="border-2 border-black bg-white p-4 md:p-6">
         <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-        <div className="text-neutral-500 flex h-[350px] items-center justify-center">
+        <div className="flex h-[350px] items-center justify-center text-neutral-500">
           Not enough data to display chart.
         </div>
       </div>

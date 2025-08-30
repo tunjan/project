@@ -84,7 +84,7 @@ const InventoryItemCard: React.FC<{
 }> = ({ item, onEdit, onDelete }) => {
   return (
     <div className="border-2 border-black bg-white p-4">
-      <div className="flex items-start justify-between">
+      <div className="flex justify-between">
         <div className="flex-1">
           <div className="mb-3">
             <h3 className="h-card">{item.category}</h3>
@@ -96,14 +96,14 @@ const InventoryItemCard: React.FC<{
         <div className="flex gap-2">
           <button
             onClick={onEdit}
-            className="text-neutral-600 p-2 transition-colors duration-300 hover:bg-black hover:text-white"
+            className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
             title="Edit item"
           >
             <PencilIcon className="h-4 w-4" />
           </button>
           <button
             onClick={onDelete}
-            className="text-neutral-600 p-2 transition-colors duration-300 hover:bg-primary hover:text-white"
+            className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-primary hover:text-white"
             title="Delete item"
           >
             <TrashIcon className="h-4 w-4" />
@@ -194,7 +194,7 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="h-section">{chapterName} Inventory</h2>
-          <p className="text-neutral-600 font-mono text-sm uppercase tracking-wider">
+          <p className="font-mono text-sm uppercase tracking-wider text-neutral-600">
             {inventory.length} item types • {totalItems} total items
           </p>
         </div>
@@ -254,7 +254,7 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
               ? 'No inventory items yet'
               : `No ${filter.toLowerCase()} found`}
           </h3>
-          <p className="text-neutral-600 mt-3 font-mono text-sm">
+          <p className="mt-3 font-mono text-sm text-neutral-600">
             {filter === 'All'
               ? 'Start building your chapter inventory by adding equipment.'
               : 'Try a different category or add new items.'}

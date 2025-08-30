@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 // Import specific functions from leaflet to avoid module issues
 import * as L from 'leaflet';
 import { type CubeEvent, type Chapter } from '@/types';
+import styles from './CubeMap.module.css';
 
 const CustomMarkerIcon = L.divIcon({
   html: `<div style="width: 20px; height: 20px; background-color: #ef4444; border: 2px solid #000000; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
@@ -41,73 +42,8 @@ const CubeMap: React.FC<CubeMapProps> = ({
   const [tileError, setTileError] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
-  // Force remove rounded corners and shadows from Leaflet popups
-  useEffect(() => {
-    const forceLeafletStyles = () => {
-      const popups = document.querySelectorAll(
-        '.leaflet-popup, .leaflet-popup-content-wrapper, .leaflet-popup-tip'
-      );
-      popups.forEach((popup) => {
-        if (popup instanceof HTMLElement) {
-          popup.style.borderRadius = '0';
-          popup.style.boxShadow = 'none';
-          popup.style.filter = 'none';
-          // Ensure popups don't have extremely high z-index
-          popup.style.zIndex = '30';
-        }
-      });
-    };
-
-    // Apply styles immediately
-    forceLeafletStyles();
-
-    // Also ensure map tiles and other elements don't have extremely high z-index
-    const mapElements = document.querySelectorAll(
-      '.leaflet-tile, .leaflet-overlay-pane, .leaflet-marker-pane, .leaflet-pane'
-    );
-    mapElements.forEach((element) => {
-      if (element instanceof HTMLElement) {
-        element.style.zIndex = '30';
-      }
-    });
-
-    // Set up a mutation observer to catch dynamically created popups
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach((node) => {
-            if (node instanceof HTMLElement) {
-              if (
-                node.classList.contains('leaflet-popup') ||
-                node.classList.contains('leaflet-popup-content-wrapper') ||
-                node.classList.contains('leaflet-popup-tip')
-              ) {
-                forceLeafletStyles();
-              }
-              // Also check child elements
-              const popupElements = node.querySelectorAll(
-                '.leaflet-popup, .leaflet-popup-content-wrapper, .leaflet-popup-tip'
-              );
-              if (popupElements.length > 0) {
-                forceLeafletStyles();
-              }
-            }
-          });
-        }
-      });
-    });
-
-    // Start observing
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Cleanup
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  // CRITICAL FIX: Removed all DOM manipulation and MutationObserver
+  // Custom styles are now handled through CSS modules
 
   const eventMarkers = useMemo(() => {
     return events
@@ -121,7 +57,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
       })
       .filter(
         (item): item is { event: CubeEvent; coords: [number, number] } =>
-          item !== null && item.coords[0] !== 0 && item.coords[1] !== 0
+          item !== null && item.coords[0] !== 0 && item.coords[1] !== 0 // Filter out invalid coordinates
       );
   }, [events, chapters]);
 
@@ -141,7 +77,6 @@ const CubeMap: React.FC<CubeMapProps> = ({
   // Handle map ready
   const handleMapReady = () => {
     setMapReady(true);
-    console.log('Map initialized successfully');
   };
 
   // Fallback tile provider if primary fails
@@ -155,7 +90,9 @@ const CubeMap: React.FC<CubeMapProps> = ({
   };
 
   return (
-    <div className="relative z-30 h-[600px] w-full border-2 border-black bg-white">
+    <div
+      className={`${styles.cubeMapContainer} relative z-30 h-[600px] w-full border-2 border-black bg-white`}
+    >
       {!mapReady && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-gray-100">
           <div className="text-center">

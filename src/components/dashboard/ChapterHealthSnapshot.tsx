@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUsers, useChapters, useEvents } from '@/store';
 import { UserGroupIcon, TrendingUpIcon, CalendarIcon } from '@/icons';
 import { subMonths, isAfter } from 'date-fns';
+import { CubeEvent } from '@/types';
 
 interface ChapterHealth {
   name: string;
@@ -31,30 +32,77 @@ const ChapterHealthSnapshot: React.FC = () => {
     const threeMonthsAgo = subMonths(new Date(), 3);
     const oneMonthAgo = subMonths(new Date(), 1);
 
+    // CRITICAL FIX: Optimize performance by pre-processing data once
+    // Create lookup maps to avoid repeated filtering operations
+    const userChapterMap = new Map<string, string[]>();
+    const eventChapterMap = new Map<string, CubeEvent[]>();
+    const userEventMap = new Map<string, CubeEvent[]>();
+
+    // Build user-chapter relationships
+    allUsers.forEach((user) => {
+      if (user.chapters) {
+        userChapterMap.set(user.id, user.chapters);
+      }
+    });
+
+    // Build event-chapter relationships and user-event relationships
+    allEvents.forEach((event) => {
+      if (event.organizer.chapters) {
+        event.organizer.chapters.forEach((chapterName) => {
+          if (!eventChapterMap.has(chapterName)) {
+            eventChapterMap.set(chapterName, []);
+          }
+          eventChapterMap.get(chapterName)!.push(event);
+        });
+
+        // Track user attendance for performance
+        if (event.report?.attendance) {
+          Object.entries(event.report.attendance).forEach(
+            ([userId, status]) => {
+              if (status === 'Attended') {
+                if (!userEventMap.has(userId)) {
+                  userEventMap.set(userId, []);
+                }
+                userEventMap.get(userId)!.push(event);
+              }
+            }
+          );
+        }
+      }
+    });
+
     return manageableChapters.map((chapter) => {
+      const chapterName = chapter.name;
+
+      // Get chapter members efficiently
       const chapterMembers = allUsers.filter((u) =>
-        u.chapters?.includes(chapter.name)
+        userChapterMap.get(u.id)?.includes(chapterName)
       );
 
+      // Calculate active members efficiently
       const activeMembers = chapterMembers.filter((member) => {
-        const lastEvent = allEvents
-          .filter(
-            (e) =>
-              e.organizer.chapters?.includes(chapter.name) &&
-              e.report?.attendance[member.id] === 'Attended'
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-          )[0];
-        return (
-          lastEvent && isAfter(new Date(lastEvent.startDate), threeMonthsAgo)
+        const userEvents = userEventMap.get(member.id) || [];
+        const chapterEvents = userEvents.filter((event) =>
+          event.organizer.chapters?.includes(chapterName)
         );
+
+        if (chapterEvents.length === 0) return false;
+
+        // Find most recent event for this user in this chapter
+        const lastEvent = chapterEvents.reduce((latest, current) =>
+          new Date(current.startDate) > new Date(latest.startDate)
+            ? current
+            : latest
+        );
+
+        return isAfter(new Date(lastEvent.startDate), threeMonthsAgo);
       }).length;
 
+      // Calculate member growth efficiently
       const recentMembers = chapterMembers.filter(
         (u) => u.joinDate && isAfter(new Date(u.joinDate), oneMonthAgo)
       ).length;
+
       const previousMembers = chapterMembers.length - recentMembers;
       const memberGrowth =
         previousMembers > 0
@@ -64,7 +112,7 @@ const ChapterHealthSnapshot: React.FC = () => {
             : 0;
 
       return {
-        name: chapter.name,
+        name: chapterName,
         totalMembers: chapterMembers.length,
         activeMembers,
         memberGrowth,

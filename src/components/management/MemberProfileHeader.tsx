@@ -1,7 +1,6 @@
 import React from 'react';
 import { User } from '@/types';
-import { BadgeList } from '@/components/dashboard/BadgeList';
-import { DiscountTierProgress } from '@/components/dashboard/DiscountTierProgress';
+import Avatar from '@/components/ui/Avatar';
 
 interface MemberProfileHeaderProps {
   user: User;
@@ -11,7 +10,7 @@ const MemberProfileHeader: React.FC<MemberProfileHeaderProps> = ({ user }) => {
   return (
     <div className="mb-8 border-2 border-black bg-white p-6">
       <div className="flex flex-col items-center gap-6 sm:flex-row">
-        <img
+        <Avatar
           src={user.profilePictureUrl}
           alt={user.name}
           className="h-24 w-24 flex-shrink-0 border-2 border-black object-cover"
