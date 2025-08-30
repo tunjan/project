@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
-import { type CubeEvent, type Chapter } from '@/types';
-import { useEventsActions } from '@/store';
-import Modal from '@/components/ui/Modal';
-import { InputField, SelectField } from '@/components/ui/Form';
 import { toast } from 'sonner';
+
+import { InputField, SelectField } from '@/components/ui/Form';
+import Modal from '@/components/ui/Modal';
+import { useEventsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
+import { type Chapter, type CubeEvent } from '@/types';
 
 interface EditEventModalProps {
   event: CubeEvent;
   organizableChapters: Chapter[];
   onClose: () => void;
+  isOpen: boolean;
 }
 
 const EditEventModal: React.FC<EditEventModalProps> = ({
   event,
   organizableChapters,
   onClose,
+  isOpen,
 }) => {
   const { updateEvent } = useEventsActions();
   const currentUser = useCurrentUser();
@@ -55,7 +58,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
   };
 
   return (
-    <Modal title="Edit Event Details" onClose={onClose}>
+    <Modal title="Edit Event Details" onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <SelectField
           label="City"

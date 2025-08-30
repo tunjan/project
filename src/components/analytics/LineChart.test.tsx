@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import LineChart, { LineChartData } from './LineChart';
 
 // Mock Recharts components

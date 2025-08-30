@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+
 import { useNavItems } from '@/hooks/useNavItems';
-import { LoginIcon, UserAddIcon, MenuIcon, XIcon, SearchIcon } from '@/icons';
+import { LoginIcon, MenuIcon, SearchIcon, UserAddIcon, XIcon } from '@/icons';
+import { useCurrentUser } from '@/store/auth.store';
+import { useSearchActions } from '@/store/search.store';
+
 import NotificationBell from './NotificationBell';
 import UserMenu from './UserMenu';
-import { useSearchActions } from '@/store/search.store';
 
 const NavLinkStyled: React.FC<{
   to: string;
@@ -73,7 +75,7 @@ const Header: React.FC = () => {
                   className="relative border-2 border-transparent p-2 transition-colors hover:border-black focus:border-black"
                   aria-label="Open search"
                 >
-                  <SearchIcon className="h-6 w-6" />
+                  <SearchIcon className="size-6" />
                 </button>
                 <NotificationBell />
                 <UserMenu variant="compact" onLinkClick={closeMenus} />
@@ -84,20 +86,20 @@ const Header: React.FC = () => {
                   aria-controls="mobile-menu"
                 >
                   {isMenuOpen ? (
-                    <XIcon className="h-6 w-6" />
+                    <XIcon className="size-6" />
                   ) : (
-                    <MenuIcon className="h-6 w-6" />
+                    <MenuIcon className="size-6" />
                   )}
                 </button>
               </>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link to="/login" className="btn-outline btn-sm">
-                  <LoginIcon className="h-4 w-4" />
+                  <LoginIcon className="size-4" />
                   <span>Log In</span>
                 </Link>
                 <Link to="/signup" className="btn-primary btn-sm">
-                  <UserAddIcon className="h-4 w-4" />
+                  <UserAddIcon className="size-4" />
                   <span>Sign Up</span>
                 </Link>
               </div>

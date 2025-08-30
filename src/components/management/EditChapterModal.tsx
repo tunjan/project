@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { type Chapter } from '@/types';
-import { useChaptersActions } from '@/store';
+import { toast } from 'sonner';
+
 import { InputField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
-import { toast } from 'sonner';
+import { useChaptersActions } from '@/store';
+import { type Chapter } from '@/types';
 
 interface EditChapterModalProps {
   chapter: Chapter;
   onClose: () => void;
+  isOpen: boolean;
 }
 
 const EditChapterModal: React.FC<EditChapterModalProps> = ({
   chapter,
   onClose,
+  isOpen,
 }) => {
   const { updateChapter } = useChaptersActions();
   const [country, setCountry] = useState(chapter.country);
@@ -33,7 +36,7 @@ const EditChapterModal: React.FC<EditChapterModalProps> = ({
   };
 
   return (
-    <Modal title={`Edit ${chapter.name}`} onClose={onClose}>
+    <Modal title={`Edit ${chapter.name}`} onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <InputField
           label="Country"

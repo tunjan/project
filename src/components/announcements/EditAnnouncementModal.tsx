@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { type Announcement } from '@/types';
-import { useAnnouncementsActions } from '@/store/announcements.store';
+import { toast } from 'sonner';
+
 import { InputField, TextAreaField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
-import { toast } from 'sonner';
+import { useAnnouncementsActions } from '@/store/announcements.store';
+import { type Announcement } from '@/types';
 
 interface EditAnnouncementModalProps {
   announcement: Announcement;
   onClose: () => void;
+  isOpen: boolean;
 }
 
 const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
   announcement,
   onClose,
+  isOpen,
 }) => {
   const { updateAnnouncement } = useAnnouncementsActions();
   const [title, setTitle] = useState(announcement.title);
@@ -28,7 +31,7 @@ const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
   };
 
   return (
-    <Modal title="Edit Announcement" onClose={onClose}>
+    <Modal title="Edit Announcement" onClose={onClose} isOpen={isOpen}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <InputField
           label="Title"

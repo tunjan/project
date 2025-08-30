@@ -1,10 +1,10 @@
 import {
-  type User,
   type CubeEvent,
   type Notification,
-  Role,
-  OnboardingStatus,
   NotificationType,
+  OnboardingStatus,
+  Role,
+  type User,
 } from '@/types';
 import { INACTIVITY_PERIOD_MONTHS } from '@/utils/user';
 
@@ -24,7 +24,8 @@ export const generateInactivityNotifications = (
   currentUser: User
 ): Omit<Notification, 'id' | 'createdAt' | 'isRead'>[] => {
   if (
-    currentUser.role !== Role.CHAPTER_ORGANISER ||
+    (currentUser.role !== Role.CHAPTER_ORGANISER &&
+      currentUser.role !== Role.GLOBAL_ADMIN) ||
     !currentUser.organiserOf?.length
   ) {
     return [];

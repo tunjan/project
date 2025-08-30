@@ -1,20 +1,22 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+
+import Challenges from '@/components/challenges/Challenges';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
+import {
+  ChatBubbleLeftRightIcon,
+  ClockIcon,
+  GlobeAltIcon,
+  TrendingUpIcon,
+  UserGroupIcon,
+  UsersIcon,
+} from '@/icons';
 import { useChallenges } from '@/store';
+
 import BarChart from './BarChart';
+import ChapterScorecard from './ChapterScorecard';
+import Histogram, { HistogramData } from './Histogram';
 import LineChart from './LineChart';
 import ScatterPlot from './ScatterPlot';
-import Histogram, { HistogramData } from './Histogram';
-import ChapterScorecard from './ChapterScorecard';
-import Challenges from '@/components/challenges/Challenges';
-import {
-  ClockIcon,
-  UsersIcon,
-  ChatBubbleLeftRightIcon,
-  GlobeAltIcon,
-  UserGroupIcon,
-  TrendingUpIcon,
-} from '@/icons';
 
 interface AnalyticsDashboardProps {}
 
@@ -50,7 +52,7 @@ const StatCard: React.FC<{
     </div>
     <p className="mt-2 text-4xl font-extrabold text-black">{value}</p>
     {tooltip && (
-      <div className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 w-max rounded-none bg-black px-2 py-1 text-xs font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+      <div className="rounded-nonenone pointer-events-none absolute bottom-full left-0 z-10 mb-2 w-max bg-black px-2 py-1 text-xs font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         {tooltip}
       </div>
     )}
@@ -183,7 +185,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedCountry}
               onChange={handleCountryChange}
               disabled={availableCountries.length <= 1}
-              className="w-full rounded-none border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
+              className="rounded-nonenone w-full border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
             >
               {availableCountries.map((country) => (
                 <option key={country} value={country}>
@@ -204,7 +206,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedChapter}
               onChange={handleChapterChange}
               disabled={chaptersInSelectedCountry.length === 0}
-              className="w-full rounded-none border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
+              className="rounded-nonenone w-full border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
             >
               <option value="all">All Chapters</option>
               {chaptersInSelectedCountry.map((chapter) => (
@@ -249,31 +251,31 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               </h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                 <StatCard
-                  icon={<UsersIcon className="h-6 w-6" />}
+                  icon={<UsersIcon className="size-6" />}
                   title="Total Members"
                   value={overviewStats.totalMembers.toLocaleString()}
                   tooltip="Total number of confirmed activists in the selected scope."
                 />
                 <StatCard
-                  icon={<ClockIcon className="h-6 w-6" />}
+                  icon={<ClockIcon className="size-6" />}
                   title="Total Hours"
                   value={overviewStats.totalHours.toLocaleString()}
                   tooltip="Sum of all activist hours contributed in the selected scope."
                 />
                 <StatCard
-                  icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
+                  icon={<ChatBubbleLeftRightIcon className="size-6" />}
                   title="Total Conversations"
                   value={overviewStats.totalConversations.toLocaleString()}
                   tooltip="Total number of outreach conversations logged."
                 />
                 <StatCard
-                  icon={<GlobeAltIcon className="h-6 w-6" />}
+                  icon={<GlobeAltIcon className="size-6" />}
                   title="Total Events"
                   value={overviewStats.totalEvents.toLocaleString()}
                   tooltip="Total number of events held."
                 />
                 <StatCard
-                  icon={<TrendingUpIcon className="h-6 w-6" />}
+                  icon={<TrendingUpIcon className="size-6" />}
                   title="Convos / Hour"
                   value={overviewStats.conversationsPerHour.toFixed(2)}
                   tooltip="Average conversations per hour of activism. A measure of outreach efficiency."
@@ -287,13 +289,13 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               </h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <StatCard
-                  icon={<UsersIcon className="h-6 w-6" />}
+                  icon={<UsersIcon className="size-6" />}
                   title="Activist Retention"
                   value={`${(activistRetention.rate * 100).toFixed(0)}%`}
                   tooltip="Members active (attended an event) in the last 3 months."
                 />
                 <StatCard
-                  icon={<UserGroupIcon className="h-6 w-6" />}
+                  icon={<UserGroupIcon className="size-6" />}
                   title="Avg. Activists/Event"
                   value={avgActivistsPerEvent.toFixed(1)}
                   tooltip="Average number of participants per event."

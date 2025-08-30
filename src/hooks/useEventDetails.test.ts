@@ -1,13 +1,15 @@
 import { renderHook } from '@testing-library/react';
-import { useEventDetails } from './useEventDetails';
+
 import {
   CubeEvent,
-  User,
-  ParticipantStatus,
   EventStatus,
   OnboardingStatus,
+  ParticipantStatus,
+  User,
 } from '@/types';
 import { Role } from '@/types';
+
+import { useEventDetails } from './useEventDetails';
 
 // Mock the store hooks
 vi.mock('@/store', () => ({

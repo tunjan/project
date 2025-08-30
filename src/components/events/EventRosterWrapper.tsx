@@ -1,6 +1,8 @@
 import React from 'react';
-import EventRoster from './EventRoster';
+
 import { CubeEvent } from '@/types';
+
+import EventRoster from './EventRoster';
 
 interface EventRosterWrapperProps {
   event: CubeEvent;

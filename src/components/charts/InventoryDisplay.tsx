@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { type InventoryItem } from '@/types';
-import { useChapterInventory } from '@/store/inventory.store';
+
 import { useCurrentUser } from '@/store/auth.store';
+import { useChapterInventory } from '@/store/inventory.store';
+import { type InventoryItem } from '@/types';
 import { Role } from '@/types';
 
 interface InventoryDisplayProps {

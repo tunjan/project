@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { type User, type Chapter, type CubeEvent } from '@/types';
+
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { type Chapter, type CubeEvent, type User } from '@/types';
 
 interface SearchResultsProps {
   users: User[];
@@ -22,7 +23,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     users.length > 0 || chapters.length > 0 || events.length > 0;
 
   return (
-    <div className="absolute left-0 top-full mt-2 w-full rounded-none border-2 border-black bg-white shadow-brutal">
+    <div className="rounded-nonenone absolute left-0 top-full mt-2 w-full border-2 border-black bg-white shadow-brutal">
       <div className="max-h-96 overflow-y-auto p-4">
         {loading && <LoadingSpinner />}
         {!loading && !hasResults && (
@@ -41,7 +42,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/members/${user.id}`}
                         onClick={onClose}
-                        className="block rounded-none p-2 font-bold hover:bg-white"
+                        className="rounded-nonenone block p-2 font-bold hover:bg-white"
                       >
                         {user.name}
                       </Link>
@@ -61,7 +62,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/chapters/${chapter.name}`}
                         onClick={onClose}
-                        className="block rounded-none p-2 font-bold hover:bg-white"
+                        className="rounded-nonenone block p-2 font-bold hover:bg-white"
                       >
                         {chapter.name}
                       </Link>
@@ -79,7 +80,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/cubes/${event.id}`}
                         onClick={onClose}
-                        className="block rounded-none p-2 font-bold hover:bg-white"
+                        className="rounded-nonenone block p-2 font-bold hover:bg-white"
                       >
                         {event.location}
                       </Link>

@@ -1,43 +1,46 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
-import {
-  useUsers,
-  useChapters,
-  useEvents,
-  useChapterJoinRequests,
-} from '@/store';
-import OnboardingPipeline from '@/components/management/OnboardingPipeline';
-import MemberDirectory from '@/components/management/MemberDirectory';
-import ChapterManagement from '@/components/management/ChapterManagement';
+
+import AtRiskMembersSnapshot from '@/components/dashboard/AtRiskMembersSnapshot';
+import ChapterHealthSnapshot from '@/components/dashboard/ChapterHealthSnapshot';
+import LeaderboardSnapshot from '@/components/dashboard/LeaderboardSnapshot';
+import NextEventWidget from '@/components/dashboard/NextEventWidget';
+import Widget from '@/components/dashboard/Widget';
 import ChapterInventory from '@/components/management/ChapterInventory';
+import ChapterManagement from '@/components/management/ChapterManagement';
+import ChapterRequestQueue from '@/components/management/ChapterRequestQueue';
+import MemberDirectory from '@/components/management/MemberDirectory';
 import OnboardingHealthCheck from '@/components/management/OnboardingHealthCheck';
+import OnboardingPipeline from '@/components/management/OnboardingPipeline';
+import ReviewApplicantModal from '@/components/management/ReviewApplicantModal';
 import {
   BuildingOfficeIcon,
   ClipboardCheckIcon,
-  TrendingUpIcon,
-  UserGroupIcon,
   ClipboardListIcon,
   HomeIcon,
+  TrendingUpIcon,
+  UserGroupIcon,
 } from '@/icons';
-import { useChapterInventory, useInventoryActions } from '@/store';
+import { generateInactivityNotifications } from '@/services/notificationService';
 import {
-  type User,
-  Role,
-  OnboardingStatus,
+  useChapterJoinRequests,
+  useChapters,
+  useEvents,
+  useNotificationsActions,
+  useNotificationsStore,
+  useUsers,
+} from '@/store';
+import { useChapterInventory, useInventoryActions } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import {
   type Chapter,
   type ChapterJoinRequest,
+  OnboardingStatus,
+  Role,
+  type User,
 } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { isUserInactive } from '@/utils/user';
-import Widget from '@/components/dashboard/Widget';
-
-import LeaderboardSnapshot from '@/components/dashboard/LeaderboardSnapshot';
-import ChapterHealthSnapshot from '@/components/dashboard/ChapterHealthSnapshot';
-import AtRiskMembersSnapshot from '@/components/dashboard/AtRiskMembersSnapshot';
-import ReviewApplicantModal from '@/components/management/ReviewApplicantModal';
-import NextEventWidget from '@/components/dashboard/NextEventWidget';
-import ChapterRequestQueue from '@/components/management/ChapterRequestQueue';
 
 type ManagementView =
   | 'dashboard'
@@ -77,7 +80,7 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
 
   return (
     <button
-      className={`card-brutal card-padding ${priorityStyles[priority]} w-full cursor-pointer text-left transition-all hover:scale-[1.02] hover:shadow-brutal-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
+      className={`card-brutal card-padding ${priorityStyles[priority]} w-full cursor-pointer text-left hover:shadow-brutal-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -225,6 +228,26 @@ const ManagementPage: React.FC = () => {
     }
   }, [selectedChapterForInventory, defaultChapter]);
 
+  // Get notifications actions at component level
+  const notificationsActions = useNotificationsActions();
+
+  // Simulate a periodic check for inactive members when the dashboard is loaded
+  useEffect(() => {
+    if (view === 'dashboard' && currentUser) {
+      const existingNotifications =
+        useNotificationsStore.getState().notifications;
+      const newInactivityNotifications = generateInactivityNotifications(
+        allUsers,
+        allEvents,
+        existingNotifications,
+        currentUser
+      );
+      if (newInactivityNotifications.length > 0) {
+        notificationsActions.addNotifications(newInactivityNotifications);
+      }
+    }
+  }, [view, currentUser, allUsers, allEvents, notificationsActions]);
+
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 
   const newApplicants = useMemo(() => {
@@ -265,7 +288,7 @@ const ManagementPage: React.FC = () => {
     // New applicants task
     if (newApplicants.length > 0) {
       tasks.push({
-        icon: <UserGroupIcon className="h-8 w-8" />,
+        icon: <UserGroupIcon className="size-8" />,
         title: 'New Applicants to Review',
         count: newApplicants.length,
         description: 'Review and approve new applicants to the platform.',
@@ -294,7 +317,7 @@ const ManagementPage: React.FC = () => {
 
     if (pendingJoinRequestsCount > 0) {
       tasks.push({
-        icon: <ClipboardCheckIcon className="h-8 w-8" />,
+        icon: <ClipboardCheckIcon className="size-8" />,
         title: 'Chapter Join Requests',
         count: pendingJoinRequestsCount,
         description: 'Activists are waiting to join your chapter(s).',
@@ -421,7 +444,7 @@ const ManagementPage: React.FC = () => {
       return [
         ...dashboardTasks,
         {
-          icon: <TrendingUpIcon className="h-8 w-8" />,
+          icon: <TrendingUpIcon className="size-8" />,
           title: 'Inactive Members to Re-engage',
           count: inactiveMembersCount,
           description:
@@ -588,14 +611,14 @@ const ManagementPage: React.FC = () => {
               onClick={() => handleViewChange('dashboard')}
               isActive={view === 'dashboard'}
             >
-              <HomeIcon className="h-5 w-5 flex-shrink-0" />
+              <HomeIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Priority Tasks</span>
             </TabButton>
             <TabButton
               onClick={() => handleViewChange('pipeline')}
               isActive={view === 'pipeline'}
             >
-              <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
+              <ClipboardCheckIcon className="size-5 shrink-0" />
               <span className="hidden truncate md:inline">
                 Onboarding & Requests
               </span>
@@ -604,7 +627,7 @@ const ManagementPage: React.FC = () => {
               onClick={() => handleViewChange('members')}
               isActive={view === 'members'}
             >
-              <UserGroupIcon className="h-5 w-5 flex-shrink-0" />
+              <UserGroupIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Member Directory</span>
             </TabButton>
             {canManageChapters && (
@@ -612,7 +635,7 @@ const ManagementPage: React.FC = () => {
                 onClick={() => handleViewChange('chapters')}
                 isActive={view === 'chapters'}
               >
-                <BuildingOfficeIcon className="h-5 w-5 flex-shrink-0" />
+                <BuildingOfficeIcon className="size-5 shrink-0" />
                 <span className="hidden md:inline">Chapters</span>
               </TabButton>
             )}
@@ -620,14 +643,14 @@ const ManagementPage: React.FC = () => {
               onClick={() => handleViewChange('inventory')}
               isActive={view === 'inventory'}
             >
-              <ClipboardListIcon className="h-5 w-5 flex-shrink-0" />
+              <ClipboardListIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Inventory</span>
             </TabButton>
             <TabButton
               onClick={() => handleViewChange('onboarding-health')}
               isActive={view === 'onboarding-health'}
             >
-              <ClipboardCheckIcon className="h-5 w-5 flex-shrink-0" />
+              <ClipboardCheckIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Onboarding Health</span>
             </TabButton>
           </nav>
@@ -638,6 +661,7 @@ const ManagementPage: React.FC = () => {
             <ReviewApplicantModal
               applicants={newApplicants}
               onClose={() => setReviewModalOpen(false)}
+              isOpen={isReviewModalOpen}
             />
           )}
         </main>

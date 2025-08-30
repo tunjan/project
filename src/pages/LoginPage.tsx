@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import Login from '@/components/auth/Login';
-import { useAuthActions } from '@/store/auth.store';
 import { useUsers } from '@/store';
-import { type User, OnboardingStatus, Role } from '@/types';
+import { useAuthActions } from '@/store/auth.store';
+import { OnboardingStatus, Role, type User } from '@/types';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();

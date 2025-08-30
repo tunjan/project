@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type Resource } from '@/types';
+
 import { initialResources } from './initialData';
 
 export interface ResourcesState {

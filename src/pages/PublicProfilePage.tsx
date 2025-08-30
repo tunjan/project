@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import UserProfile from '@/components/profile/UserProfile'; // Use the consolidated component
-import { useUserById, useUsersState, useUsersActions } from '@/store';
+
 import LoadingSpinner from '@/components/LoadingSpinner';
+import UserProfile from '@/components/profile/UserProfile'; // Use the consolidated component
+import { useUserById, useUsersActions, useUsersState } from '@/store';
 
 const PublicProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();

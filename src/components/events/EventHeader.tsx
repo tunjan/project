@@ -1,6 +1,7 @@
 import React from 'react';
-import { CubeEvent, EventStatus } from '@/types';
+
 import { CalendarIcon, ClockIcon, MapPinIcon } from '@/icons';
+import { CubeEvent, EventStatus } from '@/types';
 import { safeFormatDate, safeParseDate } from '@/utils/date';
 
 interface EventHeaderProps {
@@ -42,7 +43,7 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
         )}
         <div className="flex justify-between">
           <p className="font-semibold uppercase tracking-wide text-primary">
-            <MapPinIcon className="mr-1 inline-block h-4 w-4" />
+            <MapPinIcon className="mr-1 inline-block size-4" />
             {event.city}
           </p>
           {event.status === EventStatus.FINISHED && (
@@ -58,11 +59,11 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
 
         <div className="mt-6 space-y-3 text-black">
           <div className="flex items-center gap-3">
-            <CalendarIcon className="h-6 w-6 flex-shrink-0 text-neutral-500" />
+            <CalendarIcon className="size-6 shrink-0 text-neutral-500" />
             <span className="font-semibold">{formattedDateRange}</span>
           </div>
           <div className="flex items-center gap-3">
-            <ClockIcon className="h-6 w-6 flex-shrink-0 text-neutral-500" />
+            <ClockIcon className="size-6 shrink-0 text-neutral-500" />
             <span className="font-semibold">{formattedTime} (Start time)</span>
           </div>
         </div>
@@ -71,7 +72,7 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
           <h3 className="mb-2 text-lg font-bold text-black">Organizer</h3>
           <div className="flex items-center">
             <img
-              className="h-12 w-12 object-cover"
+              className="size-12 object-cover"
               src={event.organizer.profilePictureUrl}
               alt={event.organizer.name}
             />

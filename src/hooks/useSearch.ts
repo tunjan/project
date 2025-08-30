@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useUsers, useChapters, useEvents } from '@/store';
-import { type User, type Chapter, type CubeEvent } from '@/types';
+import { useCallback, useEffect, useState } from 'react';
+
+import { useChapters, useEvents, useUsers } from '@/store';
+import { type Chapter, type CubeEvent, type User } from '@/types';
 
 const useSearch = (query: string) => {
   const [results, setResults] = useState<{

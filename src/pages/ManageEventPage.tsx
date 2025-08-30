@@ -1,9 +1,10 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+
 import ManageEventForm from '@/components/events/ManageEventForm';
 import { useEventById, useEventsActions } from '@/store';
 import { type EventReport } from '@/types';
-import { toast } from 'sonner';
 
 const ManageEventPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();

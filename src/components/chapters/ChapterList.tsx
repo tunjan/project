@@ -1,11 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { type Chapter, Role } from '@/types';
-import { getChapterStats, ChapterStats } from '@/utils/analytics';
-import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
+
 import { SearchIcon } from '@/icons';
-import ChapterMap from './ChapterMap';
+import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
+import { type Chapter, Role } from '@/types';
+import { ChapterStats, getChapterStats } from '@/utils/analytics';
+
 import ChapterCard from './ChapterCard';
+import ChapterMap from './ChapterMap';
 import RegionalOrganiserCard from './RegionalOrganiserCard';
 
 // A small helper component for stats on mobile
@@ -25,7 +27,7 @@ const ChapterRow: React.FC<{
 }> = ({ chapterStats, onSelect }) => {
   return (
     <button
-      className="group w-full cursor-pointer bg-white p-4 text-left transition-all duration-300 even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal md:grid md:grid-cols-6 md:items-center"
+      className="group w-full cursor-pointer bg-white p-4 text-left even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal md:grid md:grid-cols-6 md:items-center"
       onClick={onSelect}
       type="button"
       aria-label={`View details for ${chapterStats.name} chapter`}
@@ -64,7 +66,7 @@ const ChapterRow: React.FC<{
       </p>
       <p className="hidden items-center justify-between font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:flex">
         {chapterStats.totalConversations}
-        <span className="text-2xl text-neutral-500 transition-all duration-300 group-hover:translate-x-2 group-hover:text-primary">
+        <span className="text-2xl text-neutral-500 group-hover:text-primary">
           →
         </span>
       </p>
@@ -158,7 +160,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             </label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="h-5 w-5 text-neutral-500" />
+                <SearchIcon className="size-5 text-neutral-500" />
               </div>
               <input
                 id="search-filter"
@@ -166,7 +168,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="Search by chapter..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block h-[42px] w-full rounded-none border-2 border-black bg-white p-2 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="rounded-nonenone block h-[42px] w-full border-2 border-black bg-white p-2 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>

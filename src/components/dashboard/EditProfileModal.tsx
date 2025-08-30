@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { type User } from '@/types';
+
+import Avatar from '@/components/ui/Avatar';
+import { InputField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
 import { UsersIcon } from '@/icons';
-import { InputField } from '@/components/ui/Form';
-import Avatar from '@/components/ui/Avatar';
+import { type User } from '@/types';
+
 import { generateRandomAvatarUrl } from '../../utils/user';
 
 interface EditProfileModalProps {
@@ -65,7 +67,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             <Avatar
               src={profilePictureUrl}
               alt="Profile avatar"
-              className="h-20 w-20 object-cover"
+              className="size-20 object-cover"
               editable={true}
               onImageChange={(newImageUrl) => {
                 setProfilePictureUrl(newImageUrl);
@@ -76,7 +78,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               onClick={handleGenerateAvatar}
               className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
             >
-              <UsersIcon className="h-4 w-4" />
+              <UsersIcon className="size-4" />
               <span>New Avatar</span>
             </button>
           </div>
@@ -111,7 +113,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setHostingAvailability(e.target.checked)
               }
-              className="h-5 w-5 accent-primary"
+              className="size-5 accent-primary"
             />
             <span className="font-bold text-black">
               I am available to host other activists

@@ -1,19 +1,20 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { can, Permission } from '@/config/permissions';
-import { useEvents, useChapters } from '@/store';
-import { useCurrentUser } from '@/store/auth.store';
+
+import CubeCalendar from '@/components/CubeCalendar';
 import CubeCard from '@/components/CubeCard';
 import CubeMap from '@/components/CubeMap';
-import CubeCalendar from '@/components/CubeCalendar';
+import { can, Permission } from '@/config/permissions';
 import {
-  PlusIcon,
+  CalendarIcon,
   ListBulletIcon,
   MapIcon,
+  PlusIcon,
   SearchIcon,
-  CalendarIcon,
 } from '@/icons';
-import { type CubeEvent, type Chapter } from '@/types';
+import { useChapters, useEvents } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { type Chapter, type CubeEvent } from '@/types';
 
 type CubesView = 'list' | 'map' | 'calendar';
 type EventTimeView = 'upcoming' | 'past';
@@ -116,7 +117,7 @@ const CubeListPage: React.FC = () => {
               onClick={handleCreateCube}
               className="flex items-center bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover"
             >
-              <PlusIcon className="mr-2 h-5 w-5" />
+              <PlusIcon className="mr-2 size-5" />
               Create Cube
             </button>
           )}
@@ -149,14 +150,14 @@ const CubeListPage: React.FC = () => {
         {}
         <div className="relative w-full md:w-auto">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <SearchIcon className="text-grey-500 h-5 w-5" />
+            <SearchIcon className="text-grey-500 size-5" />
           </div>
           <input
             type="text"
             placeholder="Search by chapter..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full rounded-none border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rounded-nonenone block w-full border-2 border-black bg-white py-1.5 pl-10 pr-3 text-sm font-semibold text-black placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         {}
@@ -165,21 +166,21 @@ const CubeListPage: React.FC = () => {
             onClick={() => setCubesView('list')}
             isActive={cubesView === 'list'}
           >
-            <ListBulletIcon className="h-5 w-5" />
+            <ListBulletIcon className="size-5" />
             <span>List</span>
           </ViewToggleButton>
           <ViewToggleButton
             onClick={() => setCubesView('map')}
             isActive={cubesView === 'map'}
           >
-            <MapIcon className="h-5 w-5" />
+            <MapIcon className="size-5" />
             <span>Map</span>
           </ViewToggleButton>
           <ViewToggleButton
             onClick={() => setCubesView('calendar')}
             isActive={cubesView === 'calendar'}
           >
-            <CalendarIcon className="h-5 w-5" />
+            <CalendarIcon className="size-5" />
             <span>Calendar</span>
           </ViewToggleButton>
         </div>

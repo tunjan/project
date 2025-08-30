@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
+
+import LoadingSpinner from '@/components/LoadingSpinner';
 import Modal from '@/components/ui/Modal';
 import { TrashIcon } from '@/icons';
 import { type User } from '@/types';
-import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface DeactivateAccountModalProps {
   user: User;
   onClose: () => void;
   onConfirm: () => Promise<void>;
+  isOpen: boolean;
 }
 
 const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
   user,
   onClose,
   onConfirm,
+  isOpen,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -26,10 +29,10 @@ const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
     }
   };
   return (
-    <Modal title="Deactivate Account" onClose={onClose}>
+    <Modal title="Deactivate Account" onClose={onClose} isOpen={isOpen}>
       <div className="text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center bg-primary">
-          <TrashIcon className="h-6 w-6 text-white" />
+        <div className="mx-auto flex size-12 items-center justify-center bg-primary">
+          <TrashIcon className="size-6 text-white" />
         </div>
         <p className="mt-4 text-danger">
           Are you sure you want to permanently delete your account,{' '}
@@ -53,7 +56,7 @@ const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
           className="btn-danger flex w-full items-center justify-center px-4 py-2 font-bold text-white transition-colors duration-300"
         >
           {isDeleting ? (
-            <LoadingSpinner className="h-5 w-5" />
+            <LoadingSpinner className="size-5" />
           ) : (
             'Yes, Delete My Account'
           )}

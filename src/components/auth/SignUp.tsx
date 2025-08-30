@@ -1,10 +1,11 @@
-import React from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { type OnboardingAnswers, type Chapter } from '@/types';
-import { InputField, TextAreaField, SelectField } from '@/components/ui/Form';
+
+import { InputField, SelectField, TextAreaField } from '@/components/ui/Form';
 import { CheckIcon } from '@/icons';
+import { type Chapter, type OnboardingAnswers } from '@/types';
 
 // 1. Define the validation schema with Zod
 const signUpSchema = z.object({
@@ -169,7 +170,7 @@ const SignUp: React.FC<SignUpProps> = ({
             {/* Show checkmark for radio button selection */}
             {!errors.abolitionistAlignment && (
               <div className="absolute right-0 top-0 flex items-center text-success">
-                <CheckIcon className="mr-1 h-4 w-4" />
+                <CheckIcon className="mr-1 size-4" />
                 <span className="text-xs font-medium">✓</span>
               </div>
             )}

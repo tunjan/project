@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type User, OnboardingStatus } from '@/types';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/Button';
 import { useCurrentUser } from '@/store';
 import { useUsersActions } from '@/store/users.store';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/Button';
+import { OnboardingStatus, type User } from '@/types';
 
 interface OnboardingActionsProps {
   user: User;
@@ -108,6 +109,14 @@ const OnboardingActions: React.FC<OnboardingActionsProps> = ({ user }) => {
         return null;
     }
   };
+
+  // Don't render anything if onboarding is finished
+  if (
+    user.onboardingStatus === OnboardingStatus.CONFIRMED ||
+    user.onboardingStatus === OnboardingStatus.COMPLETED
+  ) {
+    return null;
+  }
 
   return (
     <div className="mb-6">

@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { type OutreachLog, OutreachOutcome } from '@/types';
-import Modal from '@/components/ui/Modal';
+
 import { SelectField, TextAreaField } from '@/components/ui/Form';
+import Modal from '@/components/ui/Modal';
+import { type OutreachLog, OutreachOutcome } from '@/types';
 
 interface EditLogModalProps {
   log: OutreachLog;
   onClose: () => void;
   onSave: (logId: string, updates: Partial<OutreachLog>) => void;
+  isOpen: boolean;
 }
 
 const EditLogModal: React.FC<EditLogModalProps> = ({
   log,
   onClose,
   onSave,
+  isOpen,
 }) => {
   const [outcome, setOutcome] = useState(log.outcome);
   const [notes, setNotes] = useState(log.notes || '');
@@ -23,7 +26,7 @@ const EditLogModal: React.FC<EditLogModalProps> = ({
   };
 
   return (
-    <Modal title="Edit Log Entry" onClose={onClose} size="md">
+    <Modal title="Edit Log Entry" onClose={onClose} size="md" isOpen={isOpen}>
       <div className="space-y-4">
         <SelectField
           label="Outcome"

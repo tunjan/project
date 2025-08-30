@@ -110,3 +110,5 @@ src/data/mockData.ts
 
 # Build artifacts
 dist/
+*storybook.log
+storybook-static

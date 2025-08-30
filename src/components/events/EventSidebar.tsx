@@ -1,7 +1,8 @@
 import React from 'react';
-import { User, CubeEvent, ParticipantStatus } from '@/types';
 import { Link } from 'react-router-dom';
+
 import Widget from '@/components/dashboard/Widget';
+import { CubeEvent, ParticipantStatus, User } from '@/types';
 
 const MemberCard: React.FC<{ user: User }> = ({ user }) => (
   <Link
@@ -11,7 +12,7 @@ const MemberCard: React.FC<{ user: User }> = ({ user }) => (
     <img
       src={user.profilePictureUrl}
       alt={user.name}
-      className="h-10 w-10 object-cover"
+      className="size-10 object-cover"
     />
     <div>
       <p className="font-bold text-black">{user.name}</p>

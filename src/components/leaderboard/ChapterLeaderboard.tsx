@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  type ChapterLeaderboardEntry,
-  calculateRanks,
-} from '@/utils/leaderboard';
+
 import { BuildingOfficeIcon, TrophyIcon } from '@/icons';
+import {
+  calculateRanks,
+  type ChapterLeaderboardEntry,
+} from '@/utils/leaderboard';
 
 interface ChapterLeaderboardProps {
   title: string;
@@ -26,7 +27,7 @@ const ChapterRankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
 
   return (
     <div className={`${baseStyle} ${rankClass}`}>
-      {rank <= 3 ? <TrophyIcon className="h-6 w-6" /> : <span>{rank}</span>}
+      {rank <= 3 ? <TrophyIcon className="size-6" /> : <span>{rank}</span>}
     </div>
   );
 };
@@ -50,45 +51,46 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
       <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
-      <div className="flex-grow overflow-y-auto">
+      <div className="grow overflow-y-auto">
         {rankedData.length > 0 ? (
           <ul className="space-y-3 p-4">
             {rankedData.map(({ chapter, value, rank }) => {
               return (
-                <li
-                  key={chapter.name}
-                  onClick={() => handleChapterClick(chapter.name)}
-                  className="flex transform-gpu cursor-pointer items-stretch border-2 border-black bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-brutal"
-                >
-                  <ChapterRankIndicator rank={rank} />
-                  <div className="flex flex-grow items-center p-3">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-black bg-black">
-                      <BuildingOfficeIcon className="h-6 w-6 text-white" />
+                <li key={chapter.name}>
+                  <button
+                    onClick={() => handleChapterClick(chapter.name)}
+                    className="flex w-full transform-gpu cursor-pointer items-stretch border-2 border-black bg-white hover:-translate-y-1 hover:shadow-brutal"
+                  >
+                    <ChapterRankIndicator rank={rank} />
+                    <div className="flex grow items-center p-3">
+                      <div className="flex size-12 shrink-0 items-center justify-center border-2 border-black bg-black">
+                        <BuildingOfficeIcon className="size-6 text-white" />
+                      </div>
+                      <div className="ml-4 grow">
+                        <p className="truncate font-bold text-black">
+                          {chapter.name}
+                        </p>
+                        <p className="text-sm text-neutral-500">
+                          {chapter.country}
+                        </p>
+                      </div>
+                      <div className="ml-4 shrink-0 text-right">
+                        <p className="text-2xl font-extrabold text-black">
+                          {value.toLocaleString()}
+                        </p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+                          {unit}
+                        </p>
+                      </div>
                     </div>
-                    <div className="ml-4 flex-grow">
-                      <p className="truncate font-bold text-black">
-                        {chapter.name}
-                      </p>
-                      <p className="text-sm text-neutral-500">
-                        {chapter.country}
-                      </p>
-                    </div>
-                    <div className="ml-4 flex-shrink-0 text-right">
-                      <p className="text-2xl font-extrabold text-black">
-                        {value.toLocaleString()}
-                      </p>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
-                        {unit}
-                      </p>
-                    </div>
-                  </div>
+                  </button>
                 </li>
               );
             })}
           </ul>
         ) : (
           <div className="flex h-full flex-col items-center justify-center p-8 text-center text-neutral-500">
-            <BuildingOfficeIcon className="h-12 w-12" />
+            <BuildingOfficeIcon className="size-12" />
             <p className="mt-2 font-semibold text-black">No data available.</p>
             <p className="text-sm">
               There is no activity for this time period.

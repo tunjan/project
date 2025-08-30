@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { type User, type BadgeTemplate } from '@/types';
-import Modal from '@/components/ui/Modal';
+
 import { InputField, TextAreaField } from '@/components/ui/Form';
+import Modal from '@/components/ui/Modal';
 import { BADGE_TEMPLATES } from '@/constants';
 import * as Icons from '@/icons';
+import { type BadgeTemplate, type User } from '@/types';
 
 interface AwardBadgeModalProps {
   userToAward: User;
@@ -22,7 +23,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
   );
   const [customName, setCustomName] = useState('');
   const [customDescription, setCustomDescription] = useState('');
-  const customIcon = 'SparklesIcon'; // Use an existing icon for custom prizes.
+  const customIcon = 'SparklesIcon'; // Use an existing icon for custom recognitions.
 
   const userBadgeNames = new Set(userToAward.badges.map((b) => b.name));
   const availableBadges = BADGE_TEMPLATES.filter(
@@ -62,7 +63,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
   return (
     <Modal
       title={`Award Recognition to ${userToAward.name}`}
-      description="Select a standard recognition or create a custom prize."
+      description="Select a standard recognition or create a custom recognition."
       onClose={onClose}
     >
       <div className="mb-4 border-b border-black">
@@ -83,7 +84,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
             setSelectedBadge(null);
           }}
         >
-          Custom Prize
+          Custom Recognition
         </TabButton>
       </div>
 
@@ -104,11 +105,11 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
                 }`}
               >
                 <div
-                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center ${
+                  className={`flex size-10 shrink-0 items-center justify-center ${
                     isSelected ? 'bg-primary text-white' : 'bg-black text-white'
                   }`}
                 >
-                  <IconComponent className="h-6 w-6" />
+                  <IconComponent className="size-6" />
                 </div>
                 <div>
                   <p className="font-bold text-black">{badge.name}</p>
@@ -121,7 +122,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
           <div className="space-y-4 p-1">
             <InputField
               id="custom-name"
-              label="Prize Name"
+              label="Recognition Name"
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
               placeholder="e.g., 'Chapter MVP'"
@@ -156,7 +157,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
           }
           className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Award Prize
+          Award Recognition
         </button>
       </div>
     </Modal>

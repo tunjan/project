@@ -1,7 +1,7 @@
 // NOTE: In a production application, these complex data aggregations (getChapterStats, getGlobalStats, etc.)
 // should be performed on the backend. The client should fetch pre-computed data to ensure performance and scalability.
 
-import { type User, type CubeEvent, type Chapter, OutreachLog } from '@/types';
+import { type Chapter, type CubeEvent, OutreachLog, type User } from '@/types';
 import { safeParseDate } from '@/utils/date';
 
 export interface ChapterStats {

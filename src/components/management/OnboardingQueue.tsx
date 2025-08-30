@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { type User } from '@/types';
+
 import Avatar from '@/components/ui/Avatar';
+import { type User } from '@/types';
 
 interface OnboardingQueueProps {
   applicants: User[];
@@ -26,7 +27,7 @@ const ApplicantCard: React.FC<{
           <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
-            className="h-12 w-12 object-cover"
+            className="size-12 object-cover"
           />
           <div>
             <p className="font-bold text-black">{user.name}</p>

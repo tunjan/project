@@ -1,4 +1,4 @@
-import { Role, User, AnnouncementScope } from '@/types';
+import { AnnouncementScope, Role, User } from '@/types';
 
 export const ROLE_HIERARCHY: Record<Role, number> = {
   [Role.APPLICANT]: 0,

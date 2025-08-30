@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { InputField, TextAreaField, SelectField } from './Form';
+
+import { InputField, SelectField, TextAreaField } from './Form';
 
 describe('Form Components', () => {
   describe('<InputField />', () => {

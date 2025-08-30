@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { cn } from '@/utils/cn'; // Import the new utility
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?:
     | 'primary'
@@ -40,7 +42,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'px-6 py-3 text-lg',
     };
 
-    const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+    // REFACTOR: Use the cn utility for robust class merging
+    const classes = cn(
+      baseClasses,
+      variantClasses[variant],
+      sizeClasses[size],
+      className
+    );
 
     return (
       <button ref={ref} className={classes} {...props}>

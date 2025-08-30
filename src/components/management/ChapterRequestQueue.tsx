@@ -1,8 +1,9 @@
 import React from 'react';
-import { type ChapterJoinRequest, type User } from '@/types';
-import { useChaptersActions } from '@/store';
 import { toast } from 'sonner';
+
 import Avatar from '@/components/ui/Avatar';
+import { useChaptersActions } from '@/store';
+import { type ChapterJoinRequest, type User } from '@/types';
 
 interface ChapterRequestQueueProps {
   requests: ChapterJoinRequest[];
@@ -21,7 +22,7 @@ const RequestCard: React.FC<{
           <Avatar
             src={request.user.profilePictureUrl}
             alt={request.user.name}
-            className="h-12 w-12 object-cover"
+            className="size-12 object-cover"
           />
           <div>
             <p className="font-bold text-black">{request.user.name}</p>

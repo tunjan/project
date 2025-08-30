@@ -1,8 +1,10 @@
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type OutreachLog } from '@/types';
+
 import { processedOutreachLogs } from './initialData';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface OutreachState {
   outreachLogs: OutreachLog[];

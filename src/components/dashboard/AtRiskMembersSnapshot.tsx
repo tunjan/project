@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { useCurrentUser } from '@/store/auth.store';
-import { useUsers, useEvents } from '@/store';
-import { isUserInactive } from '@/utils/user';
-import { User } from '@/types';
 import { useNavigate } from 'react-router-dom';
+
 import Avatar from '@/components/ui/Avatar';
+import { useEvents, useUsers } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { User } from '@/types';
+import { isUserInactive } from '@/utils/user';
 
 const AtRiskMembersSnapshot: React.FC = () => {
   const currentUser = useCurrentUser();
@@ -56,7 +57,7 @@ const AtRiskMembersSnapshot: React.FC = () => {
             <Avatar
               src={user.profilePictureUrl}
               alt={user.name}
-              className="h-8 w-8 object-cover"
+              className="size-8 object-cover"
             />
             <div>
               <p className="font-semibold">{user.name}</p>

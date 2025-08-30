@@ -1,7 +1,8 @@
 import React from 'react';
-import { type OutreachLog, type CubeEvent, OutreachOutcome } from '@/types';
+
 import { Tag } from '@/components/ui/Tag';
 import { PencilIcon, XCircleIcon } from '@/icons';
+import { type CubeEvent, type OutreachLog, OutreachOutcome } from '@/types';
 
 interface LogEntryCardProps {
   log: OutreachLog;
@@ -45,20 +46,20 @@ const LogEntryCard: React.FC<LogEntryCardProps> = ({
             {new Date(log.createdAt).toLocaleString()}
           </p>
         </div>
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => onEdit(log)}
             className="p-2 text-neutral-500 hover:text-black"
             title="Edit Log"
           >
-            <PencilIcon className="h-4 w-4" />
+            <PencilIcon className="size-4" />
           </button>
           <button
             onClick={() => onDelete(log)}
             className="p-2 text-neutral-500 hover:text-danger"
             title="Delete Log"
           >
-            <XCircleIcon className="h-4 w-4" />
+            <XCircleIcon className="size-4" />
           </button>
         </div>
       </div>

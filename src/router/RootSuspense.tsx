@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import LoadingSpinner from '@/components/LoadingSpinner';
+
 import FeedbackButton from '@/components/FeedbackButton';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const RootSuspense = () => (
   <Suspense

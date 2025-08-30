@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import SignUp from './SignUp';
+
 import { Chapter } from '@/types';
+
+import SignUp from './SignUp';
 
 const mockChapters: Chapter[] = [
   { name: 'Berlin', country: 'Germany', lat: 0, lng: 0 },

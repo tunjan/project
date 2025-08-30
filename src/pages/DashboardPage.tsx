@@ -1,36 +1,36 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
-import { useUsers, useUsersActions } from '@/store';
-import {
-  OnboardingStatus,
-  EventStatus,
-  ParticipantStatus,
-  NotificationType,
-} from '@/types';
-import {
-  useEvents,
-  useAnnouncementsState,
-  useNotificationsState,
-  useChapters,
-} from '@/store';
+import { toast } from 'sonner';
+
 import StatsGrid from '@/components/dashboard/StatsGrid';
+import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
 import Modal from '@/components/ui/Modal';
 import {
   CalendarIcon,
   CheckCircleIcon,
-  ShieldExclamationIcon,
-  MegaphoneIcon,
   ClockIcon,
   MapPinIcon,
-  UsersIcon,
+  MegaphoneIcon,
   PencilIcon,
+  ShieldExclamationIcon,
+  UsersIcon,
 } from '@/icons';
-
-import { safeFormatLocaleDate } from '@/utils/date';
-import { toast } from 'sonner';
-import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
+import { useUsers, useUsersActions } from '@/store';
+import {
+  useAnnouncementsState,
+  useChapters,
+  useEvents,
+  useNotificationsState,
+} from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import {
+  EventStatus,
+  NotificationType,
+  OnboardingStatus,
+  ParticipantStatus,
+} from '@/types';
 import { getCityAttendanceForUser } from '@/utils/analytics';
+import { safeFormatLocaleDate } from '@/utils/date';
 
 interface TaskItemProps {
   icon: React.ReactNode;
@@ -62,7 +62,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
             {title}
             {count !== undefined && (
               <span
-                className={`rounded-none px-2 py-0.5 text-xs font-bold ${
+                className={`rounded-nonenone px-2 py-0.5 text-xs font-bold ${
                   urgent ? 'bg-red text-black' : 'bg-white text-black'
                 }`}
               >
@@ -76,7 +76,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
       {action && (
         <button
           onClick={action}
-          className="bg-black px-3 py-1 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+          className="bg-black px-3 py-1 text-sm font-semibold text-white hover:bg-primary-hover hover:shadow-brutal"
         >
           {actionText}
         </button>
@@ -191,7 +191,7 @@ const DashboardPage: React.FC = () => {
 
       if (pendingAccommodations.length > 0) {
         tasks.push({
-          icon: <ShieldExclamationIcon className="h-5 w-5" />,
+          icon: <ShieldExclamationIcon className="size-5" />,
           title: 'Accommodation Requests',
           description: 'Pending requests need your attention',
           count: pendingAccommodations.length,
@@ -210,7 +210,7 @@ const DashboardPage: React.FC = () => {
 
       if (newApplicants.length > 0) {
         tasks.push({
-          icon: <UsersIcon className="h-5 w-5" />,
+          icon: <UsersIcon className="size-5" />,
           title: 'New Applicants',
           description: 'New members awaiting approval',
           count: newApplicants.length,
@@ -237,7 +237,7 @@ const DashboardPage: React.FC = () => {
 
     if (pendingRSVPs > 0) {
       tasks.push({
-        icon: <CheckCircleIcon className="h-5 w-5" />,
+        icon: <CheckCircleIcon className="size-5" />,
         title: 'RSVP Approvals',
         description: 'People waiting to attend your events',
         count: pendingRSVPs,
@@ -348,7 +348,7 @@ const DashboardPage: React.FC = () => {
                       }
                     }, 0);
                   }}
-                  className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover"
+                  className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover hover:shadow-brutal"
                 >
                   I watched it
                 </button>
@@ -468,7 +468,7 @@ const DashboardPage: React.FC = () => {
                     setContactInfo('');
                   }}
                   disabled={!selectedOrganiserId || !callWhen || !contactInfo}
-                  className="bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-hover disabled:opacity-50"
+                  className="bg-primary px-4 py-2 font-semibold text-white transition-all hover:bg-primary-hover hover:shadow-brutal disabled:opacity-50"
                 >
                   Schedule
                 </button>
@@ -490,37 +490,39 @@ const DashboardPage: React.FC = () => {
               Your Next Event
             </h2>
             {nextEvent ? (
-              <div className="border-2 border-black bg-white p-6">
-                <div className="flex justify-between">
-                  <div className="flex items-start gap-4">
-                    <CalendarIcon className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
-                    <div>
-                      <h3 className="text-lg font-bold text-black">
-                        {nextEvent.location}
-                      </h3>
-                      <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
-                        <span className="flex items-center gap-1">
-                          <ClockIcon className="h-4 w-4" />
-                          {safeFormatLocaleDate(nextEvent.startDate)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPinIcon className="h-4 w-4" />
-                          {nextEvent.city}
-                        </span>
-                      </div>
+              <div
+                onClick={() => navigate(`/cubes/${nextEvent.id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    navigate(`/cubes/${nextEvent.id}`);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                className="cursor-pointer border-2 border-black bg-white p-6 transition-all hover:shadow-brutal"
+              >
+                <div className="flex items-start gap-4">
+                  <CalendarIcon className="mt-1 size-6 shrink-0 text-primary" />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-black">
+                      {nextEvent.location}
+                    </h3>
+                    <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
+                      <span className="flex items-center gap-1">
+                        <ClockIcon className="size-4" />
+                        {safeFormatLocaleDate(nextEvent.startDate)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPinIcon className="size-4" />
+                        {nextEvent.city}
+                      </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => navigate(`/cubes/${nextEvent.id}`)}
-                    className="bg-primary px-4 py-2 font-semibold text-white transition-colors hover:bg-primary-hover"
-                  >
-                    View Event
-                  </button>
                 </div>
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <CalendarIcon className="mx-auto mb-3 h-12 w-12 text-neutral-500" />
+                <CalendarIcon className="mx-auto mb-3 size-12 text-neutral-500" />
                 <h3 className="mb-2 font-bold text-black">
                   No upcoming events
                 </h3>
@@ -529,7 +531,7 @@ const DashboardPage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => navigate('/cubes')}
-                  className="bg-primary px-4 py-2 font-semibold text-white transition-colors hover:bg-primary-hover"
+                  className="bg-primary px-4 py-2 font-semibold text-white transition-all hover:bg-primary-hover hover:shadow-brutal"
                 >
                   Find Events
                 </button>
@@ -550,7 +552,7 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <CheckCircleIcon className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
+                <CheckCircleIcon className="mx-auto mb-3 size-12 text-neutral-400" />
                 <h3 className="mb-2 font-bold text-black">All caught up!</h3>
                 <p className="text-sm text-neutral-600">
                   No pending tasks require your attention.
@@ -589,7 +591,7 @@ const DashboardPage: React.FC = () => {
                     className="border-2 border-black bg-white p-4"
                   >
                     <div className="flex items-start gap-3">
-                      <MegaphoneIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                      <MegaphoneIcon className="mt-0.5 size-5 shrink-0 text-primary" />
                       <div>
                         <h3 className="text-sm font-semibold text-black">
                           {announcement.title}
@@ -611,14 +613,14 @@ const DashboardPage: React.FC = () => {
                 ))}
                 <button
                   onClick={() => navigate('/announcements')}
-                  className="w-full py-2 text-center text-sm font-semibold text-primary hover:text-primary-hover"
+                  className="w-full py-2 text-center text-sm font-semibold text-primary transition-all hover:text-primary-hover hover:shadow-brutal"
                 >
                   View All Announcements
                 </button>
               </div>
             ) : (
               <div className="border-2 border-black bg-white p-6 text-center">
-                <MegaphoneIcon className="mx-auto mb-2 h-8 w-8 text-neutral-500" />
+                <MegaphoneIcon className="mx-auto mb-2 size-8 text-neutral-500" />
                 <p className="text-sm text-neutral-600">
                   No recent announcements
                 </p>
@@ -634,28 +636,28 @@ const DashboardPage: React.FC = () => {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/cubes')}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-white"
+                className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
               >
                 <div className="flex items-center gap-3">
-                  <MapPinIcon className="h-5 w-5 text-primary" />
+                  <MapPinIcon className="size-5 text-primary" />
                   <span className="font-semibold">Find a Cube</span>
                 </div>
               </button>
               <button
                 onClick={() => navigate('/outreach')}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-white"
+                className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
               >
                 <div className="flex items-center gap-3">
-                  <PencilIcon className="h-5 w-5 text-primary" />
+                  <PencilIcon className="size-5 text-primary" />
                   <span className="font-semibold">Log Outreach</span>
                 </div>
               </button>
               <button
                 onClick={() => navigate(`/members/${currentUser.id}`)}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-colors hover:bg-white"
+                className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
               >
                 <div className="flex items-center gap-3">
-                  <UsersIcon className="h-5 w-5 text-primary" />
+                  <UsersIcon className="size-5 text-primary" />
                   <span className="font-semibold">View Profile</span>
                 </div>
               </button>

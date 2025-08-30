@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import {
   type Chapter,
   type ChapterJoinRequest,
-  type User,
   NotificationType,
+  type User,
 } from '@/types';
+
 import { initialChapters } from './initialData';
 import { useNotificationsStore } from './notifications.store';
 import { useUsersStore } from './users.store';

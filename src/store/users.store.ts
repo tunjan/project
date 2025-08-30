@@ -1,23 +1,25 @@
 import { create } from 'zustand';
-import {
-  type User,
-  Role,
-  OnboardingStatus,
-  type OrganizerNote,
-  NotificationType,
-} from '@/types';
 import { persist } from 'zustand/middleware';
-import { processedUsers } from './initialData';
-import { type OnboardingAnswers } from '@/types';
+
 import {
-  isValidStatusTransition,
-  validateOnboardingState,
   createNewUser,
   handleNewApplicationNotifications,
+  isValidStatusTransition,
+  validateOnboardingState,
 } from '@/services/onboardingService';
-import { useNotificationsStore } from './notifications.store';
-import { useAuthStore } from './auth.store';
+import {
+  NotificationType,
+  OnboardingStatus,
+  type OrganizerNote,
+  Role,
+  type User,
+} from '@/types';
+import { type OnboardingAnswers } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
+
+import { useAuthStore } from './auth.store';
+import { processedUsers } from './initialData';
+import { useNotificationsStore } from './notifications.store';
 
 export interface UsersState {
   users: User[];
@@ -524,7 +526,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         });
       },
 
-      updateUserRole: (userId, role) =>
+      updateUserRole: (userId, role) => {
         set((state) => ({
           users: state.users.map((u) => {
             if (u.id !== userId) return u;
@@ -541,7 +543,20 @@ export const useUsersStore = create<UsersState & UsersActions>()(
 
             return updatedUser;
           }),
-        })),
+        }));
+
+        const currentUser = useAuthStore.getState().currentUser;
+        const user = get().users.find((u) => u.id === userId);
+        if (currentUser && user) {
+          useNotificationsStore.getState().addNotification({
+            userId: userId,
+            type: NotificationType.ROLE_UPDATED,
+            message: `Your role has been updated to ${role} by ${currentUser.name}.`,
+            linkTo: `/members/${userId}`,
+            relatedUser: currentUser,
+          });
+        }
+      },
 
       setChapterOrganiser: (userId, chaptersToOrganise) =>
         set((state) => ({
@@ -556,7 +571,8 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           ),
         })),
 
-      updateUserChapters: (userId, newChapters) =>
+      updateUserChapters: (userId, newChapters) => {
+        const userBeforeUpdate = get().users.find((u) => u.id === userId);
         set((state) => {
           const updatedUsers = state.users.map((u) =>
             u.id === userId ? { ...u, chapters: newChapters } : u
@@ -568,7 +584,39 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               .updateCurrentUser({ chapters: newChapters });
           }
           return { users: updatedUsers };
-        }),
+        });
+
+        if (userBeforeUpdate) {
+          const oldChapters = new Set(userBeforeUpdate.chapters);
+          const addedChapters = newChapters.filter(
+            (ch) => !oldChapters.has(ch)
+          );
+          const removedChapters = userBeforeUpdate.chapters.filter(
+            (ch) => !newChapters.includes(ch)
+          );
+
+          let message = 'Your chapter memberships have been updated.';
+          if (addedChapters.length > 0) {
+            message = `You have been added to the ${addedChapters.join(', ')} chapter(s).`;
+          } else if (removedChapters.length > 0) {
+            message = `You have been removed from the ${removedChapters.join(', ')} chapter(s).`;
+          }
+
+          const currentUser = useAuthStore.getState().currentUser;
+          if (
+            currentUser &&
+            (addedChapters.length > 0 || removedChapters.length > 0)
+          ) {
+            useNotificationsStore.getState().addNotification({
+              userId: userId,
+              type: NotificationType.CHAPTER_MEMBERSHIP_UPDATED,
+              message: message,
+              linkTo: `/members/${userId}`,
+              relatedUser: currentUser,
+            });
+          }
+        }
+      },
 
       updateUserOrganiserOf: (userId, newOrganiserOf) =>
         set((state) => {

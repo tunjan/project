@@ -1,14 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import {
-  type User,
-  type Chapter,
-  Role,
-  OnboardingStatus,
-  type ChapterJoinRequest,
-} from '@/types';
-import { SearchIcon, ChevronRightIcon } from '@/icons';
-import { SelectField } from '@/components/ui/Form';
+import React, { useMemo, useState } from 'react';
+
 import Avatar from '@/components/ui/Avatar';
+import { SelectField } from '@/components/ui/Form';
+import { ChevronRightIcon, SearchIcon } from '@/icons';
+import {
+  type Chapter,
+  type ChapterJoinRequest,
+  OnboardingStatus,
+  Role,
+  type User,
+} from '@/types';
 
 interface MemberDirectoryProps {
   members: User[];
@@ -36,7 +37,7 @@ const MemberRow: React.FC<{
         <Avatar
           src={user.profilePictureUrl}
           alt={user.name}
-          className="h-10 w-10 object-cover"
+          className="size-10 object-cover"
         />
         <div>
           <p className="font-bold text-black transition-colors group-hover:text-primary">
@@ -59,7 +60,7 @@ const MemberRow: React.FC<{
         <span className="hidden text-sm font-semibold text-black md:block">
           {user.role}
         </span>
-        <ChevronRightIcon className="h-5 w-5 text-primary transition-colors group-hover:text-black" />
+        <ChevronRightIcon className="size-5 text-primary transition-colors group-hover:text-black" />
       </div>
     </button>
   );
@@ -132,14 +133,14 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
           <div className="lg:col-span-4">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="h-5 w-5 text-primary" />
+                <SearchIcon className="size-5 text-primary" />
               </div>
               <input
                 type="text"
                 placeholder="Search members by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full rounded-none border border-black bg-white p-2 pl-10 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                className="rounded-nonenone block w-full border border-black bg-white p-2 pl-10 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               />
             </div>
           </div>

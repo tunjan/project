@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { type EventComment } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
+
 import { useCommentsActions, useEventComments } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { type EventComment } from '@/types';
 
 interface EventCommentCardProps {
   comment: EventComment;
@@ -18,7 +19,7 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({ comment }) => {
       <img
         src={comment.author.profilePictureUrl}
         alt={comment.author.name}
-        className="h-10 w-10 object-cover"
+        className="size-10 object-cover"
       />
       <div className="flex-1">
         <div className="flex items-baseline space-x-2">
@@ -56,7 +57,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
   };
 
   return (
-    <div className="border-2 border-black bg-white">
+    <div className="bg-white">
       <div className="p-6 md:p-8">
         <h2 className="mb-4 text-xl font-bold text-black">Event Discussion</h2>
 
@@ -72,7 +73,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
                 <EventCommentCard key={comment.id} comment={comment} />
               ))
           ) : (
-            <p className="py-4 text-center text-sm text-neutral-500">
+            <p className="py-4 text-sm text-neutral-500">
               No comments yet. Start the conversation!
             </p>
           )}
@@ -85,7 +86,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
           <img
             src={currentUser.profilePictureUrl}
             alt={currentUser.name}
-            className="h-10 w-10 object-cover"
+            className="size-10 object-cover"
           />
           <div className="flex-1">
             <textarea

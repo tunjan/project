@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { BellIcon } from '@/icons';
-import NotificationModal from './NotificationModal';
-import { useCurrentUser } from '@/store/auth.store';
 import {
+  useNotificationsActions,
   useNotificationsForUser,
   useUnreadNotificationCount,
-  useNotificationsActions,
 } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
 import { type Notification } from '@/types';
+
+import NotificationModal from './NotificationModal';
 
 const NotificationBell: React.FC = () => {
   const navigate = useNavigate();
@@ -46,9 +48,9 @@ const NotificationBell: React.FC = () => {
         }`}
         aria-label={`View notifications (${unreadCount} unread)`}
       >
-        <BellIcon className="h-6 w-6" />
+        <BellIcon className="size-6" />
         {unreadCount > 0 && (
-          <div className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-none border-2 border-white bg-primary"></div>
+          <div className="rounded-nonenone absolute right-1.5 top-1.5 size-2.5 border-2 border-white bg-primary"></div>
         )}
       </button>
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
+
 import { can, Permission } from '@/config/permissions';
-import { type ProtectedRole, OnboardingStatus } from '@/types';
+import { useCurrentUser } from '@/store/auth.store';
+import { OnboardingStatus, type ProtectedRole } from '@/types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

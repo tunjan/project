@@ -1,39 +1,43 @@
 import React, { useMemo, useState } from 'react';
-import { Role, OnboardingStatus } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
-import {
-  useEvents,
-  useOutreachLogsForUser,
-  useOutreachActions,
-  useOutreachLogs,
-  useUsers,
-} from '@/store';
-import { ROLE_HIERARCHY } from '@/utils/auth';
 
-// Import the new components
-import QuickLogForm from '@/components/outreach/QuickLogForm';
-import PersonalPerformance from '@/components/outreach/PersonalPerformance';
 import LogHistory from '@/components/outreach/LogHistory';
 import OutreachTally from '@/components/outreach/OutreachTally';
+import PersonalPerformance from '@/components/outreach/PersonalPerformance';
+// Import the new components
+import QuickLogForm from '@/components/outreach/QuickLogForm';
+import {
+  useEvents,
+  useOutreachActions,
+  useOutreachLogs,
+  useOutreachLogsForUser,
+  useUsers,
+} from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { OnboardingStatus, Role } from '@/types';
+import { ROLE_HIERARCHY } from '@/utils/auth';
 
-// A toggle for organizers to switch between personal and team views
+// Enhanced toggle with better visual hierarchy and mobile optimization
 const OutreachViewToggle: React.FC<{
   view: 'personal' | 'team';
   onViewChange: (view: 'personal' | 'team') => void;
 }> = ({ view, onViewChange }) => (
-  <div className="inline-flex border-2 border-black bg-white">
+  <div className="inline-flex overflow-hidden rounded-none border-2 border-black bg-white">
     <button
       onClick={() => onViewChange('personal')}
-      className={`px-4 py-2 text-sm font-bold transition-colors ${
-        view === 'personal' ? 'bg-black text-white' : 'hover:bg-neutral-100'
+      className={`px-6 py-3 text-sm font-bold ${
+        view === 'personal'
+          ? 'bg-black text-white shadow-inner'
+          : 'hover:bg-neutral-100 active:bg-neutral-200'
       }`}
     >
       My Logs
     </button>
     <button
       onClick={() => onViewChange('team')}
-      className={`px-4 py-2 text-sm font-bold transition-colors ${
-        view === 'team' ? 'bg-black text-white' : 'hover:bg-neutral-100'
+      className={`px-6 py-3 text-sm font-bold ${
+        view === 'team'
+          ? 'bg-black text-white shadow-inner'
+          : 'hover:bg-neutral-100 active:bg-neutral-200'
       }`}
     >
       Team View
@@ -118,52 +122,74 @@ const OutreachLogPage: React.FC = () => {
   if (!currentUser) return null;
 
   return (
-    <div className="py-8 md:py-12">
-      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-            {title}
-          </h1>
-          <p className="mt-3 max-w-2xl text-lg text-neutral-600">
-            Log conversations to track your impact and contribute to global
-            stats.
-          </p>
-        </div>
-        {canViewTeam && (
-          <OutreachViewToggle view={view} onViewChange={setView} />
-        )}
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-white via-neutral-50 to-white">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        {/* Enhanced Header Section */}
+        <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-2 bg-primary"></div>
+              <h1 className="text-4xl font-extrabold tracking-tight text-black sm:text-5xl lg:text-6xl">
+                {title}
+              </h1>
+            </div>
+            <p className="max-w-3xl text-lg leading-relaxed text-neutral-600 sm:text-xl">
+              Track your impact and contribute to global statistics by logging
+              meaningful conversations. Every interaction counts towards
+              building a more compassionate world.
+            </p>
+          </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2">
-        {/* --- Left Column: Actions & Personal Stats --- */}
-        <div className="space-y-8 lg:col-span-1">
-          <QuickLogForm
-            key={view} // Force re-render on view change to reset form
-            currentUser={currentUser}
-            events={relevantEvents}
-            users={relevantUsers}
-            addOutreachLog={addOutreachLog}
-            removeOutreachLog={removeOutreachLog}
-            isTeamView={view === 'team'}
-          />
-          {view === 'personal' && <PersonalPerformance logs={personalLogs} />}
+          {canViewTeam && (
+            <div className="shrink-0">
+              <OutreachViewToggle view={view} onViewChange={setView} />
+            </div>
+          )}
         </div>
 
-        {/* --- Right Column: Data & History --- */}
-        <div className="space-y-8 lg:col-span-1">
-          <section>
-            <h2 className="h-section">
-              {view === 'personal' ? 'Your Tally' : 'Team Tally'}
-            </h2>
-            <OutreachTally logs={logsToShow} />
-          </section>
+        {/* Enhanced Grid Layout with Better Mobile Responsiveness */}
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-12 xl:gap-12">
+          {/* Left Column: Actions & Personal Stats - Enhanced spacing and mobile layout */}
+          <div className="space-y-8 xl:col-span-7">
+            <QuickLogForm
+              key={view} // Force re-render on view change to reset form
+              currentUser={currentUser}
+              events={relevantEvents}
+              users={relevantUsers}
+              addOutreachLog={addOutreachLog}
+              removeOutreachLog={removeOutreachLog}
+              isTeamView={view === 'team'}
+            />
 
-          <LogHistory
-            logs={logsToShow}
-            events={allEvents}
-            updateOutreachLog={updateOutreachLog}
-            removeOutreachLog={removeOutreachLog}
-          />
+            {view === 'personal' && (
+              <div>
+                <PersonalPerformance logs={personalLogs} />
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Data & History - Better visual separation */}
+          <div className="space-y-8 xl:col-span-5">
+            <div className="sticky top-8 space-y-8">
+              <section>
+                <h2 className="mb-6 border-b-4 border-primary pb-3 text-2xl font-extrabold tracking-tight text-black">
+                  {view === 'personal'
+                    ? 'Your Impact Tally'
+                    : 'Team Impact Tally'}
+                </h2>
+                <OutreachTally logs={logsToShow} />
+              </section>
+
+              <div>
+                <LogHistory
+                  logs={logsToShow}
+                  events={allEvents}
+                  updateOutreachLog={updateOutreachLog}
+                  removeOutreachLog={removeOutreachLog}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,12 +1,13 @@
 import React from 'react';
-import { CubeEvent, EventStatus } from '@/types';
+
 import {
   CheckCircleIcon,
   ClipboardCheckIcon,
-  XCircleIcon,
-  PencilIcon,
   LogoutIcon,
+  PencilIcon,
+  XCircleIcon,
 } from '@/icons';
+import { CubeEvent, EventStatus } from '@/types';
 
 interface EventActionBarProps {
   event: CubeEvent;
@@ -45,7 +46,7 @@ const EventActionBar: React.FC<EventActionBarProps> = ({
   if (isCancelled) {
     return (
       <div className="card-brutal mb-6 flex items-center justify-center bg-danger p-4 text-center font-bold text-white">
-        <XCircleIcon className="mr-2 h-6 w-6" />
+        <XCircleIcon className="mr-2 size-6" />
         This event has been cancelled.
       </div>
     );
@@ -57,7 +58,7 @@ const EventActionBar: React.FC<EventActionBarProps> = ({
         <p className="font-bold text-black">This event has ended.</p>
         {canManageEvent && (
           <button onClick={onManageEvent} className="btn-primary">
-            <ClipboardCheckIcon className="mr-2 h-5 w-5" />
+            <ClipboardCheckIcon className="mr-2 size-5" />
             Log Event Report
           </button>
         )}
@@ -69,20 +70,20 @@ const EventActionBar: React.FC<EventActionBarProps> = ({
     return (
       <div className="card-brutal mb-6 flex flex-col items-center justify-between gap-4 bg-primary-lightest p-4 sm:flex-row">
         <div className="flex items-center font-bold text-black">
-          <CheckCircleIcon className="mr-2 h-6 w-6 text-success" />
+          <CheckCircleIcon className="mr-2 size-6 text-success" />
           You are attending this event!
         </div>
         <div className="flex w-full gap-2 sm:w-auto">
           {isRegionalEvent && (
             <button onClick={onRsvp} className="btn-primary flex-1">
-              <PencilIcon className="mr-2 h-4 w-4" /> Update Duties
+              <PencilIcon className="mr-2 size-4" /> Update Duties
             </button>
           )}
           <button
             onClick={onCancelRsvp}
             className="btn-outline flex items-center"
           >
-            <LogoutIcon className="mr-2 h-4 w-4" /> Cancel RSVP
+            <LogoutIcon className="mr-2 size-4" /> Cancel RSVP
           </button>
         </div>
       </div>

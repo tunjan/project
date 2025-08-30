@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Modal from '@/components/ui/Modal';
 
 interface CityAttendanceData {
@@ -24,12 +25,12 @@ const CityAttendanceModal: React.FC<CityAttendanceModalProps> = ({
       onClose={onClose}
     >
       {attendanceData.length > 0 ? (
-        <div className="-m-6 max-h-[60vh] flex-grow overflow-y-auto bg-white">
+        <div className="-m-6 max-h-[60vh] grow overflow-y-auto bg-white">
           <ul className="divide-y divide-black">
             {attendanceData.map(({ city, count }) => (
               <li key={city} className="flex items-center justify-between p-4">
                 <span className="font-bold text-black">{city}</span>
-                <span className="rounded-none bg-black px-2 py-1 text-sm font-semibold text-white">
+                <span className="rounded-nonenone bg-black px-2 py-1 text-sm font-semibold text-white">
                   {count} {count === 1 ? 'visit' : 'visits'}
                 </span>
               </li>

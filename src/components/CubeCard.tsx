@@ -1,8 +1,7 @@
-import { type CubeEvent, EventStatus } from '@/types';
-
-import { CalendarIcon, ClockIcon, UsersIcon } from '@/icons';
-import { safeFormatDate, safeParseDate } from '@/utils/date';
 import Avatar from '@/components/ui/Avatar';
+import { CalendarIcon, ClockIcon, UsersIcon } from '@/icons';
+import { type CubeEvent, EventStatus } from '@/types';
+import { safeFormatDate, safeParseDate } from '@/utils/date';
 
 interface CubeCardProps {
   event: CubeEvent;
@@ -42,7 +41,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
     <button
       type="button"
       onClick={handleSelect}
-      className={`relative w-full transform cursor-pointer overflow-hidden border-2 border-black bg-white text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+      className={`relative w-full cursor-pointer overflow-hidden border-2 border-black bg-white text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2${
         isCancelled ? 'cursor-not-allowed opacity-60' : 'hover-raise'
       }`}
       disabled={isCancelled}
@@ -79,8 +78,8 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
                 CANCELLED
               </span>
             )}
-            <div className="flex items-center rounded-none bg-black px-2.5 py-1 text-xs font-semibold text-white">
-              <UsersIcon className="mr-1.5 h-4 w-4" />
+            <div className="rounded-nonenone flex items-center bg-black px-2.5 py-1 text-xs font-semibold text-white">
+              <UsersIcon className="mr-1.5 size-4" />
               {event.participants.length}
             </div>
           </div>
@@ -88,12 +87,12 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
 
         <div className="text-grey-800 mt-4 space-y-3">
           <div className="flex items-center">
-            <CalendarIcon className="text-red mr-3 h-5 w-5" />
+            <CalendarIcon className="text-red mr-3 size-5" />
             <span>{formattedDateRange}</span>
           </div>
           {!event.endDate && (
             <div className="flex items-center">
-              <ClockIcon className="text-red mr-3 h-5 w-5" />
+              <ClockIcon className="text-red mr-3 size-5" />
               <span>{formattedTime}</span>
             </div>
           )}
@@ -103,7 +102,7 @@ const CubeCard = ({ event, onSelect, isUserAffiliated }: CubeCardProps) => {
           <Avatar
             src={event.organizer.profilePictureUrl}
             alt={event.organizer.name}
-            className="h-10 w-10 object-cover"
+            className="size-10 object-cover"
           />
           <div className="ml-3">
             <p className="text-sm font-semibold text-black">

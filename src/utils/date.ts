@@ -1,7 +1,7 @@
 /**
  * Utility functions for safe date handling and formatting
  */
-import { parseISO, isValid } from 'date-fns';
+import { isValid, parseISO } from 'date-fns';
 
 /**
  * Generic helper function for safe date formatting

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { type User } from '@/types';
-import { TrophyIcon } from '@/icons';
-import Tag from '@/components/ui/Tag';
+
 import Avatar from '@/components/ui/Avatar';
+import Tag from '@/components/ui/Tag';
+import { TrophyIcon } from '@/icons';
+import { type User } from '@/types';
 
 interface LeaderboardRowProps {
   rank: number;
@@ -29,7 +30,7 @@ const RankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
 
   return (
     <div className={`${baseStyle} ${rankClass}`}>
-      {rank <= 3 ? <TrophyIcon className="h-6 w-6" /> : <span>{rank}</span>}
+      {rank <= 3 ? <TrophyIcon className="size-6" /> : <span>{rank}</span>}
     </div>
   );
 };
@@ -43,7 +44,7 @@ const RankChangeIndicator: React.FC<{ change?: 'up' | 'down' | 'same' }> = ({
     return (
       <div className="flex items-center gap-1 text-success">
         <svg
-          className="h-4 w-4"
+          className="size-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -62,7 +63,7 @@ const RankChangeIndicator: React.FC<{ change?: 'up' | 'down' | 'same' }> = ({
   return (
     <div className="flex items-center gap-1 text-danger">
       <svg
-        className="h-4 w-4"
+        className="size-4"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -92,22 +93,22 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
 
   return (
     <li
-      className={`flex transform-gpu flex-col border-2 border-black transition-all duration-200 hover:-translate-y-1 hover:shadow-brutal ${
+      className={`flex transform-gpu flex-col border-2 border-black hover:shadow-brutal ${
         isCurrentUser ? 'bg-primary-lightest ring-2 ring-primary' : 'bg-white'
       }`}
     >
       <Link
         to={`/members/${user.id}`}
-        className="flex min-w-0 flex-grow items-stretch"
+        className="flex min-w-0 grow items-stretch"
       >
         <RankIndicator rank={rank} />
-        <div className="flex min-w-0 flex-grow items-center p-3">
+        <div className="flex min-w-0 grow items-center p-3">
           <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
-            className="h-12 w-12 flex-shrink-0 border-2 border-black object-cover"
+            className="size-12 shrink-0 border-2 border-black object-cover"
           />
-          <div className="ml-4 min-w-0 flex-grow">
+          <div className="ml-4 min-w-0 grow">
             <div className="flex items-center gap-2">
               <p className="truncate font-bold text-black">{user.name}</p>
               {isCurrentUser && <Tag variant="primary">YOU</Tag>}
@@ -117,7 +118,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
             </p>
 
             {/* Compact progress bar to give visual weight to higher ranks */}
-            <div className="mt-2 h-2 w-full rounded-sm bg-neutral-200">
+            <div className="rounded-nonesm mt-2 h-2 w-full bg-neutral-200">
               <div
                 className="h-2 bg-primary"
                 style={{
@@ -130,7 +131,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
             </div>
           </div>
 
-          <div className="ml-4 hidden flex-shrink-0 items-center gap-2 sm:flex">
+          <div className="ml-4 hidden shrink-0 items-center gap-2 sm:flex">
             <RankChangeIndicator change={rankChange} />
             <div className="text-right">
               <p className="text-2xl font-extrabold text-black">

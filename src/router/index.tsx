@@ -1,10 +1,12 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import MainLayout from '@/layouts/MainLayout';
+
 import AuthLayout from '@/layouts/AuthLayout';
-import RootSuspense from './RootSuspense';
+import MainLayout from '@/layouts/MainLayout';
+
 import IndexRedirect from './IndexRedirect';
+import ProtectedRoute from './ProtectedRoute';
+import RootSuspense from './RootSuspense';
 
 const CubeListPage = React.lazy(() => import('@/pages/CubeListPage'));
 const CubeDetailPage = React.lazy(() => import('@/pages/CubeDetailPage'));

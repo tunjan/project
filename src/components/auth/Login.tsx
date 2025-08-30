@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { type User, Role, OnboardingStatus } from '@/types';
-import { can, Permission } from '@/config/permissions';
-import Tag from '@/components/ui/Tag';
-import { ChevronRightIcon } from '@/icons';
+
 import Avatar from '@/components/ui/Avatar';
+import Tag from '@/components/ui/Tag';
+import { can, Permission } from '@/config/permissions';
+import { ChevronRightIcon } from '@/icons';
+import { OnboardingStatus, Role, type User } from '@/types';
 
 interface LoginProps {
   users: User[];
@@ -148,7 +149,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
             </p>
           </div>
           <ChevronRightIcon
-            className={`h-4 w-4 transition-transform ${open[openKey] ? 'rotate-90' : ''}`}
+            className={`size-4 transition-transform ${open[openKey] ? 'rotate-90' : ''}`}
           />
         </button>
         {open[openKey] && (
@@ -174,14 +175,14 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       <Avatar
         src={user.profilePictureUrl}
         alt={user.name}
-        className="h-12 w-12 border-2 border-black object-cover"
+        className="size-12 border-2 border-black object-cover"
       />
       <div className="min-w-0 flex-1">
         <p className="truncate font-bold text-black">{user.name}</p>
         {/* FIX: role text was white on white; use subtle grey */}
         <p className="truncate text-sm text-neutral-600">{user.role}</p>
       </div>
-      <div className="flex flex-shrink-0 flex-col items-end space-y-1">
+      <div className="flex shrink-0 flex-col items-end space-y-1">
         <ProgressTags user={user} />
       </div>
     </button>

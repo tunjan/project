@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { TourDutyRole, User, CubeEvent } from '@/types';
 import { Link } from 'react-router-dom';
-import { getDatesBetween } from '@/utils/date';
+
 import Avatar from '@/components/ui/Avatar';
+import { CubeEvent, TourDutyRole, User } from '@/types';
+import { getDatesBetween } from '@/utils/date';
 
 interface EventRosterProps {
   event: CubeEvent;
@@ -76,12 +77,12 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
                           <Link
                             key={user.id}
                             to={`/members/${user.id}`}
-                            className="flex items-center space-x-1.5 rounded-none bg-white p-1 transition-colors hover:bg-white"
+                            className="rounded-nonenone flex items-center space-x-1.5 bg-white p-1 transition-colors hover:bg-white"
                           >
                             <Avatar
                               src={user.profilePictureUrl}
                               alt={user.name}
-                              className="h-5 w-5 object-cover"
+                              className="size-5 object-cover"
                             />
                             <span className="text-xs font-semibold">
                               {user.name}

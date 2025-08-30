@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { Toaster } from 'sonner';
+
 import Header from '@/components/header/Header';
 import Sidebar from '@/components/header/Sidebar';
-import { Toaster } from 'sonner';
-import { useUsersActions } from '@/store';
 import CommandPalette from '@/components/search/CommandPalette';
+import { useUsersActions } from '@/store';
 import { useSearchActions } from '@/store/search.store';
 
 const MainLayout: React.FC = () => {

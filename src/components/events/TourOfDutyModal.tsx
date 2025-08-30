@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { type CubeEvent, type TourDuty, TourDutyRole } from '@/types';
-import Modal from '@/components/ui/Modal';
 import { toast } from 'sonner';
+
+import Modal from '@/components/ui/Modal';
+import { type CubeEvent, type TourDuty, TourDutyRole } from '@/types';
 
 interface TourOfDutyModalProps {
   event: CubeEvent;

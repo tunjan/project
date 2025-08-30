@@ -1,6 +1,7 @@
 import React from 'react';
-import { User } from '@/types';
+
 import Avatar from '@/components/ui/Avatar';
+import { User } from '@/types';
 
 interface MemberProfileHeaderProps {
   user: User;
@@ -13,19 +14,48 @@ const MemberProfileHeader: React.FC<MemberProfileHeaderProps> = ({ user }) => {
         <Avatar
           src={user.profilePictureUrl}
           alt={user.name}
-          className="h-24 w-24 flex-shrink-0 border-2 border-black object-cover"
+          className="size-24 shrink-0 border-2 border-black object-cover"
         />
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-3xl font-extrabold text-black">{user.name}</h1>
           <p className="text-lg text-neutral-600">{user.email}</p>
-          <p className="text-sm text-neutral-500">
-            {user.chapters?.join(', ')} Chapter
-          </p>
-          {user.instagram && (
+          <div className="mt-2 space-y-1">
             <p className="text-sm text-neutral-500">
-              Instagram: @{user.instagram}
+              <span className="font-semibold">Chapters:</span>{' '}
+              {user.chapters?.join(', ') || 'None'}
             </p>
-          )}
+            {user.organiserOf && user.organiserOf.length > 0 && (
+              <p className="text-sm text-primary">
+                <span className="font-semibold">Organizing:</span>{' '}
+                {user.organiserOf.join(', ')}
+              </p>
+            )}
+            {user.instagram && (
+              <p className="text-sm text-neutral-500">
+                <span className="font-semibold">Instagram:</span>{' '}
+                <a
+                  href={`https://instagram.com/${user.instagram.replace('@', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary-hover hover:underline"
+                >
+                  {user.instagram}
+                </a>
+              </p>
+            )}
+            {user.joinDate && (
+              <p className="text-sm text-neutral-500">
+                <span className="font-semibold">Member since:</span>{' '}
+                {new Date(user.joinDate).toLocaleDateString()}
+              </p>
+            )}
+            {user.lastLogin && (
+              <p className="text-sm text-neutral-500">
+                <span className="font-semibold">Last login:</span>{' '}
+                {new Date(user.lastLogin).toLocaleDateString()}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex flex-col gap-4 sm:items-end">
           <div className="text-right">

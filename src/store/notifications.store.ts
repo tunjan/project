@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type Notification } from '@/types';
+
 import { processedNotifications } from './initialData';
 
 export interface NotificationsState {

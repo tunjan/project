@@ -1,37 +1,64 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
-import { useNotificationsForUser, useNotificationsActions } from '@/store';
-import { type Notification } from '@/types';
+
+import Avatar from '@/components/ui/Avatar';
 import { BellIcon } from '@/icons';
+import { useNotificationsActions, useNotificationsForUser } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { type Notification } from '@/types';
+import { safeFormatLocaleString } from '@/utils/date';
+import { getNotificationIcon } from '@/utils/notificationUtils';
 
 const NotificationCard: React.FC<{
   notification: Notification;
   onClick: (notification: Notification) => void;
-}> = ({ notification, onClick }) => (
-  <div
-    className={`card-brutal card-padding cursor-pointer ${
-      notification.isRead ? 'bg-white' : 'bg-primary-light'
-    }`}
-    onClick={() => onClick(notification)}
-  >
-    <div className="flex items-start gap-4">
-      {notification.relatedUser && (
-        <img
-          src={notification.relatedUser.profilePictureUrl}
-          alt={notification.relatedUser.name}
-          className="h-10 w-10 rounded-none border-2 border-black object-cover"
-        />
-      )}
-      <div>
-        <p className="font-bold text-black">{notification.message}</p>
-        <p className="text-grey-600 text-sm">
-          {new Date(notification.createdAt).toLocaleString()}
-        </p>
+}> = ({ notification, onClick }) => {
+  const icon = getNotificationIcon(notification.type);
+  const cardClasses = notification.isRead
+    ? 'bg-white hover:bg-neutral-50'
+    : 'bg-primary-lightest border-primary hover:bg-primary-lightest/80';
+  const iconColorClass = notification.isRead
+    ? 'text-neutral-500'
+    : 'text-primary';
+
+  return (
+    <div
+      className={`card-brutal cursor-pointer p-4 transition-colors ${cardClasses}`}
+      onClick={() => onClick(notification)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onClick(notification);
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="flex items-start gap-4">
+        <div className={`shrink-0 ${iconColorClass}`}>{icon}</div>
+        <div className="grow">
+          <p
+            className={`text-black ${!notification.isRead ? 'font-bold' : ''}`}
+          >
+            {notification.message}
+          </p>
+          <p className="text-sm text-neutral-600">
+            {safeFormatLocaleString(notification.createdAt, {
+              dateStyle: 'long',
+              timeStyle: 'short',
+            })}
+          </p>
+        </div>
+        {notification.relatedUser && (
+          <div className="shrink-0">
+            <Avatar
+              src={notification.relatedUser.profilePictureUrl}
+              alt={notification.relatedUser.name}
+              className="size-12"
+            />
+          </div>
+        )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const NotificationsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -75,9 +102,9 @@ const NotificationsPage: React.FC = () => {
         </div>
       ) : (
         <div className="card-brutal card-padding text-center">
-          <BellIcon className="text-grey-500 mx-auto h-12 w-12" />
+          <BellIcon className="mx-auto size-12 text-neutral-500" />
           <h2 className="mt-4 text-xl font-bold">No notifications</h2>
-          <p className="text-grey-600 mt-1">You're all caught up!</p>
+          <p className="mt-1 text-neutral-600">You're all caught up!</p>
         </div>
       )}
     </div>

@@ -1,6 +1,8 @@
 import React from 'react';
-import Modal from './Modal';
+
 import { ShieldExclamationIcon } from '@/icons';
+
+import Modal from './Modal';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -59,16 +61,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const variantStyles = getVariantStyles();
 
-  if (!isOpen) return null;
-
+  // No longer conditionally render here; the Modal itself handles it
   return (
-    <Modal title={title} onClose={onClose}>
+    <Modal title={title} onClose={onClose} isOpen={isOpen}>
       <div className="p-6">
         <div className="flex items-start space-x-4">
-          <div className="flex-shrink-0">
-            <ShieldExclamationIcon
-              className={`h-6 w-6 ${variantStyles.icon}`}
-            />
+          <div className="shrink-0">
+            <ShieldExclamationIcon className={`size-6 ${variantStyles.icon}`} />
           </div>
           <div className="flex-1">
             <p className={`mt-2 text-sm ${variantStyles.messageText}`}>

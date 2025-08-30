@@ -1,11 +1,12 @@
 import React from 'react';
-import { User, Role } from '@/types';
+
 import {
-  UserGroupIcon,
   BuildingOfficeIcon,
-  StarIcon,
   ChatBubbleLeftRightIcon,
+  StarIcon,
+  UserGroupIcon,
 } from '@/icons';
+import { Role, User } from '@/types';
 
 interface UserManagementPanelProps {
   user: User;
@@ -42,7 +43,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         {/* Role Management */}
         <div className="border-2 border-black bg-white p-4">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-            <UserGroupIcon className="h-5 w-5" />
+            <UserGroupIcon className="size-5" />
             Role Management
           </h3>
           <div className="space-y-2">
@@ -62,7 +63,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         {canEditChapters && (
           <div className="border-2 border-black bg-white p-4">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-              <BuildingOfficeIcon className="h-5 w-5" />
+              <BuildingOfficeIcon className="size-5" />
               Chapter Management
             </h3>
             <div className="space-y-2">
@@ -79,22 +80,22 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
           </div>
         )}
 
-        {/* Badge Management */}
+        {/* Recognition Management */}
         {canAwardBadges && (
           <div className="border-2 border-black bg-white p-4">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-              <StarIcon className="h-5 w-5" />
-              Badge Management
+              <StarIcon className="size-5" />
+              Recognition Management
             </h3>
             <div className="space-y-2">
               <p className="text-sm text-neutral-600">
-                Current Badges: {user.badges?.length || 0}
+                Current Recognitions: {user.badges?.length || 0}
               </p>
               <button
                 onClick={onOpenAwardBadgeModal}
                 className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
               >
-                Award Badge
+                Award Recognition
               </button>
             </div>
           </div>
@@ -103,7 +104,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         {/* Communication */}
         <div className="border-2 border-black bg-white p-4">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-            <ChatBubbleLeftRightIcon className="h-5 w-5" />
+            <ChatBubbleLeftRightIcon className="size-5" />
             Communication
           </h3>
           <div className="space-y-2">

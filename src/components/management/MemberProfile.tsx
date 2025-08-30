@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
-import { type User, OnboardingStatus, BadgeTemplate } from '@/types';
-import { useCurrentUser, useChapters } from '@/store';
-import { useUsersActions } from '@/store/users.store';
-import { useAwardsActions } from '@/store/awards.store';
+
 import { can, Permission } from '@/config/permissions';
-import PromoteToOrganiserModal from './PromoteToOrganiserModal';
-import EditChaptersModal from './EditChaptersModal';
-import DeleteUserModal from './DeleteUserModal';
-import OrganizerNotes from './OrganizerNotes';
-import AwardBadgeModal from './AwardBadgeModal';
-import MemberProfileHeader from './MemberProfileHeader';
-import UserManagementPanel from './UserManagementPanel';
-import UserDangerZone from './UserDangerZone';
-import OnboardingActions from './OnboardingActions';
-import UserStats from './UserStats';
 import {
-  ChevronLeftIcon,
   CalendarIcon,
-  ClockIcon,
   ChatBubbleLeftRightIcon,
+  ChevronLeftIcon,
+  ClockIcon,
 } from '@/icons';
+import { useChapters, useCurrentUser } from '@/store';
+import { useAwardsActions } from '@/store/awards.store';
+import { useUsersActions } from '@/store/users.store';
+import { BadgeTemplate, OnboardingStatus, type User } from '@/types';
+
+import AwardBadgeModal from './AwardBadgeModal';
+import DeleteUserModal from './DeleteUserModal';
+import EditChaptersModal from './EditChaptersModal';
+import EventParticipationHistory from './EventParticipationHistory';
+import MemberProfileHeader from './MemberProfileHeader';
+import OnboardingActions from './OnboardingActions';
+import OnboardingProgressDetails from './OnboardingProgressDetails';
+import OrganizerNotes from './OrganizerNotes';
+import OutreachLogHistory from './OutreachLogHistory';
+import PromoteToOrganiserModal from './PromoteToOrganiserModal';
+import UserDangerZone from './UserDangerZone';
+import UserManagementPanel from './UserManagementPanel';
+import UserStats from './UserStats';
 
 interface MemberProfileProps {
   user: User;
@@ -147,6 +152,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           user={user}
           onClose={() => setDeleteModalOpen(false)}
           onConfirm={handleConfirmDelete}
+          isOpen={deleteModalOpen}
         />
       )}
       {awardBadgeModalOpen && (
@@ -161,7 +167,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           onClick={onBack}
           className="mb-6 inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
         >
-          <ChevronLeftIcon className="mr-1 h-5 w-5" /> Back to Member Directory
+          <ChevronLeftIcon className="mr-1 size-5" /> Back to Member Directory
         </button>
 
         <MemberProfileHeader user={user} />
@@ -179,7 +185,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="h-5 w-5 text-neutral-500" />
+                  <CalendarIcon className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.onboardingCallScheduledAt
@@ -189,7 +195,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <ClockIcon className="h-5 w-5 text-neutral-500" />
+                  <ClockIcon className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.onboardingCallScheduledAt
@@ -199,10 +205,10 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ChatBubbleLeftRightIcon className="mt-0.5 h-5 w-5 text-neutral-500" />
+                  <ChatBubbleLeftRightIcon className="mt-0.5 size-5 text-neutral-500" />
                   <div>
                     <p className="font-semibold">Provided Contact Info:</p>
-                    <p className="rounded-md border-2 border-black bg-neutral-100 p-2 font-mono text-sm">
+                    <p className="rounded-nonemd border-2 border-black bg-neutral-100 p-2 font-mono text-sm">
                       {user.onboardingProgress.onboardingCallContactInfo ||
                         'Not provided'}
                     </p>
@@ -221,7 +227,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="h-5 w-5 text-neutral-500" />
+                  <CalendarIcon className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.revisionCallScheduledAt
@@ -231,7 +237,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <ClockIcon className="h-5 w-5 text-neutral-500" />
+                  <ClockIcon className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.revisionCallScheduledAt
@@ -241,10 +247,10 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ChatBubbleLeftRightIcon className="mt-0.5 h-5 w-5 text-neutral-500" />
+                  <ChatBubbleLeftRightIcon className="mt-0.5 size-5 text-neutral-500" />
                   <div>
                     <p className="font-semibold">Provided Contact Info:</p>
-                    <p className="rounded-md border-2 border-black bg-neutral-100 p-2 font-mono text-sm">
+                    <p className="rounded-nonemd border-2 border-black bg-neutral-100 p-2 font-mono text-sm">
                       {user.onboardingProgress.revisionCallContactInfo ||
                         'Not provided'}
                     </p>
@@ -254,12 +260,27 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
             </section>
           )}
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="space-y-8 lg:col-span-2">
-            <UserStats user={user} />
-            <OrganizerNotes user={user} />
-          </div>
-          <div className="space-y-8 lg:col-span-1">
+        {/* Comprehensive Member Data Grid */}
+        <div className="space-y-8">
+          {/* Enhanced User Stats */}
+          <UserStats user={user} />
+
+          {/* Onboarding Progress Details */}
+          <OnboardingProgressDetails user={user} />
+
+          {/* Event Participation History */}
+          <EventParticipationHistory user={user} />
+
+          {/* Outreach Log History */}
+          <OutreachLogHistory user={user} />
+
+          {/* Organizer Notes */}
+          <OrganizerNotes user={user} />
+        </div>
+
+        {/* Management Actions Sidebar */}
+        <div className="mt-8 grid grid-cols-1 gap-8">
+          <div className="space-y-8">
             {canManageRole && (
               <UserManagementPanel
                 user={user}

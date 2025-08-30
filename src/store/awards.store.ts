@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import {
   type BadgeAward,
   type BadgeTemplate,
-  type User,
   type EarnedBadge,
   NotificationType,
+  type User,
 } from '@/types';
+
 import { processedBadgeAwards } from './initialData';
 import { useNotificationsStore } from './notifications.store';
 
@@ -44,7 +46,7 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
         useNotificationsStore.getState().addNotification({
           userId: recipient.id,
           type: NotificationType.BADGE_AWARDED,
-          message: `${awarder.name} has awarded you the "${badgeTemplate.name}" badge!`,
+          message: `${awarder.name} has recognized your contribution with the "${badgeTemplate.name}" badge.`,
           linkTo: '/dashboard',
           relatedUser: awarder,
         });
@@ -90,7 +92,7 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
               response === 'Accepted'
                 ? NotificationType.BADGE_AWARD_ACCEPTED
                 : NotificationType.BADGE_AWARD_REJECTED,
-            message: `${award.recipient.name} has ${response.toLowerCase()} the "${award.badge.name}" badge.`,
+            message: `${award.recipient.name} has ${response.toLowerCase()} the "${award.badge.name}" recognition.`,
             linkTo: `/members/${award.recipient.id}`,
             relatedUser: award.recipient,
           });

@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CreateEventForm from '@/components/events/CreateEventForm';
-import { useCurrentUser } from '@/store/auth.store';
-import { useEventsActions } from '@/store';
 import { toast } from 'sonner';
+
+import CreateEventForm from '@/components/events/CreateEventForm';
+import { useEventsActions } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
 
 const CreateCubePage: React.FC = () => {
   const navigate = useNavigate();

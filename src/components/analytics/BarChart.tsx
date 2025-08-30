@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  BarChart as RechartsBarChart,
   Bar,
+  BarChart as RechartsBarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
 
 export interface BarChartData {
@@ -97,4 +97,4 @@ const BarChart: React.FC<BarChartProps> = ({
   );
 };
 
-export default BarChart;
+export default React.memo(BarChart);

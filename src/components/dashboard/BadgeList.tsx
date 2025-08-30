@@ -1,6 +1,7 @@
 import React from 'react';
-import { type EarnedBadge } from '@/types';
+
 import * as Icons from '@/icons';
+import { type EarnedBadge } from '@/types';
 
 interface BadgeListProps {
   badges: EarnedBadge[];
@@ -11,7 +12,7 @@ const BadgeList: React.FC<BadgeListProps> = ({ badges }) => {
     return (
       <div className="card-brutal p-6 text-center">
         <p className="text-neutral-500">
-          No recognitions earned yet. Keep up the great work!
+          No recognitions earned yet. Your contributions matter.
         </p>
       </div>
     );
@@ -25,8 +26,8 @@ const BadgeList: React.FC<BadgeListProps> = ({ badges }) => {
 
         return (
           <div key={badge.id} className="card-brutal flex items-center p-3">
-            <div className="mr-3 flex-shrink-0 text-primary">
-              <IconComponent className="h-8 w-8" />
+            <div className="mr-3 shrink-0 text-primary">
+              <IconComponent className="size-8" />
             </div>
             <div>
               <h4 className="text-sm font-extrabold text-black">

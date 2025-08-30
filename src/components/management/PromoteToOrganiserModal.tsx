@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { type User, Role } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
-import { useChapters } from '@/store';
+import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+
 import Modal from '@/components/ui/Modal';
+import { useChapters } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { Role, type User } from '@/types';
 
 interface PromoteToOrganiserModalProps {
   userToManage: User;
@@ -84,7 +85,7 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
                   type="checkbox"
                   checked={selectedChapters.includes(chapter.name)}
                   onChange={() => handleCheckboxChange(chapter.name)}
-                  className="h-5 w-5 accent-primary"
+                  className="size-5 accent-primary"
                 />
                 <span className="font-bold text-black">{chapter.name}</span>
                 <span className="text-sm text-neutral-500">

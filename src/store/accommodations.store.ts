@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import {
   type AccommodationRequest,
-  type User,
   NotificationType,
+  type User,
 } from '@/types';
+
 import { processedAccommodationRequests } from './initialData';
 import { useNotificationsStore } from './notifications.store';
 

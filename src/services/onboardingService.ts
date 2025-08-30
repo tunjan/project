@@ -1,12 +1,13 @@
-import {
-  type User,
-  OnboardingStatus,
-  type OnboardingAnswers,
-  Role,
-  NotificationType,
-} from '@/types';
-import { useNotificationsStore } from '@/store/notifications.store';
 import { useChaptersStore } from '@/store/chapters.store';
+import { useNotificationsStore } from '@/store/notifications.store';
+import {
+  NotificationType,
+  type OnboardingAnswers,
+  OnboardingStatus,
+  Role,
+  type User,
+} from '@/types';
+
 import { generateRandomAvatarUrl } from '../utils/user';
 
 // Helper function to validate onboarding status transitions

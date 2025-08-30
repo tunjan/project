@@ -39,10 +39,14 @@ export enum NotificationType {
   RSVP_DENIED = 'RSVP Denied',
   CHAPTER_JOIN_REQUEST = 'Chapter Join Request',
   CHAPTER_JOIN_APPROVED = 'Chapter Join Approved',
-  BADGE_AWARDED = 'Badge Awarded',
-  BADGE_AWARD_ACCEPTED = 'Badge Award Accepted',
-  BADGE_AWARD_REJECTED = 'Badge Award Rejected',
+  BADGE_AWARDED = 'Recognition Awarded',
+  BADGE_AWARD_ACCEPTED = 'Recognition Accepted',
+  BADGE_AWARD_REJECTED = 'Recognition Declined',
   NEW_APPLICANT = 'New Applicant', // NEW
+  STATS_UPDATED = 'Stats Updated',
+  ROLE_UPDATED = 'Role Updated',
+  REMOVED_FROM_EVENT = 'Removed From Event',
+  CHAPTER_MEMBERSHIP_UPDATED = 'Chapter Membership Updated',
 }
 
 export interface BadgeTemplate {

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSearchStore } from '@/store/search.store';
+
 import useSearch from '@/hooks/useSearch';
 import { SearchIcon } from '@/icons';
+import { useSearchStore } from '@/store/search.store';
 
 const CommandPalette: React.FC = () => {
   const navigate = useNavigate();
@@ -34,32 +35,27 @@ const CommandPalette: React.FC = () => {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 pt-20"
-      onClick={close}
       role="dialog"
       aria-modal="true"
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          close();
-        }
-      }}
       tabIndex={-1}
     >
-      <div
-        className="animate-scale-in w-full max-w-xl"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-        onKeyDown={(e) => e.stopPropagation()}
-        role="document"
-      >
+      {/* Backdrop for closing */}
+      <button
+        className="absolute inset-0 bg-transparent"
+        onClick={close}
+        aria-label="Close search"
+      />
+      <div className="w-full max-w-xl" role="document">
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <SearchIcon className="h-5 w-5 text-neutral-500" />
+            <SearchIcon className="size-5 text-neutral-500" />
           </div>
           <input
             type="text"
             placeholder="Search for activists, chapters, events..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-none border-2 border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder-neutral-500 focus:border-black focus:outline-none"
+            className="rounded-nonenone w-full border-2 border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder:text-neutral-500 focus:border-black focus:outline-none"
           />
         </div>
 
@@ -68,7 +64,7 @@ const CommandPalette: React.FC = () => {
           <div className="mt-2 max-h-96 overflow-y-auto border-2 border-black bg-white">
             {loading && (
               <div className="p-4 text-center">
-                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
+                <div className="rounded-nonefull inline-block size-6 border-2 border-black border-t-transparent"></div>
                 <p className="mt-2 text-sm text-neutral-500">Searching...</p>
               </div>
             )}

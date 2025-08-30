@@ -1,9 +1,15 @@
+import './index.css';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // ADD THIS
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
+
 import ErrorBoundary from './components/ErrorBoundary';
 import { router } from './router';
-import './index.css';
+
+// ADD THIS: Create a client
+const queryClient = new QueryClient();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -13,8 +19,11 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <RouterProvider router={router} />
-    </ErrorBoundary>
+    {/* ADD THIS WRAPPER */}
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
+        <RouterProvider router={router} />
+      </ErrorBoundary>
+    </QueryClientProvider>
   </React.StrictMode>
 );

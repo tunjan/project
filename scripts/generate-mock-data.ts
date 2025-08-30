@@ -1,34 +1,35 @@
 // FILE: scripts/generate-mock-data.ts
 import { faker } from '@faker-js/faker';
-import {
-  User,
-  Chapter,
-  CubeEvent,
-  Challenge,
-  Role,
-  OnboardingStatus,
-  EventStatus,
-  ParticipantStatus,
-  OutreachOutcome,
-  AnnouncementScope,
-  ResourceType,
-  SkillLevel,
-  TourDuty,
-  OutreachLog,
-  Announcement,
-  Resource,
-  Notification,
-  NotificationType,
-  BadgeAward,
-  InventoryItem,
-  EventComment,
-  AccommodationRequest,
-} from '../src/types';
-import { BADGE_TEMPLATES } from '../src/constants';
-import { nanoid } from 'nanoid';
 import fs from 'fs';
+import { nanoid } from 'nanoid';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { BADGE_TEMPLATES } from '../src/constants';
+import {
+  AccommodationRequest,
+  Announcement,
+  AnnouncementScope,
+  BadgeAward,
+  Challenge,
+  Chapter,
+  CubeEvent,
+  EventComment,
+  EventStatus,
+  InventoryItem,
+  Notification,
+  NotificationType,
+  OnboardingStatus,
+  OutreachLog,
+  OutreachOutcome,
+  ParticipantStatus,
+  Resource,
+  ResourceType,
+  Role,
+  SkillLevel,
+  TourDuty,
+  User,
+} from '../src/types';
 import { generateAvatarUrl } from '../src/utils/user';
 
 console.log('--- Starting Mock Data Generation ---');
@@ -62,10 +63,10 @@ const ENV_CONFIG = {
     NUM_CHAPTERS: 25,
     NUM_USERS: 600,
     EVENTS_PER_CHAPTER_MIN: 5,
-    EVENTS_PER_CHAPTER_MAX: 15,
-    ANNOUNCEMENTS: 30,
+    EVENTS_PER_CHAPTER_MAX: 10,
+    ANNOUNCEMENTS: 60,
     RESOURCES: 20,
-    CHALLENGES: 3,
+    CHALLENGES: 2,
     REALISTIC_DATES: true,
   },
 };
@@ -254,6 +255,10 @@ import { User, Chapter, CubeEvent, OutreachLog, Announcement, Resource, Accommod
       {
         from: '"type": "Request Denied"',
         to: '"type": NotificationType.REQUEST_DENIED',
+      },
+      {
+        from: '"type": "Recognition Awarded"',
+        to: '"type": NotificationType.BADGE_AWARDED',
       },
     ];
 
@@ -584,17 +589,17 @@ const generateEvents = (chapters: Chapter[], users: User[]): CubeEvent[] => {
         status: isPast ? EventStatus.FINISHED : EventStatus.UPCOMING,
         report: isPast
           ? {
-            hours: faker.number.int({ min: 2, max: 6 }),
-            attendance: Object.fromEntries(
-              uniqueParticipants.map((p) => [
-                p.user.id,
-                faker.helpers.weightedArrayElement([
-                  { weight: 9, value: 'Attended' },
-                  { weight: 1, value: 'Absent' },
-                ]),
-              ])
-            ),
-          }
+              hours: faker.number.int({ min: 2, max: 6 }),
+              attendance: Object.fromEntries(
+                uniqueParticipants.map((p) => [
+                  p.user.id,
+                  faker.helpers.weightedArrayElement([
+                    { weight: 9, value: 'Attended' },
+                    { weight: 1, value: 'Absent' },
+                  ]),
+                ])
+              ),
+            }
           : undefined,
       };
       events.push(event);
@@ -860,8 +865,13 @@ const generateChallenges = (
 
 const awardBadges = (
   users: User[]
-): { updatedUsers: User[]; badgeAwards: BadgeAward[] } => {
+): {
+  updatedUsers: User[];
+  badgeAwards: BadgeAward[];
+  notifications: Notification[];
+} => {
   const badgeAwards: BadgeAward[] = [];
+  const notifications: Notification[] = [];
   const updatedUsers = users.map((user) => {
     const earnedBadges = user.badges || [];
     const checkAndAward = (badgeName: string, condition: boolean) => {
@@ -873,16 +883,61 @@ const awardBadges = (
             id: nanoid(),
             awardedAt: new Date(),
           });
+        // Automatically award notifications for earned badges
+        notifications.push({
+          id: nanoid(),
+          userId: user.id,
+          type: NotificationType.BADGE_AWARDED,
+          message: `You've earned the "${badgeName}" badge. Recognition for your commitment.`,
+          linkTo: `/members/${user.id}`,
+          isRead: faker.datatype.boolean({ probability: 0.3 }),
+          createdAt: new Date(),
+        });
       }
     };
-    checkAndAward('First Cube', user.stats.cubesAttended >= 1);
-    checkAndAward('Road Warrior', new Set(user.stats.cities).size >= 5);
-    checkAndAward('Top Orator', user.stats.totalConversations >= 100);
-    checkAndAward('Veteran Activist', user.stats.totalHours >= 100);
-    checkAndAward('Community Pillar', user.stats.cubesAttended >= 25);
+
+    // Core achievement badges
+    checkAndAward('First Blood', user.stats.cubesAttended >= 1);
+    checkAndAward('Nomad', new Set(user.stats.cities).size >= 5);
+    checkAndAward('Voice of Truth', user.stats.totalConversations >= 100);
+    checkAndAward('Centurion', user.stats.totalHours >= 100);
+    checkAndAward('Veteran', user.stats.cubesAttended >= 25);
+
+    // Special recognition badges (awarded by organizers)
+    if (
+      user.role === Role.CHAPTER_ORGANISER ||
+      user.role === Role.REGIONAL_ORGANISER
+    ) {
+      // Award Chapter Anchor to dedicated chapter members
+      if (user.stats.cubesAttended >= 10 && user.stats.totalHours >= 50) {
+        checkAndAward('Chapter Anchor', true);
+      }
+
+      // Award Guide to those who help others
+      if (
+        user.stats.totalConversations >= 50 &&
+        user.stats.veganConversions >= 5
+      ) {
+        checkAndAward('Guide', true);
+      }
+    }
+
+    // Resilience and dedication badges
+    if (user.stats.cubesAttended >= 15 && user.activityLevel === 'high') {
+      checkAndAward('Steel Resolve', true);
+    }
+
+    // Strategic thinking badge
+    if (
+      user.stats.totalConversations >= 75 &&
+      user.stats.veganConversions >= 10
+    ) {
+      checkAndAward('Tactical Mind', true);
+    }
+
     return { ...user, badges: earnedBadges };
   });
-  return { updatedUsers, badgeAwards };
+  return { updatedUsers, badgeAwards, notifications };
 };
 
 const generateNotificationsForApplicants = (users: User[]): Notification[] => {
@@ -924,13 +979,13 @@ const calculateAllStats = (
 
   users.forEach(
     (u) =>
-    (userStatsMap[u.id] = {
-      totalHours: 0,
-      cubesAttended: 0,
-      totalConversations: 0,
-      veganConversions: 0,
-      cities: [],
-    })
+      (userStatsMap[u.id] = {
+        totalHours: 0,
+        cubesAttended: 0,
+        totalConversations: 0,
+        veganConversions: 0,
+        cities: [],
+      })
   );
 
   events.forEach((event) => {
@@ -985,7 +1040,11 @@ const generateAll = () => {
   users = calculateAllStats(users, events, outreachLogs);
 
   console.log('5. Awarding Badges...');
-  const { updatedUsers, badgeAwards } = awardBadges(users);
+  const {
+    updatedUsers,
+    badgeAwards,
+    notifications: badgeNotifications,
+  } = awardBadges(users);
   users = updatedUsers;
 
   console.log('6. Generating remaining interconnected data...');
@@ -1003,6 +1062,7 @@ const generateAll = () => {
   const applicantNotifications = generateNotificationsForApplicants(users);
   const notifications = [
     ...applicantNotifications,
+    ...badgeNotifications,
     ...accommodationNotifications,
   ];
   const inventory = generateInventory(chapters);

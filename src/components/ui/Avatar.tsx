@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { CameraIcon } from '@/icons';
-import { validateImageFile, createImagePreview } from '@/utils/fileUpload';
+import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+
+import { CameraIcon } from '@/icons';
+import { createImagePreview, validateImageFile } from '@/utils/fileUpload';
 
 interface AvatarProps {
   src: string | null | undefined;
@@ -42,7 +43,7 @@ const DefaultAvatar: React.FC<{ name?: string; className?: string }> = ({
   const bg = stringToColor(name);
   return (
     <div
-      className={`flex items-center justify-center rounded-full text-white ${className}`}
+      className={`rounded-nonefull flex items-center justify-center text-white ${className}`}
       role="img"
       aria-label={name ? `${name} avatar` : 'Default user avatar'}
       style={{
@@ -119,7 +120,7 @@ const Avatar: React.FC<AvatarProps> = ({
       <img
         src={currentSrc}
         alt={alt}
-        className={`h-10 w-10 rounded-full object-cover ${className}`}
+        className={`rounded-nonefull size-10 object-cover ${className}`}
         onError={handleImageError}
       />
     ) : (
@@ -136,13 +137,13 @@ const Avatar: React.FC<AvatarProps> = ({
       {avatarContent}
 
       {/* Small camera icon indicator */}
-      <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary">
-        <CameraIcon className="h-3 w-3 text-white" />
+      <div className="rounded-nonefull absolute -bottom-1 -right-1 flex size-6 items-center justify-center border-2 border-white bg-primary">
+        <CameraIcon className="size-3 text-white" />
       </div>
 
       {/* Upload overlay */}
       <div
-        className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100"
+        className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
         onClick={handleUploadClick}
         title="Click to upload new avatar image"
         role="button"
@@ -154,7 +155,7 @@ const Avatar: React.FC<AvatarProps> = ({
           }
         }}
       >
-        <CameraIcon className="h-8 w-8 text-white" />
+        <CameraIcon className="size-8 text-white" />
         <span className="sr-only">Upload new avatar</span>
       </div>
 

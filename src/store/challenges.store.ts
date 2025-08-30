@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type Challenge } from '@/types';
+
 import { processedChallenges } from './initialData';
 
 export interface ChallengesState {

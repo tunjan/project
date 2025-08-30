@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
-import { TrophyIcon, CalendarIcon } from '@/icons';
+
 import ProgressBar from '@/components/ui/ProgressBar';
-import { Challenge } from '@/types';
+import { CalendarIcon, TrophyIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
+import { Challenge } from '@/types';
 
 interface ChallengesProps {
   challenges: Challenge[];
@@ -28,7 +29,7 @@ const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
           Team-Based Challenges
         </h2>
         <div className="border-2 border-black bg-white p-8 text-center">
-          <TrophyIcon className="mx-auto h-12 w-12" />
+          <TrophyIcon className="mx-auto size-12" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No Active Challenges
           </h3>
@@ -62,14 +63,14 @@ const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
                   {challenge.description}
                 </p>
                 <div className="flex items-center text-sm text-neutral-600">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 size-4" />
                   <span>
                     Ends: {new Date(challenge.endDate).toLocaleDateString()}
                   </span>
                 </div>
               </div>
 
-              <div className="flex-grow border-t border-black bg-white p-6">
+              <div className="grow border-t border-black bg-white p-6">
                 <h4 className="text-md mb-3 font-semibold text-black">
                   Leaderboard
                 </h4>
@@ -87,7 +88,7 @@ const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
                       >
                         <div className="mb-1.5 flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            {index === 0 && <TrophyIcon className="h-5 w-5" />}
+                            {index === 0 && <TrophyIcon className="size-5" />}
                             <span
                               className={`font-bold ${isUserChapter ? 'text-primary' : 'text-black'}`}
                             >

@@ -1,19 +1,21 @@
+import { toast } from 'sonner';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import {
-  type User,
   type CubeEvent,
   type EventReport,
-  type TourDuty,
   EventStatus,
-  ParticipantStatus,
   NotificationType,
+  ParticipantStatus,
+  type TourDuty,
+  type User,
 } from '@/types';
+
 import { processedEvents } from './initialData';
 import { useNotificationsStore } from './notifications.store';
-import { useUsersStore } from './users.store';
 import { handleEventReportLogging, notifyEventUpdate } from './store.lib';
-import { toast } from 'sonner';
+import { useUsersStore } from './users.store';
 
 export interface EventsState {
   events: CubeEvent[];
@@ -246,7 +248,7 @@ export const useEventsStore = create<EventsState & EventsActions>()(
         if (event && removedUser) {
           useNotificationsStore.getState().addNotification({
             userId: participantUserId,
-            type: NotificationType.EVENT_UPDATED,
+            type: NotificationType.REMOVED_FROM_EVENT,
             message: `You have been removed from the event "${event.location}" by the organizer.`,
             linkTo: `/cubes/${event.id}`,
             relatedUser: currentUser,

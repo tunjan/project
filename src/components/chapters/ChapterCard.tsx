@@ -1,11 +1,12 @@
 import React from 'react';
-import { type ChapterStats } from '@/utils/analytics';
+
 import {
-  UsersIcon,
   BuildingOfficeIcon,
-  ClockIcon,
   ChatBubbleLeftRightIcon,
+  ClockIcon,
+  UsersIcon,
 } from '@/icons';
+import { type ChapterStats } from '@/utils/analytics';
 
 interface ChapterCardProps {
   chapterStats: ChapterStats;
@@ -35,7 +36,7 @@ const ChapterCard: React.FC<ChapterCardProps> = ({
   return (
     <button
       onClick={onSelect}
-      className="card-brutal-hover hover-raise w-full transform cursor-pointer overflow-hidden text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      className="card-brutal-hover hover-raise w-full cursor-pointer overflow-hidden text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
     >
       <div className="p-6">
         <p className="text-sm font-semibold uppercase tracking-wide text-primary">
@@ -47,22 +48,22 @@ const ChapterCard: React.FC<ChapterCardProps> = ({
 
         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 border-t-2 border-black pt-6">
           <Stat
-            icon={<UsersIcon className="h-5 w-5" />}
+            icon={<UsersIcon className="size-5" />}
             value={chapterStats.memberCount}
             label="Members"
           />
           <Stat
-            icon={<BuildingOfficeIcon className="h-5 w-5" />}
+            icon={<BuildingOfficeIcon className="size-5" />}
             value={chapterStats.eventsHeld}
             label="Events"
           />
           <Stat
-            icon={<ClockIcon className="h-5 w-5" />}
+            icon={<ClockIcon className="size-5" />}
             value={Math.round(chapterStats.totalHours)}
             label="Hours"
           />
           <Stat
-            icon={<ChatBubbleLeftRightIcon className="h-5 w-5" />}
+            icon={<ChatBubbleLeftRightIcon className="size-5" />}
             value={chapterStats.totalConversations}
             label="Convos"
           />

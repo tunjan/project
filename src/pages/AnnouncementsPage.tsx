@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import AnnouncementsPageComponent from '@/components/announcements/AnnouncementsPage';
 
 const AnnouncementsPage: React.FC = () => {

@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
 import SignUp from '@/components/auth/SignUp';
 import { useChapters, useUsersActions } from '@/store';
 import { type OnboardingAnswers } from '@/types';
-import { toast } from 'sonner';
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();

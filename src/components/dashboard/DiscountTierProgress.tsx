@@ -1,7 +1,8 @@
 import React from 'react';
+
+import { TagIcon } from '@/icons';
 import { type User } from '@/types';
 import { calculateDiscountTier } from '@/utils/rewards';
-import { TagIcon } from '@/icons';
 
 interface DiscountTierProgressProps {
   user: User;
@@ -40,7 +41,7 @@ const DiscountTierProgress: React.FC<DiscountTierProgressProps> = ({
     <div className="border-2 border-black bg-white p-6">
       <div className="mb-4 flex items-center border-b border-black pb-4">
         <div className="text-black">
-          <TagIcon className="h-6 w-6" />
+          <TagIcon className="size-6" />
         </div>
         <div className="ml-3">
           <h3 className="text-lg font-bold text-black">

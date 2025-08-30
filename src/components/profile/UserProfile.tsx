@@ -1,28 +1,29 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type User, OnboardingStatus } from '@/types';
-import StatsGrid from '@/components/dashboard/StatsGrid';
-import BadgeList from '@/components/dashboard/BadgeList';
-import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
-import ParticipationHistory from '@/components/dashboard/ParticipationHistory';
-import EditProfileModal from '@/components/dashboard/EditProfileModal';
-import DeactivateAccountModal from '@/components/dashboard/DeactivateAccountModal';
-import HostingDashboard from '@/components/dashboard/HostingDashboard';
-import BadgeAwardsDashboard from '@/components/dashboard/BadgeAwardsDashboard';
-import Avatar from '@/components/ui/Avatar';
 // QR flow deprecated
 import { toast } from 'sonner';
+
+import BadgeAwardsDashboard from '@/components/dashboard/BadgeAwardsDashboard';
+import BadgeList from '@/components/dashboard/BadgeList';
+import DeactivateAccountModal from '@/components/dashboard/DeactivateAccountModal';
+import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
+import EditProfileModal from '@/components/dashboard/EditProfileModal';
+import HostingDashboard from '@/components/dashboard/HostingDashboard';
+import ParticipationHistory from '@/components/dashboard/ParticipationHistory';
+import StatsGrid from '@/components/dashboard/StatsGrid';
+import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
+import UserActivityChart from '@/components/profile/UserActivityChart';
+import Avatar from '@/components/ui/Avatar';
 import {
-  PencilIcon,
   ChatBubbleLeftRightIcon,
-  MapIcon,
   ChevronLeftIcon,
+  MapIcon,
+  PencilIcon,
   ShieldCheckIcon,
 } from '@/icons';
-import { useUsersActions, useEvents, useBadgeAwardsForUser } from '@/store';
+import { useBadgeAwardsForUser, useEvents, useUsersActions } from '@/store';
 import { useCurrentUser } from '@/store';
-import UserActivityChart from '@/components/profile/UserActivityChart';
-import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
+import { OnboardingStatus, type User } from '@/types';
 import { getCityAttendanceForUser } from '@/utils/analytics';
 import { getUserRoleDisplay } from '@/utils/user';
 
@@ -37,7 +38,7 @@ const QuickActionButton: React.FC<{
 }> = ({ icon, text, onClick }) => (
   <button
     onClick={onClick}
-    className="card-brutal-hover flex h-full w-full flex-col items-center justify-center p-6 text-center"
+    className="card-brutal-hover flex size-full flex-col items-center justify-center p-6 text-center"
   >
     <div className="text-primary">{icon}</div>
     <p className="mt-2 text-lg font-bold text-black">{text}</p>
@@ -118,6 +119,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           user={user}
           onClose={() => setIsDeactivateModalOpen(false)}
           onConfirm={handleDeactivateConfirm}
+          isOpen={isDeactivateModalOpen}
         />
       )}
       {isCityModalOpen && (
@@ -136,7 +138,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
             onClick={() => navigate(-1)}
             className="mb-6 inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
           >
-            <ChevronLeftIcon className="mr-1 h-5 w-5" /> Back
+            <ChevronLeftIcon className="mr-1 size-5" /> Back
           </button>
         )}
 
@@ -146,7 +148,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
             <Avatar
               src={user.profilePictureUrl}
               alt={user.name}
-              className="border-brutal h-24 w-24 flex-shrink-0 object-cover md:h-32 md:w-32"
+              className="border-brutal size-24 shrink-0 object-cover md:size-32"
               editable={isOwnProfile}
               onImageChange={handleAvatarChange}
             />
@@ -156,40 +158,40 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
               </p>
             )}
           </div>
-          <div className="flex-grow">
+          <div className="grow">
             <p className="text-lg font-bold text-primary">
               {getUserRoleDisplay(user)}
             </p>
             <h1 className="flex items-center gap-2 text-3xl font-extrabold text-black md:text-5xl">
               {user.name}
-              {user.onboardingStatus === OnboardingStatus.CONFIRMED && (
-                <span
-                  className="inline-flex items-center gap-1 rounded bg-green-100 px-2 py-1 text-sm font-bold text-green-700"
-                  title="Verified activist"
-                >
-                  <ShieldCheckIcon className="h-5 w-5" /> Verified
-                </span>
-              )}
             </h1>
             {user.instagram && (
               <a
-                href={`https://instagram.com/${user.instagram}`}
+                href={`https://instagram.com/${user.instagram.replace('@', '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-red font-semibold hover:text-primary hover:underline"
               >
-                @{user.instagram}
+                {user.instagram}
               </a>
+            )}
+            {user.onboardingStatus === OnboardingStatus.CONFIRMED && (
+              <span
+                className="mt-4 inline-flex items-center gap-1 rounded bg-green-100 px-2 py-1 text-sm font-bold text-green-700"
+                title="Verified activist"
+              >
+                <ShieldCheckIcon className="size-5" /> Verified
+              </span>
             )}
           </div>
           {/* EDIT BUTTON (OWNER ONLY) */}
           {isOwnProfile && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="border-brutal group flex h-14 w-14 flex-shrink-0 items-center justify-center bg-black transition-colors hover:bg-primary"
+              className="border-brutal group flex size-14 shrink-0 items-center justify-center bg-black hover:bg-primary"
               aria-label="Edit Profile"
             >
-              <PencilIcon className="h-6 w-6 text-white" />
+              <PencilIcon className="size-6 text-white" />
             </button>
           )}
         </div>
@@ -208,12 +210,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                 <h2 className="h-section">Quick Actions</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <QuickActionButton
-                    icon={<MapIcon className="h-10 w-10" />}
+                    icon={<MapIcon className="size-10" />}
                     text="Find a Cube"
                     onClick={() => navigate('/cubes')}
                   />
                   <QuickActionButton
-                    icon={<ChatBubbleLeftRightIcon className="h-10 w-10" />}
+                    icon={<ChatBubbleLeftRightIcon className="size-10" />}
                     text="Log Outreach"
                     onClick={() => navigate('/outreach')}
                   />

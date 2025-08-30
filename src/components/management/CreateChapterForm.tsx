@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
-import { type User, Role, type Chapter } from '@/types';
+import React, { useMemo, useState } from 'react';
+
 import { InputField } from '@/components/ui/Form';
+import { type Chapter, Role, type User } from '@/types';
 
 const CreateChapterForm: React.FC<{
   currentUser: User;
@@ -70,7 +71,7 @@ const CreateChapterForm: React.FC<{
           required
           disabled={isCountryLocked}
           list="country-list"
-          className="block w-full rounded-none border border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
+          className="rounded-nonenone block w-full border border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
         />
       </div>
       {!isCountryLocked && (

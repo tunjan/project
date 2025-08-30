@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import Histogram, { HistogramData } from './Histogram';
 
 // Mock Recharts components (similar to BarChart but with Label component)

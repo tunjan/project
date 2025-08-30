@@ -1,7 +1,9 @@
 import React from 'react';
-import { type User } from '@/types';
-import { type UserLeaderboardEntry, calculateRanks } from '@/utils/leaderboard';
+
 import { UsersIcon } from '@/icons';
+import { type User } from '@/types';
+import { calculateRanks, type UserLeaderboardEntry } from '@/utils/leaderboard';
+
 import LeaderboardRow from './LeaderboardRow';
 
 interface LeaderboardProps {
@@ -36,7 +38,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
       <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
         {title}
       </h2>
-      <div className="flex-grow overflow-y-auto">
+      <div className="grow overflow-y-auto">
         {rankedData.length > 0 ? (
           <ul className="space-y-3 p-4">
             {topEntries.map((entry) => (
@@ -70,7 +72,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           </ul>
         ) : (
           <div className="flex h-full flex-col items-center justify-center p-8 text-center text-neutral-500">
-            <UsersIcon className="h-12 w-12" />
+            <UsersIcon className="size-12" />
             <p className="mt-2 font-semibold text-black">No data available.</p>
             <p className="text-sm">No activity for this time period.</p>
           </div>

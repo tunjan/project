@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { CheckCircleIcon, ExclamationTriangleIcon, WrenchIcon } from '@/icons';
 import { useUsers, useUsersActions } from '@/store';
 import { OnboardingStatus } from '@/types';
-import { ExclamationTriangleIcon, CheckCircleIcon, WrenchIcon } from '@/icons';
 
 const OnboardingHealthCheck: React.FC = () => {
   const users = useUsers();
@@ -12,7 +13,7 @@ const OnboardingHealthCheck: React.FC = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [isFixing, setIsFixing] = useState(false);
 
-  const checkOnboardingHealth = () => {
+  const checkOnboardingHealth = useCallback(() => {
     setIsChecking(true);
     const userIssues: Array<{
       userId: string;
@@ -33,7 +34,7 @@ const OnboardingHealthCheck: React.FC = () => {
 
     setIssues(userIssues);
     setIsChecking(false);
-  };
+  }, [users, validateUserOnboarding]);
 
   const handleFixIssues = async () => {
     setIsFixing(true);
@@ -48,7 +49,7 @@ const OnboardingHealthCheck: React.FC = () => {
 
   useEffect(() => {
     checkOnboardingHealth();
-  }, [users]);
+  }, [users, checkOnboardingHealth]);
 
   const getStatusCounts = () => {
     const counts = Object.values(OnboardingStatus).reduce(
@@ -104,7 +105,7 @@ const OnboardingHealthCheck: React.FC = () => {
       {issues.length > 0 ? (
         <div className="border-red border-2 bg-red-50 p-4">
           <div className="mb-4 flex items-center space-x-2">
-            <ExclamationTriangleIcon className="text-red h-6 w-6" />
+            <ExclamationTriangleIcon className="text-red size-6" />
             <h3 className="text-red text-lg font-bold">
               {issues.length} User{issues.length !== 1 ? 's' : ''} with
               Onboarding Issues
@@ -129,7 +130,7 @@ const OnboardingHealthCheck: React.FC = () => {
       ) : (
         <div className="border-green border-2 bg-green-50 p-4 text-center">
           <div className="flex items-center justify-center space-x-2">
-            <CheckCircleIcon className="text-green h-6 w-6" />
+            <CheckCircleIcon className="text-green size-6" />
             <span className="text-green text-lg font-bold">
               All users have valid onboarding states!
             </span>
@@ -140,7 +141,7 @@ const OnboardingHealthCheck: React.FC = () => {
       {/* Auto-fix Info */}
       <div className="border-blue border-2 bg-blue-50 p-4">
         <div className="flex items-center space-x-2">
-          <WrenchIcon className="text-blue h-6 w-6" />
+          <WrenchIcon className="text-blue size-6" />
           <h3 className="text-blue text-lg font-bold">Auto-Fix Capabilities</h3>
         </div>
         <p className="mt-2 text-sm text-blue-800">

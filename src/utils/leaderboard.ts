@@ -1,8 +1,8 @@
 import {
-  type User,
-  type OutreachLog,
   type Chapter,
   type CubeEvent,
+  type OutreachLog,
+  type User,
 } from '@/types';
 
 export interface UserLeaderboardEntry {

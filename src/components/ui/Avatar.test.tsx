@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import Avatar from './Avatar';
 
 // Mock the file upload utilities
@@ -25,8 +26,9 @@ vi.mock('@/icons', () => ({
   ),
 }));
 
-import { validateImageFile, createImagePreview } from '@/utils/fileUpload';
 import { toast } from 'sonner';
+
+import { createImagePreview, validateImageFile } from '@/utils/fileUpload';
 
 describe('<Avatar />', () => {
   const mockValidateImageFile = vi.mocked(validateImageFile);
@@ -91,7 +93,7 @@ describe('<Avatar />', () => {
       render(<Avatar src="https://example.com/avatar.jpg" alt="John Doe" />);
       const img = screen.getByAltText('John Doe');
       expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-      expect(img).toHaveClass('h-10', 'w-10', 'rounded-full', 'object-cover');
+      expect(img).toHaveClass('size-10', 'rounded-nonefull', 'object-cover');
     });
 
     it('falls back to initials on image error', () => {

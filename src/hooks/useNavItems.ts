@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
-import { useCurrentUser } from '@/store/auth.store';
-import { OnboardingStatus } from '@/types';
+
 import { can } from '@/config/permissions';
 import { Permission } from '@/config/permissions';
+import { useCurrentUser } from '@/store/auth.store';
+import { OnboardingStatus } from '@/types';
 
 export interface NavItem {
   to: string;

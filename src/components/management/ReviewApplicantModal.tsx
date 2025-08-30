@@ -1,31 +1,55 @@
 import React, { useState } from 'react';
-import { User, OnboardingStatus } from '@/types';
+
+import { TextAreaField } from '@/components/ui/Form';
 import Modal from '@/components/ui/Modal';
-import { useUsersActions, useCurrentUser } from '@/store';
 import {
+  CalendarIcon,
   CheckIcon,
-  XIcon,
   HashtagIcon,
   MailIcon,
-  CalendarIcon,
   UserCircleIcon,
+  XIcon,
 } from '@/icons';
-import { TextAreaField } from '@/components/ui/Form';
+import { useCurrentUser, useUsersActions } from '@/store';
+import { OnboardingStatus, User } from '@/types';
 
 // A small component to display applicant details in a structured way.
 const ApplicantDetail: React.FC<{
   icon: React.ReactNode;
   label: string;
   value?: string;
-}> = ({ icon, label, value }) => (
-  <div className="flex items-start gap-3">
-    <div className="mt-1 flex-shrink-0 text-neutral-500">{icon}</div>
-    <div>
-      <p className="text-xs font-bold uppercase text-neutral-500">{label}</p>
-      <p className="font-semibold text-black">{value || 'Not provided'}</p>
+}> = ({ icon, label, value }) => {
+  // Special handling for Instagram handles to make them clickable
+  const renderValue = () => {
+    if (label === 'Instagram' && value && value.startsWith('@')) {
+      return (
+        <a
+          href={`https://instagram.com/${value.replace('@', '')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-hover hover:underline"
+        >
+          {value}
+        </a>
+      );
+    }
+    return (
+      <span className="font-semibold text-black">
+        {value || 'Not provided'}
+      </span>
+    );
+  };
+
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-1 shrink-0 text-neutral-500">{icon}</div>
+      <div>
+        <p className="text-xs font-bold uppercase text-neutral-500">{label}</p>
+        {renderValue()}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // A component for displaying the Q&A section in brutalist style.
 const AnswerBlock: React.FC<{ question: string; answer: string }> = ({
@@ -43,11 +67,13 @@ const AnswerBlock: React.FC<{ question: string; answer: string }> = ({
 interface ReviewApplicantModalProps {
   applicants: User[];
   onClose: () => void;
+  isOpen: boolean;
 }
 
 const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   applicants,
   onClose,
+  isOpen,
 }) => {
   const { updateUserStatus, addOrganizerNote } = useUsersActions();
   const currentUser = useCurrentUser();
@@ -94,33 +120,33 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   })`;
 
   return (
-    <Modal title={modalTitle} onClose={onClose} size="lg">
+    <Modal title={modalTitle} onClose={onClose} size="lg" isOpen={isOpen}>
       <div className="space-y-6">
         {/* Applicant Header */}
         <div className="flex flex-col items-center gap-6 border-b-2 border-black pb-6 sm:flex-row">
           <img
             src={currentApplicant.profilePictureUrl}
             alt={currentApplicant.name}
-            className="h-24 w-24 flex-shrink-0 border-2 border-black object-cover"
+            className="size-24 shrink-0 border-2 border-black object-cover"
           />
           <div className="grid w-full grid-cols-1 gap-4">
             <ApplicantDetail
-              icon={<UserCircleIcon className="h-5 w-5" />}
+              icon={<UserCircleIcon className="size-5" />}
               label="Name"
               value={currentApplicant.name}
             />
             <ApplicantDetail
-              icon={<CalendarIcon className="h-5 w-5" />}
+              icon={<CalendarIcon className="size-5" />}
               label="Applying to"
               value={`${currentApplicant.chapters?.join(', ')} Chapter`}
             />
             <ApplicantDetail
-              icon={<MailIcon className="h-5 w-5" />}
+              icon={<MailIcon className="size-5" />}
               label="Email"
               value={currentApplicant.email}
             />
             <ApplicantDetail
-              icon={<HashtagIcon className="h-5 w-5" />}
+              icon={<HashtagIcon className="size-5" />}
               label="Instagram"
               value={currentApplicant.instagram}
             />
@@ -185,7 +211,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
             onClick={() => handleAction(OnboardingStatus.DENIED)}
             className="flex w-full items-center justify-center gap-2 border-2 border-black bg-danger py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg"
           >
-            <XIcon className="h-5 w-5" />
+            <XIcon className="size-5" />
             Reject
           </button>
           <button
@@ -194,7 +220,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
             }
             className="flex w-full items-center justify-center gap-2 border-2 border-black bg-success py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg"
           >
-            <CheckIcon className="h-5 w-5" />
+            <CheckIcon className="size-5" />
             Approve
           </button>
         </div>

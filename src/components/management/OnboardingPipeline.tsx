@@ -1,8 +1,9 @@
 import React from 'react';
-import { type User, OnboardingStatus, EventStatus } from '@/types';
-import { useEvents } from '@/store';
-import Tag from '@/components/ui/Tag';
+
 import Avatar from '@/components/ui/Avatar';
+import Tag from '@/components/ui/Tag';
+import { useEvents } from '@/store';
+import { EventStatus, OnboardingStatus, type User } from '@/types';
 
 interface OnboardingCardProps {
   user: User;
@@ -39,7 +40,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
           <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
-            className="h-10 w-10 flex-shrink-0 object-cover"
+            className="size-10 shrink-0 object-cover"
           />
           <div className="min-w-0">
             <p className="truncate font-bold text-black">{user.name}</p>

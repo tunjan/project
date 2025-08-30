@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type InventoryItem } from '@/types';
+
 import { initialInventory } from './initialData';
 
 interface InventoryState {

@@ -1,11 +1,12 @@
-import React from 'react';
-import FullCalendar from '@fullcalendar/react';
+import { type EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import momentPlugin from '@fullcalendar/moment';
+import FullCalendar from '@fullcalendar/react';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import React from 'react';
+
 import { CubeEvent } from '@/types';
-import { type EventClickArg } from '@fullcalendar/core';
 
 interface CubeCalendarProps {
   events: CubeEvent[];

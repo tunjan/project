@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type EventComment, type User } from '@/types';
+
 import { processedEventComments } from './initialData';
 
 export interface CommentsState {

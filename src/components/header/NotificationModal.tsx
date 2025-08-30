@@ -1,8 +1,11 @@
 import React from 'react';
-import { type Notification } from '@/types';
-import { BellIcon, XIcon } from '@/icons';
 import { Link } from 'react-router-dom';
+
+import Avatar from '@/components/ui/Avatar';
+import { BellIcon, XIcon } from '@/icons';
+import { type Notification } from '@/types';
 import { safeFormatLocaleString } from '@/utils/date';
+import { getNotificationIcon } from '@/utils/notificationUtils';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -13,14 +16,27 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onNotificationClick,
 }) => {
+  const icon = getNotificationIcon(notification.type);
+  const iconColorClass = notification.isRead
+    ? 'text-neutral-400'
+    : 'text-primary';
+
   return (
     <button
       onClick={() => onNotificationClick(notification)}
-      className="w-full p-3 text-left transition-colors duration-200 hover:bg-white"
+      className="w-full p-3 text-left transition-colors duration-200 hover:bg-neutral-100"
     >
       <div className="flex items-start space-x-3">
         {!notification.isRead && (
-          <div className="mt-1.5 h-2 w-2 flex-shrink-0 bg-primary"></div>
+          <div className="rounded-nonefull mt-1.5 size-2 shrink-0 bg-primary"></div>
+        )}
+        <div className={`shrink-0 ${iconColorClass}`}>{icon}</div>
+        {notification.relatedUser && (
+          <Avatar
+            src={notification.relatedUser.profilePictureUrl}
+            alt={notification.relatedUser.name}
+            className="size-8 shrink-0"
+          />
         )}
         <div
           className={`flex-1 ${
@@ -31,7 +47,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             {notification.message}
           </p>
           <p className="mt-1 text-xs text-neutral-500">
-            {safeFormatLocaleString(notification.createdAt)}
+            {safeFormatLocaleString(notification.createdAt, {
+              dateStyle: 'short',
+              timeStyle: 'short',
+            })}
           </p>
         </div>
       </div>
@@ -69,22 +88,20 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          onClose();
-        }
-      }}
       tabIndex={-1}
     >
-              <div
-          className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-white shadow-brutal"
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
-          role="document"
-        >
+      {/* Backdrop for closing */}
+      <button
+        className="absolute inset-0 bg-transparent"
+        onClick={onClose}
+        aria-label="Close modal"
+      />
+      <div
+        className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-neutral-50 shadow-brutal"
+        role="document"
+      >
         <div className="flex items-center justify-between border-b-2 border-black p-3">
           <h3 className="font-bold text-black">Notifications</h3>
           <div className="flex items-center space-x-2">
@@ -97,7 +114,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
               </button>
             )}
             <button onClick={onClose} className="p-1 hover:bg-white">
-              <XIcon className="h-5 w-5" />
+              <XIcon className="size-5" />
             </button>
           </div>
         </div>
@@ -115,7 +132,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
               ))
           ) : (
             <div className="p-8 text-center text-neutral-500">
-              <BellIcon className="mx-auto h-8 w-8 text-neutral-400" />
+              <BellIcon className="mx-auto size-8 text-neutral-400" />
               <p className="mt-2 text-sm">You have no notifications.</p>
             </div>
           )}

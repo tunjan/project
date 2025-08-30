@@ -1,6 +1,7 @@
 import React from 'react';
-import { User } from '@/types';
+
 import { ExclamationTriangleIcon, TrashIcon } from '@/icons';
+import { User } from '@/types';
 
 interface UserDangerZoneProps {
   user: User;
@@ -21,12 +22,12 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
       <h2 className="mb-4 border-b-2 border-danger pb-2 text-2xl font-bold text-black">
         Danger Zone
       </h2>
-      <div className="space-y-4 border-2 border-danger bg-white p-4">
+      <div className="">
         {/* Manual Verification */}
         {canManuallyVerify && onManualVerify && (
           <div className="border-2 border-warning bg-warning/10 p-4">
             <h3 className="text-warning-700 mb-2 flex items-center gap-2 text-lg font-bold">
-              <ExclamationTriangleIcon className="h-5 w-5" />
+              <ExclamationTriangleIcon className="size-5" />
               Manual Verification Override
             </h3>
             <p className="text-warning-700 mb-3 text-sm">
@@ -47,7 +48,7 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
         {canDeleteUser && (
           <div className="border-2 border-danger bg-danger/10 p-4">
             <h3 className="text-danger-700 mb-2 flex items-center gap-2 text-lg font-bold">
-              <TrashIcon className="h-5 w-5" />
+              <TrashIcon className="size-5" />
               Delete User Account
             </h3>
             <p className="text-danger-700 mb-3 text-sm">

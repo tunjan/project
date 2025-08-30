@@ -1,4 +1,4 @@
-import { type User, DiscountTierLevel } from '@/types';
+import { DiscountTierLevel, type User } from '@/types';
 
 type RequirementKey = 'cubes' | 'cities' | 'hours';
 

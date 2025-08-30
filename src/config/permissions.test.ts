@@ -1,5 +1,6 @@
+import { EventStatus, OnboardingStatus, Role, type User } from '@/types';
+
 import { can, Permission } from './permissions';
-import { Role, OnboardingStatus, EventStatus, type User } from '@/types';
 
 // Mock user data for tests
 const godModeUser: User = {

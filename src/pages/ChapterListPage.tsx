@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import ChapterListComponent from '@/components/chapters/ChapterList';
 import { type Chapter } from '@/types';
 

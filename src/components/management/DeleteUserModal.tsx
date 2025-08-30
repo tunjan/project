@@ -1,24 +1,27 @@
 import React from 'react';
-import { type User } from '@/types';
-import { TrashIcon } from '@/icons';
+
 import Modal from '@/components/ui/Modal';
+import { TrashIcon } from '@/icons';
+import { type User } from '@/types';
 
 interface DeleteUserModalProps {
   user: User;
   onClose: () => void;
   onConfirm: () => void;
+  isOpen: boolean;
 }
 
 const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   user,
   onClose,
   onConfirm,
+  isOpen,
 }) => {
   return (
-    <Modal title="Delete User" onClose={onClose}>
+    <Modal title="Delete User" onClose={onClose} isOpen={isOpen}>
       <div className="text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center bg-primary">
-          <TrashIcon className="h-6 w-6 text-white" />
+        <div className="mx-auto flex size-12 items-center justify-center bg-primary">
+          <TrashIcon className="size-6 text-white" />
         </div>
         <p className="mt-4 text-sm text-danger">
           Are you sure you want to delete{' '}

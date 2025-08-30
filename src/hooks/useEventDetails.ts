@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { CubeEvent, User, ParticipantStatus } from '@/types';
+
 import { can, Permission } from '@/config/permissions';
 import { useChapters } from '@/store';
+import { CubeEvent, ParticipantStatus, User } from '@/types';
 
 export const useEventDetails = (event: CubeEvent, currentUser: User | null) => {
   const allChapters = useChapters();

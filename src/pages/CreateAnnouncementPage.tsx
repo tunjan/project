@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
 import CreateAnnouncementFormComponent from '@/components/announcements/CreateAnnouncementForm';
+import { useAnnouncementsActions } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type AnnouncementScope } from '@/types';
-import { useAnnouncementsActions } from '@/store/announcements.store';
-import { toast } from 'sonner';
 
 const CreateAnnouncementPage: React.FC = () => {
   const navigate = useNavigate();

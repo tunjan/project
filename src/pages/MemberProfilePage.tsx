@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+
+import LoadingSpinner from '@/components/LoadingSpinner';
 import MemberProfile from '@/components/management/MemberProfile';
 import { useUsers, useUsersActions } from '@/store';
-import LoadingSpinner from '@/components/LoadingSpinner';
 
 const MemberProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();

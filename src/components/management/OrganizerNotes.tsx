@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { type User } from '@/types';
+import { toast } from 'sonner';
+
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { TextAreaField } from '@/components/ui/Form';
+import { PencilIcon, PlusIcon, TrashIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
 import { useUsersActions, useUsersState } from '@/store/users.store';
+import { type User } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
-import { toast } from 'sonner';
-import { PencilIcon, TrashIcon, PlusIcon } from '@/icons';
-import { TextAreaField } from '@/components/ui/Form';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 interface OrganizerNotesProps {
   user: User;
@@ -142,14 +143,14 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                                   className="text-neutral-500 hover:text-black"
                                   aria-label="Edit note"
                                 >
-                                  <PencilIcon className="h-4 w-4" />
+                                  <PencilIcon className="size-4" />
                                 </button>
                                 <button
                                   onClick={() => openDeleteModal(note.id)}
                                   className="text-neutral-500 hover:text-primary"
                                   aria-label="Delete note"
                                 >
-                                  <TrashIcon className="h-4 w-4" />
+                                  <TrashIcon className="size-4" />
                                 </button>
                               </div>
                             )}
@@ -180,7 +181,7 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
               type="submit"
               className="card-brutal-hover mt-2 flex w-full items-center justify-center bg-black py-2 font-bold text-white"
             >
-              <PlusIcon className="mr-2 h-4 w-4" />
+              <PlusIcon className="mr-2 size-4" />
               Add Note
             </button>
           </form>

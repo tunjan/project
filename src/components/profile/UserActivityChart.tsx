@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
+
+import LineChart from '@/components/analytics/LineChart';
 import { useEvents, useOutreachLogs } from '@/store';
 import {
-  getUserHoursByMonth,
   getUserConversationsByMonth,
+  getUserHoursByMonth,
 } from '@/utils/analytics';
-import LineChart from '@/components/analytics/LineChart';
 
 interface UserActivityChartProps {
   userId: string;

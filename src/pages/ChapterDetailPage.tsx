@@ -1,31 +1,32 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  useChapterByName,
-  useUsers,
-  useEvents,
-  useChaptersActions,
-  useChapterJoinRequests,
-  useOutreachLogs,
-} from '@/store';
-import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
-import { useCurrentUser } from '@/store/auth.store';
-import { type User, AnnouncementScope, Role } from '@/types';
-import { getChapterStats } from '@/utils/analytics';
-import {
-  UsersIcon,
-  ClockIcon,
-  ChatBubbleLeftRightIcon,
-  BuildingOfficeIcon,
-  ChevronLeftIcon,
-  InstagramIcon,
-  PlusIcon,
-} from '@/icons';
+import { toast } from 'sonner';
+
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
 import InventoryDisplay from '@/components/charts/InventoryDisplay';
 import Avatar from '@/components/ui/Avatar';
-import { toast } from 'sonner';
+import {
+  BuildingOfficeIcon,
+  ChatBubbleLeftRightIcon,
+  ChevronLeftIcon,
+  ClockIcon,
+  InstagramIcon,
+  PlusIcon,
+  UsersIcon,
+} from '@/icons';
+import {
+  useChapterByName,
+  useChapterJoinRequests,
+  useChaptersActions,
+  useEvents,
+  useOutreachLogs,
+  useUsers,
+} from '@/store';
+import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
+import { useCurrentUser } from '@/store/auth.store';
+import { AnnouncementScope, Role, type User } from '@/types';
+import { getChapterStats } from '@/utils/analytics';
 
 const StatCard: React.FC<{
   icon: React.ReactNode;
@@ -55,7 +56,7 @@ const MemberCard: React.FC<{
     <Avatar
       src={member.profilePictureUrl}
       alt={member.name}
-      className="h-10 w-10 object-cover"
+      className="size-10 object-cover"
     />
     <div>
       <p className="font-bold text-black">{member.name}</p>
@@ -179,20 +180,19 @@ const ChapterDetailPage: React.FC = () => {
 
   return (
     <>
-      {isPastEventsModalOpen && (
-        <PastEventsModal
-          chapterName={chapter.name}
-          events={pastChapterEvents}
-          onClose={() => setIsPastEventsModalOpen(false)}
-        />
-      )}
+      <PastEventsModal
+        isOpen={isPastEventsModalOpen}
+        chapterName={chapter.name}
+        events={pastChapterEvents}
+        onClose={() => setIsPastEventsModalOpen(false)}
+      />
       <div className="animate-fade-in py-8 md:py-12">
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
           <button
             onClick={() => navigate('/chapters')}
             className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
           >
-            <ChevronLeftIcon className="mr-1 h-5 w-5" />
+            <ChevronLeftIcon className="mr-1 size-5" />
             Back to all chapters
           </button>
 
@@ -203,14 +203,14 @@ const ChapterDetailPage: React.FC = () => {
                 disabled={hasPendingRequest}
                 className="disabled:bg-red inline-flex items-center bg-primary px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:text-white"
               >
-                <PlusIcon className="mr-2 h-4 w-4" />
+                <PlusIcon className="mr-2 size-4" />
                 {hasPendingRequest ? 'Request Pending' : 'Request to Join'}
               </button>
             )}
           </div>
         </div>
 
-        <div className="mb-8 mt-8">
+        <div className="my-8">
           <p className="text-base font-semibold uppercase tracking-wide text-primary">
             {chapter.country}
           </p>
@@ -225,7 +225,7 @@ const ChapterDetailPage: React.FC = () => {
               rel="noopener noreferrer"
               className="text-grey-600 mt-6 inline-flex items-center text-sm font-semibold transition hover:text-black"
             >
-              <InstagramIcon className="mr-2 h-5 w-5" />
+              <InstagramIcon className="mr-2 size-5" />
               {chapter.instagram}
             </a>
           )}
@@ -237,7 +237,7 @@ const ChapterDetailPage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <StatCard
-              icon={<UsersIcon className="h-6 w-6" />}
+              icon={<UsersIcon className="size-6" />}
               title="Members"
               value={stats.memberCount}
             />
@@ -248,18 +248,18 @@ const ChapterDetailPage: React.FC = () => {
               onClick={() => setIsPastEventsModalOpen(true)}
             >
               <StatCard
-                icon={<BuildingOfficeIcon className="h-6 w-6" />}
+                icon={<BuildingOfficeIcon className="size-6" />}
                 title="Events Held"
                 value={stats.eventsHeld}
               />
             </button>
             <StatCard
-              icon={<ClockIcon className="h-6 w-6" />}
+              icon={<ClockIcon className="size-6" />}
               title="Total Hours"
               value={Math.round(stats.totalHours).toLocaleString()}
             />
             <StatCard
-              icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
+              icon={<ChatBubbleLeftRightIcon className="size-6" />}
               title="Total Conversations"
               value={stats.totalConversations.toLocaleString()}
             />

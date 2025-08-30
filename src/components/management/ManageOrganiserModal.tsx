@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import { User, Role } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
-import { useChapters, useUsersActions } from '@/store';
+import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+
 import Modal from '@/components/ui/Modal';
-import { PencilIcon, UsersIcon } from '@/icons';
 import { getAssignableRoles } from '@/config/permissions';
+import { PencilIcon, UsersIcon } from '@/icons';
+import { useChapters, useUsersActions } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { Role, User } from '@/types';
 
 interface ManageOrganiserModalProps {
   organiser: User;
@@ -166,7 +167,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           <img
             src={organiser.profilePictureUrl}
             alt={organiser.name}
-            className="h-12 w-12 rounded-full object-cover"
+            className="rounded-nonefull size-12 object-cover"
           />
           <div>
             <h3 className="text-lg font-bold text-black">{organiser.name}</h3>
@@ -180,7 +181,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
         {/* Role Management */}
         <div>
           <h4 className="mb-3 flex items-center text-sm font-bold text-black">
-            <PencilIcon className="mr-2 h-4 w-4" />
+            <PencilIcon className="mr-2 size-4" />
             Change Role
           </h4>
           <select
@@ -207,7 +208,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
         {selectedRole === Role.CHAPTER_ORGANISER && (
           <div>
             <h4 className="mb-3 flex items-center text-sm font-bold text-black">
-              <UsersIcon className="mr-2 h-4 w-4" />
+              <UsersIcon className="mr-2 size-4" />
               Manage Chapter Assignments
             </h4>
             <div className="max-h-48 space-y-2 overflow-y-auto border border-black p-4">
@@ -220,7 +221,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
                     type="checkbox"
                     checked={selectedChapters.includes(chapter.name)}
                     onChange={() => handleChapterCheckboxChange(chapter.name)}
-                    className="h-4 w-4 accent-primary"
+                    className="size-4 accent-primary"
                   />
                   <span className="font-semibold text-black">
                     {chapter.name}

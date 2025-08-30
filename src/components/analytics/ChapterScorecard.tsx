@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 import { calculateChapterScorecard } from '@/utils/scorecard';
 
@@ -45,7 +46,7 @@ const ChapterScorecard: React.FC = () => {
                 <td className="p-3 text-center">
                   <div className="flex items-center justify-center">
                     <span
-                      className={`mr-2 inline-block h-3 w-3 ${getScoreColor(
+                      className={`mr-2 inline-block size-3 ${getScoreColor(
                         data.healthScore
                       )}`}
                     ></span>

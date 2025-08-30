@@ -1,9 +1,10 @@
 import React from 'react';
-import { type BadgeAward } from '@/types';
-import * as Icons from '@/icons';
 import { toast } from 'sonner';
-import { useAwardsActions } from '@/store';
+
+import * as Icons from '@/icons';
 import { UsersIcon, XIcon } from '@/icons';
+import { useAwardsActions } from '@/store';
+import { type BadgeAward } from '@/types';
 
 interface BadgeAwardCardProps {
   award: BadgeAward;
@@ -20,10 +21,10 @@ const BadgeAwardCard: React.FC<BadgeAwardCardProps> = ({
   return (
     <div className="border-2 border-black bg-white p-4">
       <div className="flex items-start space-x-4">
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center bg-black text-white">
-          <IconComponent className="h-7 w-7" />
+        <div className="flex size-12 shrink-0 items-center justify-center bg-black text-white">
+          <IconComponent className="size-7" />
         </div>
-        <div className="flex-grow">
+        <div className="grow">
           <p className="text-sm text-neutral-600">
             Awarded by{' '}
             <span className="font-bold text-black">{award.awarder.name}</span>
@@ -37,13 +38,13 @@ const BadgeAwardCard: React.FC<BadgeAwardCardProps> = ({
           onClick={() => onRespond(award.id, 'Rejected')}
           className="flex w-full items-center justify-center bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-black"
         >
-          <XIcon className="mr-1.5 h-4 w-4" /> Decline
+          <XIcon className="mr-1.5 size-4" /> Decline
         </button>
         <button
           onClick={() => onRespond(award.id, 'Accepted')}
           className="flex w-full items-center justify-center bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
         >
-          <UsersIcon className="mr-1.5 h-4 w-4" /> Accept
+          <UsersIcon className="mr-1.5 size-4" /> Accept
         </button>
       </div>
     </div>
@@ -65,7 +66,7 @@ const BadgeAwardsDashboard: React.FC<BadgeAwardsDashboardProps> = ({
   ) => {
     respondToBadgeAward(awardId, response);
     toast.success(
-      `Badge ${response.toLowerCase()}. It will now appear on your profile!`
+      `Recognition ${response.toLowerCase()}. It will now appear on your profile.`
     );
   };
 

@@ -1,16 +1,18 @@
 import React from 'react';
-import {
-  type Announcement,
-  Role,
-  AnnouncementScope,
-  type Chapter,
-} from '@/types';
-import { PlusIcon, MegaphoneIcon } from '@/icons';
-import AnnouncementCard from './AnnouncementCard';
-import { useCurrentUser } from '@/store/auth.store';
+
+import { can, Permission } from '@/config/permissions';
+import { MegaphoneIcon, PlusIcon } from '@/icons';
 import { useChapters } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
-import { can, Permission } from '@/config/permissions';
+import { useCurrentUser } from '@/store/auth.store';
+import {
+  type Announcement,
+  AnnouncementScope,
+  type Chapter,
+  Role,
+} from '@/types';
+
+import AnnouncementCard from './AnnouncementCard';
 
 interface AnnouncementsPageProps {
   onCreate: () => void;
@@ -80,9 +82,9 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         {can(currentUser, Permission.CREATE_ANNOUNCEMENT) && (
           <button
             onClick={onCreate}
-            className="flex flex-shrink-0 items-center bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+            className="flex shrink-0 items-center bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
           >
-            <PlusIcon className="mr-2 h-5 w-5" />
+            <PlusIcon className="mr-2 size-5" />
             Create Announcement
           </button>
         )}
@@ -98,7 +100,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         </div>
       ) : (
         <div className="border-2 border-black bg-white p-8 text-center">
-          <MegaphoneIcon className="mx-auto h-12 w-12 text-neutral-500" />
+          <MegaphoneIcon className="mx-auto size-12 text-neutral-500" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No announcements yet.
           </h3>

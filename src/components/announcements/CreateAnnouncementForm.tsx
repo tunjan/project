@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { AnnouncementScope, Role, Chapter } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { InputField, SelectField, TextAreaField } from '@/components/ui/Form';
 import { useChapters } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { AnnouncementScope, Chapter, Role } from '@/types';
 import { getPostableScopes } from '@/utils/auth';
-import { InputField, TextAreaField, SelectField } from '@/components/ui/Form';
 
 interface CreateAnnouncementFormProps {
   onCreate: (data: {

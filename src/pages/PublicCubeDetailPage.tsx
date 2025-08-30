@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import CubeDetail from '@/components/CubeDetail';
 import { useEventById } from '@/store';
 

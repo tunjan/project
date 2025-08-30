@@ -1,6 +1,7 @@
 import React from 'react';
-import { type Resource } from '@/types';
+
 import * as Icons from '@/icons'; // Import all icons
+import { type Resource } from '@/types';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -32,9 +33,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
     <div className="card-brutal-hover hover-raise flex flex-col justify-between border-2 border-black bg-white transition-transform">
       <div className="p-5">
         <div className="mb-3 flex items-center space-x-3">
-          <div className="flex-shrink-0 bg-black p-2">
+          <div className="shrink-0 bg-black p-2">
             {/* Use the mapped component */}
-            <IconComponent className="h-5 w-5 text-white" />
+            <IconComponent className="size-5 text-white" />
           </div>
           <h3 className="text-lg font-bold leading-tight text-black">
             {resource.title}

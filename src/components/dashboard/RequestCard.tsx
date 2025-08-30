@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { type AccommodationRequest } from '@/types';
-import { CheckCircleIcon, XCircleIcon } from '@/icons';
-import { useCurrentUser } from '@/store/auth.store';
-import { useAccommodationsActions } from '@/store';
-import { safeParseDate, safeFormatLocaleDate } from '@/utils/date';
-import Tag from '@/components/ui/Tag';
+
 import Avatar from '@/components/ui/Avatar';
+import Tag from '@/components/ui/Tag';
+import { CheckCircleIcon, XCircleIcon } from '@/icons';
+import { useAccommodationsActions } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { type AccommodationRequest } from '@/types';
+import { safeFormatLocaleDate, safeParseDate } from '@/utils/date';
 
 interface RequestCardProps {
   request: AccommodationRequest;
@@ -68,7 +69,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
             <Avatar
               src={otherUser.profilePictureUrl}
               alt={otherUser.name}
-              className="h-8 w-8 object-cover"
+              className="size-8 object-cover"
             />
             <p className="font-bold text-black">{otherUser.name}</p>
           </div>
@@ -127,13 +128,13 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
               onClick={() => handleRespond('Denied')}
               className="btn-secondary flex w-full items-center justify-center"
             >
-              <XCircleIcon className="mr-1.5 h-5 w-5" /> Deny
+              <XCircleIcon className="mr-1.5 size-5" /> Deny
             </button>
             <button
               onClick={() => handleRespond('Accepted')}
               className="btn-primary flex w-full items-center justify-center"
             >
-              <CheckCircleIcon className="mr-1.5 h-5 w-5" /> Accept
+              <CheckCircleIcon className="mr-1.5 size-5" /> Accept
             </button>
           </div>
         </div>

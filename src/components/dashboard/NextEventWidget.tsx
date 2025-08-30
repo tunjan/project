@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { formatDistanceToNowStrict } from 'date-fns';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { CalendarIcon, ClockIcon, MapPinIcon } from '@/icons';
 import { useCurrentUser, useEvents } from '@/store';
 import { CubeEvent, EventStatus } from '@/types';
-import { formatDistanceToNowStrict } from 'date-fns';
-import { CalendarIcon, ClockIcon, MapPinIcon } from '@/icons';
 
 const Countdown: React.FC<{ date: Date }> = ({ date }) => {
   const [countdown, setCountdown] = useState('');
@@ -35,7 +36,7 @@ const UpcomingEventCard: React.FC<{
   isNext?: boolean;
 }> = ({ event, onManage, isNext }) => (
   <div
-    className={`card-brutal card-padding cursor-pointer transition-all hover:scale-[1.02] hover:shadow-brutal-lg ${isNext ? 'bg-primary-lightest' : ''}`}
+    className={`card-brutal card-padding cursor-pointer hover:shadow-brutal-lg ${isNext ? 'bg-primary-lightest' : ''}`}
     onClick={onManage}
     onKeyDown={(e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -49,24 +50,24 @@ const UpcomingEventCard: React.FC<{
   >
     {isNext && (
       <div className="mb-2 text-sm font-bold text-primary">
-        NEXT EVENT <ClockIcon className="ml-1 inline-block h-4 w-4" />
+        NEXT EVENT <ClockIcon className="ml-1 inline-block size-4" />
       </div>
     )}
     <div className="flex justify-between">
       <div className="flex items-start gap-4">
-        <CalendarIcon className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
+        <CalendarIcon className="mt-1 size-6 shrink-0 text-primary" />
         <div>
           <h3 className="h-card">{event.location}</h3>
           <div className="text-grey-600 mt-1 flex flex-col gap-1 text-sm sm:gap-4">
             <span className="flex items-center gap-1">
-              <ClockIcon className="h-4 w-4" />
+              <ClockIcon className="size-4" />
               {new Date(event.startDate).toLocaleString([], {
                 dateStyle: 'medium',
                 timeStyle: 'short',
               })}
             </span>
             <span className="flex items-center gap-1">
-              <MapPinIcon className="h-4 w-4" />
+              <MapPinIcon className="size-4" />
               {event.city}
             </span>
           </div>

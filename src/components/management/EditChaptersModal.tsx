@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { type User, type Chapter } from '@/types';
+
 import Modal from '@/components/ui/Modal';
+import { type Chapter, type User } from '@/types';
 
 interface EditChaptersModalProps {
   user: User;
@@ -50,7 +51,7 @@ const EditChaptersModal: React.FC<EditChaptersModalProps> = ({
                   type="checkbox"
                   checked={selectedChapters.includes(chapter.name)}
                   onChange={() => handleCheckboxChange(chapter.name)}
-                  className="h-5 w-5 accent-primary"
+                  className="size-5 accent-primary"
                 />
                 <span className="font-bold text-black">{chapter.name}</span>
                 <span className="text-sm text-neutral-500">

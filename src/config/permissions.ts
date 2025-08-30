@@ -1,9 +1,9 @@
 import {
-  type User,
-  type CubeEvent,
-  Role,
-  OnboardingStatus,
   type Chapter,
+  type CubeEvent,
+  OnboardingStatus,
+  Role,
+  type User,
 } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 

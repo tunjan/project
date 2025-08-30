@@ -1,22 +1,23 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Role } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
+
+import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
-import { useUsers, useEvents, useChapters, useOutreachLogs } from '@/store';
-import { ROLE_HIERARCHY } from '@/utils/auth';
+import { Role } from '@/types';
 import {
-  getGlobalStats,
-  getChapterStats,
-  getEventTrendsByMonth,
+  getActivistPerformanceDistribution,
   getActivistRetention,
-  getMemberGrowth,
-  getTotalMembersByMonth,
-  getTopActivistsByHours,
   getAverageActivistsPerEvent,
   getChapterOutreachStats, // NEW
+  getChapterStats,
   getConversationTrendsByMonth, // NEW
-  getActivistPerformanceDistribution,
+  getEventTrendsByMonth,
   getEventTurnoutDistribution,
+  getGlobalStats,
+  getMemberGrowth,
+  getTopActivistsByHours,
+  getTotalMembersByMonth,
 } from '@/utils/analytics';
+import { ROLE_HIERARCHY } from '@/utils/auth';
 
 export function useAnalyticsData() {
   const currentUser = useCurrentUser();

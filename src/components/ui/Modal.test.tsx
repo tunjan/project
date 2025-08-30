@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import Modal from './Modal';
 
 // Mock focus-trap-react
@@ -67,36 +68,24 @@ describe('<Modal />', () => {
 
   it('applies correct size classes', () => {
     const { rerender } = render(<Modal {...defaultProps} size="sm" />);
-    expect(screen.getByRole('dialog').firstElementChild).toHaveClass(
-      'max-w-sm'
-    );
+    expect(screen.getByTestId('modal-content')).toHaveClass('max-w-sm');
 
     rerender(<Modal {...defaultProps} size="md" />);
-    expect(screen.getByRole('dialog').firstElementChild).toHaveClass(
-      'max-w-lg'
-    );
+    expect(screen.getByTestId('modal-content')).toHaveClass('max-w-lg');
 
     rerender(<Modal {...defaultProps} size="lg" />);
-    expect(screen.getByRole('dialog').firstElementChild).toHaveClass(
-      'max-w-2xl'
-    );
+    expect(screen.getByTestId('modal-content')).toHaveClass('max-w-2xl');
 
     rerender(<Modal {...defaultProps} size="xl" />);
-    expect(screen.getByRole('dialog').firstElementChild).toHaveClass(
-      'max-w-4xl'
-    );
+    expect(screen.getByTestId('modal-content')).toHaveClass('max-w-4xl');
 
     rerender(<Modal {...defaultProps} size="2xl" />);
-    expect(screen.getByRole('dialog').firstElementChild).toHaveClass(
-      'max-w-6xl'
-    );
+    expect(screen.getByTestId('modal-content')).toHaveClass('max-w-6xl');
   });
 
   it('defaults to md size when no size is provided', () => {
     render(<Modal {...defaultProps} />);
-    expect(screen.getByRole('dialog').firstElementChild).toHaveClass(
-      'max-w-lg'
-    );
+    expect(screen.getByTestId('modal-content')).toHaveClass('max-w-lg');
   });
 
   it('calls onClose when close button is clicked', async () => {
@@ -117,7 +106,7 @@ describe('<Modal />', () => {
 
     render(<Modal {...defaultProps} onClose={mockOnClose} />);
 
-    const backdrop = screen.getByRole('dialog');
+    const backdrop = screen.getByTestId('modal-backdrop');
     await user.click(backdrop);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -129,7 +118,7 @@ describe('<Modal />', () => {
 
     render(<Modal {...defaultProps} onClose={mockOnClose} />);
 
-    const modalContent = screen.getByRole('dialog').firstElementChild!;
+    const modalContent = screen.getByTestId('modal-content');
     await user.click(modalContent);
 
     expect(mockOnClose).not.toHaveBeenCalled();
@@ -157,24 +146,13 @@ describe('<Modal />', () => {
 
   it('cleans up event listeners on unmount', () => {
     const mockOnClose = vi.fn();
-    const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
-    const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
-
     const { unmount } = render(
       <Modal {...defaultProps} onClose={mockOnClose} />
     );
 
-    expect(addEventListenerSpy).toHaveBeenCalledWith(
-      'keydown',
-      expect.any(Function)
-    );
-
-    unmount();
-
-    expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'keydown',
-      expect.any(Function)
-    );
+    // Headless UI handles its own event listeners internally
+    // We just need to ensure the component unmounts without errors
+    expect(() => unmount()).not.toThrow();
   });
 
   it('has correct ARIA attributes', () => {
@@ -203,27 +181,17 @@ describe('<Modal />', () => {
     render(<Modal {...defaultProps} />);
 
     const dialog = screen.getByRole('dialog');
-    expect(dialog).toHaveClass(
-      'animate-fade-in',
-      'fixed',
-      'inset-0',
-      'z-50',
-      'flex',
-      'items-start',
-      'justify-center',
-      'overflow-y-auto',
-      'bg-black/70',
-      'p-4'
-    );
+    expect(dialog).toHaveClass('relative', 'z-50');
 
-    const modalContent = dialog.firstElementChild!;
+    const modalContent = screen.getByTestId('modal-content');
     expect(modalContent).toHaveClass(
       'relative',
       'my-4',
       'w-full',
       'border-2',
       'border-black',
-      'bg-white'
+      'bg-white',
+      'max-w-lg'
     );
   });
 

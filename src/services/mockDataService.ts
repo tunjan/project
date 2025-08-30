@@ -1,17 +1,18 @@
 import {
-  type Chapter,
-  type User,
-  type CubeEvent,
-  type OutreachLog,
   type Announcement,
-  type Resource,
-  type Notification,
   type BadgeAward,
-  type InventoryItem,
   type Challenge,
-  Role,
+  type Chapter,
+  type CubeEvent,
+  type InventoryItem,
+  type Notification,
   OnboardingStatus,
+  type OutreachLog,
+  type Resource,
+  Role,
+  type User,
 } from '@/types';
+
 import { generateAvatarUrl } from '../utils/user';
 
 export interface MockDataResponse {

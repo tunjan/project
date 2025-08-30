@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  ScatterChart,
+  CartesianGrid,
+  ResponsiveContainer,
   Scatter,
+  ScatterChart,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
 
 export interface ScatterPlotData {
@@ -133,4 +133,4 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   );
 };
 
-export default ScatterPlot;
+export default React.memo(ScatterPlot);

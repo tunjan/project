@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
+
 import LandingPage from '@/pages/LandingPage';
+import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus } from '@/types';
 
 const IndexRedirect = () => {

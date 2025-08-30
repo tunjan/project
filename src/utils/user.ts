@@ -1,4 +1,4 @@
-import { User, Role, OnboardingStatus, CubeEvent } from '@/types';
+import { CubeEvent, OnboardingStatus, Role, User } from '@/types';
 
 // Shared constant for inactivity period
 export const INACTIVITY_PERIOD_MONTHS = 3;
@@ -43,6 +43,11 @@ export const getUserRoleDisplay = (user: User): string => {
     const memberAffiliation = `Member of ${memberOnly.join(', ')}`;
 
     return `${organisedLabel} · ${memberAffiliation}`;
+  }
+
+  // For Global Admin and Godmode users, don't show chapter affiliations
+  if (user.role === Role.GLOBAL_ADMIN || user.role === Role.GODMODE) {
+    return roleLabel;
   }
 
   // Default: show role + primary affiliation if any
@@ -131,22 +136,15 @@ export const createUserAttendanceMap = (
 };
 
 /**
- * Generates a profile picture URL with CORS proxy support
+ * Generates a profile picture URL using reliable avatar services
  * @param seed - Unique identifier for the avatar
  * @param size - Size of the avatar (default: 150)
  * @returns Profile picture URL
  */
-export function generateAvatarUrl(seed: string, size: number = 150): string {
-  // Use reliable avatar services directly (no CORS proxy).
+export function generateAvatarUrl(seed: string, size: number = 1000): string {
+  // Use DiceBear as the primary service - it's reliable and has no CORS issues
   // Encode seed to avoid accidental URL injection.
-  const services = [
-    `https://i.pravatar.cc/${size}?u=${encodeURIComponent(seed)}`,
-    `https://picsum.photos/${size}/${size}?random=${encodeURIComponent(seed)}`,
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}&size=${size}`,
-  ];
-
-  // Prefer pravatar first, then picsum, then dicebear
-  return services[0];
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}&size=${size}`;
 }
 
 /**

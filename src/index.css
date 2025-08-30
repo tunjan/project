@@ -43,10 +43,10 @@
     @apply leading-tight;
   }
 
-  /* Enhanced transitions and spacing */
+  /* Enhanced spacing */
   button,
   a {
-    @apply transition-all duration-200;
+    /* Transitions removed for performance */
   }
 
   /* Better spacing for text content */
@@ -248,7 +248,7 @@
     @apply border-2 border-black bg-white;
   }
   .card-brutal-hover {
-    @apply border-2 border-black bg-white transition-all hover:shadow-brutal;
+    @apply border-2 border-black bg-white hover:shadow-brutal;
   }
   .h-section {
     @apply mb-6 border-b-4 border-gray-500 pb-3 text-3xl font-extrabold tracking-tight text-black;
@@ -282,28 +282,28 @@
 
   /* Button variants for consistency */
   .btn-primary {
-    @apply bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover;
+    @apply bg-primary px-4 py-2 font-bold text-white hover:bg-primary-hover;
   }
   .btn-secondary {
-    @apply bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-600;
+    @apply bg-gray-600 px-4 py-2 font-bold text-white hover:bg-gray-600;
   }
   .btn-outline {
-    @apply border-2 border-black bg-white px-4 py-2 font-bold text-black transition-colors duration-0 hover:bg-black hover:text-white;
+    @apply border-2 border-black bg-white px-4 py-2 font-bold text-black hover:bg-black hover:text-white;
   }
   .btn-danger {
-    @apply bg-danger px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-danger-hover;
+    @apply bg-danger px-4 py-2 font-bold text-white hover:bg-danger-hover;
   }
   .btn-warning {
-    @apply bg-warning px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-warning-hover;
+    @apply bg-warning px-4 py-2 font-bold text-black hover:bg-warning-hover;
   }
   .btn-success {
-    @apply bg-success px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-success-hover;
+    @apply bg-success px-4 py-2 font-bold text-white hover:bg-success-hover;
   }
   .btn-info {
-    @apply bg-info px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-info-hover;
+    @apply bg-info px-4 py-2 font-bold text-white hover:bg-info-hover;
   }
   .btn-gray {
-    @apply bg-grey-200 px-4 py-2 font-bold text-black transition-colors duration-300 hover:bg-grey-300;
+    @apply bg-grey-200 px-4 py-2 font-bold text-black hover:bg-grey-300;
   }
   .btn-sm {
     @apply px-3 py-1 text-sm;
@@ -446,73 +446,5 @@
 }
 
 @layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
-  }
-
-  /* Subtle tactile hover transforms */
-  .hover-raise {
-    transition:
-      transform 150ms ease,
-      box-shadow 150ms ease;
-  }
-  .hover-raise:hover {
-    transform: translateY(-2px);
-  }
-  .hover-press {
-    transition:
-      transform 120ms ease,
-      box-shadow 120ms ease;
-  }
-  .hover-press:active {
-    transform: translateY(1px);
-  }
-
-  /* Pop-in animation for validation checkmarks or badges */
-  .animate-pop-in {
-    animation: popIn 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
-    transform-origin: center;
-    will-change: transform, opacity;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes popIn {
-    0% {
-      opacity: 0;
-      transform: scale(0.92);
-    }
-    60% {
-      opacity: 1;
-      transform: scale(1.06);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
+  /* Animation classes removed for performance */
 }

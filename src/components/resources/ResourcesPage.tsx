@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { type Resource, type ResourceType, type SkillLevel } from '@/types';
-import ResourceCard from './ResourceCard';
-import ResourceFilters from './ResourceFilters';
+import React, { useMemo, useState } from 'react';
+
 import { BookOpenIcon } from '@/icons';
 import { useResources } from '@/store';
+import { type Resource, type ResourceType, type SkillLevel } from '@/types';
+
+import ResourceCard from './ResourceCard';
+import ResourceFilters from './ResourceFilters';
 
 const ResourcesPage: React.FC = () => {
   const allResources = useResources();
@@ -71,7 +73,7 @@ const ResourcesPage: React.FC = () => {
           </div>
         ) : (
           <div className="card-brutal card-padding text-center">
-            <BookOpenIcon className="text-grey-500 mx-auto h-12 w-12" />
+            <BookOpenIcon className="text-grey-500 mx-auto size-12" />
             <h3 className="mt-4 text-xl font-bold text-black">
               No resources found
             </h3>

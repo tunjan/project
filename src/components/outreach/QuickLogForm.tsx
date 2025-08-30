@@ -1,13 +1,14 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+
+import { SelectField } from '@/components/ui/Form';
+import { ArrowUturnLeftIcon, MinusIcon, PencilIcon, PlusIcon } from '@/icons';
 import {
   type CubeEvent,
-  type User,
-  OutreachOutcome,
   type OutreachLog,
+  OutreachOutcome,
+  type User,
 } from '@/types';
-import { SelectField } from '@/components/ui/Form';
-import { toast } from 'sonner';
-import { ArrowUturnLeftIcon, PencilIcon } from '@/icons';
 
 interface QuickLogFormProps {
   currentUser: User;
@@ -18,6 +19,7 @@ interface QuickLogFormProps {
   isTeamView: boolean;
 }
 
+// Enhanced tab button with better visual feedback
 const TabButton: React.FC<{
   isActive: boolean;
   onClick: () => void;
@@ -26,15 +28,50 @@ const TabButton: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`-mb-px w-full border-b-2 px-4 py-2 text-sm font-bold ${
+    className={`flex-1 border-b-2 px-6 py-4 text-sm font-bold ${
       isActive
-        ? 'border-primary text-primary'
-        : 'border-transparent text-neutral-500 hover:text-black'
+        ? 'border-primary bg-primary text-white shadow-inner'
+        : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:text-black active:bg-neutral-100'
     }`}
   >
     {children}
   </button>
 );
+
+// Enhanced outcome button with better visual distinction
+const OutcomeButton: React.FC<{
+  outcome: OutreachOutcome;
+  onClick: () => void;
+  className?: string;
+}> = ({ outcome, onClick, className = '' }) => {
+  const getOutcomeColor = (outcome: OutreachOutcome) => {
+    switch (outcome) {
+      case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
+        return 'bg-success text-white border-success hover:bg-success-hover';
+      case OutreachOutcome.BECAME_VEGAN:
+        return 'bg-primary text-white border-primary hover:bg-primary-hover';
+      case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
+        return 'bg-info text-white border-info hover:bg-info-hover';
+      case OutreachOutcome.MOSTLY_SURE:
+        return 'bg-warning text-black border-warning hover:bg-warning-hover';
+      case OutreachOutcome.NOT_SURE:
+        return 'bg-neutral-600 text-white border-neutral-600 hover:bg-neutral-700';
+      case OutreachOutcome.NO_CHANGE:
+        return 'bg-neutral-400 text-white border-neutral-400 hover:bg-neutral-500';
+      default:
+        return 'bg-white text-black border-black hover:bg-black hover:text-white';
+    }
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`btn-outline h-16 w-full border-2 font-bold ${getOutcomeColor(outcome)} ${className}`}
+    >
+      {outcome}
+    </button>
+  );
+};
 
 const QuickLogForm: React.FC<QuickLogFormProps> = ({
   currentUser,
@@ -95,7 +132,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
         label: 'Undo',
         onClick: () => removeOutreachLog(logId),
       },
-      icon: <ArrowUturnLeftIcon className="h-5 w-5" />,
+      icon: <ArrowUturnLeftIcon className="size-5" />,
     });
     setNotes('');
   };
@@ -132,11 +169,21 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
   if (pastEvents.length === 0) {
     return (
       <section>
-        <h2 className="h-section">Quick Log</h2>
-        <div className="card-brutal card-padding text-center">
-          <p className="text-sm text-neutral-500">
-            Attend an event to start logging conversations.
-          </p>
+        <h2 className="mb-6 border-b-4 border-primary pb-3 text-2xl font-extrabold tracking-tight text-black">
+          Quick Log
+        </h2>
+        <div className="card-brutal card-padding text-center shadow-brutal hover:shadow-brutal-lg">
+          <div className="py-12">
+            <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
+              <PencilIcon className="size-8 text-neutral-400" />
+            </div>
+            <p className="text-lg font-semibold text-neutral-700">
+              Attend an event to start logging conversations
+            </p>
+            <p className="mt-2 text-sm text-neutral-500">
+              Your first outreach conversation will appear here
+            </p>
+          </div>
         </div>
       </section>
     );
@@ -144,51 +191,59 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
 
   return (
     <section>
-      <h2 className="h-section">Quick Log</h2>
-      <div className="card-brutal">
-        <div className="space-y-4 p-6">
-          <SelectField
-            label="Event"
-            id="event-select"
-            value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
-          >
-            {pastEvents.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.location} ({new Date(e.startDate).toLocaleDateString()})
-              </option>
-            ))}
-          </SelectField>
+      <h2 className="mb-6 border-b-4 border-primary pb-3 text-2xl font-extrabold tracking-tight text-black">
+        Quick Log
+      </h2>
 
-          {isTeamView && (
+      <div className="card-brutal shadow-brutal hover:shadow-brutal-lg">
+        {/* Enhanced Form Section with Better Spacing */}
+        <div className="space-y-6 p-8">
+          <div className="grid grid-cols-1 gap-6">
             <SelectField
-              label="Log for Member"
-              id="user-select"
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
+              label="Event"
+              id="event-select"
+              value={selectedEventId}
+              onChange={(e) => setSelectedEventId(e.target.value)}
             >
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name}
+              {pastEvents.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.location} ({new Date(e.startDate).toLocaleDateString()})
                 </option>
               ))}
             </SelectField>
-          )}
 
+            {isTeamView && (
+              <SelectField
+                label="Log for Member"
+                id="user-select"
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+              >
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name}
+                  </option>
+                ))}
+              </SelectField>
+            )}
+          </div>
+
+          {/* Enhanced Notes Input */}
           <div className="relative">
-            <PencilIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-500" />
+            <PencilIcon className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-neutral-500" />
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Quick notes (optional)"
-              className="w-full border-2 border-black bg-white p-3 pl-10 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Add quick notes about your conversation (optional)"
+              className="w-full border-2 border-black bg-white p-4 pl-12 text-black placeholder:text-neutral-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
 
+        {/* Enhanced Tab Section */}
         <div className="border-t-2 border-black">
-          <div className="flex justify-between border-b border-black">
+          <div className="flex border-b border-neutral-200">
             <TabButton
               isActive={mode === 'single'}
               onClick={() => setMode('single')}
@@ -202,29 +257,41 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
               Bulk Log
             </TabButton>
           </div>
-          <div className="p-6">
+
+          <div className="p-8">
             {mode === 'single' ? (
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                {Object.values(OutreachOutcome).map((outcome) => (
-                  <button
-                    key={outcome}
-                    onClick={() => handleLog(outcome)}
-                    className="btn-outline p-3 text-xs"
-                  >
-                    {outcome}
-                  </button>
-                ))}
+              // Enhanced Single Log Mode
+              <div className="space-y-4">
+                <p className="text-sm font-medium text-neutral-600">
+                  Select the outcome of your conversation:
+                </p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {Object.values(OutreachOutcome).map((outcome) => (
+                    <OutcomeButton
+                      key={outcome}
+                      outcome={outcome}
+                      onClick={() => handleLog(outcome)}
+                    />
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="space-y-2">
+              // Enhanced Bulk Log Mode
+              <div className="space-y-6">
+                <p className="text-sm font-medium text-neutral-600">
+                  Count multiple conversations by outcome:
+                </p>
+
+                <div className="space-y-4">
                   {Object.entries(bulkCounts).map(([outcome, count]) => (
                     <div
                       key={outcome}
-                      className="flex items-center justify-between"
+                      className="flex items-center justify-between rounded-none border-2 border-neutral-200 bg-neutral-50 p-4 hover:border-neutral-300 hover:bg-white"
                     >
-                      <span className="text-sm font-semibold">{outcome}</span>
-                      <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-neutral-700">
+                        {outcome}
+                      </span>
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() =>
                             setBulkCounts((p) => ({
@@ -235,11 +302,11 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                               ),
                             }))
                           }
-                          className="btn-sm h-7 w-7 border-2 border-black bg-white p-0 text-lg"
+                          className="flex size-10 items-center justify-center rounded-none border-2 border-black bg-white text-lg font-bold hover:bg-black hover:text-white"
                         >
-                          -
+                          <MinusIcon className="size-5" />
                         </button>
-                        <span className="w-8 text-center font-bold">
+                        <span className="w-12 text-center text-xl font-bold text-black">
                           {count}
                         </span>
                         <button
@@ -249,17 +316,18 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                               [outcome]: p[outcome as OutreachOutcome] + 1,
                             }))
                           }
-                          className="btn-sm h-7 w-7 border-2 border-black bg-white p-0 text-lg"
+                          className="flex size-10 items-center justify-center rounded-none border-2 border-black bg-white text-lg font-bold hover:bg-black hover:text-white"
                         >
-                          +
+                          <PlusIcon className="size-5" />
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
+
                 <button
                   onClick={handleBulkSubmit}
-                  className="btn-primary w-full"
+                  className="btn-primary w-full py-4 text-lg font-bold shadow-brutal hover:shadow-brutal-lg"
                 >
                   Submit Bulk Logs
                 </button>

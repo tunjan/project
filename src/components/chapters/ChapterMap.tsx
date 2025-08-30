@@ -1,10 +1,12 @@
-import React, { useMemo, useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Import specific functions from leaflet to avoid module issues
 import * as L from 'leaflet';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+
 import { type Chapter } from '@/types';
+
 import styles from './ChapterMap.module.css';
 
 const CustomMarkerIcon = L.divIcon({
@@ -90,7 +92,7 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
       {!mapReady && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-gray-100">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-black"></div>
+            <div className="rounded-nonefull mx-auto mb-4 size-12 animate-spin border-b-2 border-black"></div>
             <p className="text-gray-600">Loading map...</p>
           </div>
         </div>
@@ -141,7 +143,7 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
                 )}
                 <button
                   onClick={() => onSelectChapter(chapter)}
-                  className="w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:bg-black hover:shadow-brutal"
+                  className="w-full border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white hover:bg-black hover:shadow-brutal"
                 >
                   {popupActionText}
                 </button>

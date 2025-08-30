@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
 import { differenceInDays, formatDistanceToNow } from 'date-fns';
-import { type Announcement, Role, AnnouncementScope } from '@/types';
-import { useCurrentUser } from '@/store/auth.store';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+
+import Avatar from '@/components/ui/Avatar';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { ChevronRightIcon, PencilIcon, TrashIcon } from '@/icons';
 import { useAnnouncementsActions } from '@/store/announcements.store';
+import { useCurrentUser } from '@/store/auth.store';
+import { type Announcement, AnnouncementScope, Role } from '@/types';
 import { ROLE_HIERARCHY } from '@/utils/auth';
 import { safeFormatLocaleDate } from '@/utils/date';
-import { toast } from 'sonner';
-import { PencilIcon, TrashIcon, ChevronRightIcon } from '@/icons';
+
 import EditAnnouncementModal from './EditAnnouncementModal';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import Avatar from '@/components/ui/Avatar';
 
 const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
   scope,
@@ -85,6 +87,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         <EditAnnouncementModal
           announcement={announcement}
           onClose={() => setIsEditing(false)}
+          isOpen={isEditing}
         />
       )}
 
@@ -116,14 +119,14 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                     className="p-1 text-neutral-500 hover:text-black"
                     aria-label="Edit announcement"
                   >
-                    <PencilIcon className="h-4 w-4" />
+                    <PencilIcon className="size-4" />
                   </button>
                   <button
                     onClick={() => setIsDeleteModalOpen(true)}
                     className="p-1 text-neutral-500 hover:text-primary"
                     aria-label="Delete announcement"
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon className="size-4" />
                   </button>
                 </>
               )}
@@ -146,7 +149,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                 className="btn-primary inline-flex items-center"
               >
                 {announcement.ctaText || 'Learn More'}
-                <ChevronRightIcon className="ml-2 h-4 w-4" />
+                <ChevronRightIcon className="ml-2 size-4" />
               </a>
             </div>
           )}
@@ -155,7 +158,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             <Avatar
               src={announcement.author.profilePictureUrl}
               alt={announcement.author.name}
-              className="h-10 w-10 object-cover"
+              className="size-10 object-cover"
             />
             <div className="ml-3">
               <p className="text-sm font-semibold text-black">

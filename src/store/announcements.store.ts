@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import { type Announcement, type User } from '@/types';
+
 import { processedAnnouncements } from './initialData';
 
 export interface AnnouncementsState {

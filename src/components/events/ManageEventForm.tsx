@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { type CubeEvent, type EventReport, type OutreachLog } from '@/types';
-import { ChevronLeftIcon, CheckCircleIcon, XCircleIcon } from '@/icons';
 import { toast } from 'sonner';
+
+import { CheckCircleIcon, ChevronLeftIcon, XCircleIcon } from '@/icons';
 import { useOutreachLogs } from '@/store';
+import { type CubeEvent, type EventReport, type OutreachLog } from '@/types';
 
 interface ManageEventFormProps {
   event: CubeEvent;
@@ -58,7 +59,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
           onClick={onCancel}
           className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
         >
-          <ChevronLeftIcon className="mr-1 h-5 w-5" />
+          <ChevronLeftIcon className="mr-1 size-5" />
           Back to Event
         </button>
       </div>
@@ -142,7 +143,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
           {}
           <div className="p-8">
             <h2 className="mb-4 text-xl font-bold text-black">Attendance</h2>
-            <ul className="divide-y-2 divide-black border-b-2 border-t-2 border-black">
+            <ul className="divide-y-2 divide-black border-y-2 border-black">
               {event.participants.map(({ user }) => (
                 <li
                   key={user.id}
@@ -152,7 +153,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                     <img
                       src={user.profilePictureUrl}
                       alt={user.name}
-                      className="h-10 w-10 object-cover"
+                      className="size-10 object-cover"
                     />
                     <div>
                       <p className="font-bold text-black">{user.name}</p>
@@ -171,7 +172,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                           : 'btn-outline'
                       }`}
                     >
-                      <CheckCircleIcon className="mr-1.5 h-5 w-5" />
+                      <CheckCircleIcon className="mr-1.5 size-5" />
                       Attended
                     </button>
                     <button
@@ -183,7 +184,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                           : 'btn-outline'
                       }`}
                     >
-                      <XCircleIcon className="mr-1.5 h-5 w-5" />
+                      <XCircleIcon className="mr-1.5 size-5" />
                       Absent
                     </button>
                   </div>

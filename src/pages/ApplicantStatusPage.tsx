@@ -1,15 +1,16 @@
 import React from 'react';
-import { Navigate, Link } from 'react-router-dom';
-import { useCurrentUser } from '@/store/auth.store';
-import { OnboardingStatus } from '@/types';
+import { Link, Navigate } from 'react-router-dom';
+
 import {
+  CalendarIcon,
   CheckIcon,
   ClockIcon,
-  XCircleIcon,
-  CalendarIcon,
   CubeIcon,
   VideoCameraIcon,
+  XCircleIcon,
 } from '@/icons';
+import { useCurrentUser } from '@/store/auth.store';
+import { OnboardingStatus } from '@/types';
 
 const ProgressStep: React.FC<{
   title: string;
@@ -32,7 +33,7 @@ const ProgressStep: React.FC<{
     <div className="flex items-start space-x-4">
       {/* Step indicator */}
       <div
-        className={`relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-black ${
+        className={`relative z-10 flex size-12 shrink-0 items-center justify-center border-2 border-black ${
           isComplete
             ? 'bg-black text-white'
             : isActive
@@ -41,7 +42,7 @@ const ProgressStep: React.FC<{
         }`}
       >
         {isComplete ? (
-          <CheckIcon className="h-6 w-6" />
+          <CheckIcon className="size-6" />
         ) : (
           <span className="text-sm font-bold">{stepNumber}</span>
         )}
@@ -201,7 +202,7 @@ const ApplicantStatusPage: React.FC = () => {
 
         {isDenied ? (
           <div className="border-2 border-black bg-white p-6 text-center">
-            <XCircleIcon className="mx-auto mb-4 h-12 w-12 text-black" />
+            <XCircleIcon className="mx-auto mb-4 size-12 text-black" />
             <h2 className="mb-4 text-xl font-bold text-black">
               Application Not Approved
             </h2>
@@ -237,7 +238,7 @@ const ApplicantStatusPage: React.FC = () => {
                   to="/dashboard"
                   className="btn-primary flex w-full items-center justify-center gap-2"
                 >
-                  <CalendarIcon className="h-5 w-5" />
+                  <CalendarIcon className="size-5" />
                   Schedule Onboarding Call
                 </Link>
               )}
@@ -246,7 +247,7 @@ const ApplicantStatusPage: React.FC = () => {
                   to="/cubes"
                   className="btn-primary flex w-full items-center justify-center gap-2"
                 >
-                  <CubeIcon className="h-5 w-5" />
+                  <CubeIcon className="size-5" />
                   Find a Cube to Attend
                 </Link>
               )}
@@ -255,7 +256,7 @@ const ApplicantStatusPage: React.FC = () => {
                   to="/dashboard"
                   className="btn-primary flex w-full items-center justify-center gap-2"
                 >
-                  <VideoCameraIcon className="h-5 w-5" />
+                  <VideoCameraIcon className="size-5" />
                   Confirm Masterclass Watched
                 </Link>
               )}
@@ -264,7 +265,7 @@ const ApplicantStatusPage: React.FC = () => {
                   to="/dashboard"
                   className="btn-primary flex w-full items-center justify-center gap-2"
                 >
-                  <CalendarIcon className="h-5 w-5" />
+                  <CalendarIcon className="size-5" />
                   Schedule Revision Call
                 </Link>
               )}
@@ -296,7 +297,7 @@ const ApplicantStatusPage: React.FC = () => {
             {/* Waiting State */}
             {status === OnboardingStatus.PENDING_APPLICATION_REVIEW && (
               <div className="border-t-2 border-black pt-6 text-center">
-                <ClockIcon className="mx-auto h-10 w-10 text-neutral-500" />
+                <ClockIcon className="mx-auto size-10 text-neutral-500" />
                 <h3 className="mt-2 font-bold text-black">
                   Patience is a virtue!
                 </h3>

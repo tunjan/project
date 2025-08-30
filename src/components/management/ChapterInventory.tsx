@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { PlusIcon, PencilIcon, TrashIcon } from '@/icons';
 import { toast } from 'sonner';
-import { type InventoryItem } from '@/types';
-import { InputField, SelectField } from '@/components/ui/Form';
+
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { InputField, SelectField } from '@/components/ui/Form';
+import { PencilIcon, PlusIcon, TrashIcon } from '@/icons';
+import { type InventoryItem } from '@/types';
 
 interface ChapterInventoryProps {
   chapterName: string;
@@ -99,14 +100,14 @@ const InventoryItemCard: React.FC<{
             className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
             title="Edit item"
           >
-            <PencilIcon className="h-4 w-4" />
+            <PencilIcon className="size-4" />
           </button>
           <button
             onClick={onDelete}
             className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-primary hover:text-white"
             title="Delete item"
           >
-            <TrashIcon className="h-4 w-4" />
+            <TrashIcon className="size-4" />
           </button>
         </div>
       </div>
@@ -202,7 +203,7 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
           onClick={() => setShowForm(true)}
           className="btn-primary flex items-center gap-2"
         >
-          <PlusIcon className="h-4 w-4" />
+          <PlusIcon className="size-4" />
           Add Item
         </button>
       </div>

@@ -1,9 +1,10 @@
+import { isAfter, subMonths } from 'date-fns';
 import React, { useMemo } from 'react';
-import { useCurrentUser } from '@/store/auth.store';
 import { useNavigate } from 'react-router-dom';
-import { useUsers, useChapters, useEvents } from '@/store';
-import { UserGroupIcon, TrendingUpIcon, CalendarIcon } from '@/icons';
-import { subMonths, isAfter } from 'date-fns';
+
+import { CalendarIcon, TrendingUpIcon, UserGroupIcon } from '@/icons';
+import { useChapters, useEvents, useUsers } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
 import { CubeEvent } from '@/types';
 
 interface ChapterHealth {
@@ -134,22 +135,22 @@ const ChapterHealthSnapshot: React.FC = () => {
         <button
           key={health.name}
           onClick={() => navigate(`/chapters/${health.name}`)}
-          className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
+          className="w-full border-2 border-black bg-white p-4 text-left hover:shadow-brutal"
         >
           <h4 className="h-card mb-4">{health.name}</h4>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <UserGroupIcon className="mx-auto h-6 w-6 text-primary" />
+              <UserGroupIcon className="mx-auto size-6 text-primary" />
               <p className="mt-1 text-2xl font-bold">{health.totalMembers}</p>
               <p className="text-xs text-neutral-600">Total Members</p>
             </div>
             <div>
-              <TrendingUpIcon className="mx-auto h-6 w-6 text-success" />
+              <TrendingUpIcon className="mx-auto size-6 text-success" />
               <p className="mt-1 text-2xl font-bold">{health.activeMembers}</p>
               <p className="text-xs text-neutral-600">Active (3mo)</p>
             </div>
             <div>
-              <CalendarIcon className="mx-auto h-6 w-6 text-primary" />
+              <CalendarIcon className="mx-auto size-6 text-primary" />
               <p className="mt-1 text-2xl font-bold">
                 {health.memberGrowth.toFixed(0)}%
               </p>

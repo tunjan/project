@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import RequestCard from './RequestCard';
+
 import { HomeIcon } from '@/icons';
-
 import { useAccommodationRequests } from '@/store';
-
 import { useCurrentUser } from '@/store/auth.store';
+
+import RequestCard from './RequestCard';
 
 interface HostingDashboardProps {}
 
@@ -64,7 +64,7 @@ const HostingDashboard: React.FC<HostingDashboardProps> = () => {
 
   const NoRequestsMessage = () => (
     <div className="border-2 border-black bg-white p-8 text-center">
-      <HomeIcon className="text-red mx-auto h-12 w-12" />
+      <HomeIcon className="text-red mx-auto size-12" />
       <h3 className="mt-4 text-xl font-bold text-black">
         {view === 'incoming'
           ? 'No incoming requests.'

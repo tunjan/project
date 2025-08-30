@@ -1,12 +1,13 @@
 import React from 'react';
-import { type UserStats } from '@/types';
+
 import {
+  ChatBubbleLeftRightIcon,
   ClockIcon,
   CubeIcon,
-  TrendingUpIcon,
   GlobeAltIcon,
-  ChatBubbleLeftRightIcon,
+  TrendingUpIcon,
 } from '@/icons';
+import { type UserStats } from '@/types';
 
 interface StatsGridProps {
   stats: UserStats;
@@ -27,12 +28,16 @@ const StatCard: React.FC<{
         : 'cursor-default'
     }`}
     onClick={onClick}
-    onKeyDown={onClick ? (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onClick();
-      }
-    } : undefined}
+    onKeyDown={
+      onClick
+        ? (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick();
+            }
+          }
+        : undefined
+    }
     role={onClick ? 'button' : undefined}
     tabIndex={onClick ? 0 : undefined}
   >
@@ -54,29 +59,29 @@ const StatsGrid: React.FC<StatsGridProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <StatCard
-        icon={<ClockIcon className="h-6 w-6" />}
+        icon={<ClockIcon className="size-6" />}
         title="Hours"
         value={Math.round(stats.totalHours)}
       />
       <StatCard
-        icon={<CubeIcon className="h-6 w-6" />}
+        icon={<CubeIcon className="size-6" />}
         title="Cubes"
         value={stats.cubesAttended}
       />
       <StatCard
-        icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
+        icon={<ChatBubbleLeftRightIcon className="size-6" />}
         title="Conversations"
         value={stats.totalConversations}
       />
       <StatCard
-        icon={<GlobeAltIcon className="h-6 w-6" />}
+        icon={<GlobeAltIcon className="size-6" />}
         title="Cities"
         value={stats.cities.length}
         onClick={onCityClick}
       />
       {showPrivateStats && (
         <StatCard
-          icon={<TrendingUpIcon className="h-6 w-6" />}
+          icon={<TrendingUpIcon className="size-6" />}
           title="Conversions"
           value={stats.veganConversions}
         />

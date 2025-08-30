@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { useCurrentUser } from '@/store/auth.store';
-import { useUsers, useEvents } from '@/store';
-import { User, CubeEvent } from '@/types';
+
 import { TrophyIcon } from '@/icons';
+import { useEvents, useUsers } from '@/store';
+import { useCurrentUser } from '@/store/auth.store';
+import { CubeEvent, User } from '@/types';
 
 const LeaderboardSnapshot: React.FC = () => {
   const currentUser = useCurrentUser();
@@ -54,7 +55,7 @@ const LeaderboardSnapshot: React.FC = () => {
   if (!userRank || userRank.hours === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-center">
-        <TrophyIcon className="text-grey-400 mb-4 h-12 w-12" />
+        <TrophyIcon className="text-grey-400 mb-4 size-12" />
         <h3 className="font-bold">No activity this month</h3>
         <p className="text-grey-600 text-sm">
           Log some hours to get on the board!
@@ -65,7 +66,7 @@ const LeaderboardSnapshot: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      <TrophyIcon className="h-16 w-16 text-yellow" />
+      <TrophyIcon className="size-16 text-yellow" />
       <p className="mt-4 text-lg">You are</p>
       <h3 className="text-5xl font-bold">#{userRank.rank}</h3>
       <p className="text-lg">out of {userRank.total} activists</p>

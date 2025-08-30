@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+
 import Modal from '@/components/ui/Modal';
-import { CubeEvent } from '@/types';
 import { ChevronDownIcon } from '@/icons';
+import { CubeEvent } from '@/types';
 
 interface PastEventsModalProps {
   chapterName: string;
   events: CubeEvent[];
   onClose: () => void;
+  isOpen: boolean;
 }
 
 const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
@@ -32,7 +34,7 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
           <p className="text-sm text-neutral-500">{formattedDate}</p>
         </div>
         <ChevronDownIcon
-          className={`h-5 w-5 text-neutral-500 transition-transform ${
+          className={`size-5 text-neutral-500 transition-transform ${
             isExpanded ? 'rotate-180' : ''
           }`}
         />
@@ -51,7 +53,7 @@ const EventItem: React.FC<{ event: CubeEvent }> = ({ event }) => {
                 <img
                   src={p.user.profilePictureUrl}
                   alt={p.user.name}
-                  className="h-8 w-8 object-cover"
+                  className="size-8 object-cover"
                 />
                 <div>
                   <p className="text-sm font-semibold text-black">
@@ -72,15 +74,17 @@ const PastEventsModal: React.FC<PastEventsModalProps> = ({
   chapterName,
   events,
   onClose,
+  isOpen,
 }) => {
   return (
     <Modal
+      isOpen={isOpen}
       title="Past Events"
       description={`For ${chapterName} Chapter`}
       onClose={onClose}
     >
       {events.length > 0 ? (
-        <div className="-m-6 max-h-[60vh] flex-grow overflow-y-auto bg-white">
+        <div className="-m-6 max-h-[60vh] grow overflow-y-auto bg-white">
           {events.map((event) => (
             <EventItem key={event.id} event={event} />
           ))}

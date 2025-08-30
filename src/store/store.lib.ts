@@ -1,6 +1,12 @@
-import { useUsersStore } from './users.store';
+import {
+  type CubeEvent,
+  EventReport,
+  NotificationType,
+  type User,
+} from '@/types';
+
 import { useNotificationsStore } from './notifications.store';
-import { type User, type CubeEvent, NotificationType } from '@/types';
+import { useUsersStore } from './users.store';
 
 /**
  * Handles the logic for logging an event report, including updating user stats.
@@ -10,7 +16,7 @@ import { type User, type CubeEvent, NotificationType } from '@/types';
  */
 export const handleEventReportLogging = (
   event: CubeEvent,
-  report: CubeEvent['report']
+  report?: EventReport
 ) => {
   // Prepare batch update for user stats
   const usersStore = useUsersStore.getState();
@@ -44,6 +50,28 @@ export const handleEventReportLogging = (
         usersStore.advanceOnboardingAfterEvent(update.userId);
       }
     });
+  }
+
+  // Notify attendees that their stats have been updated
+  const notificationsStore = useNotificationsStore.getState();
+  const notificationsToCreate = [];
+
+  if (report) {
+    for (const participant of event.participants) {
+      if (report.attendance[participant.user.id] === 'Attended') {
+        notificationsToCreate.push({
+          userId: participant.user.id,
+          type: NotificationType.STATS_UPDATED,
+          message: `Your stats have been updated from the event: "${event.location}".`,
+          linkTo: `/members/${participant.user.id}`,
+          relatedUser: event.organizer,
+        });
+      }
+    }
+  }
+
+  if (notificationsToCreate.length > 0) {
+    notificationsStore.addNotifications(notificationsToCreate);
   }
 };
 

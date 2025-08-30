@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 import ChapterMap from '@/components/chapters/ChapterMap';
+import { BuildingOfficeIcon, CalendarIcon, ChevronRightIcon } from '@/icons';
 import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
-import { EventStatus, type Chapter } from '@/types';
-import { ChevronRightIcon, CalendarIcon, BuildingOfficeIcon } from '@/icons';
+import { type Chapter, EventStatus } from '@/types';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const LandingPage: React.FC = () => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Hero */}
-      <section className="mb-12 rounded-none border-2 border-black bg-neutral-100 p-6 shadow-brutal">
+      <section className="rounded-nonenone mb-12 border-2 border-black bg-neutral-100 p-6 shadow-brutal">
         <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="h-card mb-2">Join the Movement</h1>
@@ -44,10 +45,10 @@ const LandingPage: React.FC = () => {
               to="/login"
               className="btn-secondary inline-flex items-center"
             >
-              Login <ChevronRightIcon className="ml-2 h-4 w-4" />
+              Login <ChevronRightIcon className="ml-2 size-4" />
             </Link>
             <Link to="/signup" className="btn-primary inline-flex items-center">
-              Join the Hub <ChevronRightIcon className="ml-2 h-4 w-4" />
+              Join the Hub <ChevronRightIcon className="ml-2 size-4" />
             </Link>
           </div>
         </div>
@@ -81,7 +82,7 @@ const LandingPage: React.FC = () => {
       {/* Interactive Map */}
       <section className="mb-12">
         <div className="mb-3 flex items-center gap-2">
-          <BuildingOfficeIcon className="h-5 w-5 text-primary" />
+          <BuildingOfficeIcon className="size-5 text-primary" />
           <h2 className="text-2xl font-extrabold">Our Chapters</h2>
         </div>
         <div className="mb-3 text-sm text-neutral-700">
@@ -95,31 +96,31 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Benefits for Activists */}
-      <section className="mb-12 rounded-none border-2 border-black bg-white p-6 shadow-brutal">
+      <section className="rounded-nonenone mb-12 border-2 border-black bg-white p-6 shadow-brutal">
         <div className="mb-4 flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5 text-primary" />
+          <CalendarIcon className="size-5 text-primary" />
           <h2 className="text-2xl font-extrabold">Why Join?</h2>
         </div>
         <ul className="grid gap-3 sm:grid-cols-2">
-          <li className="rounded-none border-2 border-black bg-neutral-100 p-4">
+          <li className="rounded-nonenone border-2 border-black bg-neutral-100 p-4">
             <p className="font-semibold">Find and join events</p>
             <p className="text-sm text-neutral-700">
               Discover cubes near you and RSVP with one click.
             </p>
           </li>
-          <li className="rounded-none border-2 border-black bg-neutral-100 p-4">
+          <li className="rounded-nonenone border-2 border-black bg-neutral-100 p-4">
             <p className="font-semibold">Track your impact</p>
             <p className="text-sm text-neutral-700">
               Log conversations and see your growth over time.
             </p>
           </li>
-          <li className="rounded-none border-2 border-black bg-neutral-100 p-4">
+          <li className="rounded-nonenone border-2 border-black bg-neutral-100 p-4">
             <p className="font-semibold">Build your chapter</p>
             <p className="text-sm text-neutral-700">
               Manage members, announcements, and resources.
             </p>
           </li>
-          <li className="rounded-none border-2 border-black bg-neutral-100 p-4">
+          <li className="rounded-nonenone border-2 border-black bg-neutral-100 p-4">
             <p className="font-semibold">Global community</p>
             <p className="text-sm text-neutral-700">
               Connect with activists around the world.
@@ -131,13 +132,13 @@ const LandingPage: React.FC = () => {
             to="/login"
             className="btn-secondary inline-flex items-center justify-center"
           >
-            Login <ChevronRightIcon className="ml-2 h-4 w-4" />
+            Login <ChevronRightIcon className="ml-2 size-4" />
           </Link>
           <Link
             to="/signup"
             className="btn-primary inline-flex items-center justify-center"
           >
-            Join the Hub <ChevronRightIcon className="ml-2 h-4 w-4" />
+            Join the Hub <ChevronRightIcon className="ml-2 size-4" />
           </Link>
         </div>
       </section>

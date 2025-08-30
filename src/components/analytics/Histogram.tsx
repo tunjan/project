@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Label,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Label,
 } from 'recharts';
 
 export interface HistogramData {
@@ -120,4 +120,4 @@ const Histogram: React.FC<HistogramProps> = ({
   );
 };
 
-export default Histogram;
+export default React.memo(Histogram);

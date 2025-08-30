@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import { type Chapter, type User, Role } from '@/types';
-import CreateChapterForm from './CreateChapterForm';
+import React, { useMemo, useState } from 'react';
+
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { PencilIcon, TrashIcon } from '@/icons';
 import { useChaptersActions, useUsers } from '@/store';
+import { type Chapter, Role, type User } from '@/types';
+
+import CreateChapterForm from './CreateChapterForm';
 import EditChapterModal from './EditChapterModal';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import ManageOrganiserModal from './ManageOrganiserModal';
 
 interface ChapterManagementProps {
@@ -68,6 +70,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
         <EditChapterModal
           chapter={editingChapter}
           onClose={() => setEditingChapter(null)}
+          isOpen={!!editingChapter}
         />
       )}
 
@@ -96,7 +99,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                   return (
                     <li
                       key={chapter.name}
-                      className="p-4 transition-colors hover:bg-primary-lightest"
+                      className="p-4 hover:bg-primary-lightest"
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -108,17 +111,17 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => setEditingChapter(chapter)}
-                            className="rounded-none p-2 text-neutral-500 transition-colors hover:bg-black hover:text-white"
+                            className="rounded-nonenone p-2 text-neutral-500 hover:bg-black hover:text-white"
                             aria-label="Edit Chapter"
                           >
-                            <PencilIcon className="h-4 w-4" />
+                            <PencilIcon className="size-4" />
                           </button>
                           <button
                             onClick={() => openDeleteModal(chapter.name)}
-                            className="rounded-none p-2 text-neutral-500 transition-colors hover:bg-danger hover:text-white"
+                            className="rounded-nonenone p-2 text-neutral-500 hover:bg-danger hover:text-white"
                             aria-label="Delete Chapter"
                           >
-                            <TrashIcon className="h-4 w-4" />
+                            <TrashIcon className="size-4" />
                           </button>
                         </div>
                       </div>
@@ -132,13 +135,13 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                               <button
                                 key={org.id}
                                 onClick={() => setManagingOrganiser(org)}
-                                className="flex cursor-pointer items-center space-x-2 rounded-none border border-black bg-white p-1 pr-2 transition-colors hover:bg-neutral-100"
+                                className="rounded-nonenone flex cursor-pointer items-center space-x-2 p-1 pr-2"
                                 title={`Click to manage ${org.name}`}
                               >
                                 <img
                                   src={org.profilePictureUrl}
                                   alt={org.name}
-                                  className="h-5 w-5 object-cover"
+                                  className="size-5 object-cover"
                                 />
                                 <span className="text-xs font-semibold text-black hover:text-primary">
                                   {org.name}

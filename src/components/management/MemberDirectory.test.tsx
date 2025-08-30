@@ -1,12 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import MemberDirectory from './MemberDirectory';
+import { fireEvent, render, screen } from '@testing-library/react';
+
 import {
-  User,
   Chapter,
-  Role,
-  OnboardingStatus,
   ChapterJoinRequest,
+  OnboardingStatus,
+  Role,
+  User,
 } from '@/types';
+
+import MemberDirectory from './MemberDirectory';
 
 const mockChapters: Chapter[] = [
   { name: 'Berlin', country: 'Germany', lat: 0, lng: 0 },
