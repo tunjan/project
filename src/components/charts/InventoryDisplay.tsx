@@ -88,7 +88,7 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
             onClick={() => setFilter(category)}
             className={`px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${
               filter === category
-                ? 'border-2 border-primary bg-primary text-white'
+                ? 'border-primary bg-primary text-white md:border-2'
                 : 'btn-outline'
             }`}
           >

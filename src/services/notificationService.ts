@@ -6,7 +6,7 @@ import {
   Role,
   type User,
 } from '@/types';
-import { INACTIVITY_PERIOD_MONTHS } from '@/utils/user';
+import { INACTIVITY_PERIOD_MONTHS } from '@/utils';
 
 /**
  * Simulates a backend job to generate inactivity notifications for chapter organisers.

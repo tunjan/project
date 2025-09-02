@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Modal from '@/components/ui/Modal';
+import { Modal } from '@/components/ui';
 import { TrashIcon } from '@/icons';
 import { type User } from '@/types';
 

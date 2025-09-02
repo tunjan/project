@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, SelectField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { InputField, SelectField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { useEventsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type Chapter, type CubeEvent } from '@/types';

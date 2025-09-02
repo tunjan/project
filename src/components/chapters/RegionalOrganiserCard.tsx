@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { MailIcon, ShieldCheckIcon } from '@/icons';
 import { type User } from '@/types';
-import { copyToClipboard } from '@/utils/copyToClipboard';
+import { copyToClipboard } from '@/utils';
 
 interface RegionalOrganiserCardProps {
   user: User;
@@ -35,7 +35,7 @@ const RegionalOrganiserCard: React.FC<RegionalOrganiserCardProps> = ({
         <img
           src={user.profilePictureUrl}
           alt={user.name}
-          className="size-24 shrink-0 border-2 border-black object-cover"
+          className="size-24 shrink-0 border-black object-cover md:border-2"
         />
         <div className="flex-1">
           <div className="mb-2 flex items-center justify-center gap-2 sm:justify-start">
@@ -57,7 +57,7 @@ const RegionalOrganiserCard: React.FC<RegionalOrganiserCardProps> = ({
         type="button"
         onClick={handleCopyEmail}
         title="Copy email to clipboard"
-        className="rounded-nonenone border-2 border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100"
+        className="rounded-nonenone border-black bg-white px-2 py-0.5 text-xs font-bold text-black transition-colors hover:bg-neutral-100 md:border-2"
         aria-label="Copy email to clipboard"
       >
         Copy

@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { ROLE_HIERARCHY } from '@/constants';
 import {
   createNewUser,
+  determineNextStatusAfterFirstCube,
+  finalizeOnboarding as finalizeOnboardingService,
   handleNewApplicationNotifications,
   isValidStatusTransition,
   validateOnboardingState,
@@ -15,7 +18,6 @@ import {
   type User,
 } from '@/types';
 import { type OnboardingAnswers } from '@/types';
-import { ROLE_HIERARCHY } from '@/utils/auth';
 
 import { useAuthStore } from './auth.store';
 import { processedUsers } from './initialData';
@@ -193,22 +195,11 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           return;
         }
 
-        // Validate that user can be finalized
-        if (
-          currentUser.onboardingStatus !==
-          OnboardingStatus.AWAITING_REVISION_CALL
-        ) {
+        // Use service function for validation
+        const result = finalizeOnboardingService(currentUser);
+        if (!result.success) {
           console.warn(
-            `User ${userId} cannot be finalized from status ${currentUser.onboardingStatus}`
-          );
-          return;
-        }
-
-        // Validate onboarding state
-        const validation = validateOnboardingState(currentUser);
-        if (!validation.isValid) {
-          console.warn(
-            `Cannot finalize user ${userId}: ${validation.issues.join(', ')}`
+            `User ${userId} cannot be finalized: ${result.issues.join(', ')}`
           );
           return;
         }
@@ -272,7 +263,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
               watchedMasterclass: true,
             };
 
-            const onboardingStatus = OnboardingStatus.AWAITING_REVISION_CALL;
+            const onboardingStatus = determineNextStatusAfterFirstCube(u);
 
             const updatedUser = {
               ...u,

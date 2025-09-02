@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { can } from '@/config/permissions';
-import { Permission } from '@/config/permissions';
+import { can } from '@/config';
+import { Permission } from '@/config';
 import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus } from '@/types';
 

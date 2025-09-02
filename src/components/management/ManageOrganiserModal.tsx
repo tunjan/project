@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import Modal from '@/components/ui/Modal';
-import { getAssignableRoles } from '@/config/permissions';
+import { Modal } from '@/components/ui';
+import { getAssignableRoles } from '@/config';
 import { PencilIcon, UsersIcon } from '@/icons';
 import { useChapters, useUsersActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
@@ -187,7 +187,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
           <select
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="w-full border-2 border-black bg-white p-2 text-black"
+            className="w-full border-black bg-white p-2 text-black md:border-2"
           >
             {assignableRoles.map((role) => (
               <option key={role} value={role}>

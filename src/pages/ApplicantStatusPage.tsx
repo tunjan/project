@@ -33,7 +33,7 @@ const ProgressStep: React.FC<{
     <div className="flex items-start space-x-4">
       {/* Step indicator */}
       <div
-        className={`relative z-10 flex size-12 shrink-0 items-center justify-center border-2 border-black ${
+        className={`relative z-10 flex size-12 shrink-0 items-center justify-center border-black md:border-2 ${
           isComplete
             ? 'bg-black text-white'
             : isActive
@@ -55,12 +55,12 @@ const ProgressStep: React.FC<{
 
         {/* Status badge */}
         {isComplete && (
-          <div className="mt-2 inline-block border-2 border-black bg-white px-3 py-1 text-xs font-bold text-black">
+          <div className="mt-2 inline-block border-black bg-white px-3 py-1 text-xs font-bold text-black md:border-2">
             COMPLETED
           </div>
         )}
         {isActive && !isComplete && (
-          <div className="mt-2 inline-block border-2 border-primary bg-primary px-3 py-1 text-xs font-bold text-white">
+          <div className="mt-2 inline-block border-primary bg-primary px-3 py-1 text-xs font-bold text-white md:border-2">
             IN PROGRESS
           </div>
         )}
@@ -191,7 +191,7 @@ const ApplicantStatusPage: React.FC = () => {
       <div className="mx-auto max-w-2xl">
         {/* Header Section */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-extrabold text-black">
+          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
             Your Application Status
           </h1>
           <p className="mt-2 text-neutral-600">
@@ -201,7 +201,7 @@ const ApplicantStatusPage: React.FC = () => {
         </div>
 
         {isDenied ? (
-          <div className="border-2 border-black bg-white p-6 text-center">
+          <div className="border-black bg-white p-6 text-center md:border-2">
             <XCircleIcon className="mx-auto mb-4 size-12 text-black" />
             <h2 className="mb-4 text-xl font-bold text-black">
               Application Not Approved
@@ -211,16 +211,16 @@ const ApplicantStatusPage: React.FC = () => {
               this time. Please contact your local chapter organizer for more
               information.
             </p>
-            <button className="border-2 border-black bg-black px-6 py-2 font-bold text-white transition-colors hover:bg-white hover:text-black">
+            <button className="border-black bg-black px-6 py-2 font-bold text-white transition-colors hover:bg-white hover:text-black md:border-2">
               CONTACT ORGANIZER
             </button>
           </div>
         ) : (
-          <div className="border-2 border-black bg-white p-6 md:p-8">
+          <div className="border-black bg-white p-6 md:border-2 md:p-8">
             {/* Status Message */}
             <div className="mb-8 text-center">
               <div
-                className={`inline-block border-2 px-4 py-2 font-bold ${
+                className={`inline-block px-4 py-2 font-bold md:border-2 ${
                   statusInfo.type === 'success'
                     ? 'border-black bg-black text-white'
                     : 'border-primary bg-primary text-white'

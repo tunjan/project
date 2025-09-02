@@ -2,29 +2,14 @@
  * Utility functions for handling file uploads
  */
 
-export const convertFileToBase64 = (file: File): Promise<string> => {
+export const readFileAsDataURL = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === 'string') {
         resolve(reader.result);
       } else {
-        reject(new Error('Failed to convert file to base64'));
-      }
-    };
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsDataURL(file);
-  });
-};
-
-export const createImagePreview = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result);
-      } else {
-        reject(new Error('Failed to create image preview'));
+        reject(new Error('Failed to read file as data URL'));
       }
     };
     reader.onerror = () => reject(new Error('Failed to read file'));

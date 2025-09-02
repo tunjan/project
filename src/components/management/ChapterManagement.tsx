@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { ConfirmationModal } from '@/components/ui';
 import { PencilIcon, TrashIcon } from '@/icons';
 import { useChaptersActions, useUsers } from '@/store';
 import { type Chapter, Role, type User } from '@/types';
@@ -89,7 +89,7 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
           <h3 className="mb-4 text-xl font-bold text-black">
             Existing Chapters ({chapters.length})
           </h3>
-          <div className="max-h-[70vh] overflow-y-auto border-2 border-black bg-white">
+          <div className="max-h-[70vh] overflow-y-auto border-black bg-white md:border-2">
             <ul className="divide-y-2 divide-black">
               {chapters
                 .sort((a, b) => a.name.localeCompare(b.name))

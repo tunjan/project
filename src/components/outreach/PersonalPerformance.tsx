@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import LineChart from '@/components/analytics/LineChart';
 import { CalendarIcon, TargetIcon, TrendingUpIcon, TrophyIcon } from '@/icons';
 import { type OutreachLog, OutreachOutcome } from '@/types';
-import { getConversationTrendsByMonth } from '@/utils/analytics';
+import { getConversationTrendsByMonth } from '@/utils';
 
 // Enhanced stat card with better visual impact
 const Stat: React.FC<{
@@ -13,7 +13,7 @@ const Stat: React.FC<{
   subtitle?: string;
   trend?: 'up' | 'down' | 'neutral';
 }> = ({ icon, label, value, subtitle, trend }) => (
-  <div className="group relative overflow-hidden rounded-none border-2 border-black bg-white p-6 hover:shadow-brutal-lg">
+  <div className="group relative overflow-hidden rounded-none border-black bg-white p-6 hover:shadow-brutal-lg md:border-2">
     <div className="flex items-start justify-between">
       <div className="flex-1">
         <div className="mb-2 flex items-center gap-3">
@@ -148,7 +148,7 @@ const PersonalPerformance: React.FC<{ logs: OutreachLog[] }> = ({ logs }) => {
         </div>
 
         {/* Enhanced Chart Section */}
-        <div className="rounded-none border-2 border-black bg-white p-6 hover:shadow-brutal-lg">
+        <div className="rounded-none border-black bg-white p-6 hover:shadow-brutal-lg md:border-2">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-bold text-black">
               Monthly Conversation Trends

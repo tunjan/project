@@ -79,7 +79,7 @@ const EventParticipationHistory: React.FC<EventParticipationHistoryProps> = ({
 
   if (eventHistory.length === 0) {
     return (
-      <div className="rounded-none border-2 border-black bg-white p-8 text-center shadow-brutal">
+      <div className="rounded-none border-black bg-white p-8 text-center shadow-brutal md:border-2">
         <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
           <CalendarIcon className="size-8 text-neutral-400" />
         </div>
@@ -102,7 +102,7 @@ const EventParticipationHistory: React.FC<EventParticipationHistoryProps> = ({
             ({ event, participation, status, attended, role }) => (
               <div
                 key={event.id}
-                className="rounded-none border-2 border-black bg-white p-6"
+                className="rounded-none border-black bg-white p-6 md:border-2"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -215,7 +215,7 @@ const EventParticipationHistory: React.FC<EventParticipationHistoryProps> = ({
       </div>
 
       {/* Summary Statistics */}
-      <div className="rounded-none border-2 border-black bg-white p-6">
+      <div className="rounded-none border-black bg-white p-6 md:border-2">
         <h4 className="mb-4 text-lg font-bold text-black">
           Participation Summary
         </h4>

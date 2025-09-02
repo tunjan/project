@@ -9,10 +9,13 @@ import Widget from '@/components/dashboard/Widget';
 import ChapterInventory from '@/components/management/ChapterInventory';
 import ChapterManagement from '@/components/management/ChapterManagement';
 import ChapterRequestQueue from '@/components/management/ChapterRequestQueue';
+import ManagementTask from '@/components/management/ManagementTask';
 import MemberDirectory from '@/components/management/MemberDirectory';
 import OnboardingHealthCheck from '@/components/management/OnboardingHealthCheck';
 import OnboardingPipeline from '@/components/management/OnboardingPipeline';
 import ReviewApplicantModal from '@/components/management/ReviewApplicantModal';
+import { TabButton } from '@/components/ui';
+import { ROLE_HIERARCHY } from '@/constants';
 import {
   BuildingOfficeIcon,
   ClipboardCheckIcon,
@@ -39,8 +42,7 @@ import {
   Role,
   type User,
 } from '@/types';
-import { ROLE_HIERARCHY } from '@/utils/auth';
-import { isUserInactive } from '@/utils/user';
+import { isUserInactive } from '@/utils';
 
 type ManagementView =
   | 'dashboard'
@@ -63,69 +65,6 @@ interface ManagementTaskProps {
   onClick: () => void;
   priority: 'high' | 'medium' | 'low';
 }
-
-const ManagementTask: React.FC<ManagementTaskProps> = ({
-  icon,
-  title,
-  count,
-  description,
-  onClick,
-  priority,
-}) => {
-  const priorityStyles = {
-    high: 'border-l-4 border-red bg-white',
-    medium: 'border-l-4 border-gray-500 bg-white',
-    low: 'border-l-4 border-black bg-white',
-  };
-
-  return (
-    <button
-      className={`card-brutal card-padding ${priorityStyles[priority]} w-full cursor-pointer text-left hover:shadow-brutal-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      aria-label={`${title}: ${description}`}
-    >
-      <div className="flex justify-between">
-        <div className="flex items-start gap-4">
-          <div className="text-2xl text-primary" aria-hidden="true">
-            {icon}
-          </div>
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <h3 className="h-card">{title}</h3>
-              <span className="tag-brutal" aria-label={`${count} items`}>
-                {count}
-              </span>
-            </div>
-            <p className="text-grey-600 text-sm">{description}</p>
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-};
-
-const TabButton: React.FC<{
-  onClick: () => void;
-  isActive: boolean;
-  children: React.ReactNode;
-}> = ({ onClick, isActive, children }) => (
-  <button
-    onClick={onClick}
-    className={`flex flex-1 items-center justify-center gap-2 border-b-4 px-2 py-3 text-sm font-bold transition-colors duration-200 md:flex-none md:justify-start md:border-b-0 md:border-l-4 md:px-4 md:py-3 ${
-      isActive
-        ? 'border-primary text-primary md:bg-white md:text-black'
-        : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-black md:border-transparent md:hover:border-black md:hover:bg-white'
-    }`}
-  >
-    {children}
-  </button>
-);
 
 const Dashboard: React.FC<{
   tasks: ManagementTaskProps[];
@@ -540,7 +479,7 @@ const ManagementPage: React.FC = () => {
                   onChange={(e) =>
                     setSelectedChapterForInventory(e.target.value)
                   }
-                  className="border border-black px-3 py-2 focus:border-primary focus:outline-none"
+                  className="border border-black px-3 py-2 focus:border-primary focus:outline-none dark:border-white"
                 >
                   {manageableChapters.map((chapter) => (
                     <option key={chapter.name} value={chapter.name}>
@@ -559,7 +498,7 @@ const ManagementPage: React.FC = () => {
                 }
               />
             ) : manageableChapters.length === 0 ? (
-              <div className="border-2 border-white bg-white p-8 text-center">
+              <div className="border-white bg-white p-8 text-center dark:border-black dark:bg-black md:border-2">
                 <h3 className="text-lg font-bold text-black">
                   No Manageable Chapters
                 </h3>
@@ -569,7 +508,7 @@ const ManagementPage: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="border-2 border-white bg-white p-8 text-center">
+              <div className="border-white bg-white p-8 text-center dark:border-black dark:bg-black md:border-2">
                 <h3 className="text-lg font-bold text-black">
                   No Chapter Selected
                 </h3>
@@ -593,23 +532,29 @@ const ManagementPage: React.FC = () => {
 
   return (
     <div className="py-12">
-      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-            Management
-          </h1>
-          <p className="text-red mt-2 max-w-2xl text-lg">
-            Oversee activists, chapters, and onboarding processes.
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Management Hub
+            </h1>
+          </div>
+          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            Manage your chapters, review applications, and oversee member
+            activities from one central location.
           </p>
         </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-4">
         <aside className="md:col-span-1">
-          <nav className="flex flex-row gap-4 border-b-2 border-black bg-white p-4 md:flex-col md:border-2">
+          <nav className="flex flex-row gap-4 border-b-2 border-black bg-white p-4 dark:border-white dark:bg-black md:flex-col md:md:border-2">
             <TabButton
               onClick={() => handleViewChange('dashboard')}
               isActive={view === 'dashboard'}
+              variant="management"
             >
               <HomeIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Priority Tasks</span>
@@ -617,6 +562,7 @@ const ManagementPage: React.FC = () => {
             <TabButton
               onClick={() => handleViewChange('pipeline')}
               isActive={view === 'pipeline'}
+              variant="management"
             >
               <ClipboardCheckIcon className="size-5 shrink-0" />
               <span className="hidden truncate md:inline">
@@ -626,6 +572,7 @@ const ManagementPage: React.FC = () => {
             <TabButton
               onClick={() => handleViewChange('members')}
               isActive={view === 'members'}
+              variant="management"
             >
               <UserGroupIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Member Directory</span>
@@ -634,6 +581,7 @@ const ManagementPage: React.FC = () => {
               <TabButton
                 onClick={() => handleViewChange('chapters')}
                 isActive={view === 'chapters'}
+                variant="management"
               >
                 <BuildingOfficeIcon className="size-5 shrink-0" />
                 <span className="hidden md:inline">Chapters</span>
@@ -642,6 +590,7 @@ const ManagementPage: React.FC = () => {
             <TabButton
               onClick={() => handleViewChange('inventory')}
               isActive={view === 'inventory'}
+              variant="management"
             >
               <ClipboardListIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Inventory</span>
@@ -649,6 +598,7 @@ const ManagementPage: React.FC = () => {
             <TabButton
               onClick={() => handleViewChange('onboarding-health')}
               isActive={view === 'onboarding-health'}
+              variant="management"
             >
               <ClipboardCheckIcon className="size-5 shrink-0" />
               <span className="hidden md:inline">Onboarding Health</span>

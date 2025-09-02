@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { can, Permission } from '@/config/permissions';
+import { can, Permission } from '@/config';
 import {
   CalendarIcon,
   ChatBubbleLeftRightIcon,
@@ -12,6 +12,7 @@ import { useAwardsActions } from '@/store/awards.store';
 import { useUsersActions } from '@/store/users.store';
 import { BadgeTemplate, OnboardingStatus, type User } from '@/types';
 
+import ApplicationAnswers from './ApplicationAnswers';
 import AwardBadgeModal from './AwardBadgeModal';
 import DeleteUserModal from './DeleteUserModal';
 import EditChaptersModal from './EditChaptersModal';
@@ -179,7 +180,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         {(user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL ||
           user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL) &&
           user.onboardingProgress?.onboardingCallScheduledAt && (
-            <section className="mb-8 border-2 border-black bg-white p-6">
+            <section className="mb-8 border-black bg-white p-6 md:border-2">
               <h2 className="mb-4 text-2xl font-bold text-black">
                 Onboarding Call Scheduled
               </h2>
@@ -208,7 +209,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   <ChatBubbleLeftRightIcon className="mt-0.5 size-5 text-neutral-500" />
                   <div>
                     <p className="font-semibold">Provided Contact Info:</p>
-                    <p className="rounded-nonemd border-2 border-black bg-neutral-100 p-2 font-mono text-sm">
+                    <p className="rounded-nonemd border-black bg-neutral-100 p-2 font-mono text-sm md:border-2">
                       {user.onboardingProgress.onboardingCallContactInfo ||
                         'Not provided'}
                     </p>
@@ -221,7 +222,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         {/* Revision Call Scheduled Info */}
         {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
           user.onboardingProgress?.revisionCallScheduledAt && (
-            <section className="mb-8 border-2 border-black bg-white p-6">
+            <section className="mb-8 border-black bg-white p-6 md:border-2">
               <h2 className="mb-4 text-2xl font-bold text-black">
                 Revision Call Scheduled
               </h2>
@@ -250,7 +251,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   <ChatBubbleLeftRightIcon className="mt-0.5 size-5 text-neutral-500" />
                   <div>
                     <p className="font-semibold">Provided Contact Info:</p>
-                    <p className="rounded-nonemd border-2 border-black bg-neutral-100 p-2 font-mono text-sm">
+                    <p className="rounded-nonemd border-black bg-neutral-100 p-2 font-mono text-sm md:border-2">
                       {user.onboardingProgress.revisionCallContactInfo ||
                         'Not provided'}
                     </p>
@@ -259,6 +260,15 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
               </div>
             </section>
           )}
+
+        {/* Application Answers - Show first for unapproved members */}
+        {(user.onboardingStatus ===
+          OnboardingStatus.PENDING_APPLICATION_REVIEW ||
+          user.onboardingStatus === OnboardingStatus.DENIED) && (
+          <div className="mb-8">
+            <ApplicationAnswers user={user} />
+          </div>
+        )}
 
         {/* Comprehensive Member Data Grid */}
         <div className="space-y-8">

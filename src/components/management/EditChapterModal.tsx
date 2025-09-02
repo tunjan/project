@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { InputField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { useChaptersActions } from '@/store';
 import { type Chapter } from '@/types';
 

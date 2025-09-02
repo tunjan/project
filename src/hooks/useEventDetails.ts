@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { can, Permission } from '@/config/permissions';
+import { can, Permission } from '@/config';
 import { useChapters } from '@/store';
 import { CubeEvent, ParticipantStatus, User } from '@/types';
 

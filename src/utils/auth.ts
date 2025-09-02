@@ -1,13 +1,5 @@
+import { ROLE_HIERARCHY } from '@/constants';
 import { AnnouncementScope, Role, User } from '@/types';
-
-export const ROLE_HIERARCHY: Record<Role, number> = {
-  [Role.APPLICANT]: 0,
-  [Role.ACTIVIST]: 1,
-  [Role.CHAPTER_ORGANISER]: 2,
-  [Role.REGIONAL_ORGANISER]: 3,
-  [Role.GLOBAL_ADMIN]: 4,
-  [Role.GODMODE]: 5,
-};
 
 export const getPostableScopes = (user: User): AnnouncementScope[] => {
   const userRole = user.role;

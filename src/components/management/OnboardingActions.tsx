@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui';
 import { useCurrentUser } from '@/store';
 import { useUsersActions } from '@/store/users.store';
 import { OnboardingStatus, type User } from '@/types';

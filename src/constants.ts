@@ -1,80 +1,66 @@
-import { BadgeTemplate } from './types';
+import { type BadgeTemplate, Role } from '@/types';
 
 /**
- * ============================================================================
- *                              BADGE TEMPLATES
- * ============================================================================
- * This is the master list of all available badges that can be awarded.
- * The `icon` property is a string key that maps to a component in `@/icons`.
+ * Role hierarchy for permission checking
+ * Higher numbers indicate higher privileges
+ */
+export const ROLE_HIERARCHY: Record<Role, number> = {
+  [Role.APPLICANT]: 0,
+  [Role.ACTIVIST]: 1,
+  [Role.CHAPTER_ORGANISER]: 2,
+  [Role.REGIONAL_ORGANISER]: 3,
+  [Role.GLOBAL_ADMIN]: 4,
+  [Role.GODMODE]: 5,
+};
+
+/**
+ * Available badge templates for awarding to users
  */
 export const BADGE_TEMPLATES: BadgeTemplate[] = [
   {
     name: 'First Blood',
-    description: 'Completed your first Cube of Truth. The journey begins.',
-    icon: 'StarIcon',
+    description: 'Attended your first cube event',
+    icon: 'HeartIcon',
   },
   {
     name: 'Nomad',
-    description:
-      'Attended events across 5+ cities. Your reach extends beyond borders.',
-    icon: 'GlobeAltIcon',
+    description: 'Attended cubes in 5 or more cities',
+    icon: 'MapPinIcon',
   },
   {
     name: 'Voice of Truth',
-    description: 'Logged 100+ conversations. Your words carry weight.',
-    icon: 'SparklesIcon',
+    description: 'Had 100+ conversations about veganism',
+    icon: 'ChatBubbleLeftRightIcon',
   },
   {
     name: 'Centurion',
-    description:
-      'Contributed 100+ hours of outreach. Time well spent in service.',
-    icon: 'TrophyIcon',
-  },
-  {
-    name: 'Unstoppable',
-    description: 'Attended 5 cubes in a single month. Relentless dedication.',
-    icon: 'FireIcon',
+    description: 'Completed 100+ hours of activism',
+    icon: 'ClockIcon',
   },
   {
     name: 'Veteran',
-    description:
-      'Attended 25+ cubes total. Experience earned through persistence.',
-    icon: 'UsersIcon',
+    description: 'Attended 25+ cube events',
+    icon: 'TrophyIcon',
   },
   {
     name: 'Chapter Anchor',
-    description:
-      'Recognized for exceptional contribution to your chapter. You are the foundation.',
-    icon: 'ShieldCheckIcon',
+    description: 'Dedicated chapter member with 10+ events and 50+ hours',
+    icon: 'BuildingOfficeIcon',
   },
   {
     name: 'Guide',
-    description:
-      'Provided outstanding guidance to new activists. Knowledge shared is power multiplied.',
-    icon: 'AcademicCapIcon',
+    description: 'Helped others with 50+ conversations and 5+ conversions',
+    icon: 'UserGroupIcon',
   },
   {
     name: 'Steel Resolve',
-    description:
-      'Maintained consistent attendance through challenging circumstances. Resilience defines you.',
+    description: 'High activity level with 15+ events attended',
     icon: 'ShieldCheckIcon',
-  },
-  {
-    name: 'Truth Seeker',
-    description:
-      'Demonstrated exceptional critical thinking and research skills in outreach.',
-    icon: 'AcademicCapIcon',
-  },
-  {
-    name: 'Bridge Builder',
-    description:
-      'Successfully connected with diverse audiences across cultural and social barriers.',
-    icon: 'UsersIcon',
   },
   {
     name: 'Tactical Mind',
     description:
-      'Showed strategic thinking in outreach planning and execution.',
-    icon: 'SparklesIcon',
+      'Strategic activist with 75+ conversations and 10+ conversions',
+    icon: 'LightBulbIcon',
   },
 ];

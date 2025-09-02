@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-import Avatar from '@/components/ui/Avatar';
-import Tag from '@/components/ui/Tag';
+import { Avatar } from '@/components/ui';
+import { Tag } from '@/components/ui';
 import { CheckCircleIcon, XCircleIcon } from '@/icons';
 import { useAccommodationsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type AccommodationRequest } from '@/types';
-import { safeFormatLocaleDate, safeParseDate } from '@/utils/date';
+import { formatDateSafe, safeParseDate } from '@/utils';
 
 interface RequestCardProps {
   request: AccommodationRequest;
@@ -55,11 +55,11 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
       month: 'short',
       day: 'numeric',
     };
-    return `${safeFormatLocaleDate(startDate, options)} - ${safeFormatLocaleDate(endDate, options)}`;
+    return `${formatDateSafe(startDate, (d, o) => d.toLocaleDateString(undefined, o), options)} - ${formatDateSafe(endDate, (d, o) => d.toLocaleDateString(undefined, o), options)}`;
   };
 
   return (
-    <div className="border-2 border-black bg-white p-4">
+    <div className="border-black bg-white p-4 md:border-2">
       <div className="mb-3 flex flex-col justify-between border-b-2 border-black pb-3 sm:flex-row sm:items-center">
         <div className="mb-2 sm:mb-0">
           <p className="text-sm text-neutral-600">
@@ -85,7 +85,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2">
           <p className="mb-1 text-sm font-semibold text-black">Message:</p>
-          <p className="border-2 border-black bg-white p-2 text-sm text-black">
+          <p className="border-black bg-white p-2 text-sm text-black md:border-2">
             {request.message}
           </p>
 
@@ -94,7 +94,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
               <p className="mb-1 text-sm font-semibold text-black">
                 Host's Reply:
               </p>
-              <p className="border-2 border-primary bg-primary/10 p-2 text-sm text-black">
+              <p className="border-primary bg-primary/10 p-2 text-sm text-black md:border-2">
                 {request.hostReply}
               </p>
             </div>
@@ -121,7 +121,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
             onChange={(e) => setReply(e.target.value)}
             placeholder="Optional: Reply with a message..."
             rows={2}
-            className="block w-full border-2 border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+            className="block w-full border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm md:border-2"
           />
           <div className="flex items-center space-x-2">
             <button

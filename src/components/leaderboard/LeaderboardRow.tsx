@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import Avatar from '@/components/ui/Avatar';
-import Tag from '@/components/ui/Tag';
+import { Avatar } from '@/components/ui';
+import { Tag } from '@/components/ui';
 import { TrophyIcon } from '@/icons';
 import { type User } from '@/types';
 
@@ -93,7 +93,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
 
   return (
     <li
-      className={`flex transform-gpu flex-col border-2 border-black hover:shadow-brutal ${
+      className={`sm:border-1 flex transform-gpu flex-col border-y border-black hover:shadow-brutal sm:border-black ${
         isCurrentUser ? 'bg-primary-lightest ring-2 ring-primary' : 'bg-white'
       }`}
     >
@@ -106,7 +106,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
           <Avatar
             src={user.profilePictureUrl}
             alt={user.name}
-            className="size-12 shrink-0 border-2 border-black object-cover"
+            className="size-12 shrink-0 border-black object-cover md:border-2"
           />
           <div className="ml-4 min-w-0 grow">
             <div className="flex items-center gap-2">

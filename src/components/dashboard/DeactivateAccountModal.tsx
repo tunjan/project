@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import LoadingSpinner from '@/components/LoadingSpinner';
-import Modal from '@/components/ui/Modal';
+import { LoadingSpinner } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { TrashIcon } from '@/icons';
 import { type User } from '@/types';
 

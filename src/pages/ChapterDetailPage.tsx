@@ -3,9 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
+import MemberCard from '@/components/chapters/MemberCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
+import StatCard from '@/components/chapters/StatCard';
 import InventoryDisplay from '@/components/charts/InventoryDisplay';
-import Avatar from '@/components/ui/Avatar';
 import {
   BuildingOfficeIcon,
   ChatBubbleLeftRightIcon,
@@ -26,44 +27,7 @@ import {
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
 import { AnnouncementScope, Role, type User } from '@/types';
-import { getChapterStats } from '@/utils/analytics';
-
-const StatCard: React.FC<{
-  icon: React.ReactNode;
-  title: string;
-  value: string | number;
-}> = ({ icon, title, value }) => (
-  <div className="h-full border-2 border-black bg-white p-4">
-    <div className="flex items-center">
-      <div className="text-primary">{icon}</div>
-      <p className="text-grey-600 ml-3 truncate text-sm font-semibold uppercase tracking-wider">
-        {title}
-      </p>
-    </div>
-    <p className="mt-2 text-4xl font-extrabold text-black">{value}</p>
-  </div>
-);
-
-const MemberCard: React.FC<{
-  member: User;
-  onMemberClick: (member: User) => void;
-}> = ({ member, onMemberClick }) => (
-  <button
-    type="button"
-    onClick={() => onMemberClick(member)}
-    className="flex w-full items-center space-x-3 p-2 text-left transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-black"
-  >
-    <Avatar
-      src={member.profilePictureUrl}
-      alt={member.name}
-      className="size-10 object-cover"
-    />
-    <div>
-      <p className="font-bold text-black">{member.name}</p>
-      <p className="text-sm text-neutral-500">{member.role}</p>
-    </div>
-  </button>
-);
+import { getChapterStats } from '@/utils';
 
 const ChapterDetailPage: React.FC = () => {
   const navigate = useNavigate();
@@ -214,7 +178,7 @@ const ChapterDetailPage: React.FC = () => {
           <p className="text-base font-semibold uppercase tracking-wide text-primary">
             {chapter.country}
           </p>
-          <h1 className="mt-1 text-4xl font-extrabold text-black md:text-5xl">
+          <h1 className="mt-1 text-2xl font-extrabold text-black sm:text-3xl md:text-4xl lg:text-5xl">
             {chapter.name} Chapter
           </h1>
 
@@ -232,9 +196,7 @@ const ChapterDetailPage: React.FC = () => {
         </div>
 
         <section className="mb-12">
-          <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-            Chapter Statistics
-          </h2>
+          <h2 className="h-section">Chapter Statistics</h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <StatCard
               icon={<UsersIcon className="size-6" />}
@@ -270,7 +232,7 @@ const ChapterDetailPage: React.FC = () => {
           <div className="space-y-6 lg:col-span-1">
             <div>
               <h2 className="mb-4 text-xl font-bold text-black">Organisers</h2>
-              <div className="border-2 border-black bg-white p-4">
+              <div className="border-black bg-white p-4 md:border-2">
                 {chapterOrganisers.length > 0 ? (
                   <div className="space-y-2 divide-y divide-neutral-200">
                     {chapterOrganisers.map((m) => (
@@ -290,7 +252,7 @@ const ChapterDetailPage: React.FC = () => {
             </div>
             <div>
               <h2 className="mb-4 text-xl font-bold text-black">Members</h2>
-              <div className="max-h-96 overflow-y-auto border-2 border-black bg-white p-4">
+              <div className="max-h-96 overflow-y-auto border-black bg-white p-4 md:border-2">
                 {regularMembers.length > 0 ? (
                   <div className="space-y-2 divide-y divide-neutral-200">
                     {regularMembers.map((m) => (
@@ -324,7 +286,7 @@ const ChapterDetailPage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="border-2 border-black bg-white p-8 text-center">
+              <div className="border-black bg-white p-8 text-center md:border-2">
                 <h3 className="text-lg font-bold text-black">
                   No chapter-specific announcements.
                 </h3>

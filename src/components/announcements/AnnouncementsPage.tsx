@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { can, Permission } from '@/config/permissions';
+import { can, Permission } from '@/config';
 import { MegaphoneIcon, PlusIcon } from '@/icons';
 import { useChapters } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
@@ -70,19 +70,27 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
 
   return (
     <div className="py-8 md:py-12">
-      <div className="mb-8 flex flex-col items-center justify-between gap-4 md:mb-12 md:flex-row">
-        <div className="text-center md:text-left">
-          <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-            Announcements
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600">
-            Stay up to date with the latest news and updates.
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Announcements
+            </h1>
+            <div className="flex shrink-0 items-center gap-4">
+              <MegaphoneIcon className="size-6 text-primary sm:size-12" />
+            </div>
+          </div>
+          <p className="max-w-3xl px-4 text-base leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            Stay up to date with the latest news, updates, and important
+            information from your chapters and the global movement.
           </p>
         </div>
         {can(currentUser, Permission.CREATE_ANNOUNCEMENT) && (
           <button
             onClick={onCreate}
-            className="flex shrink-0 items-center bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
+            className="flex w-full justify-center self-end bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover sm:w-fit"
           >
             <PlusIcon className="mr-2 size-5" />
             Create Announcement
@@ -90,16 +98,32 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         )}
       </div>
       {filteredAnnouncements.length > 0 ? (
-        <div className="space-y-6">
-          {filteredAnnouncements.map((announcement: Announcement) => (
-            <AnnouncementCard
-              key={announcement.id}
-              announcement={announcement}
-            />
-          ))}
-        </div>
+        <>
+          {/* Mobile: Single column with dividers */}
+          <div className="md:hidden">
+            {filteredAnnouncements.map((announcement: Announcement, index) => (
+              <div key={announcement.id}>
+                <AnnouncementCard announcement={announcement} />
+                {/* Add divider between cards, but not after the last one */}
+                {index < filteredAnnouncements.length - 1 && (
+                  <div className="border-b border-gray-300"></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: Original layout with spacing */}
+          <div className="hidden space-y-6 md:block">
+            {filteredAnnouncements.map((announcement: Announcement) => (
+              <AnnouncementCard
+                key={announcement.id}
+                announcement={announcement}
+              />
+            ))}
+          </div>
+        </>
       ) : (
-        <div className="border-2 border-black bg-white p-8 text-center">
+        <div className="border-y border-neutral-200 px-0 py-4 text-center dark:border-gray-600 sm:border-black sm:bg-white sm:p-8 dark:sm:border-white dark:sm:bg-black sm:md:border-2">
           <MegaphoneIcon className="mx-auto size-12 text-neutral-500" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No announcements yet.

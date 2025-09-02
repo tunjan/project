@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Modal from '@/components/ui/Modal';
+import { Modal } from '@/components/ui';
 import { ChevronDownIcon } from '@/icons';
 import { CubeEvent } from '@/types';
 

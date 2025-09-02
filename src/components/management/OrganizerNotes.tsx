@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import { TextAreaField } from '@/components/ui/Form';
+import { ConfirmationModal, TextAreaField } from '@/components/ui';
+import { ROLE_HIERARCHY } from '@/constants';
 import { PencilIcon, PlusIcon, TrashIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
 import { useUsersActions, useUsersState } from '@/store/users.store';
 import { type User } from '@/types';
-import { ROLE_HIERARCHY } from '@/utils/auth';
 
 interface OrganizerNotesProps {
   user: User;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { TextAreaField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { TextAreaField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import {
   CalendarIcon,
   CheckIcon,
@@ -58,7 +58,7 @@ const AnswerBlock: React.FC<{ question: string; answer: string }> = ({
 }) => (
   <div>
     <p className="mb-1 text-sm font-bold text-black">{question}</p>
-    <div className="border-2 border-black bg-white p-3">
+    <div className="border-black bg-white p-3 md:border-2">
       <p className="text-sm text-neutral-700">{answer}</p>
     </div>
   </div>
@@ -127,7 +127,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
           <img
             src={currentApplicant.profilePictureUrl}
             alt={currentApplicant.name}
-            className="size-24 shrink-0 border-2 border-black object-cover"
+            className="size-24 shrink-0 border-black object-cover md:border-2"
           />
           <div className="grid w-full grid-cols-1 gap-4">
             <ApplicantDetail
@@ -159,7 +159,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
             Application Answers
           </h3>
           {currentApplicant.onboardingAnswers ? (
-            <div className="space-y-4 border-2 border-black bg-neutral-100 p-4">
+            <div className="space-y-4 border-black bg-neutral-100 p-4 md:border-2">
               <AnswerBlock
                 question="Why did you go vegan?"
                 answer={currentApplicant.onboardingAnswers.veganReason}
@@ -178,7 +178,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
               />
             </div>
           ) : (
-            <div className="border-2 border-warning bg-warning/10 p-4">
+            <div className="border-warning bg-warning/10 p-4 md:border-2">
               <p className="font-bold text-yellow-700">
                 ⚠️ No Onboarding Answers
               </p>
@@ -209,7 +209,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
         <div className="grid grid-cols-2 gap-4 border-t-2 border-black pt-6">
           <button
             onClick={() => handleAction(OnboardingStatus.DENIED)}
-            className="flex w-full items-center justify-center gap-2 border-2 border-black bg-danger py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg"
+            className="flex w-full items-center justify-center gap-2 border-black bg-danger py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg md:border-2"
           >
             <XIcon className="size-5" />
             Reject
@@ -218,7 +218,7 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
             onClick={() =>
               handleAction(OnboardingStatus.PENDING_ONBOARDING_CALL)
             }
-            className="flex w-full items-center justify-center gap-2 border-2 border-black bg-success py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg"
+            className="flex w-full items-center justify-center gap-2 border-black bg-success py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg md:border-2"
           >
             <CheckIcon className="size-5" />
             Approve

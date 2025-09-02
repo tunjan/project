@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 import Challenges from '@/components/challenges/Challenges';
+import { TabButton } from '@/components/ui';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 import {
   ChatBubbleLeftRightIcon,
@@ -20,30 +21,13 @@ import ScatterPlot from './ScatterPlot';
 
 interface AnalyticsDashboardProps {}
 
-const TabButton: React.FC<{
-  onClick: () => void;
-  isActive: boolean;
-  children: React.ReactNode;
-}> = ({ onClick, isActive, children }) => (
-  <button
-    onClick={onClick}
-    className={`-mb-px w-full border-b-4 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors duration-200 ${
-      isActive
-        ? 'border-primary text-primary'
-        : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-black'
-    }`}
-  >
-    {children}
-  </button>
-);
-
 const StatCard: React.FC<{
   icon: React.ReactNode;
   title: string;
   value: string | number;
   tooltip?: string;
 }> = ({ icon, title, value, tooltip }) => (
-  <div className="group relative border-2 border-black bg-white p-4">
+  <div className="group relative border-black bg-white p-4 dark:border-white dark:bg-black md:border-2">
     <div className="flex items-center">
       <div className="text-primary">{icon}</div>
       <p className="ml-3 text-sm font-semibold uppercase tracking-wider text-neutral-600">
@@ -159,19 +143,25 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
 
   return (
     <div className="py-12">
-      <div className="mb-12">
-        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          Analytics: {viewTitle}
-        </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
-          Organization performance metrics and impact tracking. Use the filters
-          to drill down.
-        </p>
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Analytics: {viewTitle}
+            </h1>
+          </div>
+          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            Comprehensive insights into chapter performance, member engagement,
+            and outreach impact.
+          </p>
+        </div>
       </div>
 
       {/* Filters */}
       {/* Filters */}
-      <div className="mb-8 border-2 border-black bg-white p-6">
+      <div className="mb-8 p-2 sm:p-0">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label
@@ -185,7 +175,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedCountry}
               onChange={handleCountryChange}
               disabled={availableCountries.length <= 1}
-              className="rounded-nonenone w-full border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
+              className="rounded-nonenone w-full border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white dark:border-white dark:bg-black dark:text-white dark:disabled:bg-black sm:text-sm"
             >
               {availableCountries.map((country) => (
                 <option key={country} value={country}>
@@ -206,7 +196,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
               value={selectedChapter}
               onChange={handleChapterChange}
               disabled={chaptersInSelectedCountry.length === 0}
-              className="rounded-nonenone w-full border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
+              className="rounded-nonenone w-full border border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white dark:border-white dark:bg-black dark:text-white dark:disabled:bg-black sm:text-sm"
             >
               <option value="all">All Chapters</option>
               {chaptersInSelectedCountry.map((chapter) => (
@@ -220,22 +210,25 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="mb-8 flex border-b-2 border-black">
+      <div className="mb-8 flex border-b-2 border-black dark:border-white">
         <TabButton
           onClick={() => setActiveTab('overview')}
           isActive={activeTab === 'overview'}
+          variant="analytics"
         >
           Overview & Trends
         </TabButton>
         <TabButton
           onClick={() => setActiveTab('chapters')}
           isActive={activeTab === 'chapters'}
+          variant="analytics"
         >
           Chapter Analysis
         </TabButton>
         <TabButton
           onClick={() => setActiveTab('distributions')}
           isActive={activeTab === 'distributions'}
+          variant="analytics"
         >
           Performance Distributions
         </TabButton>

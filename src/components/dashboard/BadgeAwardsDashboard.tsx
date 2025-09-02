@@ -19,7 +19,7 @@ const BadgeAwardCard: React.FC<BadgeAwardCardProps> = ({
     Icons[award.badge.icon as keyof typeof Icons] || Icons.TrophyIcon;
 
   return (
-    <div className="border-2 border-black bg-white p-4">
+    <div className="border-black bg-white p-4 md:border-2">
       <div className="flex items-start space-x-4">
         <div className="flex size-12 shrink-0 items-center justify-center bg-black text-white">
           <IconComponent className="size-7" />

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Avatar from '@/components/ui/Avatar';
-import Tag from '@/components/ui/Tag';
+import { Avatar } from '@/components/ui';
+import { Tag } from '@/components/ui';
 import { useEvents } from '@/store';
 import { EventStatus, OnboardingStatus, type User } from '@/types';
 
@@ -33,7 +33,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
       }}
       role="button"
       tabIndex={0}
-      className="cursor-pointer border-2 border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal"
+      className="cursor-pointer border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal md:border-2"
     >
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center space-x-3">
@@ -87,7 +87,7 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
   users,
   onNavigate,
 }) => (
-  <div className="flex flex-col border-2 border-black bg-white">
+  <div className="flex flex-col border-black bg-white md:border-2">
     <h3 className="border-b-2 border-black bg-white p-3 text-sm font-extrabold uppercase tracking-wider text-black">
       {title}{' '}
       <span className="font-normal text-neutral-500">({users.length})</span>

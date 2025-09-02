@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { CubeEvent, TourDutyRole, User } from '@/types';
-import { getDatesBetween } from '@/utils/date';
+import { getDatesBetween } from '@/utils';
 
 interface EventRosterProps {
   event: CubeEvent;
@@ -44,7 +44,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
   if (!event.endDate || event.scope !== 'Regional') return null;
 
   return (
-    <div className="border-2 border-black bg-white">
+    <div className="border-black bg-white md:border-2">
       <div className="border-b-2 border-black p-6">
         <h2 className="text-xl font-bold text-black">Event Roster</h2>
         <p className="text-sm text-neutral-600">
@@ -57,7 +57,7 @@ const EventRoster: React.FC<EventRosterProps> = ({ event }) => {
           const dailyRoster = rosterByDay[dateString];
 
           return (
-            <div key={dateString} className="border-2 border-black p-4">
+            <div key={dateString} className="border-black p-4 md:border-2">
               <h3 className="font-bold">
                 {new Date(day).toLocaleDateString(undefined, {
                   weekday: 'long',

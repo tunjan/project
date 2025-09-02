@@ -30,7 +30,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   })();
 
   return (
-    <div className="card-brutal-hover hover-raise flex flex-col justify-between border-2 border-black bg-white transition-transform">
+    <div className="card-brutal-hover hover-raise card-base flex flex-col justify-between transition-transform">
       <div className="p-5">
         <div className="mb-3 flex items-center space-x-3">
           <div className="shrink-0 bg-black p-2">

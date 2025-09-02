@@ -1,10 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import Avatar from '@/components/ui/Avatar';
-import Tag from '@/components/ui/Tag';
-import { can, Permission } from '@/config/permissions';
-import { ChevronRightIcon } from '@/icons';
+import { Avatar } from '@/components/ui';
+import { Tag } from '@/components/ui';
+import { can, Permission } from '@/config';
+import {
+  AcademicCapIcon,
+  ChevronRightIcon,
+  GlobeAltIcon,
+  ShieldCheckIcon,
+  UserAddIcon,
+  UserGroupIcon,
+} from '@/icons';
 import { OnboardingStatus, Role, type User } from '@/types';
 
 interface LoginProps {
@@ -128,34 +135,40 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
   const Section: React.FC<{
     title: string;
     count: number;
-    openKey: 'organizers' | 'activists' | 'applicants'; // FIX: Updated type to match actual usage
+    openKey: 'organizers' | 'activists' | 'applicants';
+    icon: React.ReactNode;
     children: React.ReactNode;
-  }> = ({ title, count, openKey, children }) => {
+  }> = ({ title, count, openKey, icon, children }) => {
     const contentId = `section-${openKey}-content`;
 
     return (
-      <div className="border-2 border-black bg-white">
+      <div className="overflow-hidden border-black bg-white transition-all duration-300 dark:border-white dark:bg-black md:border-2">
         <button
           type="button"
           onClick={() => toggle(openKey)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-neutral-100"
+          className="flex w-full items-center justify-between px-6 py-4 text-left transition-all duration-200 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           aria-expanded={open[openKey]}
           aria-controls={contentId}
         >
-          <div>
-            <p className="font-extrabold">{title}</p>
-            <p className="text-xs text-neutral-600">
-              {count.toLocaleString()} profiles
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center bg-primary-lightest text-primary">
+              {icon}
+            </div>
+            <div>
+              <p className="text-lg font-bold text-black">{title}</p>
+              <p className="text-sm text-neutral-600">
+                {count.toLocaleString()} profile{count !== 1 ? 's' : ''}
+              </p>
+            </div>
           </div>
           <ChevronRightIcon
-            className={`size-4 transition-transform ${open[openKey] ? 'rotate-90' : ''}`}
+            className={`size-5 text-neutral-400 transition-transform duration-200 ${open[openKey] ? 'rotate-90' : ''}`}
           />
         </button>
         {open[openKey] && (
           <div
             id={contentId}
-            className="px-3 pb-3"
+            className="border-t border-neutral-200 bg-neutral-50 px-6 pb-6 pt-4"
             role="region"
             aria-label={`${title} profiles`}
           >
@@ -170,84 +183,122 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
     <button
       key={user.id}
       onClick={() => onLogin(user)}
-      className={`flex w-full items-center gap-4 border-2 border-black ${borderClassFor(user)} bg-white p-3 text-left transition-colors duration-200 hover:bg-neutral-100`}
+      className={`group flex w-full items-center gap-4 border-black md:border-2 ${borderClassFor(user)} bg-white p-4 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-white dark:bg-black`}
     >
       <Avatar
         src={user.profilePictureUrl}
         alt={user.name}
-        className="size-12 border-2 border-black object-cover"
+        className="size-14 border-black object-cover transition-transform duration-200 group-hover:scale-105 dark:border-white md:border-2"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-bold text-black">{user.name}</p>
-        {/* FIX: role text was white on white; use subtle grey */}
-        <p className="truncate text-sm text-neutral-600">{user.role}</p>
+        <p className="truncate text-lg font-bold text-black transition-colors duration-200 group-hover:text-primary">
+          {user.name}
+        </p>
+        <p className="truncate text-sm capitalize text-neutral-600">
+          {user.role.replace('_', ' ').toLowerCase()}
+        </p>
       </div>
-      <div className="flex shrink-0 flex-col items-end space-y-1">
+      <div className="flex shrink-0 flex-col items-end space-y-2">
         <ProgressTags user={user} />
       </div>
     </button>
   );
 
   return (
-    <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-2xl border-2 border-black bg-white p-6 md:p-8">
-        {/* Branding/Header */}
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight text-black">
-            Log In
+    <div className="min-h-screen bg-white py-8 dark:bg-black md:py-16">
+      <div className="mx-auto max-w-4xl">
+        {/* Hero Section */}
+        <div className="mb-12 text-center">
+          <h1 className="mb-4 text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl">
+            Welcome Back
           </h1>
-          <p className="mt-1 text-sm font-semibold text-neutral-700">
-            The central hub for activists
-          </p>
-          <p className="mt-2 text-xs text-neutral-600">
-            Select a profile to simulate logging in.
-          </p>
         </div>
 
-        <div className="space-y-3">
-          <Section
-            title="Administrators & Organizers"
-            count={groups.adminsAndOrganizers.length}
-            openKey="organizers"
-          >
-            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-              {groups.adminsAndOrganizers.map((u) => (
-                <UserButton key={u.id} user={u} />
-              ))}
-            </div>
-          </Section>
+        {/* Main Login Container */}
+        <div className="mx-auto max-w-3xl">
+          <div className="space-y-6">
+            <Section
+              title="Administrators & Organizers"
+              count={groups.adminsAndOrganizers.length}
+              openKey="organizers"
+              icon={<ShieldCheckIcon className="size-5" />}
+            >
+              <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
+                {groups.adminsAndOrganizers.length > 0 ? (
+                  groups.adminsAndOrganizers.map((u) => (
+                    <UserButton key={u.id} user={u} />
+                  ))
+                ) : (
+                  <div className="py-8 text-center text-neutral-500">
+                    <ShieldCheckIcon className="mx-auto mb-2 size-8 text-neutral-300" />
+                    <p>No administrators or organizers available</p>
+                  </div>
+                )}
+              </div>
+            </Section>
 
-          <Section
-            title="Activists"
-            count={groups.activists.length}
-            openKey="activists"
-          >
-            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-              {groups.activists.map((u) => (
-                <UserButton key={u.id} user={u} />
-              ))}
-            </div>
-          </Section>
+            <Section
+              title="Active Activists"
+              count={groups.activists.length}
+              openKey="activists"
+              icon={<UserGroupIcon className="size-5" />}
+            >
+              <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
+                {groups.activists.length > 0 ? (
+                  groups.activists.map((u) => (
+                    <UserButton key={u.id} user={u} />
+                  ))
+                ) : (
+                  <div className="py-8 text-center text-neutral-500">
+                    <UserGroupIcon className="mx-auto mb-2 size-8 text-neutral-300" />
+                    <p>No active activists available</p>
+                  </div>
+                )}
+              </div>
+            </Section>
 
-          <Section
-            title="Applicants / Onboarding"
-            count={groups.applicants.length}
-            openKey="applicants"
-          >
-            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-              {groups.applicants.map((u) => (
-                <UserButton key={u.id} user={u} />
-              ))}
+            <Section
+              title="Applicants & Onboarding"
+              count={groups.applicants.length}
+              openKey="applicants"
+              icon={<AcademicCapIcon className="size-5" />}
+            >
+              <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
+                {groups.applicants.length > 0 ? (
+                  groups.applicants.map((u) => (
+                    <UserButton key={u.id} user={u} />
+                  ))
+                ) : (
+                  <div className="py-8 text-center text-neutral-500">
+                    <AcademicCapIcon className="mx-auto mb-2 size-8 text-neutral-300" />
+                    <p>No applicants in onboarding</p>
+                  </div>
+                )}
+              </div>
+            </Section>
+          </div>
+
+          {/* Call to Action */}
+          <div className="mt-12 text-center">
+            <div className="border-black bg-white p-6 dark:border-white dark:bg-black md:border-2">
+              <GlobeAltIcon className="mx-auto mb-3 size-8 text-primary" />
+              <p className="mb-3 text-lg font-semibold text-black">
+                New to the movement?
+              </p>
+              <p className="mb-4 text-sm text-neutral-600">
+                Join thousands of activists making a difference in their
+                communities
+              </p>
+              <Link
+                to="/signup"
+                className="inline-flex items-center gap-2 bg-primary px-6 py-3 font-bold text-white transition-all duration-200 hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                <UserAddIcon className="size-4" />
+                Join the Movement
+              </Link>
             </div>
-          </Section>
+          </div>
         </div>
-
-        <p className="mt-8 text-center text-sm text-neutral-700">
-          New here?{' '}
-          <Link to="/signup" className="font-bold text-primary hover:underline">
-            Join the movement
-          </Link>
-        </p>
       </div>
     </div>
   );

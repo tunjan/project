@@ -65,7 +65,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
       </div>
       <div className="mx-auto max-w-4xl border border-black bg-white">
         <div className="border-b border-black p-8">
-          <h1 className="text-3xl font-extrabold text-black">
+          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
             Log Event Report
           </h1>
           <p className="text-red mt-2">
@@ -119,7 +119,7 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
                 {eventLogs.map((log: OutreachLog) => (
                   <div
                     key={log.id}
-                    className="border-2 border-black bg-white p-3"
+                    className="border-black bg-white p-3 md:border-2"
                   >
                     <p className="font-semibold">{log.outcome}</p>
                     {log.notes && (

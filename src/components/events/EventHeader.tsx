@@ -2,7 +2,7 @@ import React from 'react';
 
 import { CalendarIcon, ClockIcon, MapPinIcon } from '@/icons';
 import { CubeEvent, EventStatus } from '@/types';
-import { safeFormatDate, safeParseDate } from '@/utils/date';
+import { formatDateSafe, safeParseDate } from '@/utils';
 
 interface EventHeaderProps {
   event: CubeEvent;
@@ -12,20 +12,28 @@ const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
   const startDate = safeParseDate(event.startDate);
   const endDate = safeParseDate(event.endDate);
 
-  const formattedDate = safeFormatDate(startDate, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-  const formattedTime = safeFormatDate(startDate, {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  });
+  const formattedDate = formatDateSafe(
+    startDate,
+    (d, o) => new Intl.DateTimeFormat(undefined, o).format(d),
+    {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }
+  );
+  const formattedTime = formatDateSafe(
+    startDate,
+    (d, o) => new Intl.DateTimeFormat(undefined, o).format(d),
+    {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }
+  );
   const formattedDateRange =
     startDate && endDate
-      ? `${safeFormatDate(startDate, { dateStyle: 'full' })} to ${safeFormatDate(endDate, { dateStyle: 'full' })}`
+      ? `${formatDateSafe(startDate, (d, o) => new Intl.DateTimeFormat(undefined, o).format(d), { dateStyle: 'full' })} to ${formatDateSafe(endDate, (d, o) => new Intl.DateTimeFormat(undefined, o).format(d), { dateStyle: 'full' })}`
       : formattedDate;
 
   return (

@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
-import Modal from '@/components/ui/Modal';
+import { Modal } from '@/components/ui';
 import {
   CalendarIcon,
   CheckCircleIcon,
@@ -29,8 +29,8 @@ import {
   OnboardingStatus,
   ParticipantStatus,
 } from '@/types';
-import { getCityAttendanceForUser } from '@/utils/analytics';
-import { safeFormatLocaleDate } from '@/utils/date';
+import { getCityAttendanceForUser } from '@/utils';
+import { formatDateSafe } from '@/utils';
 
 interface TaskItemProps {
   icon: React.ReactNode;
@@ -52,7 +52,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   urgent = false,
 }) => (
   <div
-    className={`border-2 border-black bg-white p-4 ${urgent ? 'border-red bg-white' : ''}`}
+    className={`border-black bg-white p-4 md:border-2 ${urgent ? 'border-red bg-white' : ''}`}
   >
     <div className="flex justify-between">
       <div className="flex items-start gap-3">
@@ -307,15 +307,20 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="py-8 md:py-12">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          Welcome back, {currentUser.name.split(' ')[0]}!
-        </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
-          Here's what needs your attention today. Use the search bar in the
-          sidebar to find anything on the platform.
-        </p>
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Welcome back, {currentUser.name.split(' ')[0]}!
+            </h1>
+          </div>
+          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            Here's what needs your attention today. Use the search bar in the
+            sidebar to find anything on the platform.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -354,7 +359,7 @@ const DashboardPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setShowMasterclassModal(false)}
-                  className="border-2 border-black bg-white px-4 py-2 font-semibold"
+                  className="border-black bg-white px-4 py-2 font-semibold md:border-2"
                 >
                   Not yet
                 </button>
@@ -387,7 +392,7 @@ const DashboardPage: React.FC = () => {
                   id="organiser-select"
                   value={selectedOrganiserId}
                   onChange={(e) => setSelectedOrganiserId(e.target.value)}
-                  className="w-full border-2 border-black bg-white p-2"
+                  className="w-full border-black bg-white p-2 md:border-2"
                 >
                   <option value="">Select organiser…</option>
                   {allUsers
@@ -417,7 +422,7 @@ const DashboardPage: React.FC = () => {
                   type="datetime-local"
                   value={callWhen}
                   onChange={(e) => setCallWhen(e.target.value)}
-                  className="w-full border-2 border-black bg-white p-2"
+                  className="w-full border-black bg-white p-2 md:border-2"
                 />
               </div>
               <div>
@@ -432,7 +437,7 @@ const DashboardPage: React.FC = () => {
                   type="text"
                   value={contactInfo}
                   onChange={(e) => setContactInfo(e.target.value)}
-                  className="w-full border-2 border-black bg-white p-2"
+                  className="w-full border-black bg-white p-2 md:border-2"
                   placeholder="How can the organizer reach you?"
                   required
                 />
@@ -474,7 +479,7 @@ const DashboardPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setShowScheduleCallModal(false)}
-                  className="border-2 border-black bg-white px-4 py-2 font-semibold"
+                  className="border-black bg-white px-4 py-2 font-semibold md:border-2"
                 >
                   Cancel
                 </button>
@@ -499,7 +504,7 @@ const DashboardPage: React.FC = () => {
                 }}
                 role="button"
                 tabIndex={0}
-                className="cursor-pointer border-2 border-black bg-white p-6 transition-all hover:shadow-brutal"
+                className="cursor-pointer border-black bg-white p-6 transition-all hover:shadow-brutal md:border-2"
               >
                 <div className="flex items-start gap-4">
                   <CalendarIcon className="mt-1 size-6 shrink-0 text-primary" />
@@ -510,7 +515,9 @@ const DashboardPage: React.FC = () => {
                     <div className="mt-1 flex items-center gap-4 text-sm text-neutral-600">
                       <span className="flex items-center gap-1">
                         <ClockIcon className="size-4" />
-                        {safeFormatLocaleDate(nextEvent.startDate)}
+                        {formatDateSafe(nextEvent.startDate, (d, o) =>
+                          d.toLocaleDateString(undefined, o)
+                        )}
                       </span>
                       <span className="flex items-center gap-1">
                         <MapPinIcon className="size-4" />
@@ -521,7 +528,7 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="border-2 border-black bg-white p-6 text-center">
+              <div className="border-black bg-white p-6 text-center md:border-2">
                 <CalendarIcon className="mx-auto mb-3 size-12 text-neutral-500" />
                 <h3 className="mb-2 font-bold text-black">
                   No upcoming events
@@ -551,7 +558,7 @@ const DashboardPage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="border-2 border-black bg-white p-6 text-center">
+              <div className="border-black bg-white p-6 text-center md:border-2">
                 <CheckCircleIcon className="mx-auto mb-3 size-12 text-neutral-400" />
                 <h3 className="mb-2 font-bold text-black">All caught up!</h3>
                 <p className="text-sm text-neutral-600">
@@ -588,7 +595,7 @@ const DashboardPage: React.FC = () => {
                 {relevantAnnouncements.map((announcement) => (
                   <div
                     key={announcement.id}
-                    className="border-2 border-black bg-white p-4"
+                    className="border-black bg-white p-4 md:border-2"
                   >
                     <div className="flex items-start gap-3">
                       <MegaphoneIcon className="mt-0.5 size-5 shrink-0 text-primary" />
@@ -601,7 +608,9 @@ const DashboardPage: React.FC = () => {
                         </p>
                         <div className="mt-2 flex items-center justify-between">
                           <span className="text-xs text-neutral-500">
-                            {safeFormatLocaleDate(announcement.createdAt)}
+                            {formatDateSafe(announcement.createdAt, (d, o) =>
+                              d.toLocaleDateString(undefined, o)
+                            )}
                           </span>
                           <span className="rounded bg-white px-2 py-0.5 text-xs font-medium">
                             {announcement.scope}
@@ -619,7 +628,7 @@ const DashboardPage: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="border-2 border-black bg-white p-6 text-center">
+              <div className="border-black bg-white p-6 text-center md:border-2">
                 <MegaphoneIcon className="mx-auto mb-2 size-8 text-neutral-500" />
                 <p className="text-sm text-neutral-600">
                   No recent announcements
@@ -636,7 +645,7 @@ const DashboardPage: React.FC = () => {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/cubes')}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
+                className="w-full border-black bg-white p-4 text-left transition-all hover:shadow-brutal md:border-2"
               >
                 <div className="flex items-center gap-3">
                   <MapPinIcon className="size-5 text-primary" />
@@ -645,7 +654,7 @@ const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/outreach')}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
+                className="w-full border-black bg-white p-4 text-left transition-all hover:shadow-brutal md:border-2"
               >
                 <div className="flex items-center gap-3">
                   <PencilIcon className="size-5 text-primary" />
@@ -654,7 +663,7 @@ const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate(`/members/${currentUser.id}`)}
-                className="w-full border-2 border-black bg-white p-4 text-left transition-all hover:shadow-brutal"
+                className="w-full border-black bg-white p-4 text-left transition-all hover:shadow-brutal md:border-2"
               >
                 <div className="flex items-center gap-3">
                   <UsersIcon className="size-5 text-primary" />

@@ -41,7 +41,7 @@ const NotificationBell: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`relative border-2 p-2 transition-colors ${
+        className={`relative p-2 transition-colors md:border-2 ${
           isOpen
             ? 'border-black bg-white'
             : 'border-transparent hover:border-black focus:border-black'
@@ -50,7 +50,7 @@ const NotificationBell: React.FC = () => {
       >
         <BellIcon className="size-6" />
         {unreadCount > 0 && (
-          <div className="rounded-nonenone absolute right-1.5 top-1.5 size-2.5 border-2 border-white bg-primary"></div>
+          <div className="rounded-nonenone absolute right-1.5 top-1.5 size-2.5 border-white bg-primary md:border-2"></div>
         )}
       </button>
 

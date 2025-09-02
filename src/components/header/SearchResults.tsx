@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import LoadingSpinner from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui';
 import { type Chapter, type CubeEvent, type User } from '@/types';
 
 interface SearchResultsProps {
@@ -23,7 +23,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     users.length > 0 || chapters.length > 0 || events.length > 0;
 
   return (
-    <div className="rounded-nonenone absolute left-0 top-full mt-2 w-full border-2 border-black bg-white shadow-brutal">
+    <div className="rounded-nonenone absolute left-0 top-full mt-2 w-full border-black bg-white shadow-brutal md:border-2">
       <div className="max-h-96 overflow-y-auto p-4">
         {loading && <LoadingSpinner />}
         {!loading && !hasResults && (

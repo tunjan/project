@@ -47,7 +47,7 @@ The application is built with a modern, brutalist design aesthetic and features 
 - **Routing:** [React Router](https://reactrouter.com/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/) with a custom "Modern Brutalism" design system
 - **Forms:** [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/) for validation
-- **Charts & Maps:** [Recharts](https://recharts.org/) for analytics & [Leaflet](https://leafletjs.com/) for maps
+- **Charts & Maps:** [Recharts](https://recharts.org/) for analytics & [Leaflet](https://leafletjs.com/) with OpenStreetMap for maps
 - **UI Components:** [FullCalendar](https://fullcalendar.io/), [Sonner](https://sonner.emilkowal.ski/) (for toasts)
 - **Testing:** [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/)
 - **Linting & Formatting:** [ESLint](https://eslint.org/) & [Prettier](https://prettier.io/)
@@ -78,7 +78,7 @@ Follow these instructions to set up and run the project locally.
     ```
 
 3.  **Set up environment variables:**
-    - There are no required environment variables to run the application locally as it uses mock data. If you add services that require API keys, create a `.env.local` file.
+    - Maps use free OpenStreetMap tiles via Leaflet - no API keys required!
 
 4.  **Generate mock data:**
     - The application relies on a generated TypeScript file for all its data. Run the TypeScript script to create it.

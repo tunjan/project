@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import { InputField } from '@/components/ui/Form';
+import { InputField } from '@/components/ui';
 import { type Chapter, Role, type User } from '@/types';
 
 const CreateChapterForm: React.FC<{
@@ -48,7 +48,7 @@ const CreateChapterForm: React.FC<{
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 border-2 border-black bg-white p-6"
+      className="space-y-4 border-black bg-white p-6 md:border-2"
     >
       <InputField
         label="Chapter Name"

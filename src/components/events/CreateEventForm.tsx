@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, SelectField } from '@/components/ui/Form';
+import { InputField, SelectField } from '@/components/ui';
 import { useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Chapter, Role } from '@/types';
@@ -135,9 +135,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
 
   return (
     <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-2xl border-2 border-black bg-white">
+      <div className="mx-auto max-w-2xl border-black bg-white md:border-2">
         <div className="border-b-2 border-black p-8">
-          <h1 className="text-3xl font-extrabold text-black">
+          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
             Create New Event
           </h1>
           <p className="text-red mt-2">

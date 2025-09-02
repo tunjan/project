@@ -131,7 +131,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
 
   if (userOutreachData.userLogs.length === 0) {
     return (
-      <div className="rounded-none border-2 border-black bg-white p-8 text-center shadow-brutal">
+      <div className="rounded-none border-black bg-white p-8 text-center shadow-brutal md:border-2">
         <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
           <ChatBubbleLeftRightIcon className="size-8 text-neutral-400" />
         </div>
@@ -149,7 +149,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
       <div>
         <h3 className="mb-4 text-xl font-bold text-black">Outreach Overview</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="text-center">
               <p className="text-2xl font-bold text-black">
                 {userOutreachData.totalConversations}
@@ -158,7 +158,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="text-center">
               <p className="text-2xl font-bold text-success">
                 {userOutreachData.successRate}%
@@ -167,7 +167,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="text-center">
               <p className="text-2xl font-bold text-primary">
                 {userOutreachData.eventsWithLogs}
@@ -176,7 +176,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="text-center">
               <p className="text-2xl font-bold text-warning">
                 {userOutreachData.recentLogs.length}
@@ -188,7 +188,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
       </div>
 
       {/* Outcomes Breakdown */}
-      <div className="rounded-none border-2 border-black bg-white p-6">
+      <div className="rounded-none border-black bg-white p-6 md:border-2">
         <h4 className="mb-4 text-lg font-bold text-black">
           Conversation Outcomes Breakdown
         </h4>
@@ -226,7 +226,7 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
             ({ event, logs, totalConversations, outcomes }) => (
               <div
                 key={event.id}
-                className="rounded-none border-2 border-black bg-white p-6"
+                className="rounded-none border-black bg-white p-6 md:border-2"
               >
                 <div className="mb-4">
                   <h5 className="text-lg font-bold text-black">{event.name}</h5>

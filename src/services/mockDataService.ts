@@ -13,7 +13,7 @@ import {
   type User,
 } from '@/types';
 
-import { generateAvatarUrl } from '../utils/user';
+import { getAvatarUrl } from '../utils/user';
 
 export interface MockDataResponse {
   chapters: Chapter[];
@@ -129,7 +129,7 @@ class MockDataService {
           role: Role.ACTIVIST,
           chapters: ['Fallback Chapter'],
           onboardingStatus: OnboardingStatus.CONFIRMED,
-          profilePictureUrl: generateAvatarUrl('fallback'),
+          profilePictureUrl: getAvatarUrl('fallback'),
           joinDate: new Date('2023-01-01'),
           lastLogin: new Date(),
           stats: {

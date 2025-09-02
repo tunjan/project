@@ -5,6 +5,8 @@ import {
   type User,
 } from '@/types';
 
+import { calculateAllMetrics } from './metrics';
+
 export interface UserLeaderboardEntry {
   user: User;
   value: number;
@@ -97,40 +99,32 @@ const getStartDate = (period: 'week' | 'month' | 'year'): Date => {
   return date;
 };
 
-const getConfirmedUsers = (users: User[]): User[] => {
-  return users.filter((u) => u.onboardingStatus === 'Confirmed');
-};
-
 export const calculateLeaderboards = (
   users: User[],
   chapters: Chapter[],
   outreachLogs: OutreachLog[],
   events: CubeEvent[]
 ): LeaderboardData => {
-  const confirmedUsers = getConfirmedUsers(users);
+  const metrics = calculateAllMetrics(users, events, chapters, outreachLogs);
+  const confirmedUsers = metrics.users.confirmed;
   const userMap = new Map<string, User>(confirmedUsers.map((u) => [u.id, u]));
   const chapterMap = new Map<string, Chapter>(chapters.map((c) => [c.name, c]));
 
-  // Performance optimization: Create chapter-to-members map once
-  const chapterToMembersMap = new Map<string, User[]>();
-  chapters.forEach((chapter) => chapterToMembersMap.set(chapter.name, []));
-  confirmedUsers.forEach((user) => {
-    user.chapters.forEach((chapterName) => {
-      if (chapterToMembersMap.has(chapterName)) {
-        chapterToMembersMap.get(chapterName)!.push(user);
-      }
-    });
-  });
+  // Use pre-computed chapter-to-members map from metrics
+  const chapterToMembersMap = metrics.users.byChapter;
 
   const eventToCityMap = new Map<string, string>();
   events.forEach((e) => eventToCityMap.set(e.id, e.city));
 
   // --- USER LEADERBOARDS ---
   const userHoursAllTime = [...confirmedUsers]
-    .map((user) => ({
-      user,
-      value: Math.round(user.stats.totalHours),
-    }))
+    .map((user) => {
+      const userStats = metrics.users.stats.get(user.id);
+      return {
+        user,
+        value: Math.round(userStats?.totalHours || 0),
+      };
+    })
     .sort((a, b) => b.value - a.value)
     .slice(0, 50);
 

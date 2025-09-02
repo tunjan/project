@@ -11,6 +11,8 @@ import {
 } from '@/icons';
 import { OnboardingStatus, type User } from '@/types';
 
+import ApplicationAnswers from './ApplicationAnswers';
+
 interface OnboardingProgressDetailsProps {
   user: User;
 }
@@ -99,7 +101,7 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
         </h3>
 
         {/* Current Status Overview */}
-        <div className="mb-6 rounded-none border-2 border-black bg-white p-6">
+        <div className="mb-6 rounded-none border-black bg-white p-6 md:border-2">
           <div className="mb-4 flex items-center gap-3">
             {getStatusIcon(user.onboardingStatus, true)}
             <div>
@@ -140,7 +142,7 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
         </div>
 
         {/* Onboarding Journey */}
-        <div className="rounded-none border-2 border-black bg-white p-6">
+        <div className="rounded-none border-black bg-white p-6 md:border-2">
           <h4 className="mb-4 text-lg font-bold text-black">
             Onboarding Journey
           </h4>
@@ -195,7 +197,7 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
 
         {/* Onboarding Details */}
         {user.onboardingProgress && (
-          <div className="rounded-none border-2 border-black bg-white p-6">
+          <div className="rounded-none border-black bg-white p-6 md:border-2">
             <h4 className="mb-4 text-lg font-bold text-black">
               Onboarding Details
             </h4>
@@ -305,48 +307,17 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
           </div>
         )}
 
-        {/* Onboarding Answers */}
-        {user.onboardingAnswers && (
-          <div className="rounded-none border-2 border-black bg-white p-6">
-            <h4 className="mb-4 text-lg font-bold text-black">
-              Application Answers
-            </h4>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Why are you vegan?
-                </p>
-                <p className="text-black">
-                  {user.onboardingAnswers.veganReason}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Abolitionist Alignment
-                </p>
-                <p className="text-black">
-                  {user.onboardingAnswers.abolitionistAlignment ? 'Yes' : 'No'}
-                </p>
-              </div>
-
-              {user.onboardingAnswers.customAnswer && (
-                <div>
-                  <p className="text-sm font-bold text-neutral-600">
-                    Additional Information
-                  </p>
-                  <p className="text-black">
-                    {user.onboardingAnswers.customAnswer}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Application Answers - Only show for approved members */}
+        {user.onboardingAnswers &&
+          user.onboardingStatus !==
+            OnboardingStatus.PENDING_APPLICATION_REVIEW &&
+          user.onboardingStatus !== OnboardingStatus.DENIED && (
+            <ApplicationAnswers user={user} />
+          )}
 
         {/* Join Date */}
         {user.joinDate && (
-          <div className="rounded-none border-2 border-black bg-white p-6">
+          <div className="rounded-none border-black bg-white p-6 md:border-2">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-none bg-success/10">
                 <CalendarIcon className="size-5 text-success" />

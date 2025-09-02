@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { InputField, SelectField, TextAreaField } from '@/components/ui/Form';
+import { InputField, SelectField, TextAreaField } from '@/components/ui';
 import { useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { AnnouncementScope, Chapter, Role } from '@/types';
-import { getPostableScopes } from '@/utils/auth';
+import { getPostableScopes } from '@/utils';
 
 interface CreateAnnouncementFormProps {
   onCreate: (data: {
@@ -80,9 +80,9 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
 
   return (
     <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-3xl border-2 border-black bg-white">
-        <div className="border-b-2 border-black p-8">
-          <h1 className="text-3xl font-extrabold text-black">
+      <div className="mx-auto max-w-3xl border-y border-neutral-200 sm:border-black sm:bg-white sm:md:border-2">
+        <div className="border-b border-neutral-200 p-4 sm:border-b-2 sm:border-black sm:p-8">
+          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
             Create Announcement
           </h1>
           <p className="text-grey-600 mt-2">
@@ -90,7 +90,7 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
             scope.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-6 p-8">
+        <form onSubmit={handleSubmit} className="space-y-6 p-4 sm:p-8">
           <InputField
             label="Title"
             id="title"

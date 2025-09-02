@@ -55,16 +55,16 @@ const CommandPalette: React.FC = () => {
             placeholder="Search for activists, chapters, events..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="rounded-nonenone w-full border-2 border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder:text-neutral-500 focus:border-black focus:outline-none"
+            className="rounded-nonenone w-full border-black bg-white py-3 pl-12 pr-4 text-base font-bold text-black placeholder:text-neutral-500 focus:border-black focus:outline-none md:border-2"
           />
         </div>
 
         {/* Search Results */}
         {query && (
-          <div className="mt-2 max-h-96 overflow-y-auto border-2 border-black bg-white">
+          <div className="mt-2 max-h-96 overflow-y-auto border-black bg-white md:border-2">
             {loading && (
               <div className="p-4 text-center">
-                <div className="rounded-nonefull inline-block size-6 border-2 border-black border-t-transparent"></div>
+                <div className="rounded-nonefull inline-block size-6 border-black border-t-transparent md:border-2"></div>
                 <p className="mt-2 text-sm text-neutral-500">Searching...</p>
               </div>
             )}

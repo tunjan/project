@@ -25,7 +25,7 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
       <div className="">
         {/* Manual Verification */}
         {canManuallyVerify && onManualVerify && (
-          <div className="border-2 border-warning bg-warning/10 p-4">
+          <div className="border-warning bg-warning/10 p-4 md:border-2">
             <h3 className="text-warning-700 mb-2 flex items-center gap-2 text-lg font-bold">
               <ExclamationTriangleIcon className="size-5" />
               Manual Verification Override
@@ -46,7 +46,7 @@ const UserDangerZone: React.FC<UserDangerZoneProps> = ({
 
         {/* Delete User */}
         {canDeleteUser && (
-          <div className="border-2 border-danger bg-danger/10 p-4">
+          <div className="border-danger bg-danger/10 p-4 md:border-2">
             <h3 className="text-danger-700 mb-2 flex items-center gap-2 text-lg font-bold">
               <TrashIcon className="size-5" />
               Delete User Account

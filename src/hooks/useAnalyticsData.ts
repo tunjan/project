@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { ROLE_HIERARCHY } from '@/constants';
 import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Role } from '@/types';
@@ -16,8 +17,7 @@ import {
   getMemberGrowth,
   getTopActivistsByHours,
   getTotalMembersByMonth,
-} from '@/utils/analytics';
-import { ROLE_HIERARCHY } from '@/utils/auth';
+} from '@/utils';
 
 export function useAnalyticsData() {
   const currentUser = useCurrentUser();

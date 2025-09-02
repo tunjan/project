@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { LogoutIcon } from '@/icons';
 import { useAuthActions, useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus } from '@/types';
@@ -34,13 +34,13 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
       <Link
         to={profileLink}
         onClick={onLinkClick}
-        className="block border-2 border-transparent p-1 transition-colors hover:border-black focus:border-black"
+        className="block border-transparent p-1 transition-colors hover:border-black focus:border-black md:border-2"
         aria-label="View your profile"
       >
         <Avatar
           src={currentUser.profilePictureUrl}
           alt="User profile"
-          className="size-10 border-2 border-black object-cover"
+          className="size-10 border-black object-cover md:border-2"
         />
       </Link>
     );
@@ -53,12 +53,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
         <Link
           to={profileLink}
           onClick={onLinkClick}
-          className="rounded-nonenone flex items-center space-x-3 border-2 border-transparent p-3 transition-colors hover:border-black focus:border-black"
+          className="rounded-nonenone flex items-center space-x-3 border-transparent p-3 transition-colors hover:border-black focus:border-black md:border-2"
         >
           <Avatar
             src={currentUser.profilePictureUrl}
             alt="User profile"
-            className="rounded-nonenone size-10 border-2 border-black object-cover"
+            className="rounded-nonenone size-10 border-black object-cover md:border-2"
           />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-black">
@@ -72,7 +72,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
       </div>
       <button
         onClick={handleLogout}
-        className="rounded-nonenone flex w-full items-center justify-center space-x-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+        className="rounded-nonenone flex w-full items-center justify-center space-x-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white md:border-2"
       >
         <LogoutIcon className="size-4" />
         <span>Logout</span>

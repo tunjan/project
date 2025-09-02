@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { useEvents, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { User } from '@/types';
-import { isUserInactive } from '@/utils/user';
+import { isUserInactive } from '@/utils';
 
 const AtRiskMembersSnapshot: React.FC = () => {
   const currentUser = useCurrentUser();

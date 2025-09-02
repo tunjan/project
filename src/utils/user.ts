@@ -12,16 +12,16 @@ export const INACTIVITY_PERIOD_MONTHS = 3;
  */
 export const getUserRoleDisplay = (user: User): string => {
   // Map role labels to nicer variants
-  const roleLabel = (() => {
-    switch (user.role) {
-      case Role.ACTIVIST:
-        return 'Activist';
-      case Role.GODMODE:
-        return 'Administrator';
-      default:
-        return user.role; // Already human-readable for other roles
-    }
-  })();
+  const roleLabelMap: Record<Role, string> = {
+    [Role.ACTIVIST]: 'Activist',
+    [Role.APPLICANT]: 'Applicant',
+    [Role.GODMODE]: 'Administrator',
+    [Role.CHAPTER_ORGANISER]: 'Chapter Organiser',
+    [Role.REGIONAL_ORGANISER]: 'Regional Organiser',
+    [Role.GLOBAL_ADMIN]: 'Global Admin',
+  };
+
+  const roleLabel = roleLabelMap[user.role] || user.role;
 
   // Regional organiser emphasises country
   if (user.role === Role.REGIONAL_ORGANISER && user.managedCountry) {
@@ -141,24 +141,10 @@ export const createUserAttendanceMap = (
  * @param size - Size of the avatar (default: 150)
  * @returns Profile picture URL
  */
-export function generateAvatarUrl(seed: string, size: number = 1000): string {
+export function getAvatarUrl(seed: string, size: number = 150): string {
   // Use DiceBear as the primary service - it's reliable and has no CORS issues
   // Encode seed to avoid accidental URL injection.
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}&size=${size}`;
-}
-
-/**
- * Generates a fallback avatar URL if the primary service fails
- * @param seed - Unique identifier for the avatar
- * @param size - Size of the avatar (default: 150)
- * @returns Fallback avatar URL
- */
-export function generateFallbackAvatarUrl(
-  seed: string,
-  size: number = 150
-): string {
-  // Use DiceBear as a reliable fallback (no CORS issues)
-  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&size=${size}`;
 }
 
 /**
@@ -168,5 +154,26 @@ export function generateFallbackAvatarUrl(
  */
 export function generateRandomAvatarUrl(size: number = 150): string {
   const timestamp = Date.now();
-  return generateAvatarUrl(`user_${timestamp}`, size);
+  return getAvatarUrl(`user_${timestamp}`, size);
 }
+
+/**
+ * Filters users to return only those with 'Confirmed' onboarding status
+ * @param users - Array of users to filter
+ * @returns Array of confirmed users only
+ */
+export const getConfirmedUsers = (users: User[]): User[] =>
+  users.filter((u) => u.onboardingStatus === 'Confirmed');
+
+/**
+ * Generate initials from a name (e.g. "Courtney Gusikowski" -> "CG")
+ */
+
+/**
+ * Generates a consistent avatar URL for a user based on their ID.
+ * Uses a placeholder service to generate consistent avatars.
+ */
+export const generateAvatarUrl = (userId: string): string => {
+  // Use a placeholder service that generates consistent avatars based on seed
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+};

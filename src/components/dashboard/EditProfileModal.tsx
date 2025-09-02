@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import Avatar from '@/components/ui/Avatar';
-import { InputField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { Avatar } from '@/components/ui';
+import { InputField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { UsersIcon } from '@/icons';
 import { type User } from '@/types';
 
@@ -69,14 +69,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               alt="Profile avatar"
               className="size-20 object-cover"
               editable={true}
-              onImageChange={(newImageUrl) => {
+              onImageChange={(newImageUrl: string) => {
                 setProfilePictureUrl(newImageUrl);
               }}
             />
             <button
               type="button"
               onClick={handleGenerateAvatar}
-              className="flex items-center space-x-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+              className="flex items-center space-x-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white md:border-2"
             >
               <UsersIcon className="size-4" />
               <span>New Avatar</span>
@@ -135,7 +135,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   setHostingCapacity(Number(e.target.value))
                 }
                 min="1"
-                className="block border-2 border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+                className="block border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm md:border-2"
               />
             </div>
           )}

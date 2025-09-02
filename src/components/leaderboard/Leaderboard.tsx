@@ -2,7 +2,7 @@ import React from 'react';
 
 import { UsersIcon } from '@/icons';
 import { type User } from '@/types';
-import { calculateRanks, type UserLeaderboardEntry } from '@/utils/leaderboard';
+import { calculateRanks, type UserLeaderboardEntry } from '@/utils';
 
 import LeaderboardRow from './LeaderboardRow';
 
@@ -34,13 +34,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   );
 
   return (
-    <div className="flex h-full flex-col border-2 border-black bg-white">
-      <h2 className="border-b-2 border-black p-4 text-xl font-bold text-black">
+    <div className="flex h-full flex-col border-y border-neutral-200 sm:border-black sm:bg-white sm:md:border-2">
+      <h2 className="border-b border-neutral-200 p-4 text-xl font-bold text-black sm:border-b-2 sm:border-black">
         {title}
       </h2>
       <div className="grow overflow-y-auto">
         {rankedData.length > 0 ? (
-          <ul className="space-y-3 p-4">
+          <ul className="space-y-0">
             {topEntries.map((entry) => (
               <LeaderboardRow
                 key={entry.user.id}

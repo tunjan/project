@@ -5,6 +5,7 @@ import OutreachTally from '@/components/outreach/OutreachTally';
 import PersonalPerformance from '@/components/outreach/PersonalPerformance';
 // Import the new components
 import QuickLogForm from '@/components/outreach/QuickLogForm';
+import { ROLE_HIERARCHY } from '@/constants';
 import {
   useEvents,
   useOutreachActions,
@@ -14,14 +15,13 @@ import {
 } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus, Role } from '@/types';
-import { ROLE_HIERARCHY } from '@/utils/auth';
 
 // Enhanced toggle with better visual hierarchy and mobile optimization
 const OutreachViewToggle: React.FC<{
   view: 'personal' | 'team';
   onViewChange: (view: 'personal' | 'team') => void;
 }> = ({ view, onViewChange }) => (
-  <div className="inline-flex overflow-hidden rounded-none border-2 border-black bg-white">
+  <div className="inline-flex overflow-hidden rounded-none border-black bg-white dark:border-white dark:bg-black md:border-2">
     <button
       onClick={() => onViewChange('personal')}
       className={`px-6 py-3 text-sm font-bold ${
@@ -122,18 +122,18 @@ const OutreachLogPage: React.FC = () => {
   if (!currentUser) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-neutral-50 to-white">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <div className="min-h-screen bg-white dark:bg-black">
+      <div className="mx-auto max-w-7xl py-8 lg:px-8 lg:py-12">
         {/* Enhanced Header Section */}
         <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="h-12 w-2 bg-primary"></div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-black sm:text-5xl lg:text-6xl">
+              <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
                 {title}
               </h1>
             </div>
-            <p className="max-w-3xl text-lg leading-relaxed text-neutral-600 sm:text-xl">
+            <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
               Track your impact and contribute to global statistics by logging
               meaningful conversations. Every interaction counts towards
               building a more compassionate world.

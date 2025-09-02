@@ -2,7 +2,10 @@
 // should be performed on the backend. The client should fetch pre-computed data to ensure performance and scalability.
 
 import { type Chapter, type CubeEvent, OutreachLog, type User } from '@/types';
-import { safeParseDate } from '@/utils/date';
+import { safeParseDate } from '@/utils';
+import { getConfirmedUsers } from '@/utils';
+
+import { calculateAllMetrics } from './metrics';
 
 export interface ChapterStats {
   name: string;
@@ -35,85 +38,14 @@ export interface MonthlyTrend {
   count: number;
 }
 
-const getConfirmedUsers = (users: User[]): User[] =>
-  users.filter((u) => u.onboardingStatus === 'Confirmed');
-
-// Helper function to calculate chapter metrics (hours and conversations)
-const calculateChapterMetrics = (
-  users: User[],
-  events: CubeEvent[],
-  chapters: Chapter[],
-  outreachLogs: OutreachLog[]
-) => {
-  const confirmedUsers = getConfirmedUsers(users);
-  return chapters.map((chapter) => {
-    const chapterUsers = confirmedUsers.filter((u) =>
-      u.chapters.includes(chapter.name)
-    );
-    const chapterEvents = events.filter((e) => e.city === chapter.name);
-    const chapterEventIds = new Set(chapterEvents.map((e) => e.id));
-
-    const totalHours = chapterEvents.reduce((sum, event) => {
-      if (!event.report) return sum;
-
-      // Find members of the current chapter who attended this event
-      const attendedChapterMembers = chapterUsers.filter(
-        (user) => event.report?.attendance[user.id] === 'Attended'
-      );
-
-      // Add hours for each attending member from this chapter
-      return sum + attendedChapterMembers.length * event.report.hours;
-    }, 0);
-
-    const totalConversations = outreachLogs.filter((log) =>
-      chapterEventIds.has(log.eventId)
-    ).length;
-
-    return {
-      chapter,
-      chapterUsers,
-      chapterEvents,
-      totalHours: Math.round(totalHours),
-      totalConversations,
-    };
-  });
-};
-
 export const getGlobalStats = (
   users: User[],
   events: CubeEvent[],
   chapters: Chapter[],
   outreachLogs: OutreachLog[]
 ): GlobalStats => {
-  const confirmedUsers = getConfirmedUsers(users);
-  // Call calculateChapterMetrics directly to avoid redundant computation
-  const chapterMetrics = calculateChapterMetrics(
-    users,
-    events,
-    chapters,
-    outreachLogs
-  );
-
-  const totalHours = chapterMetrics.reduce(
-    (sum, metric) => sum + metric.totalHours,
-    0
-  );
-  const totalConversations = chapterMetrics.reduce(
-    (sum, metric) => sum + metric.totalConversations,
-    0
-  );
-
-  const conversationsPerHour =
-    totalHours > 0 ? totalConversations / totalHours : 0;
-
-  return {
-    totalMembers: confirmedUsers.length,
-    totalHours: Math.round(totalHours),
-    totalConversations,
-    totalEvents: events.length,
-    chapterCount: chapters.length,
-    conversationsPerHour,
-  };
+  const metrics = calculateAllMetrics(users, events, chapters, outreachLogs);
+  return metrics.global;
 };
 
 export const getChapterStats = (
@@ -122,27 +54,8 @@ export const getChapterStats = (
   chapters: Chapter[],
   outreachLogs: OutreachLog[]
 ): ChapterStats[] => {
-  const metrics = calculateChapterMetrics(
-    users,
-    events,
-    chapters,
-    outreachLogs
-  );
-
-  return metrics.map((metric) => {
-    const conversationsPerHour =
-      metric.totalHours > 0 ? metric.totalConversations / metric.totalHours : 0;
-
-    return {
-      name: metric.chapter.name,
-      country: metric.chapter.country,
-      memberCount: metric.chapterUsers.length,
-      totalHours: metric.totalHours,
-      totalConversations: metric.totalConversations,
-      eventsHeld: metric.chapterEvents.length,
-      conversationsPerHour,
-    };
-  });
+  const metrics = calculateAllMetrics(users, events, chapters, outreachLogs);
+  return Array.from(metrics.chapters.stats.values());
 };
 
 // NEW: Calculates total hours and conversations per chapter for the scatter plot
@@ -152,18 +65,8 @@ export const getChapterOutreachStats = (
   chapters: Chapter[],
   outreachLogs: OutreachLog[]
 ): ChapterOutreachStats[] => {
-  const metrics = calculateChapterMetrics(
-    users,
-    events,
-    chapters,
-    outreachLogs
-  );
-
-  return metrics.map((metric) => ({
-    name: metric.chapter.name,
-    totalHours: metric.totalHours,
-    totalConversations: metric.totalConversations,
-  }));
+  const metrics = calculateAllMetrics(users, events, chapters, outreachLogs);
+  return Array.from(metrics.chapters.outreachStats.values());
 };
 
 // Generic helper for generating monthly trends

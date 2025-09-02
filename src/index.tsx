@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import ErrorBoundary from './components/ErrorBoundary';
+import { ThemeProvider } from './contexts/ThemeProvider';
 import { router } from './router';
 
 // ADD THIS: Create a client
@@ -21,9 +22,11 @@ root.render(
   <React.StrictMode>
     {/* ADD THIS WRAPPER */}
     <QueryClientProvider client={queryClient}>
-      <ErrorBoundary>
-        <RouterProvider router={router} />
-      </ErrorBoundary>
+      <ThemeProvider>
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+        </ErrorBoundary>
+      </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

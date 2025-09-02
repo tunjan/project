@@ -1,33 +1,18 @@
 import React from 'react';
 
+import { Stat } from '@/components/ui';
 import {
   BuildingOfficeIcon,
   ChatBubbleLeftRightIcon,
   ClockIcon,
   UsersIcon,
 } from '@/icons';
-import { type ChapterStats } from '@/utils/analytics';
+import { type ChapterStats } from '@/utils';
 
 interface ChapterCardProps {
   chapterStats: ChapterStats;
   onSelect: () => void;
 }
-
-const Stat: React.FC<{
-  icon: React.ReactNode;
-  value: string | number;
-  label: string;
-}> = ({ icon, value, label }) => (
-  <div className="flex items-center gap-2">
-    <div className="text-neutral-500">{icon}</div>
-    <div>
-      <p className="font-mono text-lg font-bold">{value}</p>
-      <p className="text-xs font-semibold uppercase text-neutral-500">
-        {label}
-      </p>
-    </div>
-  </div>
-);
 
 const ChapterCard: React.FC<ChapterCardProps> = ({
   chapterStats,
@@ -46,26 +31,30 @@ const ChapterCard: React.FC<ChapterCardProps> = ({
           {chapterStats.name}
         </h3>
 
-        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 border-t-2 border-black pt-6">
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 border-t-2 border-black pt-6 dark:border-white">
           <Stat
             icon={<UsersIcon className="size-5" />}
             value={chapterStats.memberCount}
             label="Members"
+            variant="detailed"
           />
           <Stat
             icon={<BuildingOfficeIcon className="size-5" />}
             value={chapterStats.eventsHeld}
             label="Events"
+            variant="detailed"
           />
           <Stat
             icon={<ClockIcon className="size-5" />}
             value={Math.round(chapterStats.totalHours)}
             label="Hours"
+            variant="detailed"
           />
           <Stat
             icon={<ChatBubbleLeftRightIcon className="size-5" />}
             value={chapterStats.totalConversations}
             label="Convos"
+            variant="detailed"
           />
         </div>
       </div>

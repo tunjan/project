@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import EditEventModal from '@/components/events/EditEventModal';
 import EventDiscussion from '@/components/events/EventDiscussion';
 import RequestAccommodationModal from '@/components/events/RequestAccommodationModal';
-import Avatar from '@/components/ui/Avatar';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { Avatar } from '@/components/ui';
+import { ConfirmationModal } from '@/components/ui';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import {
   CalendarIcon,
@@ -39,7 +39,7 @@ import {
   TourDuty,
   type User,
 } from '@/types';
-import { safeFormatDate, safeParseDate } from '@/utils/date';
+import { formatDateSafe, safeParseDate } from '@/utils';
 
 import InventoryDisplay from './charts/InventoryDisplay';
 import CancelEventModal from './events/CancelEventModal';
@@ -92,10 +92,10 @@ const ParticipantCard: React.FC<{
             className="rounded-nonefull size-12 shrink-0 object-cover ring-2 ring-neutral-100 group-hover:ring-primary/20"
           />
           <div className="ml-4 min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-black">
+            <p className="truncate text-sm font-semibold text-black dark:text-white">
               {participant.user.name}
             </p>
-            <p className="truncate text-sm text-neutral-500">
+            <p className="truncate text-sm text-neutral-500 dark:text-gray-400">
               {participant.user.role}
             </p>
           </div>
@@ -158,10 +158,10 @@ const PendingRequestCard: React.FC<{
             className="rounded-nonefull size-12 object-cover ring-2 ring-yellow-200"
           />
           <div className="ml-4">
-            <p className="text-sm font-semibold text-black">
+            <p className="text-sm font-semibold text-black dark:text-white">
               {participant.user.name}
             </p>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-neutral-600 dark:text-gray-300">
               {participant.user.chapters?.join(', ') || 'No chapters assigned'}
             </p>
           </div>
@@ -203,8 +203,10 @@ const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> = ({
             className="rounded-nonefull size-12 object-cover ring-2 ring-neutral-100"
           />
           <div className="ml-4">
-            <p className="text-sm font-semibold text-black">{host.name}</p>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm font-semibold text-black dark:text-white">
+              {host.name}
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-gray-300">
               Can host {host.hostingCapacity}{' '}
               {host.hostingCapacity === 1 ? 'person' : 'people'}
             </p>
@@ -280,22 +282,30 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
   const startDate = safeParseDate(event.startDate);
   const endDate = safeParseDate(event.endDate);
 
-  const formattedDate = safeFormatDate(startDate, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const formattedDate = formatDateSafe(
+    startDate,
+    (d, o) => new Intl.DateTimeFormat(undefined, o).format(d),
+    {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }
+  );
 
-  const formattedTime = safeFormatDate(startDate, {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  });
+  const formattedTime = formatDateSafe(
+    startDate,
+    (d, o) => new Intl.DateTimeFormat(undefined, o).format(d),
+    {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }
+  );
 
   const formattedDateRange =
     startDate && endDate
-      ? `${safeFormatDate(startDate, { dateStyle: 'full' })} to ${safeFormatDate(endDate, { dateStyle: 'full' })}`
+      ? `${formatDateSafe(startDate, (d, o) => new Intl.DateTimeFormat(undefined, o).format(d), { dateStyle: 'full' })} to ${formatDateSafe(endDate, (d, o) => new Intl.DateTimeFormat(undefined, o).format(d), { dateStyle: 'full' })}`
       : formattedDate;
 
   // ✨ REFACTORING: Use the custom hook to get all derived state
@@ -487,12 +497,12 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
       )}
 
       <div className="min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl py-8 lg:px-8">
           {/* Header Navigation */}
           <div className="mb-8">
             <button
               onClick={onBack}
-              className="rounded-nonelg inline-flex items-center bg-white text-sm font-semibold text-neutral-700 hover:text-black"
+              className="rounded-nonelg inline-flex items-center bg-white text-sm font-semibold text-neutral-700 hover:text-black dark:bg-black dark:text-gray-300 dark:hover:text-white"
             >
               <ChevronLeftIcon className="mr-2 size-5" />
               Back to all cubes
@@ -502,7 +512,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           {/* Cancellation Alert */}
           {isCancelled && (
             <div
-              className="rounded-nonexl mb-8 border-2 border-red-200 bg-red-50 p-6"
+              className="rounded-nonexl mb-8 border-red-200 bg-red-50 p-6 md:md:border-2"
               role="alert"
             >
               <div className="flex items-start">
@@ -521,11 +531,11 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
             </div>
           )}
 
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="gap-8 lg:grid lg:grid-cols-3">
             {/* Main Content Area */}
             <div className="space-y-8 lg:col-span-2">
               {/* Hero Section */}
-              <div className="rounded-none2xl overflow-hidden border-2 border-black bg-white shadow-lg">
+              <div className="rounded-none2xl overflow-hidden border-black bg-white shadow-lg dark:border-white dark:bg-black md:md:border-2">
                 <div className="relative">
                   <img
                     src="/default-cube-image.svg"
@@ -558,7 +568,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                         </span>
                       </div>
                     </div>
-                    <h1 className="text-4xl font-extrabold text-black sm:text-5xl">
+                    <h1 className="text-4xl font-extrabold text-black dark:text-white sm:text-5xl">
                       {event.location}
                     </h1>
                   </div>
@@ -596,7 +606,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 
                   {/* Organizer Section */}
                   <div className="rounded-nonexl mt-8 border border-neutral-200 bg-neutral-50 p-6">
-                    <h3 className="mb-4 text-lg font-bold text-black">
+                    <h3 className="mb-4 text-lg font-bold text-black dark:text-white">
                       Event Organizer
                     </h3>
                     <div className="flex items-center">
@@ -609,7 +619,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                         <p className="text-lg font-semibold text-black">
                           {event.organizer.name}
                         </p>
-                        <p className="text-sm text-neutral-600">
+                        <p className="text-sm text-neutral-600 dark:text-gray-300">
                           {event.organizer.role}
                         </p>
                       </div>
@@ -620,16 +630,16 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 
               {/* Regional Event Roster */}
               {isRegionalEvent && !readOnlyPublic && (
-                <div className="rounded-none2xl border-2 border-black bg-white p-8 shadow-lg">
+                <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
                   <EventRoster event={event} />
                 </div>
               )}
 
               {/* Pending Requests */}
               {canManageParticipants && pendingParticipants.length > 0 && (
-                <div className="rounded-none2xl border-2 border-yellow-200 bg-yellow-50 p-8 shadow-lg">
+                <div className="rounded-none2xl border-yellow-200 bg-yellow-50 p-8 shadow-lg md:border-2">
                   <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-black">
+                    <h2 className="text-2xl font-bold text-black dark:text-white">
                       Pending Join Requests ({pendingParticipants.length})
                     </h2>
                     <p className="mt-2 text-neutral-700">
@@ -657,12 +667,12 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 !isPastEvent &&
                 currentUser &&
                 !isRegionalEvent && (
-                  <div className="rounded-none2xl border-2 border-black bg-white p-8 shadow-lg">
+                  <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
                     <div className="mb-6 flex items-center border-b border-neutral-200 pb-4">
                       <div className="rounded-nonelg flex size-12 items-center justify-center bg-primary/10">
                         <HomeIcon className="size-6 text-primary" />
                       </div>
-                      <h2 className="ml-4 text-2xl font-bold text-black">
+                      <h2 className="ml-4 text-2xl font-bold text-black dark:text-white">
                         Available Hosts
                       </h2>
                     </div>
@@ -694,13 +704,13 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
 
               {/* Event Discussion */}
               {canParticipateInDiscussion && (
-                <div className="rounded-none2xl border-2 border-black bg-white p-8 shadow-lg">
+                <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
                   <EventDiscussion eventId={event.id} />
                 </div>
               )}
 
               {/* Chapter Inventory */}
-              <div className="rounded-none2xl border-2 border-black bg-white p-8 shadow-lg">
+              <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
                 <InventoryDisplay
                   chapterName={event.city}
                   showTitle={true}
@@ -712,9 +722,11 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Participants Card */}
-              <div className="rounded-none2xl border-2 border-black bg-white p-6 shadow-lg">
+              <div className="rounded-none2xl border-black bg-white p-6 shadow-lg dark:border-white dark:bg-black md:border-2">
                 <div className="mb-6 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-black">Participants</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white">
+                    Participants
+                  </h2>
                   <div className="rounded-nonefull flex items-center bg-primary px-4 py-2 text-sm font-semibold text-white">
                     <UsersIcon className="mr-2 size-4" />
                     {attendingParticipants.length}
@@ -737,7 +749,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                 {/* Status Display */}
                 <div className="mt-6 space-y-3">
                   {!readOnlyPublic && isAttending && (
-                    <div className="rounded-nonelg flex items-center justify-center border-2 border-green-200 bg-green-50 px-4 py-3">
+                    <div className="rounded-nonelg flex items-center justify-center border-green-200 bg-green-50 px-4 py-3 md:border-2">
                       <ClipboardCheckIcon className="mr-2 size-5 text-green-600" />
                       <span className="font-semibold text-green-800">
                         Status: Attending
@@ -746,7 +758,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   )}
 
                   {!readOnlyPublic && isPending && (
-                    <div className="rounded-nonelg flex items-center justify-center border-2 border-yellow-200 bg-yellow-50 px-4 py-3">
+                    <div className="rounded-nonelg flex items-center justify-center border-yellow-200 bg-yellow-50 px-4 py-3 md:border-2">
                       <ClockIcon className="mr-2 size-5 text-yellow-600" />
                       <span className="font-semibold text-yellow-800">
                         Status: Request Pending
@@ -755,7 +767,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   )}
 
                   {isPastEvent || event.status === EventStatus.FINISHED ? (
-                    <div className="rounded-nonelg flex items-center justify-center border-2 border-neutral-200 bg-neutral-50 px-4 py-3">
+                    <div className="rounded-nonelg flex items-center justify-center border-neutral-200 bg-neutral-50 px-4 py-3 md:border-2">
                       <span className="font-semibold text-neutral-700">
                         Event has ended
                       </span>
@@ -810,7 +822,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                     !isCancelled && (
                       <button
                         onClick={() => onCancelRsvp(event.id)}
-                        className="rounded-nonelg w-full border-2 border-neutral-800 bg-neutral-800 px-4 py-3 font-bold text-white transition-all hover:bg-neutral-700 hover:shadow-brutal"
+                        className="rounded-nonelg w-full border-neutral-800 bg-neutral-800 px-4 py-3 font-bold text-white transition-all hover:bg-neutral-700 hover:shadow-brutal md:border-2"
                       >
                         Cancel RSVP
                       </button>
@@ -820,7 +832,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   {!readOnlyPublic && canEditEvent && (
                     <button
                       onClick={() => setIsEditModalOpen(true)}
-                      className="rounded-nonelg w-full border-2 border-black bg-black px-4 py-3 font-bold text-white transition-all hover:bg-neutral-800 hover:shadow-brutal"
+                      className="rounded-nonelg w-full border-black bg-black px-4 py-3 font-bold text-white transition-all hover:bg-neutral-800 hover:shadow-brutal md:border-2"
                     >
                       <PencilIcon className="mr-2 size-5" />
                       Edit Event
@@ -830,7 +842,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   {!readOnlyPublic && canCancelEvent && (
                     <button
                       onClick={() => setIsCancelModalOpen(true)}
-                      className="rounded-nonelg w-full border-2 border-red-600 bg-red-600 px-4 py-3 font-bold text-white transition-all duration-200 hover:bg-red-700"
+                      className="rounded-nonelg w-full border-red-600 bg-red-600 px-4 py-3 font-bold text-white transition-all duration-200 hover:bg-red-700 md:border-2"
                     >
                       <XCircleIcon className="mr-2 size-5" />
                       Cancel Event

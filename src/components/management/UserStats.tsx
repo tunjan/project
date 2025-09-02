@@ -13,7 +13,7 @@ import {
 } from '@/icons';
 import { useEvents, useOutreachLogs } from '@/store';
 import { type User } from '@/types';
-import { getConversationTrendsByMonth } from '@/utils/analytics';
+import { getConversationTrendsByMonth } from '@/utils';
 
 interface UserStatsProps {
   user: User;
@@ -101,7 +101,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
           Performance Overview
         </h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-none bg-primary/10">
                 <CalendarIcon className="size-5 text-primary" />
@@ -117,7 +117,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-none bg-success/10">
                 <ChatBubbleLeftRightIcon className="size-5 text-success" />
@@ -133,7 +133,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-none bg-warning/10">
                 <ClockIcon className="size-5 text-warning" />
@@ -149,7 +149,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-black bg-white p-4 md:border-2">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-none bg-info/10">
                 <MapIcon className="size-5 text-info" />
@@ -174,7 +174,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
         </h3>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Monthly Trends Chart */}
-          <div className="rounded-none border-2 border-black bg-white p-6">
+          <div className="rounded-none border-black bg-white p-6 md:border-2">
             <h4 className="mb-4 text-lg font-bold text-black">
               Monthly Conversation Trends
             </h4>
@@ -190,7 +190,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
           </div>
 
           {/* Outreach Outcomes Breakdown */}
-          <div className="rounded-none border-2 border-black bg-white p-6">
+          <div className="rounded-none border-black bg-white p-6 md:border-2">
             <h4 className="mb-4 text-lg font-bold text-black">
               Conversation Outcomes
             </h4>
@@ -229,7 +229,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
         </h3>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Activity */}
-          <div className="rounded-none border-2 border-black bg-white p-6">
+          <div className="rounded-none border-black bg-white p-6 md:border-2">
             <h4 className="mb-4 text-lg font-bold text-black">
               Recent Activity (30 days)
             </h4>
@@ -254,7 +254,7 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
           </div>
 
           {/* Event Organization */}
-          <div className="rounded-none border-2 border-black bg-white p-6">
+          <div className="rounded-none border-black bg-white p-6 md:border-2">
             <h4 className="mb-4 text-lg font-bold text-black">
               Event Organization
             </h4>

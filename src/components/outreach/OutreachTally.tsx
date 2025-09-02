@@ -88,7 +88,7 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
     <div className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-none border-2 border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg">
+        <div className="rounded-none border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg md:border-2">
           <div className="text-2xl font-bold text-black">
             {totalConversations}
           </div>
@@ -96,7 +96,7 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
             Total Conversations
           </div>
         </div>
-        <div className="rounded-none border-2 border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg">
+        <div className="rounded-none border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg md:border-2">
           <div className="text-2xl font-bold text-success">
             {positiveOutcomes}
           </div>
@@ -104,7 +104,7 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
             Positive Outcomes
           </div>
         </div>
-        <div className="rounded-none border-2 border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg">
+        <div className="rounded-none border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg md:border-2">
           <div className="text-2xl font-bold text-primary">
             {totalConversations > 0
               ? Math.round((positiveOutcomes / totalConversations) * 100)
@@ -118,7 +118,7 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
       </div>
 
       {/* Detailed Breakdown */}
-      <div className="rounded-none border-2 border-black bg-white p-6">
+      <div className="rounded-none border-black bg-white p-6 md:border-2">
         <h3 className="mb-4 text-lg font-bold text-black">Outcome Breakdown</h3>
         <div className="space-y-4">
           {Object.entries(tally).map(([outcome, count]) => {

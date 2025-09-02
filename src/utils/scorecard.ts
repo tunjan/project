@@ -1,3 +1,5 @@
+import { TARGETS, WEIGHTS } from '@/config';
+
 import { ChapterStats } from './analytics';
 
 export interface ScorecardData extends ChapterStats {
@@ -8,20 +10,6 @@ export interface ScorecardData extends ChapterStats {
     membershipTargetProgress: number; // Renamed from retention to be more accurate
   };
 }
-
-// These weights should be configurable in a real application
-const WEIGHTS = {
-  EVENT_FREQUENCY: 0.5,
-  MEMBER_COUNT: 0.2,
-  RETENTION_RATE: 0.3,
-};
-
-// These are target values for normalization.
-const TARGETS = {
-  EVENTS_PER_MONTH: 4, // Target 1 event per week
-  MEMBER_COUNT: 50,
-  RETENTION_RATE: 0.75, // Target 75% retention
-};
 
 export const calculateChapterScorecard = (
   chapterStats: ChapterStats[]

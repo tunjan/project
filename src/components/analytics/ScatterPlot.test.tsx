@@ -196,7 +196,7 @@ describe('<ScatterPlot />', () => {
     render(<ScatterPlot {...defaultProps} />);
     const container = screen.getByText('Correlation Analysis').closest('div');
     expect(container).toHaveClass(
-      'border-2',
+      'md:border-2',
       'border-black',
       'bg-white',
       'p-4',

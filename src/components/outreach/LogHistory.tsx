@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField } from '@/components/ui/Form';
+import { InputField } from '@/components/ui';
 import { CalendarIcon, FunnelIcon, XMarkIcon } from '@/icons';
 import { type CubeEvent, type OutreachLog } from '@/types';
 
@@ -123,7 +123,7 @@ const LogHistory: React.FC<LogHistoryProps> = ({
       )}
 
       {/* Enhanced Filter Section */}
-      <div className="mb-6 border-2 border-black bg-white p-6">
+      <div className="mb-6 border-black bg-white p-6 dark:border-white dark:bg-black md:border-2">
         <div className="mb-4 flex items-center gap-2">
           <FunnelIcon className="size-5 text-neutral-600" />
           <h3 className="text-lg font-bold text-black">Filter Logs</h3>
@@ -182,7 +182,7 @@ const LogHistory: React.FC<LogHistoryProps> = ({
             </div>
           </div>
 
-          <div className="max-h-[70vh] overflow-y-auto border-2 border-black bg-white shadow-brutal">
+          <div className="max-h-[70vh] overflow-y-auto border-black bg-white shadow-brutal dark:border-white dark:bg-black md:border-2">
             <div className="divide-y-2 divide-neutral-200">
               {sortedLogs
                 .filter((log) => !pendingDeleteIds.has(log.id))
@@ -202,7 +202,7 @@ const LogHistory: React.FC<LogHistoryProps> = ({
           </div>
         </div>
       ) : (
-        <div className="border-2 border-black bg-white p-12 text-center shadow-brutal">
+        <div className="border-black bg-white p-12 text-center shadow-brutal dark:border-white dark:bg-black md:border-2">
           <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
             <CalendarIcon className="size-8 text-neutral-400" />
           </div>

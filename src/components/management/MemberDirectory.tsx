@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
-import Avatar from '@/components/ui/Avatar';
-import { SelectField } from '@/components/ui/Form';
+import { Avatar } from '@/components/ui';
+import { SelectField } from '@/components/ui';
 import { ChevronRightIcon, SearchIcon } from '@/icons';
 import {
   type Chapter,
@@ -127,7 +127,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
   ]);
 
   return (
-    <div className="border-2 border-black bg-white">
+    <div className="border-black bg-white md:border-2">
       <div className="border-b-2 border-black p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-4">

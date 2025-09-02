@@ -3,7 +3,7 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { InputField, SelectField, TextAreaField } from '@/components/ui/Form';
+import { InputField, SelectField, TextAreaField } from '@/components/ui';
 import { CheckIcon } from '@/icons';
 import { type Chapter, type OnboardingAnswers } from '@/types';
 
@@ -84,7 +84,7 @@ const SignUp: React.FC<SignUpProps> = ({
     <div className="py-8 md:py-16">
       <div className="mx-auto max-w-2xl border border-black bg-white">
         <div className="border-b border-black p-8">
-          <h1 className="text-3xl font-extrabold text-black">
+          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
             Join the Movement
           </h1>
           <p className="mt-2 text-neutral-600">

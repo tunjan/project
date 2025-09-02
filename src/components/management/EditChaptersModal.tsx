@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Modal from '@/components/ui/Modal';
+import { Modal } from '@/components/ui';
 import { type Chapter, type User } from '@/types';
 
 interface EditChaptersModalProps {

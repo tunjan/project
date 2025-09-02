@@ -10,7 +10,7 @@ import {
   calculateLeaderboards,
   type Timeframe,
   type UserLeaderboardEntry,
-} from '@/utils/leaderboard';
+} from '@/utils';
 
 const SectionTab: React.FC<{
   onClick: () => void;
@@ -19,11 +19,11 @@ const SectionTab: React.FC<{
 }> = ({ onClick, isActive, children }) => (
   <button
     onClick={onClick}
-    className={`h-10 border-r-2 border-black px-3 py-2 text-xs font-extrabold uppercase tracking-wider transition-colors last:border-r-0 ${
+    className={`flex min-h-[44px] flex-1 items-center justify-center space-x-1 border-r border-black px-3 py-2.5 text-xs font-semibold last:border-r-0 sm:flex-initial sm:space-x-2 sm:px-3 sm:py-2 sm:text-sm ${
       isActive
         ? 'bg-black text-white'
-        : 'bg-white text-black hover:bg-neutral-100'
-    }`}
+        : 'bg-white text-black hover:bg-gray-50 active:bg-gray-100'
+    } touch-manipulation transition-colors duration-200`}
   >
     {children}
   </button>
@@ -36,11 +36,11 @@ const TimeframeTab: React.FC<{
 }> = ({ onClick, isActive, children }) => (
   <button
     onClick={onClick}
-    className={`h-10 border-r-2 border-black px-3 py-2 text-xs font-extrabold uppercase tracking-wider transition-colors last:border-r-0 ${
+    className={`flex min-h-[44px] flex-1 items-center justify-center space-x-1 border-r-2 border-black px-3 py-2.5 text-xs font-semibold last:border-r-0 sm:flex-initial sm:space-x-2 sm:px-3 sm:py-2 sm:text-sm ${
       isActive
         ? 'bg-black text-white'
-        : 'bg-white text-black hover:bg-neutral-100'
-    }`}
+        : 'bg-white text-black hover:bg-gray-50 active:bg-gray-100'
+    } touch-manipulation transition-colors duration-200`}
   >
     {children}
   </button>
@@ -90,72 +90,87 @@ const LeaderboardPage: React.FC = () => {
 
   return (
     <div className="py-8 md:py-12">
-      <div className="mb-8 text-center md:mb-12">
-        <TrophyIcon className="mx-auto size-12 text-primary" />
-        <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          Leaderboards
-        </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-lg text-neutral-600">
-          See who our most dedicated activists are. Your stats are highlighted.
-        </p>
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Leaderboards
+            </h1>
+          </div>
+          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            See who our most dedicated activists are. Your stats are
+            highlighted.
+          </p>
+        </div>
+        <div className="shrink-0">
+          <TrophyIcon className="size-6 text-primary sm:size-12" />
+        </div>
       </div>
 
       <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <div className="inline-flex border-2 border-black bg-white">
-          <SectionTab
-            onClick={() => setMetric('conversations')}
-            isActive={metric === 'conversations'}
-          >
-            Conversations
-          </SectionTab>
-          <SectionTab
-            onClick={() => setMetric('hours')}
-            isActive={metric === 'hours'}
-          >
-            Hours
-          </SectionTab>
+        <div className="flex w-full justify-center md:w-auto md:justify-start">
+          <div className="flex w-full items-center border-2 border-black bg-white md:w-auto">
+            <SectionTab
+              onClick={() => setMetric('conversations')}
+              isActive={metric === 'conversations'}
+            >
+              Conversations
+            </SectionTab>
+            <SectionTab
+              onClick={() => setMetric('hours')}
+              isActive={metric === 'hours'}
+            >
+              Hours
+            </SectionTab>
+          </div>
         </div>
 
-        <div className="inline-flex border-2 border-black bg-white">
-          <TimeframeTab
-            onClick={() => setTimeframe('week')}
-            isActive={timeframe === 'week'}
-          >
-            Week
-          </TimeframeTab>
-          <TimeframeTab
-            onClick={() => setTimeframe('month')}
-            isActive={timeframe === 'month'}
-          >
-            Month
-          </TimeframeTab>
-          <TimeframeTab
-            onClick={() => setTimeframe('year')}
-            isActive={timeframe === 'year'}
-          >
-            Year
-          </TimeframeTab>
-          <TimeframeTab
-            onClick={() => setTimeframe('allTime')}
-            isActive={timeframe === 'allTime'}
-          >
-            All Time
-          </TimeframeTab>
+        <div className="flex w-full justify-center md:w-auto md:justify-start">
+          <div className="flex w-full items-center border-2 border-black bg-white md:w-auto">
+            <TimeframeTab
+              onClick={() => setTimeframe('week')}
+              isActive={timeframe === 'week'}
+            >
+              Week
+            </TimeframeTab>
+            <TimeframeTab
+              onClick={() => setTimeframe('month')}
+              isActive={timeframe === 'month'}
+            >
+              Month
+            </TimeframeTab>
+            <TimeframeTab
+              onClick={() => setTimeframe('year')}
+              isActive={timeframe === 'year'}
+            >
+              Year
+            </TimeframeTab>
+            <TimeframeTab
+              onClick={() => setTimeframe('allTime')}
+              isActive={timeframe === 'allTime'}
+            >
+              All Time
+            </TimeframeTab>
+          </div>
         </div>
 
-        <select
-          value={chapterFilter}
-          onChange={(e) => setChapterFilter(e.target.value)}
-          className="rounded-nonenone h-10 w-40 max-w-40 border-2 border-black bg-white px-3 py-2 text-sm"
-          aria-label="Filter by chapter"
-        >
-          <option value="">All Chapters</option>
-          {chapterNames.map((name) => (
-            <option value={name} key={name}>
-              {name}
-            </option>
-          ))}
-        </select>
+        <div className="flex w-full justify-center md:w-auto md:justify-start">
+          <select
+            value={chapterFilter}
+            onChange={(e) => setChapterFilter(e.target.value)}
+            className="block w-full border-black bg-white px-3 py-2.5 text-sm font-semibold text-black focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary md:w-40 md:border-2 md:py-2"
+            aria-label="Filter by chapter"
+          >
+            <option value="">All Chapters</option>
+            {chapterNames.map((name) => (
+              <option value={name} key={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

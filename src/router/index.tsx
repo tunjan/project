@@ -15,7 +15,7 @@ const ManageEventPage = React.lazy(() => import('@/pages/ManageEventPage'));
 const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
 
 const ManagementPage = React.lazy(() => import('@/pages/ManagementPage'));
-const MemberProfilePage = React.lazy(() => import('@/pages/MemberProfilePage'));
+const ManageProfilePage = React.lazy(() => import('@/pages/ManageProfilePage'));
 const AnalyticsPage = React.lazy(() => import('@/pages/AnalyticsPage'));
 const AnnouncementsPage = React.lazy(() => import('@/pages/AnnouncementsPage'));
 const CreateAnnouncementPage = React.lazy(
@@ -31,7 +31,7 @@ const SignUpSuccessPage = React.lazy(() => import('@/pages/SignUpSuccessPage'));
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
 
 const LeaderboardPage = React.lazy(() => import('@/pages/LeaderboardPage'));
-const PublicProfilePage = React.lazy(() => import('@/pages/PublicProfilePage'));
+const ViewProfilePage = React.lazy(() => import('@/pages/ViewProfilePage'));
 const ApplicantStatusPage = React.lazy(
   () => import('@/pages/ApplicantStatusPage')
 ); // NEW
@@ -116,7 +116,7 @@ export const router = createBrowserRouter([
             path: 'members/:userId',
             element: (
               <ProtectedRoute requireCoreAccess>
-                <PublicProfilePage />
+                <ViewProfilePage />
               </ProtectedRoute>
             ),
           },
@@ -174,7 +174,7 @@ export const router = createBrowserRouter([
             path: 'manage/member/:userId',
             element: (
               <ProtectedRoute requiredRole="organizer" requireFullAccess>
-                <MemberProfilePage />
+                <ManageProfilePage />
               </ProtectedRoute>
             ),
           },

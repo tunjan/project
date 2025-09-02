@@ -1,3 +1,4 @@
+import { ROLE_HIERARCHY } from '@/constants';
 import {
   type Chapter,
   type CubeEvent,
@@ -5,7 +6,6 @@ import {
   Role,
   type User,
 } from '@/types';
-import { ROLE_HIERARCHY } from '@/utils/auth';
 
 // 1. Define every possible action in the system
 export enum Permission {

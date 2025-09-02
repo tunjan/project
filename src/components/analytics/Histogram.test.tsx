@@ -232,7 +232,7 @@ describe('<Histogram />', () => {
     render(<Histogram {...defaultProps} />);
     const container = screen.getByText('Age Distribution').closest('div');
     expect(container).toHaveClass(
-      'border-2',
+      'md:border-2',
       'border-black',
       'bg-white',
       'p-4',

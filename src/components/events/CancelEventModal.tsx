@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { TextAreaField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { TextAreaField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { type CubeEvent } from '@/types';
 
 interface CancelEventModalProps {

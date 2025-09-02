@@ -5,12 +5,14 @@ import { Toaster } from 'sonner';
 import Header from '@/components/header/Header';
 import Sidebar from '@/components/header/Sidebar';
 import CommandPalette from '@/components/search/CommandPalette';
+import { useTheme } from '@/hooks/useTheme';
 import { useUsersActions } from '@/store';
 import { useSearchActions } from '@/store/search.store';
 
 const MainLayout: React.FC = () => {
   const { init } = useUsersActions();
   const { open } = useSearchActions();
+  const { theme } = useTheme();
 
   // Initialize store when layout mounts
   useEffect(() => {
@@ -30,7 +32,7 @@ const MainLayout: React.FC = () => {
   }, [open]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-black">
       <Sidebar />
       <Header />
       {/* 
@@ -42,23 +44,26 @@ const MainLayout: React.FC = () => {
         position="bottom-right"
         toastOptions={{
           style: {
-            background: 'white',
-            border: '2px solid black',
-            boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
+            background: theme === 'dark' ? 'black' : 'white',
+            border: theme === 'dark' ? '2px solid white' : '2px solid black',
+            boxShadow:
+              theme === 'dark'
+                ? '4px 4px 0px 0px rgba(255,255,255,1)'
+                : '4px 4px 0px 0px rgba(0,0,0,1)',
             borderRadius: '0px',
-            color: 'black',
+            color: theme === 'dark' ? 'white' : 'black',
             fontFamily: 'Libre Franklin, sans-serif',
             fontWeight: '600',
           },
         }}
-        theme="light"
+        theme={theme}
       />
       <CommandPalette />
-      <main className="max-w-7xl flex-1 px-4 sm:px-6 lg:ml-64 lg:px-8">
+      <main className="flex-1 sm:px-6 lg:ml-64">
         <Outlet />
       </main>
-      <footer className="bg-black py-6 lg:ml-64">
-        <div className="mx-auto max-w-7xl px-4 text-center text-sm text-white sm:px-6 lg:px-8">
+      <footer className="bg-black py-6 dark:bg-white lg:ml-64">
+        <div className="mx-auto text-center text-sm text-white dark:text-black">
           <p>
             &copy; {new Date().getFullYear()} Anonymous for the Voiceless hub.
             Powered by respect for animals.

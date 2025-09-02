@@ -172,3 +172,50 @@ export const autoAdvanceOnboarding = (user: User): OnboardingStatus | null => {
 
   return null;
 };
+
+/**
+ * Determines the next status after a user's first cube attendance
+ * @param user - The user to check
+ * @returns The appropriate next onboarding status
+ */
+export const determineNextStatusAfterFirstCube = (
+  user: User
+): OnboardingStatus => {
+  // Check if the masterclass was watched
+  if (user.onboardingProgress?.watchedMasterclass) {
+    return OnboardingStatus.AWAITING_REVISION_CALL;
+  }
+
+  return OnboardingStatus.AWAITING_MASTERCLASS;
+};
+
+/**
+ * Finalizes onboarding for a user with all validation checks
+ * @param user - The user to finalize onboarding for
+ * @returns Object with success status and any issues found
+ */
+export const finalizeOnboarding = (
+  user: User
+): { success: boolean; issues: string[] } => {
+  // Validate that user can be finalized
+  if (user.onboardingStatus !== OnboardingStatus.AWAITING_REVISION_CALL) {
+    return {
+      success: false,
+      issues: [`User cannot be finalized from status ${user.onboardingStatus}`],
+    };
+  }
+
+  // Validate onboarding state
+  const validation = validateOnboardingState(user);
+  if (!validation.isValid) {
+    return {
+      success: false,
+      issues: validation.issues,
+    };
+  }
+
+  return {
+    success: true,
+    issues: [],
+  };
+};

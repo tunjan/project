@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { type User } from '@/types';
 
 interface OnboardingQueueProps {
@@ -21,7 +21,7 @@ const ApplicantCard: React.FC<{
       : 'No chapter';
 
   return (
-    <div className="border-2 border-black bg-white">
+    <div className="border-black bg-white md:border-2">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-4">
           <Avatar
@@ -96,7 +96,7 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
 }) => {
   if (applicants.length === 0) {
     return (
-      <div className="border-2 border-black bg-white p-8 text-center">
+      <div className="border-black bg-white p-8 text-center md:border-2">
         <h3 className="text-xl font-bold text-black">The queue is empty.</h3>
         <p className="mt-2 text-neutral-500">
           There are no new applicants to review at this time.

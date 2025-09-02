@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
-import { calculateChapterScorecard } from '@/utils/scorecard';
+import { calculateChapterScorecard } from '@/utils';
 
 const getScoreColor = (score: number) => {
   if (score >= 80) return 'bg-success';
@@ -27,7 +27,7 @@ const ChapterScorecard: React.FC = () => {
       <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
         Chapter Health Scorecard
       </h2>
-      <div className="border-2 border-black bg-white">
+      <div className="border-black bg-white md:border-2">
         <table className="w-full text-left">
           <thead className="text-grey-600 border-b-2 border-black text-xs uppercase">
             <tr>

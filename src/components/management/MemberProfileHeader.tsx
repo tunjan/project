@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { User } from '@/types';
 
 interface MemberProfileHeaderProps {
@@ -9,12 +9,12 @@ interface MemberProfileHeaderProps {
 
 const MemberProfileHeader: React.FC<MemberProfileHeaderProps> = ({ user }) => {
   return (
-    <div className="mb-8 border-2 border-black bg-white p-6">
+    <div className="mb-8 border-black bg-white p-6 md:border-2">
       <div className="flex flex-col items-center gap-6 sm:flex-row">
         <Avatar
           src={user.profilePictureUrl}
           alt={user.name}
-          className="size-24 shrink-0 border-2 border-black object-cover"
+          className="size-24 shrink-0 border-black object-cover md:border-2"
         />
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-3xl font-extrabold text-black">{user.name}</h1>

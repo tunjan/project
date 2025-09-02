@@ -3,14 +3,14 @@ export * from './accommodations.store';
 export * from './announcements.store';
 export * from './auth.store';
 export * from './awards.store';
-export * from './challenges.store';
+// export * from './challenges.store'; // Replaced with hook
 export * from './chapters.store';
 export * from './comments.store';
 export * from './events.store';
 export * from './inventory.store';
 export * from './notifications.store';
 export * from './outreach.store';
-export * from './resources.store';
+// export * from './resources.store'; // Replaced with hook
 export * from './users.store';
 
 // Import action hooks for useAppActions
@@ -25,9 +25,10 @@ import { useOutreachActions } from './outreach.store';
 import { useUsersActions } from './users.store';
 
 // Convenience re-exports for backward compatibility with appStore hooks
+export { useChallenges } from '../hooks/useChallenges';
+export { useResources } from '../hooks/useResources';
 export { useAccommodationsState as useAccommodationRequests } from './accommodations.store';
 export { useBadgeAwardsForUser } from './awards.store';
-export { useChallengesState as useChallenges } from './challenges.store';
 export { useChaptersState as useChapters } from './chapters.store';
 export { useChapterByName, useChapterJoinRequests } from './chapters.store';
 export { useEventCommentsState as useEventComments } from './comments.store';
@@ -40,7 +41,6 @@ export {
 } from './notifications.store';
 export { useOutreachLogs } from './outreach.store';
 export { useLogsForEvent } from './outreach.store';
-export { useResourcesState as useResources } from './resources.store';
 export { useUsersState as useUsers } from './users.store';
 export { useUserById, useUsersActions } from './users.store';
 

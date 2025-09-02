@@ -1,129 +1,53 @@
-import { EventStatus, OnboardingStatus, Role, type User } from '@/types';
+import { createUserMock } from '@/test/test-utils';
+import { EventStatus, Role } from '@/types';
 
 import { can, Permission } from './permissions';
 
 // Mock user data for tests
-const godModeUser: User = {
+const godModeUser = createUserMock({
   id: '1',
   name: 'God',
   email: 'god@example.com',
   role: Role.GODMODE,
-  chapters: ['Berlin'],
-  onboardingStatus: OnboardingStatus.COMPLETED,
-  profilePictureUrl: 'test.jpg',
-  stats: {
-    totalHours: 0,
-    cubesAttended: 0,
-    veganConversions: 0,
-    totalConversations: 0,
-    cities: [],
-  },
-  badges: [],
-  hostingAvailability: false,
-  lastLogin: new Date(),
-};
+});
 
-const globalAdmin: User = {
+const globalAdmin = createUserMock({
   id: '2',
   name: 'Admin',
   email: 'admin@example.com',
   role: Role.GLOBAL_ADMIN,
-  chapters: ['Berlin'],
-  onboardingStatus: OnboardingStatus.COMPLETED,
-  profilePictureUrl: 'test.jpg',
-  stats: {
-    totalHours: 0,
-    cubesAttended: 0,
-    veganConversions: 0,
-    totalConversations: 0,
-    cities: [],
-  },
-  badges: [],
-  hostingAvailability: false,
-  lastLogin: new Date(),
-};
+});
 
-const regionalOrganiserDE: User = {
+const regionalOrganiserDE = createUserMock({
   id: '3',
   name: 'Regional DE',
   email: 'regional@example.com',
   role: Role.REGIONAL_ORGANISER,
   managedCountry: 'Germany',
-  chapters: ['Berlin'],
-  onboardingStatus: OnboardingStatus.COMPLETED,
-  profilePictureUrl: 'test.jpg',
-  stats: {
-    totalHours: 0,
-    cubesAttended: 0,
-    veganConversions: 0,
-    totalConversations: 0,
-    cities: [],
-  },
-  badges: [],
-  hostingAvailability: false,
-  lastLogin: new Date(),
-};
+});
 
-const chapterOrganiserBerlin: User = {
+const chapterOrganiserBerlin = createUserMock({
   id: '4',
   name: 'Org Berlin',
   email: 'org@example.com',
   role: Role.CHAPTER_ORGANISER,
   organiserOf: ['Berlin'],
-  chapters: ['Berlin'],
-  onboardingStatus: OnboardingStatus.COMPLETED,
-  profilePictureUrl: 'test.jpg',
-  stats: {
-    totalHours: 0,
-    cubesAttended: 0,
-    veganConversions: 0,
-    totalConversations: 0,
-    cities: [],
-  },
-  badges: [],
-  hostingAvailability: false,
-  lastLogin: new Date(),
-};
+});
 
-const activistBerlin: User = {
+const activistBerlin = createUserMock({
   id: '5',
   name: 'Activist Berlin',
   email: 'activist@example.com',
   role: Role.ACTIVIST,
-  chapters: ['Berlin'],
-  onboardingStatus: OnboardingStatus.COMPLETED,
-  profilePictureUrl: 'test.jpg',
-  stats: {
-    totalHours: 0,
-    cubesAttended: 0,
-    veganConversions: 0,
-    totalConversations: 0,
-    cities: [],
-  },
-  badges: [],
-  hostingAvailability: false,
-  lastLogin: new Date(),
-};
+});
 
-const activistHamburg: User = {
+const activistHamburg = createUserMock({
   id: '6',
   name: 'Activist Hamburg',
   email: 'activist2@example.com',
   role: Role.ACTIVIST,
   chapters: ['Hamburg'],
-  onboardingStatus: OnboardingStatus.COMPLETED,
-  profilePictureUrl: 'test.jpg',
-  stats: {
-    totalHours: 0,
-    cubesAttended: 0,
-    veganConversions: 0,
-    totalConversations: 0,
-    cities: [],
-  },
-  badges: [],
-  hostingAvailability: false,
-  lastLogin: new Date(),
-};
+});
 
 // Mock chapter data
 const mockChapters = [

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { can, Permission } from '@/config/permissions';
+import { can, Permission } from '@/config';
 import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus, type ProtectedRole } from '@/types';
 

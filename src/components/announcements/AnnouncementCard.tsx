@@ -2,14 +2,13 @@ import { differenceInDays, formatDistanceToNow } from 'date-fns';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import Avatar from '@/components/ui/Avatar';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { Avatar, ConfirmationModal } from '@/components/ui';
+import { ROLE_HIERARCHY } from '@/constants';
 import { ChevronRightIcon, PencilIcon, TrashIcon } from '@/icons';
 import { useAnnouncementsActions } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type Announcement, AnnouncementScope, Role } from '@/types';
-import { ROLE_HIERARCHY } from '@/utils/auth';
-import { safeFormatLocaleDate } from '@/utils/date';
+import { formatDateSafe } from '@/utils';
 
 import EditAnnouncementModal from './EditAnnouncementModal';
 
@@ -57,11 +56,15 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const formattedDate = safeFormatLocaleDate(announcement.createdAt, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const formattedDate = formatDateSafe(
+    announcement.createdAt,
+    (d, o) => d.toLocaleDateString(undefined, o),
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }
+  );
 
   // Relative timestamp for recent announcements
   const createdDate = new Date(announcement.createdAt);
@@ -101,7 +104,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         variant="danger"
       />
 
-      <div className="overflow-hidden border-2 border-black bg-white">
+      <div className="overflow-hidden border-black bg-white dark:border-white dark:bg-black md:border-2">
         <div className="p-6">
           <div className="mb-4 flex justify-between">
             <ScopeBadge

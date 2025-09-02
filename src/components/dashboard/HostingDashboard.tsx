@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { TabButton } from '@/components/ui';
 import { HomeIcon } from '@/icons';
 import { useAccommodationRequests } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
@@ -9,27 +10,6 @@ import RequestCard from './RequestCard';
 interface HostingDashboardProps {}
 
 type HostingView = 'incoming' | 'sent';
-
-const TabButton: React.FC<{
-  onClick: () => void;
-  isActive: boolean;
-  count: number;
-  children: React.ReactNode;
-}> = ({ onClick, isActive, count, children }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
-      isActive ? 'text-black' : 'border-transparent text-white hover:text-black'
-    }`}
-  >
-    {children}
-    {count > 0 && (
-      <span className="ml-1 bg-primary px-2 py-0.5 text-xs font-bold text-white">
-        {count}
-      </span>
-    )}
-  </button>
-);
 
 const HostingDashboard: React.FC<HostingDashboardProps> = () => {
   const currentUser = useCurrentUser();
@@ -63,7 +43,7 @@ const HostingDashboard: React.FC<HostingDashboardProps> = () => {
   });
 
   const NoRequestsMessage = () => (
-    <div className="border-2 border-black bg-white p-8 text-center">
+    <div className="border-black bg-white p-8 text-center md:border-2">
       <HomeIcon className="text-red mx-auto size-12" />
       <h3 className="mt-4 text-xl font-bold text-black">
         {view === 'incoming'

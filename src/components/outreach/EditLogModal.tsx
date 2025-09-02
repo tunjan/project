@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { SelectField, TextAreaField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { SelectField, TextAreaField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { type OutreachLog, OutreachOutcome } from '@/types';
 
 interface EditLogModalProps {

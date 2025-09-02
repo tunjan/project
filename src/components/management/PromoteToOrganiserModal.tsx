@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import Modal from '@/components/ui/Modal';
+import { Modal } from '@/components/ui';
 import { useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Role, type User } from '@/types';

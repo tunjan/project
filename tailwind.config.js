@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -25,6 +26,7 @@ export default {
           DEFAULT: '#d81313', // Your brand's red
           hover: '#b91c1c', // A darker red for hover
           lightest: '#fef2f2', // Very light red for backgrounds
+          dark: '#ef4444', // Lighter red for dark mode
         },
         success: {
           DEFAULT: '#16a34a', // green-600

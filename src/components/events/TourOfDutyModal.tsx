@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import Modal from '@/components/ui/Modal';
+import { Modal } from '@/components/ui';
 import { type CubeEvent, type TourDuty, TourDutyRole } from '@/types';
 
 interface TourOfDutyModalProps {
@@ -65,7 +65,7 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
           return (
             <div
               key={dateString}
-              className="border-2 border-black bg-white p-4"
+              className="border-black bg-white p-4 md:border-2"
             >
               <h4 className="font-bold">
                 {new Date(day).toLocaleDateString(undefined, {
@@ -78,7 +78,7 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
                 {availableRoles.map((role) => (
                   <label
                     key={role}
-                    className="flex cursor-pointer items-center space-x-2 border-2 border-black p-2 text-sm transition-colors has-[:checked]:bg-primary has-[:checked]:text-white"
+                    className="flex cursor-pointer items-center space-x-2 border-black p-2 text-sm transition-colors has-[:checked]:bg-primary has-[:checked]:text-white md:border-2"
                   >
                     <input
                       type="checkbox"

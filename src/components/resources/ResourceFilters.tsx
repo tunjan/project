@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SelectField } from '@/components/ui/Form';
+import { SelectField } from '@/components/ui';
 import { SearchIcon } from '@/icons';
 import { ResourceType, SkillLevel } from '@/types';
 
@@ -18,7 +18,7 @@ interface ResourceFiltersProps {
 
 const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
   return (
-    <div className="border-2 border-black bg-white p-4">
+    <div className="border-black bg-white p-4 md:border-2">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="md:col-span-4">
           <label htmlFor="keyword-search" className="sr-only">
@@ -94,7 +94,7 @@ const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
               props.setSelectedLevel('all');
               props.setSelectedLang('all');
             }}
-            className="size-full border-2 border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
+            className="size-full border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black md:border-2"
           >
             Reset
           </button>

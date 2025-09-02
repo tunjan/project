@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { createUserMock } from '@/test/test-utils';
 import {
   Chapter,
   ChapterJoinRequest,
@@ -16,45 +17,21 @@ const mockChapters: Chapter[] = [
 ];
 
 const mockMembers: User[] = [
-  {
+  createUserMock({
     id: '1',
     name: 'John Doe',
     email: 'john@example.com',
     role: Role.ACTIVIST,
-    chapters: ['Berlin'],
-    onboardingStatus: OnboardingStatus.COMPLETED,
     profilePictureUrl: 'test1.jpg',
-    stats: {
-      totalHours: 0,
-      cubesAttended: 0,
-      veganConversions: 0,
-      totalConversations: 0,
-      cities: [],
-    },
-    badges: [],
-    hostingAvailability: false,
-    lastLogin: new Date(),
-  },
-  {
+  }),
+  createUserMock({
     id: '2',
     name: 'Jane Smith',
     email: 'jane@example.com',
     role: Role.CHAPTER_ORGANISER,
-    chapters: ['Berlin'],
-    onboardingStatus: OnboardingStatus.COMPLETED,
     profilePictureUrl: 'test2.jpg',
-    stats: {
-      totalHours: 0,
-      cubesAttended: 0,
-      veganConversions: 0,
-      totalConversations: 0,
-      cities: [],
-    },
-    badges: [],
-    hostingAvailability: false,
-    lastLogin: new Date(),
-  },
-  {
+  }),
+  createUserMock({
     id: '3',
     name: 'Bob Wilson',
     email: 'bob@example.com',
@@ -62,41 +39,20 @@ const mockMembers: User[] = [
     chapters: ['Hamburg'],
     onboardingStatus: OnboardingStatus.AWAITING_FIRST_CUBE,
     profilePictureUrl: 'test3.jpg',
-    stats: {
-      totalHours: 0,
-      cubesAttended: 0,
-      veganConversions: 0,
-      totalConversations: 0,
-      cities: [],
-    },
-    badges: [],
-    hostingAvailability: false,
-    lastLogin: new Date(),
-  },
+  }),
 ];
 
 const mockPendingRequests: ChapterJoinRequest[] = [
   {
     id: 'req1',
-    user: {
+    user: createUserMock({
       id: '4',
       name: 'Alice Brown',
       email: 'alice@example.com',
       role: Role.ACTIVIST,
       chapters: [],
-      onboardingStatus: OnboardingStatus.COMPLETED,
       profilePictureUrl: 'test4.jpg',
-      stats: {
-        totalHours: 0,
-        cubesAttended: 0,
-        veganConversions: 0,
-        totalConversations: 0,
-        cities: [],
-      },
-      badges: [],
-      hostingAvailability: false,
-      lastLogin: new Date(),
-    },
+    }),
     chapterName: 'Berlin',
     status: 'Pending',
     createdAt: new Date('2024-01-01T00:00:00Z'),

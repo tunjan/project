@@ -1,7 +1,7 @@
 import React from 'react';
 import { toast } from 'sonner';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { useChaptersActions } from '@/store';
 import { type ChapterJoinRequest, type User } from '@/types';
 

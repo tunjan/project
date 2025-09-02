@@ -93,7 +93,7 @@ const OnboardingHealthCheck: React.FC = () => {
         {Object.entries(statusCounts).map(([status, count]) => (
           <div
             key={status}
-            className="border-2 border-black bg-white p-4 text-center transition-all hover:bg-neutral-100"
+            className="border-black bg-white p-4 text-center transition-all hover:bg-neutral-100 md:border-2"
           >
             <div className="text-2xl font-bold text-black">{count}</div>
             <div className="text-xs text-neutral-600">{status}</div>
@@ -103,7 +103,7 @@ const OnboardingHealthCheck: React.FC = () => {
 
       {/* Issues List */}
       {issues.length > 0 ? (
-        <div className="border-red border-2 bg-red-50 p-4">
+        <div className="border-red bg-red-50 p-4 md:border-2">
           <div className="mb-4 flex items-center space-x-2">
             <ExclamationTriangleIcon className="text-red size-6" />
             <h3 className="text-red text-lg font-bold">
@@ -128,7 +128,7 @@ const OnboardingHealthCheck: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="border-green border-2 bg-green-50 p-4 text-center">
+        <div className="border-green bg-green-50 p-4 text-center md:border-2">
           <div className="flex items-center justify-center space-x-2">
             <CheckCircleIcon className="text-green size-6" />
             <span className="text-green text-lg font-bold">
@@ -139,7 +139,7 @@ const OnboardingHealthCheck: React.FC = () => {
       )}
 
       {/* Auto-fix Info */}
-      <div className="border-blue border-2 bg-blue-50 p-4">
+      <div className="border-blue bg-blue-50 p-4 md:border-2">
         <div className="flex items-center space-x-2">
           <WrenchIcon className="text-blue size-6" />
           <h3 className="text-blue text-lg font-bold">Auto-Fix Capabilities</h3>

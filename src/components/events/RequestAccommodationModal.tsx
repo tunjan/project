@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, TextAreaField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { InputField, TextAreaField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { type AccommodationRequest, type CubeEvent, type User } from '@/types';
 
 interface RequestAccommodationModalProps {

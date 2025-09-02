@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import ProgressBar from '@/components/ui/ProgressBar';
+import { ProgressBar } from '@/components/ui';
 import { CalendarIcon, TrophyIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
 import { Challenge } from '@/types';
@@ -28,7 +28,7 @@ const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
         <h2 className="mb-6 border-b-2 border-primary pb-3 text-3xl font-extrabold tracking-tight text-black">
           Team-Based Challenges
         </h2>
-        <div className="border-2 border-black bg-white p-8 text-center">
+        <div className="border-black bg-white p-8 text-center md:border-2">
           <TrophyIcon className="mx-auto size-12" />
           <h3 className="mt-4 text-xl font-bold text-black">
             No Active Challenges

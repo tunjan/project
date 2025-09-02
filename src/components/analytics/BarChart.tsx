@@ -32,7 +32,7 @@ const CustomTooltip = ({
 }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="border-2 border-black bg-white p-3 shadow-brutal">
+      <div className="border-black bg-white p-3 shadow-brutal md:border-2">
         <p className="font-bold text-black">{label}</p>
         <p className="text-primary">
           Value:{' '}
@@ -57,7 +57,7 @@ const BarChart: React.FC<BarChartProps> = ({
   }));
 
   return (
-    <div className="border-2 border-black bg-white p-4 md:p-6">
+    <div className="border-black bg-white p-4 md:border-2 md:p-6">
       <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">

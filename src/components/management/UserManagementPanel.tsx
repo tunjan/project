@@ -36,12 +36,10 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
 }) => {
   return (
     <section>
-      <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-        User Management
-      </h2>
+      <h2 className="h-section">User Management</h2>
       <div className="space-y-4">
         {/* Role Management */}
-        <div className="border-2 border-black bg-white p-4">
+        <div className="border-black bg-white p-4 md:border-2">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
             <UserGroupIcon className="size-5" />
             Role Management
@@ -61,7 +59,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
 
         {/* Chapter Management */}
         {canEditChapters && (
-          <div className="border-2 border-black bg-white p-4">
+          <div className="border-black bg-white p-4 md:border-2">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
               <BuildingOfficeIcon className="size-5" />
               Chapter Management
@@ -82,7 +80,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
 
         {/* Recognition Management */}
         {canAwardBadges && (
-          <div className="border-2 border-black bg-white p-4">
+          <div className="border-black bg-white p-4 md:border-2">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
               <StarIcon className="size-5" />
               Recognition Management
@@ -102,7 +100,7 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
         )}
 
         {/* Communication */}
-        <div className="border-2 border-black bg-white p-4">
+        <div className="border-black bg-white p-4 md:border-2">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
             <ChatBubbleLeftRightIcon className="size-5" />
             Communication

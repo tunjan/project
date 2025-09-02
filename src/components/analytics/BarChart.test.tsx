@@ -185,7 +185,7 @@ describe('<BarChart />', () => {
     render(<BarChart {...defaultProps} />);
     const container = screen.getByText('Monthly Sales').closest('div');
     expect(container).toHaveClass(
-      'border-2',
+      'md:border-2',
       'border-black',
       'bg-white',
       'p-4',

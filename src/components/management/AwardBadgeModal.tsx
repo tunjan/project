@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { InputField, TextAreaField } from '@/components/ui/Form';
-import Modal from '@/components/ui/Modal';
+import { InputField, TextAreaField } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { BADGE_TEMPLATES } from '@/constants';
 import * as Icons from '@/icons';
 import { type BadgeTemplate, type User } from '@/types';
@@ -98,7 +98,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
               <button
                 key={badge.name}
                 onClick={() => setSelectedBadge(badge)}
-                className={`flex w-full items-center space-x-4 border-2 p-3 text-left transition-all ${
+                className={`flex w-full items-center space-x-4 p-3 text-left transition-all md:border-2 ${
                   isSelected
                     ? 'border-primary bg-primary/10'
                     : 'border-black bg-white hover:bg-white'

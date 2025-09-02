@@ -43,13 +43,23 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <div className="py-8 md:py-12">
-      <div className="mb-8 md:mb-12">
-        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          Learning Center
-        </h1>
-        <p className="text-grey-600 mt-3 max-w-2xl text-lg">
-          Access protocol documents, training materials, and outreach guides.
-        </p>
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Learning Center
+            </h1>
+          </div>
+          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            Access protocol documents, training materials, and outreach guides
+            to enhance your activism skills.
+          </p>
+        </div>
+        <div className="shrink-0">
+          <BookOpenIcon className="size-6 text-primary sm:size-12" />
+        </div>
       </div>
 
       <ResourceFilters

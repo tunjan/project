@@ -135,7 +135,7 @@ const ChapterHealthSnapshot: React.FC = () => {
         <button
           key={health.name}
           onClick={() => navigate(`/chapters/${health.name}`)}
-          className="w-full border-2 border-black bg-white p-4 text-left hover:shadow-brutal"
+          className="w-full border-black bg-white p-4 text-left hover:shadow-brutal md:border-2"
         >
           <h4 className="h-card mb-4">{health.name}</h4>
           <div className="grid grid-cols-3 gap-4 text-center">

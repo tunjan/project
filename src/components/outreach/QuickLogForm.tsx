@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { SelectField } from '@/components/ui/Form';
+import { SelectField } from '@/components/ui';
 import { ArrowUturnLeftIcon, MinusIcon, PencilIcon, PlusIcon } from '@/icons';
 import {
   type CubeEvent,
@@ -66,7 +66,7 @@ const OutcomeButton: React.FC<{
   return (
     <button
       onClick={onClick}
-      className={`btn-outline h-16 w-full border-2 font-bold ${getOutcomeColor(outcome)} ${className}`}
+      className={`btn-outline h-16 w-full font-bold md:border-2 ${getOutcomeColor(outcome)} ${className}`}
     >
       {outcome}
     </button>
@@ -236,13 +236,13 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add quick notes about your conversation (optional)"
-              className="w-full border-2 border-black bg-white p-4 pl-12 text-black placeholder:text-neutral-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full border-black bg-white p-4 pl-12 text-black placeholder:text-neutral-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-neutral-500 md:border-2"
             />
           </div>
         </div>
 
         {/* Enhanced Tab Section */}
-        <div className="border-t-2 border-black">
+        <div className="border-t-2 border-black dark:border-white">
           <div className="flex border-b border-neutral-200">
             <TabButton
               isActive={mode === 'single'}
@@ -286,7 +286,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                   {Object.entries(bulkCounts).map(([outcome, count]) => (
                     <div
                       key={outcome}
-                      className="flex items-center justify-between rounded-none border-2 border-neutral-200 bg-neutral-50 p-4 hover:border-neutral-300 hover:bg-white"
+                      className="flex items-center justify-between rounded-none border-neutral-200 bg-neutral-50 p-4 hover:border-neutral-300 hover:bg-white dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500 dark:hover:bg-gray-700 md:border-2"
                     >
                       <span className="text-sm font-semibold text-neutral-700">
                         {outcome}
@@ -302,7 +302,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                               ),
                             }))
                           }
-                          className="flex size-10 items-center justify-center rounded-none border-2 border-black bg-white text-lg font-bold hover:bg-black hover:text-white"
+                          className="flex size-10 items-center justify-center rounded-none border-black bg-white text-lg font-bold hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black md:border-2"
                         >
                           <MinusIcon className="size-5" />
                         </button>
@@ -316,7 +316,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                               [outcome]: p[outcome as OutreachOutcome] + 1,
                             }))
                           }
-                          className="flex size-10 items-center justify-center rounded-none border-2 border-black bg-white text-lg font-bold hover:bg-black hover:text-white"
+                          className="flex size-10 items-center justify-center rounded-none border-black bg-white text-lg font-bold hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black md:border-2"
                         >
                           <PlusIcon className="size-5" />
                         </button>

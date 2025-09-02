@@ -4,9 +4,14 @@
 import { isValid, parseISO } from 'date-fns';
 
 /**
- * Generic helper function for safe date formatting
+ * Safely formats a date using a custom formatter function
+ * @param date - The date to format (Date object, string, or null/undefined)
+ * @param formatter - Function to format the date
+ * @param options - Optional options to pass to the formatter
+ * @param fallback - Fallback text if date is invalid (default: 'Date not available')
+ * @returns Formatted date string or fallback text
  */
-const safeFormatDateGeneric = (
+export const formatDateSafe = (
   date: Date | string | null | undefined,
   formatter: (date: Date, options?: Intl.DateTimeFormatOptions) => string,
   options?: Intl.DateTimeFormatOptions,
@@ -23,66 +28,6 @@ const safeFormatDateGeneric = (
     console.error('Error formatting date:', error);
     return fallback;
   }
-};
-
-/**
- * Safely formats a date using Intl.DateTimeFormat
- * @param date - The date to format (Date object, string, or null/undefined)
- * @param options - DateTimeFormat options
- * @param fallback - Fallback text if date is invalid (default: 'Date not available')
- * @returns Formatted date string or fallback text
- */
-export const safeFormatDate = (
-  date: Date | string | null | undefined,
-  options: Intl.DateTimeFormatOptions,
-  fallback: string = 'Date not available'
-): string => {
-  return safeFormatDateGeneric(
-    date,
-    (d, o) => new Intl.DateTimeFormat(undefined, o).format(d),
-    options,
-    fallback
-  );
-};
-
-/**
- * Safely formats a date using toLocaleDateString
- * @param date - The date to format (Date object, string, or null/undefined)
- * @param options - Locale options
- * @param fallback - Fallback text if date is invalid (default: 'Date not available')
- * @returns Formatted date string or fallback text
- */
-export const safeFormatLocaleDate = (
-  date: Date | string | null | undefined,
-  options?: Intl.DateTimeFormatOptions,
-  fallback: string = 'Date not available'
-): string => {
-  return safeFormatDateGeneric(
-    date,
-    (d, o) => d.toLocaleDateString(undefined, o),
-    options,
-    fallback
-  );
-};
-
-/**
- * Safely formats a date using toLocaleString
- * @param date - The date to format (Date object, string, or null/undefined)
- * @param options - Locale options
- * @param fallback - Fallback text if date is invalid (default: 'Date not available')
- * @returns Formatted date string or fallback text
- */
-export const safeFormatLocaleString = (
-  date: Date | string | null | undefined,
-  options?: Intl.DateTimeFormatOptions,
-  fallback: string = 'Date not available'
-): string => {
-  return safeFormatDateGeneric(
-    date,
-    (d, o) => d.toLocaleString(undefined, o),
-    options,
-    fallback
-  );
 };
 
 /**

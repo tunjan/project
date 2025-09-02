@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import { InputField, SelectField } from '@/components/ui/Form';
+import { ConfirmationModal } from '@/components/ui';
+import { InputField, SelectField } from '@/components/ui';
 import { PencilIcon, PlusIcon, TrashIcon } from '@/icons';
 import { type InventoryItem } from '@/types';
 
@@ -30,7 +30,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ item, onSave, onCancel }) => {
   };
 
   return (
-    <div className="border-2 border-black bg-white p-4">
+    <div className="border-black bg-white p-4 md:border-2">
       <h3 className="h-subsection">{item ? 'Edit Item' : 'Add New Item'}</h3>
       <form onSubmit={handleSubmit} className="form-spacing">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -84,7 +84,7 @@ const InventoryItemCard: React.FC<{
   onDelete: () => void;
 }> = ({ item, onEdit, onDelete }) => {
   return (
-    <div className="border-2 border-black bg-white p-4">
+    <div className="border-black bg-white p-4 md:border-2">
       <div className="flex justify-between">
         <div className="flex-1">
           <div className="mb-3">
@@ -227,7 +227,7 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
             onClick={() => setFilter(category)}
             className={`px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${
               filter === category
-                ? 'border-2 border-primary bg-primary text-white'
+                ? 'border-primary bg-primary text-white md:border-2'
                 : 'btn-outline'
             }`}
           >

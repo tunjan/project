@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import { BellIcon, XIcon } from '@/icons';
 import { type Notification } from '@/types';
-import { safeFormatLocaleString } from '@/utils/date';
-import { getNotificationIcon } from '@/utils/notificationUtils';
+import { formatDateSafe } from '@/utils';
+import { getNotificationIcon } from '@/utils';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -24,7 +24,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <button
       onClick={() => onNotificationClick(notification)}
-      className="w-full p-3 text-left transition-colors duration-200 hover:bg-neutral-100"
+      className="w-full p-3 text-left transition-colors duration-200 hover:bg-neutral-100 dark:hover:bg-gray-700"
     >
       <div className="flex items-start space-x-3">
         {!notification.isRead && (
@@ -43,14 +43,18 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             !notification.isRead ? 'font-semibold' : 'font-normal'
           }`}
         >
-          <p className="text-sm leading-tight text-black">
+          <p className="text-sm leading-tight text-black dark:text-white">
             {notification.message}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
-            {safeFormatLocaleString(notification.createdAt, {
-              dateStyle: 'short',
-              timeStyle: 'short',
-            })}
+          <p className="mt-1 text-xs text-neutral-500 dark:text-gray-400">
+            {formatDateSafe(
+              notification.createdAt,
+              (d, o) => d.toLocaleString(undefined, o),
+              {
+                dateStyle: 'short',
+                timeStyle: 'short',
+              }
+            )}
           </p>
         </div>
       </div>
@@ -87,7 +91,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-16"
       role="dialog"
       aria-modal="true"
       tabIndex={-1}
@@ -99,11 +103,13 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
         aria-label="Close modal"
       />
       <div
-        className="animate-fade-in animate-scale-in w-full max-w-md border-2 border-black bg-neutral-50 shadow-brutal"
+        className="animate-fade-in animate-scale-in flex max-h-[calc(100vh-8rem)] w-full max-w-md flex-col border-black bg-neutral-50 shadow-brutal dark:border-white dark:bg-gray-800 md:border-2"
         role="document"
       >
-        <div className="flex items-center justify-between border-b-2 border-black p-3">
-          <h3 className="font-bold text-black">Notifications</h3>
+        <div className="flex shrink-0 items-center justify-between border-b-2 border-black p-3 dark:border-white">
+          <h3 className="font-bold text-black dark:text-white">
+            Notifications
+          </h3>
           <div className="flex items-center space-x-2">
             {unreadCount > 0 && (
               <button
@@ -113,13 +119,16 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
                 Mark all as read
               </button>
             )}
-            <button onClick={onClose} className="p-1 hover:bg-white">
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-white dark:hover:bg-gray-700"
+            >
               <XIcon className="size-5" />
             </button>
           </div>
         </div>
 
-        <div className="max-h-96 divide-y divide-neutral-200 overflow-y-auto">
+        <div className="min-h-0 flex-1 divide-y divide-neutral-200 overflow-y-auto">
           {notifications.length > 0 ? (
             notifications
               .slice(0, 5)
@@ -131,14 +140,16 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
                 />
               ))
           ) : (
-            <div className="p-8 text-center text-neutral-500">
-              <BellIcon className="mx-auto size-8 text-neutral-400" />
-              <p className="mt-2 text-sm">You have no notifications.</p>
+            <div className="p-8 text-center text-neutral-500 dark:text-gray-400">
+              <BellIcon className="mx-auto size-8 text-neutral-400 dark:text-gray-500" />
+              <p className="mt-2 text-sm dark:text-gray-300">
+                You have no notifications.
+              </p>
             </div>
           )}
         </div>
         {notifications.length > 0 && (
-          <div className="border-t-2 border-black p-2 text-center">
+          <div className="shrink-0 border-t-2 border-black p-2 text-center dark:border-white">
             <Link
               to="/notifications"
               onClick={onClose}

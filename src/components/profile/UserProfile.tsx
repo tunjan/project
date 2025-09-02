@@ -13,7 +13,7 @@ import ParticipationHistory from '@/components/dashboard/ParticipationHistory';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
 import UserActivityChart from '@/components/profile/UserActivityChart';
-import Avatar from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui';
 import {
   ChatBubbleLeftRightIcon,
   ChevronLeftIcon,
@@ -24,8 +24,8 @@ import {
 import { useBadgeAwardsForUser, useEvents, useUsersActions } from '@/store';
 import { useCurrentUser } from '@/store';
 import { OnboardingStatus, type User } from '@/types';
-import { getCityAttendanceForUser } from '@/utils/analytics';
-import { getUserRoleDisplay } from '@/utils/user';
+import { getCityAttendanceForUser } from '@/utils';
+import { getUserRoleDisplay } from '@/utils';
 
 interface UserProfileProps {
   user: User;

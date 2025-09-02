@@ -36,7 +36,7 @@ const SignUpSuccessPage: React.FC = () => {
           We've received your application for{' '}
           {chapter ? <strong>{chapter}</strong> : 'your chapter'}.
         </p>
-        <div className="rounded-nonenone mt-4 border-2 border-black bg-white p-4 shadow-brutal">
+        <div className="rounded-nonenone mt-4 border-black bg-white p-4 shadow-brutal md:border-2">
           <div className="flex items-start gap-3">
             <CalendarIcon className="mt-0.5 size-5 text-primary" />
             <div>
@@ -76,7 +76,7 @@ const SignUpSuccessPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="rounded-nonenone mt-6 border-2 border-black bg-white p-4 shadow-brutal">
+        <div className="rounded-nonenone mt-6 border-black bg-white p-4 shadow-brutal md:border-2">
           <p className="mb-2 font-semibold">Stay in the loop</p>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             {instagramUrl && (

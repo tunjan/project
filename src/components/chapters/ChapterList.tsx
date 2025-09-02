@@ -1,38 +1,31 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Stat } from '@/components/ui';
 import { SearchIcon } from '@/icons';
 import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
 import { type Chapter, Role } from '@/types';
-import { ChapterStats, getChapterStats } from '@/utils/analytics';
+import { ChapterStats, getChapterStats } from '@/utils';
 
 import ChapterCard from './ChapterCard';
 import ChapterMap from './ChapterMap';
 import RegionalOrganiserCard from './RegionalOrganiserCard';
 
-// A small helper component for stats on mobile
-const Stat: React.FC<{ label: string; value: string | number }> = ({
-  label,
-  value,
-}) => (
-  <div className="text-center">
-    <p className="font-mono text-xl font-bold">{value}</p>
-    <p className="text-xs font-semibold uppercase text-neutral-500">{label}</p>
-  </div>
-);
-
 const ChapterRow: React.FC<{
   chapterStats: ChapterStats;
   onSelect: () => void;
-}> = ({ chapterStats, onSelect }) => {
+  isFirst?: boolean;
+}> = ({ chapterStats, onSelect, isFirst = false }) => {
   return (
     <button
-      className="group w-full cursor-pointer bg-white p-4 text-left even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal md:grid md:grid-cols-6 md:items-center"
+      className={`group w-full cursor-pointer bg-white p-4 text-left even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal dark:bg-black dark:even:bg-gray-800 dark:hover:bg-gray-700 md:grid md:grid-cols-6 md:items-center ${
+        isFirst ? 'border-t-2 border-black dark:border-white md:border-t-0' : ''
+      }`}
       onClick={onSelect}
       type="button"
       aria-label={`View details for ${chapterStats.name} chapter`}
     >
-      {/* --- Mobile & Desktop: Chapter Name --- */}
+      {/* Chapter Name */}
       <div className="md:col-span-2">
         <Link
           to={`/chapters/${chapterStats.name}`}
@@ -46,30 +39,20 @@ const ChapterRow: React.FC<{
         </p>
       </div>
 
-      {/* --- Mobile View: Stats Grid --- */}
-      <div className="mt-4 grid grid-cols-2 gap-4 border-t-2 border-black pt-4 md:hidden">
+      {/* Stats - Mobile: Grid layout, Desktop: Individual columns */}
+      <div className="mt-4 grid grid-cols-2 gap-4 border-t-2 border-black pt-4 dark:border-white md:mt-0 md:grid-cols-4 md:border-t-0 md:pt-0">
         <Stat label="Members" value={chapterStats.memberCount} />
         <Stat label="Events" value={chapterStats.eventsHeld} />
         <Stat label="Hours" value={Math.round(chapterStats.totalHours)} />
         <Stat label="Convos" value={chapterStats.totalConversations} />
       </div>
 
-      {/* --- Desktop View: Stats in Grid Columns --- */}
-      <p className="hidden font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:block">
-        {chapterStats.memberCount}
-      </p>
-      <p className="hidden font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:block">
-        {chapterStats.eventsHeld}
-      </p>
-      <p className="hidden font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:block">
-        {Math.round(chapterStats.totalHours)}
-      </p>
-      <p className="hidden items-center justify-between font-mono text-lg font-bold transition-colors duration-300 group-hover:text-primary md:flex">
-        {chapterStats.totalConversations}
+      {/* Desktop arrow indicator */}
+      <div className="hidden items-center justify-end md:flex">
         <span className="text-2xl text-neutral-500 group-hover:text-primary">
           →
         </span>
-      </p>
+      </div>
     </button>
   );
 };
@@ -86,7 +69,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
 
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'map' | 'grid'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'grid'>('grid');
 
   const chapterStats = useMemo(
     () => getChapterStats(allUsers, allEvents, allChapters, allOutreachLogs),
@@ -137,19 +120,25 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
 
   return (
     <div className="py-8 md:py-12">
-      <div className="mb-8 md:mb-12">
-        <h1 className="text-4xl font-extrabold tracking-tight text-black md:text-5xl">
-          {selectedRegion === 'all'
-            ? 'Global Chapters'
-            : `${selectedRegion} Chapters`}
-        </h1>
-        <p className="mt-3 max-w-2xl text-lg text-neutral-600">
-          An operational directory of our global network of activist chapters.
-        </p>
+      {/* Enhanced Header Section */}
+      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-2 bg-primary"></div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              {selectedRegion === 'all'
+                ? 'Global Chapters'
+                : `${selectedRegion} Chapters`}
+            </h1>
+          </div>
+          <p className="max-w-3xl px-2 text-base leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
+            An operational directory of our global network of activist chapters.
+          </p>
+        </div>
       </div>
 
       {/* Search and Filter Controls */}
-      <div className="mb-8 border-2 border-black bg-white p-4">
+      <div className="mb-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="md:col-span-1">
             <label
@@ -158,7 +147,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             >
               Search by Name or Country
             </label>
-            <div className="relative">
+            <div className="relative border-2 border-black dark:border-white sm:border-0">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <SearchIcon className="size-5 text-neutral-500" />
               </div>
@@ -168,7 +157,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                 placeholder="Search by chapter..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="rounded-nonenone block h-[42px] w-full border-2 border-black bg-white p-2 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="rounded-nonenone block h-[42px] w-full border-black bg-white p-2 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary dark:border-white dark:bg-black dark:text-white dark:placeholder:text-neutral-500 md:border-2"
               />
             </div>
           </div>
@@ -184,7 +173,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
               name="region-filter"
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block h-[42px] w-full border-2 border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
+              className="block h-[42px] w-full border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-white dark:bg-black dark:text-white sm:text-sm md:border-2"
             >
               {availableRegions.map((region) => (
                 <option key={region} value={region}>
@@ -197,10 +186,10 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
             <div className="mb-1 block text-sm font-bold text-black">
               View Mode
             </div>
-            <div className="flex border-2 border-black">
+            <div className="flex border-black dark:border-white md:border-2">
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex-1 p-2 text-sm font-bold transition-colors ${
+                className={`hidden flex-1 p-2 text-sm font-bold transition-colors md:block ${
                   viewMode === 'list'
                     ? 'bg-black text-white'
                     : 'bg-white text-black hover:bg-gray-100'
@@ -237,7 +226,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
 
       {/* Map View */}
       {viewMode === 'map' && (
-        <div className="mb-8 border-2 border-black bg-white">
+        <div className="mb-8">
           <ChapterMap
             chapters={filteredChapters}
             onSelectChapter={onNavigateToChapter}
@@ -245,24 +234,16 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
         </div>
       )}
 
-      {/* List View */}
+      {/* List and Grid Views */}
       {viewMode === 'list' && (
-        <div className="border-2 border-black bg-white">
+        <div className="border-black bg-white dark:border-white dark:bg-black lg:md:border-2">
           {/* Desktop Header */}
-          <div className="hidden grid-cols-6 items-center border-b-2 border-black bg-white p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 md:grid">
+          <div className="hidden grid-cols-6 items-center border-b-2 border-black bg-white p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:border-white dark:bg-black dark:text-gray-400 md:grid">
             <p className="col-span-2">Chapter</p>
             <p>Members</p>
             <p>Events</p>
             <p>Hours</p>
             <p>Conversations</p>
-          </div>
-
-          {/* Mobile Header - Show labels for mobile users */}
-          <div className="border-b-2 border-black bg-neutral-50 p-3 text-xs font-semibold text-neutral-600 md:hidden">
-            <p className="text-center">
-              Tap on a chapter row to view details. Data shown: Members, Events,
-              Hours, Conversations
-            </p>
           </div>
 
           {/* CRITICAL FIX: Add semantic table structure for screen readers */}
@@ -292,13 +273,14 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
           </table>
           {filteredAndSortedStats.length > 0 ? (
             <div className="divide-y-2 divide-black">
-              {filteredAndSortedStats.map((stat) => {
+              {filteredAndSortedStats.map((stat, index) => {
                 const chapter = allChapters.find((c) => c.name === stat.name)!;
                 return (
                   <ChapterRow
                     key={stat.name}
                     chapterStats={stat}
                     onSelect={() => onNavigateToChapter(chapter)}
+                    isFirst={index === 0}
                   />
                 );
               })}
@@ -320,20 +302,27 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
       {viewMode === 'grid' && (
         <>
           {filteredAndSortedStats.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredAndSortedStats.map((stat) => {
+            <div
+              className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : ''}`}
+            >
+              {filteredAndSortedStats.map((stat, index) => {
                 const chapter = allChapters.find((c) => c.name === stat.name)!;
                 return (
-                  <ChapterCard
-                    key={stat.name}
-                    chapterStats={stat}
-                    onSelect={() => onNavigateToChapter(chapter)}
-                  />
+                  <div key={stat.name}>
+                    <ChapterCard
+                      chapterStats={stat}
+                      onSelect={() => onNavigateToChapter(chapter)}
+                    />
+                    {/* Add divider between cards on mobile, but not after the last one */}
+                    {index < filteredAndSortedStats.length - 1 && (
+                      <div className="border-b border-gray-300 md:hidden"></div>
+                    )}
+                  </div>
                 );
               })}
             </div>
           ) : (
-            <div className="border-2 border-black bg-white p-8 text-center">
+            <div className="border-black bg-white p-8 text-center dark:border-white dark:bg-black md:border-2">
               <h3 className="text-xl font-bold text-black">
                 No chapters found.
               </h3>

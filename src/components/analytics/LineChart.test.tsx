@@ -178,7 +178,7 @@ describe('<LineChart />', () => {
     render(<LineChart {...defaultProps} />);
     const container = screen.getByText('Monthly Trends').closest('div');
     expect(container).toHaveClass(
-      'border-2',
+      'md:border-2',
       'border-black',
       'bg-white',
       'p-4',

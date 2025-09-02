@@ -8,7 +8,7 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: './src/setupTests.ts',
+      setupFiles: './src/setupTests.tsx',
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html'],
