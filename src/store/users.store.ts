@@ -83,7 +83,6 @@ export interface UsersActions {
   autoAdvanceOnboarding: (userId: string) => void;
   fixOnboardingIssues: () => void;
   resetToInitialData: () => void;
-  getUsers: () => User[];
   clearPersistedData: () => void;
   init: () => void;
   advanceOnboardingAfterEvent: (userId: string) => void;
@@ -93,16 +92,6 @@ export const useUsersStore = create<UsersState & UsersActions>()(
   persist(
     (set, get) => ({
       users: processedUsers,
-
-      // Ensure users are always available
-      getUsers: () => {
-        const state = get();
-        if (!state.users || state.users.length === 0) {
-          set({ users: processedUsers });
-          return processedUsers;
-        }
-        return state.users;
-      },
 
       init: () => {},
 
@@ -860,11 +849,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
   )
 );
 
-export const useUsersState = () =>
-  useUsersStore((s) => {
-    // Ensure users are available
-    return s.users && s.users.length > 0 ? s.users : s.getUsers();
-  });
+export const useUsersState = () => useUsersStore((s) => s.users);
 export const useUsersActions = () =>
   useUsersStore((s) => ({
     register: s.register,
@@ -896,10 +881,7 @@ export const useUsersActions = () =>
 // Selectors
 export const useUserById = (userId?: string) => {
   const user = useUsersStore((s) => {
-    // Ensure users are available
-    const users = s.users && s.users.length > 0 ? s.users : s.getUsers();
-
-    return users.find((u) => u.id === userId);
+    return s.users.find((u) => u.id === userId);
   });
   return user;
 };
