@@ -1,12 +1,3 @@
-/**
- * String utility functions
- */
-
-/**
- * Generates initials from a name string
- * @param name - The name to generate initials from
- * @returns The initials (up to 2 characters)
- */
 export const getInitials = (name?: string) => {
   if (!name) return '';
   const parts = name.trim().split(/\s+/);
@@ -14,13 +5,8 @@ export const getInitials = (name?: string) => {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
-/**
- * Deterministic background color generator based on name string
- * @param str - The string to generate a color from
- * @returns HSL color string
- */
 export const stringToColor = (str?: string) => {
-  if (!str) return '#CBD5E1'; // neutral if no name
+  if (!str) return '#CBD5E1';
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);

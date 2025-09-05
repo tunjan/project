@@ -6,9 +6,7 @@ import {
 } from '@/types';
 import { getConfirmedUsers } from './user';
 
-// Comprehensive metrics data structure
 export interface MetricsData {
-  // User metrics
   users: {
     confirmed: User[];
     byChapter: Map<string, User[]>;
@@ -16,34 +14,29 @@ export interface MetricsData {
     stats: Map<string, UserStats>;
   };
 
-  // Chapter metrics
   chapters: {
     stats: Map<string, ChapterStats>;
     outreachStats: Map<string, ChapterOutreachStats>;
   };
 
-  // Event metrics
   events: {
     byChapter: Map<string, CubeEvent[]>;
     byMonth: Map<string, CubeEvent[]>;
     byStatus: Map<string, CubeEvent[]>;
   };
 
-  // Outreach metrics
   outreach: {
     byUser: Map<string, OutreachLog[]>;
     byEvent: Map<string, OutreachLog[]>;
     byMonth: Map<string, OutreachLog[]>;
   };
 
-  // Time-bucketed data
   timeBuckets: {
     weekly: Map<string, OutreachLog[]>;
     monthly: Map<string, OutreachLog[]>;
     yearly: Map<string, OutreachLog[]>;
   };
 
-  // Global aggregated stats
   global: GlobalStats;
 }
 
@@ -80,11 +73,6 @@ export interface GlobalStats {
   conversationsPerHour: number;
 }
 
-/**
- * Primary function to calculate all metrics from raw data
- * This runs once and generates a comprehensive, structured object
- * containing all necessary pre-computed data
- */
 export const calculateAllMetrics = (
   users: User[],
   events: CubeEvent[],
@@ -93,7 +81,6 @@ export const calculateAllMetrics = (
 ): MetricsData => {
   const confirmedUsers = getConfirmedUsers(users);
 
-  // Initialize data structures
   const metrics: MetricsData = {
     users: {
       confirmed: confirmedUsers,
@@ -130,11 +117,8 @@ export const calculateAllMetrics = (
     },
   };
 
-  // FIX: Optimize performance by building user attendance and outreach maps first
-  const userAttendance = new Map<string, Set<string>>(); // userId -> Set of attended eventIds
-  const userOutreachCount = new Map<string, number>(); // userId -> conversation count
-
-  // Build attendance map from events
+  const userAttendance = new Map<string, Set<string>>();
+  const userOutreachCount = new Map<string, number>();
   events.forEach((event) => {
     if (event.report) {
       for (const [userId, status] of Object.entries(event.report.attendance)) {
@@ -148,15 +132,12 @@ export const calculateAllMetrics = (
     }
   });
 
-  // Build outreach map from logs
   outreachLogs.forEach((log) => {
     const currentCount = userOutreachCount.get(log.userId) || 0;
     userOutreachCount.set(log.userId, currentCount + 1);
   });
 
-  // Process users with optimized data
   confirmedUsers.forEach((user) => {
-    // Group by chapter
     user.chapters.forEach((chapterName) => {
       if (!metrics.users.byChapter.has(chapterName)) {
         metrics.users.byChapter.set(chapterName, []);
@@ -164,13 +145,11 @@ export const calculateAllMetrics = (
       metrics.users.byChapter.get(chapterName)!.push(user);
     });
 
-    // Group by role
     if (!metrics.users.byRole.has(user.role)) {
       metrics.users.byRole.set(user.role, []);
     }
     metrics.users.byRole.get(user.role)!.push(user);
 
-    // Calculate user stats using pre-built maps
     const userStats = calculateUserStatsOptimized(
       user,
       events,
@@ -181,7 +160,6 @@ export const calculateAllMetrics = (
     metrics.users.stats.set(user.id, userStats);
   });
 
-  // Process chapters
   chapters.forEach((chapter) => {
     const chapterUsers = metrics.users.byChapter.get(chapter.name) || [];
     const chapterEvents = events.filter((e) => e.city === chapter.name);
@@ -206,15 +184,12 @@ export const calculateAllMetrics = (
     metrics.chapters.outreachStats.set(chapter.name, outreachStats);
   });
 
-  // Process events
   events.forEach((event) => {
-    // Group by chapter
     if (!metrics.events.byChapter.has(event.city)) {
       metrics.events.byChapter.set(event.city, []);
     }
     metrics.events.byChapter.get(event.city)!.push(event);
 
-    // Group by month
     const startDate = new Date(event.startDate);
     const monthKey = `${startDate.getFullYear()}-${String(
       startDate.getMonth() + 1
@@ -224,28 +199,23 @@ export const calculateAllMetrics = (
     }
     metrics.events.byMonth.get(monthKey)!.push(event);
 
-    // Group by status
     if (!metrics.events.byStatus.has(event.status)) {
       metrics.events.byStatus.set(event.status, []);
     }
     metrics.events.byStatus.get(event.status)!.push(event);
   });
 
-  // Process outreach logs
   outreachLogs.forEach((log) => {
-    // Group by user
     if (!metrics.outreach.byUser.has(log.userId)) {
       metrics.outreach.byUser.set(log.userId, []);
     }
     metrics.outreach.byUser.get(log.userId)!.push(log);
 
-    // Group by event
     if (!metrics.outreach.byEvent.has(log.eventId)) {
       metrics.outreach.byEvent.set(log.eventId, []);
     }
     metrics.outreach.byEvent.get(log.eventId)!.push(log);
 
-    // Group by month - ensure createdAt is a Date object
     const createdAt =
       log.createdAt instanceof Date ? log.createdAt : new Date(log.createdAt);
     const monthKey = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
@@ -255,13 +225,148 @@ export const calculateAllMetrics = (
     metrics.outreach.byMonth.get(monthKey)!.push(log);
   });
 
-  // Calculate global stats
   metrics.global = calculateGlobalStats(metrics);
 
   return metrics;
 };
 
-// Optimized helper function using pre-built maps
+export const filterMetrics = (
+  metrics: MetricsData,
+  selectedCountry?: string,
+  selectedChapter?: string
+): MetricsData => {
+  if (!selectedCountry && !selectedChapter) {
+    return metrics;
+  }
+
+  const filteredMetrics: MetricsData = {
+    users: {
+      confirmed: [],
+      byChapter: new Map(),
+      byRole: new Map(),
+      stats: new Map(),
+    },
+    chapters: {
+      stats: new Map(),
+      outreachStats: new Map(),
+    },
+    events: {
+      byChapter: new Map(),
+      byMonth: new Map(),
+      byStatus: new Map(),
+    },
+    outreach: {
+      byUser: new Map(),
+      byEvent: new Map(),
+      byMonth: new Map(),
+    },
+    timeBuckets: {
+      weekly: new Map(),
+      monthly: new Map(),
+      yearly: new Map(),
+    },
+    global: {
+      totalMembers: 0,
+      totalHours: 0,
+      totalConversations: 0,
+      totalEvents: 0,
+      chapterCount: 0,
+      conversationsPerHour: 0,
+    },
+  };
+
+  let chaptersToInclude = new Set<string>();
+
+  if (selectedChapter && selectedChapter !== 'all') {
+    chaptersToInclude.add(selectedChapter);
+  } else if (selectedCountry && selectedCountry !== 'global') {
+    for (const [chapterName, chapterStats] of metrics.chapters.stats) {
+      if (chapterStats.country === selectedCountry) {
+        chaptersToInclude.add(chapterName);
+      }
+    }
+  } else {
+    chaptersToInclude = new Set(metrics.chapters.stats.keys());
+  }
+
+  for (const chapterName of chaptersToInclude) {
+    const chapterStats = metrics.chapters.stats.get(chapterName);
+    const chapterOutreachStats =
+      metrics.chapters.outreachStats.get(chapterName);
+
+    if (chapterStats) {
+      filteredMetrics.chapters.stats.set(chapterName, chapterStats);
+    }
+    if (chapterOutreachStats) {
+      filteredMetrics.chapters.outreachStats.set(
+        chapterName,
+        chapterOutreachStats
+      );
+    }
+  }
+
+  const filteredUserIds = new Set<string>();
+  for (const chapterName of chaptersToInclude) {
+    const chapterUsers = metrics.users.byChapter.get(chapterName) || [];
+    chapterUsers.forEach((user) => {
+      filteredUserIds.add(user.id);
+      filteredMetrics.users.confirmed.push(user);
+    });
+  }
+
+  const userMap = new Map<string, User>();
+  filteredMetrics.users.confirmed.forEach((user) => userMap.set(user.id, user));
+  filteredMetrics.users.confirmed = Array.from(userMap.values());
+
+  for (const userId of filteredUserIds) {
+    const userStats = metrics.users.stats.get(userId);
+    if (userStats) {
+      filteredMetrics.users.stats.set(userId, userStats);
+    }
+  }
+
+  for (const chapterName of chaptersToInclude) {
+    const chapterUsers = metrics.users.byChapter.get(chapterName);
+    if (chapterUsers) {
+      filteredMetrics.users.byChapter.set(chapterName, chapterUsers);
+    }
+  }
+
+  filteredMetrics.global = calculateGlobalStatsFromFiltered(filteredMetrics);
+
+  return filteredMetrics;
+};
+
+const calculateGlobalStatsFromFiltered = (
+  metrics: MetricsData
+): GlobalStats => {
+  const totalMembers = metrics.users.confirmed.length;
+  const totalHours = Array.from(metrics.chapters.stats.values()).reduce(
+    (sum, stats) => sum + stats.totalHours,
+    0
+  );
+  const totalConversations = Array.from(metrics.chapters.stats.values()).reduce(
+    (sum, stats) => sum + stats.totalConversations,
+    0
+  );
+  const totalEvents = Array.from(metrics.chapters.stats.values()).reduce(
+    (sum, stats) => sum + stats.eventsHeld,
+    0
+  );
+  const chapterCount = metrics.chapters.stats.size;
+  const conversationsPerHour =
+    totalHours > 0 ? totalConversations / totalHours : 0;
+
+  return {
+    totalMembers,
+    totalHours,
+    totalConversations,
+    totalEvents,
+    chapterCount,
+    conversationsPerHour,
+  };
+};
+
 const calculateUserStatsOptimized = (
   user: User,
   events: CubeEvent[],

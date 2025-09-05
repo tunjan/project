@@ -18,9 +18,7 @@ const AtRiskMembersSnapshot: React.FC = () => {
   const atRiskMembers = useMemo(() => {
     if (!currentUser) return [];
 
-    // CRITICAL FIX: Combine filtering operations for better performance
     return allUsers.filter((user) => {
-      // Check if user is visible to current user
       const isVisible =
         currentUser.role === 'Global Admin' ||
         user.chapters?.some((c) => currentUser.organiserOf?.includes(c)) ||
@@ -34,7 +32,6 @@ const AtRiskMembersSnapshot: React.FC = () => {
 
       if (!isVisible) return false;
 
-      // Check if user is at risk (inactive)
       return isUserInactive(user, allEvents);
     });
   }, [currentUser, allUsers, allEvents, allChapters]);

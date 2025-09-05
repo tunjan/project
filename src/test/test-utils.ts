@@ -1,10 +1,5 @@
 import { OnboardingStatus, Role, type User } from '@/types';
 
-/**
- * Factory function to create mock user data with sensible defaults
- * @param overrides - Partial user object to override defaults
- * @returns Complete User object
- */
 export const createUserMock = (overrides: Partial<User> = {}): User => {
   const defaults: User = {
     id: 'test-user-id',

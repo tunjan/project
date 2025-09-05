@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
+    "removeComments": true,
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
@@ -15,15 +16,31 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/data/*": ["./src/data/*"]
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/data/*": ["./src/data/*"],
+      "@/store/*": ["./src/store/*"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/contexts/*": ["./src/contexts/*"],
+      "@/services/*": ["./src/services/*"]
     },
     "noEmit": true,
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "types": ["node", "vite/client"]
   },
-  "include": ["src", "vite.config.ts", "vitest.config.ts"],
+  "include": [
+    "src",
+    "vite.config.ts",
+    "eslint.config.js",
+    "tailwind.config.js",
+    "postcss.config.js",
+    "scripts"
+  ],
   "exclude": ["node_modules", "dist", "src/data/mockData.ts"]
 }

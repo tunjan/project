@@ -35,7 +35,6 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
   const userOutreachData = useMemo(() => {
     const userLogs = allOutreachLogs.filter((log) => log.userId === user.id);
 
-    // Group logs by event
     const logsByEvent = userLogs.reduce(
       (acc, log) => {
         const event = allEvents.find((e) => e.id === log.eventId);
@@ -68,7 +67,6 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
       >
     );
 
-    // Calculate overall statistics
     const totalConversations = userLogs.length;
     const outcomesBreakdown = userLogs.reduce(
       (acc, log) => {
@@ -78,7 +76,6 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
       {} as Record<OutreachOutcome, number>
     );
 
-    // Calculate success rate (positive outcomes)
     const positiveOutcomes = [
       OutreachOutcome.BECAME_VEGAN_ACTIVIST,
       OutreachOutcome.BECAME_VEGAN,
@@ -92,7 +89,6 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
         ? ((successCount / totalConversations) * 100).toFixed(1)
         : '0';
 
-    // Recent activity (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentLogs = userLogs.filter(

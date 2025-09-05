@@ -1,6 +1,3 @@
-// NOTE: In a production application, these complex data aggregations (getChapterStats, getGlobalStats, etc.)
-// should be performed on the backend. The client should fetch pre-computed data to ensure performance and scalability.
-
 import { type Chapter, type CubeEvent, OutreachLog, type User } from '@/types';
 import { safeParseDate } from './date';
 import { getConfirmedUsers } from './user';
@@ -17,7 +14,6 @@ export interface ChapterStats {
   conversationsPerHour: number;
 }
 
-// NEW: A dedicated type for our new efficiency metric
 export interface ChapterOutreachStats {
   name: string;
   totalHours: number;
@@ -58,7 +54,6 @@ export const getChapterStats = (
   return Array.from(metrics.chapters.stats.values());
 };
 
-// NEW: Calculates total hours and conversations per chapter for the scatter plot
 export const getChapterOutreachStats = (
   users: User[],
   events: CubeEvent[],
@@ -69,7 +64,6 @@ export const getChapterOutreachStats = (
   return Array.from(metrics.chapters.outreachStats.values());
 };
 
-// Generic helper for generating monthly trends
 const generateMonthlyTrend = <T>(
   items: T[],
   getDate: (item: T) => Date | undefined,
@@ -78,14 +72,12 @@ const generateMonthlyTrend = <T>(
   const trends: Record<string, number> = {};
   const now = new Date();
 
-  // Initialize all months with 0
   for (let i = 0; i < months; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     trends[key] = 0;
   }
 
-  // Count items per month
   items.forEach((item) => {
     const itemDate = getDate(item);
     if (itemDate) {
@@ -112,9 +104,6 @@ export const getEventTrendsByMonth = (
   );
 };
 
-/**
- * NEW: Calculates the number of conversations logged per month.
- */
 export const getConversationTrendsByMonth = (
   outreachLogs: OutreachLog[],
   months: number = 12
@@ -179,39 +168,32 @@ export const getTotalMembersByMonth = (
   const now = new Date();
   const confirmedUsers = getConfirmedUsers(users);
 
-  // Initialize all months with 0
   for (let i = 0; i < months; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     trends[key] = 0;
   }
 
-  // CRITICAL FIX: Optimize from O(N*M) to O(N+M) by processing users once
-  // and calculating their active months efficiently
   for (const user of confirmedUsers) {
     if (!user.joinDate) continue;
 
     const joinDate = new Date(user.joinDate);
     const leaveDate = user.leaveDate ? new Date(user.leaveDate) : null;
 
-    // Calculate the range of months this user was active
     const joinMonth = new Date(joinDate.getFullYear(), joinDate.getMonth(), 1);
     const leaveMonth = leaveDate
       ? new Date(leaveDate.getFullYear(), leaveDate.getMonth(), 1)
       : null;
 
-    // Find the earliest month we care about
     const earliestMonth = new Date(
       now.getFullYear(),
       now.getMonth() - months + 1,
       1
     );
 
-    // Determine start and end months for this user's activity
     const startMonth = joinMonth > earliestMonth ? joinMonth : earliestMonth;
     const endMonth = leaveMonth && leaveMonth < now ? leaveMonth : now;
 
-    // Add 1 to each month in the user's active range
     const currentMonth = new Date(startMonth);
     while (currentMonth <= endMonth && currentMonth <= now) {
       const key = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
@@ -234,11 +216,8 @@ export const getTopActivistsByHours = (
 ): { name: string; value: number }[] => {
   const confirmedUsers = getConfirmedUsers(users);
 
-  // FIX: Optimize performance by iterating through events only once
-  // Build a map of user hours instead of filtering events for each user
   const userHours = new Map<string, number>();
 
-  // Iterate through events once to build the map
   for (const event of allEvents) {
     if (event.report) {
       for (const [userId, status] of Object.entries(event.report.attendance)) {
@@ -273,9 +252,6 @@ export const getAverageActivistsPerEvent = (events: CubeEvent[]): number => {
   return totalAttendees / events.length;
 };
 
-/**
- * Aggregates a specific user's hours per month.
- */
 export const getUserHoursByMonth = (
   userId: string,
   allEvents: CubeEvent[]
@@ -299,9 +275,6 @@ export const getUserHoursByMonth = (
     .sort((a, b) => a.month.localeCompare(b.month));
 };
 
-/**
- * Aggregates a specific user's conversations per month.
- */
 export const getUserConversationsByMonth = (
   userId: string,
   allLogs: OutreachLog[]
@@ -322,9 +295,6 @@ export const getUserConversationsByMonth = (
     .sort((a, b) => a.month.localeCompare(b.month));
 };
 
-/**
- * NEW: Calculates the number of times a user has attended an event in each city.
- */
 export const getCityAttendanceForUser = (
   userId: string,
   allEvents: CubeEvent[]
@@ -341,10 +311,9 @@ export const getCityAttendanceForUser = (
 
   return Object.entries(cityCounts)
     .map(([city, count]) => ({ city, count }))
-    .sort((a, b) => b.count - a.count); // Sort by most visited
+    .sort((a, b) => b.count - a.count);
 };
 
-// A helper function to create bins for histogram data.
 const createHistogramData = (
   values: number[],
   numBins: number = 10
@@ -373,19 +342,14 @@ const createHistogramData = (
   });
 };
 
-/**
- * NEW: Generates data for activist hours distribution histogram.
- */
 export const getActivistHoursDistribution = (
   users: User[],
   allEvents: CubeEvent[]
 ): { name: string; value: number }[] => {
   const confirmedUsers = getConfirmedUsers(users);
 
-  // Build a map of user hours from events
   const userHours = new Map<string, number>();
 
-  // Process all events once to build user hours map
   for (const event of allEvents) {
     if (event.report) {
       for (const [userId, status] of Object.entries(event.report.attendance)) {
@@ -397,7 +361,6 @@ export const getActivistHoursDistribution = (
     }
   }
 
-  // Calculate hours for each user
   const usersWithHours = confirmedUsers.map((user) => ({
     ...user,
     totalHours: userHours.get(user.id) || 0,
@@ -409,25 +372,19 @@ export const getActivistHoursDistribution = (
     .map((u) => ({ name: u.name, value: Math.round(u.totalHours) }));
 };
 
-/**
- * NEW: Generates data for activist conversations distribution histogram.
- */
 export const getActivistConversationsDistribution = (
   users: User[],
   allLogs: OutreachLog[]
 ): { name: string; value: number }[] => {
   const confirmedUsers = getConfirmedUsers(users);
 
-  // Build a map of user conversations from logs
   const userConversations = new Map<string, number>();
 
-  // Process all logs once to build user conversations map
   for (const log of allLogs) {
     const currentCount = userConversations.get(log.userId) || 0;
     userConversations.set(log.userId, currentCount + 1);
   }
 
-  // Calculate conversations for each user
   const usersWithConversations = confirmedUsers.map((user) => ({
     ...user,
     totalConversations: userConversations.get(user.id) || 0,
@@ -439,9 +396,6 @@ export const getActivistConversationsDistribution = (
     .map((u) => ({ name: u.name, value: u.totalConversations }));
 };
 
-/**
- * NEW: Generates data for event turnout distribution histogram.
- */
 export const getEventTurnoutDistribution = (
   events: CubeEvent[],
   numBins: number = 10

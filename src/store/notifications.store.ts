@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -71,29 +72,36 @@ export const useNotificationsStore = create<
 
 export const useNotificationsState = () =>
   useNotificationsStore((s) => s.notifications);
-export const useNotificationsActions = () =>
-  useNotificationsStore((s) => ({
-    addNotification: s.addNotification,
-    addNotifications: s.addNotifications,
-    markNotificationAsRead: s.markNotificationAsRead,
-    markAllNotificationsAsRead: s.markAllNotificationsAsRead,
-  }));
+export const useNotificationsActions = () => {
+  const store = useNotificationsStore();
+  return useMemo(
+    () => ({
+      addNotification: store.addNotification,
+      addNotifications: store.addNotifications,
+      markNotificationAsRead: store.markNotificationAsRead,
+      markAllNotificationsAsRead: store.markAllNotificationsAsRead,
+    }),
+    [
+      store.addNotification,
+      store.addNotifications,
+      store.markNotificationAsRead,
+      store.markAllNotificationsAsRead,
+    ]
+  );
+};
 
-// Selectors
-export const useNotificationsForUser = (userId?: string) =>
-  useNotificationsStore((s) => {
+export const useNotificationsForUser = (userId?: string) => {
+  const notifications = useNotificationsStore((s) => s.notifications);
+  return useMemo(() => {
     if (!userId) return [];
-    return s.notifications
-      .filter((n) => n.userId === userId)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  });
+    return notifications.filter((n) => n.userId === userId);
+  }, [notifications, userId]);
+};
 
-export const useUnreadNotificationCount = (userId?: string) =>
-  useNotificationsStore((s) => {
+export const useUnreadNotificationCount = (userId?: string) => {
+  const notifications = useNotificationsStore((s) => s.notifications);
+  return useMemo(() => {
     if (!userId) return 0;
-    return s.notifications.filter((n) => n.userId === userId && !n.isRead)
-      .length;
-  });
+    return notifications.filter((n) => n.userId === userId && !n.isRead).length;
+  }, [notifications, userId]);
+};

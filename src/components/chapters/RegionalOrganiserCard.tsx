@@ -24,7 +24,7 @@ const RegionalOrganiserCard: React.FC<RegionalOrganiserCardProps> = ({
     try {
       await copyToClipboard(user.email);
       toast.success('Email copied to clipboard');
-    } catch (err) {
+    } catch {
       toast.error('Failed to copy email');
     }
   };

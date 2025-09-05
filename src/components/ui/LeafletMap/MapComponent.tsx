@@ -1,6 +1,5 @@
 import 'leaflet/dist/leaflet.css';
 
-// Import specific functions from leaflet to avoid module issues
 import * as L from 'leaflet';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -33,13 +32,13 @@ export interface MapMarker {
   key: string;
 }
 
-interface LeafletMapProps {
+interface MapComponentProps {
   markers: MapMarker[];
   className?: string;
   height?: string;
 }
 
-const LeafletMap: React.FC<LeafletMapProps> = ({
+const MapComponent: React.FC<MapComponentProps> = ({
   markers,
   className = '',
   height = '600px',
@@ -54,24 +53,19 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
     return new L.LatLngBounds(allCoords);
   }, [markers]);
 
-  // Handle tile loading errors
   const handleTileError = () => {
     console.warn('Primary tile provider failed, map may not display correctly');
     setTileError(true);
   };
 
-  // Handle map ready
   const handleMapReady = () => {
     setMapReady(true);
   };
 
-  // Fallback tile provider if primary fails
   const getTileUrl = () => {
     if (tileError) {
-      // Use OpenStreetMap directly as fallback
       return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     }
-    // Primary: CARTO basemaps (HTTPS compatible)
     return 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
   };
 
@@ -124,4 +118,4 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   );
 };
 
-export default LeafletMap;
+export default MapComponent;

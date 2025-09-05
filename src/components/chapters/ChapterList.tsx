@@ -225,7 +225,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
                   <ToggleGroup
                     type="single"
                     value={viewMode}
-                    onValueChange={(value) => {
+                    onValueChange={(value: string) => {
                       if (value) setViewMode(value as 'list' | 'map' | 'grid');
                     }}
                     className="w-full"

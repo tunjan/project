@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { can, Permission } from '@/config';
 import { useChaptersActions, useUsers } from '@/store';
 import { type Chapter, Role, type User } from '@/types';
 
@@ -110,7 +111,6 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
           organiser={managingOrganiser}
           onClose={() => setManagingOrganiser(null)}
           onUpdate={() => {
-            // Force re-render by updating a dependency
             setManagingOrganiser(null);
           }}
         />
@@ -180,23 +180,33 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setEditingChapter(chapter)}
-                                aria-label="Edit Chapter"
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openDeleteModal(chapter.name)}
-                                aria-label="Delete Chapter"
-                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                              >
-                                <Trash className="size-4" />
-                              </Button>
+                              {can(currentUser, Permission.EDIT_CHAPTER, {
+                                chapterName: chapter.name,
+                                allChapters: chapters,
+                              }) && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingChapter(chapter)}
+                                  aria-label="Edit Chapter"
+                                >
+                                  <Pencil className="size-4" />
+                                </Button>
+                              )}
+                              {can(currentUser, Permission.DELETE_CHAPTER, {
+                                chapterName: chapter.name,
+                                allChapters: chapters,
+                              }) && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openDeleteModal(chapter.name)}
+                                  aria-label="Delete Chapter"
+                                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                >
+                                  <Trash className="size-4" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>

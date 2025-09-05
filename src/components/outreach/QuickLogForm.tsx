@@ -51,7 +51,6 @@ interface QuickLogFormProps {
   isTeamView: boolean;
 }
 
-// Modern outcome button with clean design
 const OutcomeButton: React.FC<{
   outcome: OutreachOutcome;
   onClick: () => void;
@@ -131,6 +130,26 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
         Object.values(OutreachOutcome).map((o) => [o, 0])
       ) as Record<OutreachOutcome, number>
   );
+
+  // Memoize bulk count callbacks to prevent infinite loops
+  const updateBulkCount = useMemo(() => {
+    return (outcome: OutreachOutcome, delta: number) => {
+      setBulkCounts((prev) => ({
+        ...prev,
+        [outcome]: Math.max(0, prev[outcome] + delta),
+      }));
+    };
+  }, []);
+
+  const resetBulkCounts = useMemo(() => {
+    return () => {
+      setBulkCounts(
+        Object.fromEntries(
+          Object.values(OutreachOutcome).map((o) => [o, 0])
+        ) as Record<OutreachOutcome, number>
+      );
+    };
+  }, []);
 
   const getOutcomeStyling = (outcome: OutreachOutcome) => {
     switch (outcome) {
@@ -217,11 +236,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
     });
 
     toast.success(`${totalLogs} conversations logged successfully!`);
-    setBulkCounts(
-      Object.fromEntries(
-        Object.values(OutreachOutcome).map((o) => [o, 0])
-      ) as Record<OutreachOutcome, number>
-    );
+    resetBulkCounts();
     setNotes('');
   };
 
@@ -386,13 +401,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                           size="icon"
                           className="size-8"
                           onClick={() =>
-                            setBulkCounts((p) => ({
-                              ...p,
-                              [outcome]: Math.max(
-                                0,
-                                p[outcome as OutreachOutcome] - 1
-                              ),
-                            }))
+                            updateBulkCount(outcome as OutreachOutcome, -1)
                           }
                         >
                           <Minus className="size-3" />
@@ -405,10 +414,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                           size="icon"
                           className="size-8"
                           onClick={() =>
-                            setBulkCounts((p) => ({
-                              ...p,
-                              [outcome]: p[outcome as OutreachOutcome] + 1,
-                            }))
+                            updateBulkCount(outcome as OutreachOutcome, 1)
                           }
                         >
                           <Plus className="size-3" />

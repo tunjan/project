@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// QR flow deprecated
 import { toast } from 'sonner';
 
 import BadgeAwardsDashboard from '@/components/dashboard/BadgeAwardsDashboard';
@@ -59,10 +58,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
 
-  // CONSOLIDATED LOGIC: This boolean now controls all view variations.
   const isOwnProfile = currentUser?.id === user.id;
 
-  const pendingAwards = useBadgeAwardsForUser(currentUser?.id);
+  const allBadgeAwards = useBadgeAwardsForUser(currentUser?.id);
+
+  const pendingAwards = useMemo(() => {
+    if (!currentUser?.id) return [];
+    return allBadgeAwards.filter(
+      (award) =>
+        award.recipient.id === currentUser.id && award.status === 'Pending'
+    );
+  }, [allBadgeAwards, currentUser?.id]);
 
   const cityAttendanceData = useMemo(
     () => getCityAttendanceForUser(user.id, allEvents),
@@ -82,8 +88,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   };
 
   const handleDeactivateInitiation = () => {
-    setIsEditModalOpen(false); // Close edit modal
-    setIsDeactivateModalOpen(true); // Open deactivate modal
+    setIsEditModalOpen(false);
+    setIsDeactivateModalOpen(true);
   };
 
   const handleDeactivateConfirm = async () => {

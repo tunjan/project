@@ -4,22 +4,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import MemberProfile from '@/components/management/MemberProfile';
 import { Button } from '@/components/ui/button';
-import { useUsers, useUsersActions } from '@/store';
+import { useUsers, useUsersStore } from '@/store';
 
 const ManageProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const users = useUsers();
-  const { init, clearPersistedData } = useUsersActions();
   const [showResetButton, setShowResetButton] = useState(false);
   const user = users.find((u) => u.id === userId);
 
-  // Initialize store when component mounts
-  useEffect(() => {
-    init();
-  }, [init]);
-
-  // Show reset button after 5 seconds if still loading
   useEffect(() => {
     if (!user) {
       const timer = setTimeout(() => setShowResetButton(true), 5000);
@@ -29,7 +22,7 @@ const ManageProfilePage: React.FC = () => {
   }, [user]);
 
   const handleResetStore = () => {
-    clearPersistedData();
+    useUsersStore.getState().clearPersistedData();
     window.location.reload();
   };
 

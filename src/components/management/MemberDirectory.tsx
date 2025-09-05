@@ -27,13 +27,13 @@ interface MemberDirectoryProps {
   members: User[];
   onSelectUser: (user: User) => void;
   filterableChapters: Chapter[];
-  pendingRequests?: ChapterJoinRequest[]; // New prop for pending chapter join requests
+  pendingRequests?: ChapterJoinRequest[];
 }
 
 const MemberRow: React.FC<{
   user: User;
   onSelectUser: (user: User) => void;
-  isPendingForCurrentChapter?: boolean; // New prop to show pending status
+  isPendingForCurrentChapter?: boolean;
 }> = ({ user, onSelectUser, isPendingForCurrentChapter }) => {
   const chapterText =
     user.chapters && user.chapters.length > 0
@@ -86,7 +86,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
   members,
   onSelectUser,
   filterableChapters,
-  pendingRequests = [], // Default to empty array
+  pendingRequests = [],
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('all');
@@ -95,9 +95,7 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
     OnboardingStatus | 'all'
   >('all');
 
-  // ✨ PERFORMANCE OPTIMIZATION: Memoize the filtered members list
   const filteredMembers = useMemo(() => {
-    // Combine members with pending request users
     const allUsers = [
       ...members,
       ...pendingRequests
@@ -112,10 +110,8 @@ const MemberDirectory: React.FC<MemberDirectoryProps> = ({
       .filter((user) => {
         if (selectedChapter === 'all') return true;
 
-        // Check if user is already a member of the selected chapter
         const isAlreadyMember = user.chapters?.includes(selectedChapter);
 
-        // Check if there's a pending request for this user and chapter
         const hasPendingRequestForChapter = pendingRequests.some(
           (req) =>
             req.user.id === user.id &&

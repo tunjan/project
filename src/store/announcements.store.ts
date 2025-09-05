@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -83,9 +84,18 @@ export const useAnnouncementsStore = create<
 
 export const useAnnouncementsState = () =>
   useAnnouncementsStore((s) => s.announcements);
-export const useAnnouncementsActions = () =>
-  useAnnouncementsStore((s) => ({
-    createAnnouncement: s.createAnnouncement,
-    updateAnnouncement: s.updateAnnouncement,
-    deleteAnnouncement: s.deleteAnnouncement,
-  }));
+export const useAnnouncementsActions = () => {
+  const store = useAnnouncementsStore();
+  return useMemo(
+    () => ({
+      createAnnouncement: store.createAnnouncement,
+      updateAnnouncement: store.updateAnnouncement,
+      deleteAnnouncement: store.deleteAnnouncement,
+    }),
+    [
+      store.createAnnouncement,
+      store.updateAnnouncement,
+      store.deleteAnnouncement,
+    ]
+  );
+};

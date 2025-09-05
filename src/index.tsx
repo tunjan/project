@@ -9,7 +9,6 @@ import { RouterProvider } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import { router } from './router';
 
-// Create a client
 const queryClient = new QueryClient();
 
 const rootElement = document.getElementById('root');

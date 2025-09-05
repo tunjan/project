@@ -1,9 +1,5 @@
 import { type BadgeTemplate, Role } from '@/types';
 
-/**
- * Role hierarchy for permission checking
- * Higher numbers indicate higher privileges
- */
 export const ROLE_HIERARCHY: Record<Role, number> = {
   [Role.APPLICANT]: 0,
   [Role.ACTIVIST]: 1,
@@ -13,9 +9,6 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
   [Role.GODMODE]: 5,
 };
 
-/**
- * Available badge templates for awarding to users
- */
 export const BADGE_TEMPLATES: BadgeTemplate[] = [
   {
     name: 'First Blood',

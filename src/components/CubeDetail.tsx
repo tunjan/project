@@ -263,7 +263,6 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     null
   );
 
-  // Ensure dates are valid Date objects
   const startDate = safeParseDate(event.startDate);
   const endDate = safeParseDate(event.endDate);
 
@@ -293,7 +292,6 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
       ? `${formatDateSafe(startDate, (d, o) => new Intl.DateTimeFormat(undefined, o).format(d), { dateStyle: 'full' })} to ${formatDateSafe(endDate, (d, o) => new Intl.DateTimeFormat(undefined, o).format(d), { dateStyle: 'full' })}`
       : formattedDate;
 
-  // ✨ REFACTORING: Use the custom hook to get all derived state
   const {
     isAttending,
     isPending,
@@ -308,7 +306,6 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     currentUserParticipant,
   } = useEventDetails(event, currentUser);
 
-  // Apply readOnlyPublic restrictions
   const canManageEvent = !readOnlyPublic && baseCanManageEvent;
   const canEditEvent = !readOnlyPublic && baseCanEditEvent;
   const canCancelEvent = !readOnlyPublic && baseCanCancelEvent;

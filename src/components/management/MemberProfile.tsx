@@ -56,13 +56,11 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     isOrganiser: boolean
   ) => {
     if (isOrganiser) {
-      // Add chapter to organiserOf array
       const currentOrganiserOf = user.organiserOf || [];
       if (!currentOrganiserOf.includes(chapterName)) {
         setChapterOrganiser(userId, [...currentOrganiserOf, chapterName]);
       }
     } else {
-      // Remove chapter from organiserOf array
       const currentOrganiserOf = user.organiserOf || [];
       setChapterOrganiser(
         userId,
@@ -89,7 +87,6 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
   };
 
   const handleSendMessage = () => {
-    // Create a pre-filled email for the organizer to send
     const subject = encodeURIComponent(
       `Message from ${currentUser?.name} - Chapter Update`
     );
@@ -98,10 +95,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
     );
     const mailtoLink = `mailto:${user.email || ''}?subject=${subject}&body=${body}`;
 
-    // Open the user's default email client
     window.open(mailtoLink, '_blank');
-
-    // Email client opened
   };
 
   const canManageRole = can(currentUser, Permission.EDIT_USER_ROLES, {

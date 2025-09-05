@@ -29,7 +29,7 @@ import Histogram, { HistogramData } from './Histogram';
 import LineChart from './LineChart';
 import ScatterPlot from './ScatterPlot';
 
-interface AnalyticsDashboardProps {}
+type AnalyticsDashboardProps = Record<string, never>;
 
 const StatCard: React.FC<{
   icon: React.ReactNode;
@@ -82,12 +82,10 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
     eventTurnoutDistribution,
   } = useAnalyticsData();
 
-  // Create proper histogram data from activist performance data
   const activistHoursHistogramData = useMemo((): HistogramData[] => {
     if (!activistHoursDistribution || activistHoursDistribution.length === 0)
       return [];
 
-    // Create bins for hours distribution
     const maxHours = Math.max(...activistHoursDistribution.map((d) => d.value));
     if (maxHours === 0)
       return [{ range: '0', count: activistHoursDistribution.length }];
@@ -117,7 +115,6 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = () => {
     )
       return [];
 
-    // Create bins for conversations distribution
     const maxConversations = Math.max(
       ...activistConversationsDistribution.map((d) => d.value)
     );

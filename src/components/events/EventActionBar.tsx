@@ -116,7 +116,6 @@ const EventActionBar: React.FC<EventActionBarProps> = ({
     );
   }
 
-  // Default state: Can RSVP
   const rsvpText = isRegionalEvent
     ? 'Sign Up for Duties'
     : isGuest

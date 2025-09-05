@@ -10,7 +10,6 @@ import {
 
 import { generateRandomAvatarUrl } from '../utils/user';
 
-// Helper function to validate onboarding status transitions
 export const isValidStatusTransition = (
   fromStatus: OnboardingStatus,
   toStatus: OnboardingStatus
@@ -33,7 +32,7 @@ export const isValidStatusTransition = (
     ],
     [OnboardingStatus.AWAITING_REVISION_CALL]: [OnboardingStatus.CONFIRMED],
     [OnboardingStatus.CONFIRMED]: [],
-    [OnboardingStatus.COMPLETED]: [], // FIX: Added missing property
+    [OnboardingStatus.COMPLETED]: [],
     [OnboardingStatus.DENIED]: [],
     [OnboardingStatus.INACTIVE]: [],
   };
@@ -41,13 +40,11 @@ export const isValidStatusTransition = (
   return validTransitions[fromStatus]?.includes(toStatus) ?? false;
 };
 
-// Helper function to validate onboarding state
 export const validateOnboardingState = (
   user: User
 ): { isValid: boolean; issues: string[] } => {
   const issues: string[] = [];
 
-  // Check for invalid status combinations
   if (
     user.onboardingStatus === OnboardingStatus.CONFIRMED &&
     !user.onboardingProgress?.watchedMasterclass
@@ -72,7 +69,6 @@ export const validateOnboardingState = (
   return { isValid: issues.length === 0, issues };
 };
 
-// Create a new user for registration
 export const createNewUser = (formData: {
   name: string;
   instagram: string;
@@ -104,24 +100,20 @@ export const createNewUser = (formData: {
   };
 };
 
-// Handle notifications for new applications
 export const handleNewApplicationNotifications = (
   newUser: User,
   users: User[]
 ): void => {
-  // Find organizers of the chapter and notify them
   let organizersToNotify = users.filter(
     (u) =>
       u.role === Role.CHAPTER_ORGANISER &&
       u.organiserOf?.includes(newUser.chapters[0])
   );
 
-  // **FIX: Application Black Hole Escalation Logic**
   if (organizersToNotify.length === 0) {
     const allChapters = useChaptersStore.getState().chapters;
     const chapterData = allChapters.find((c) => c.name === newUser.chapters[0]);
     if (chapterData) {
-      // Escalate to Regional Organiser
       organizersToNotify = users.filter(
         (u) =>
           u.role === Role.REGIONAL_ORGANISER &&
@@ -131,7 +123,6 @@ export const handleNewApplicationNotifications = (
   }
 
   if (organizersToNotify.length === 0) {
-    // Escalate to Global Admins if no regional organizer is found
     organizersToNotify = users.filter((u) => u.role === Role.GLOBAL_ADMIN);
   }
 
@@ -145,16 +136,14 @@ export const handleNewApplicationNotifications = (
 
   useNotificationsStore.getState().addNotifications(notificationsToCreate);
 
-  // Add notification for the newly registered user
   useNotificationsStore.getState().addNotification({
     userId: newUser.id,
-    type: NotificationType.NEW_ANNOUNCEMENT, // Using existing type for now
+    type: NotificationType.NEW_ANNOUNCEMENT,
     message: `Welcome, ${newUser.name}! Your application for ${newUser.chapters[0]} has been submitted for review.`,
     linkTo: '/onboarding-status',
   });
 };
 
-// Auto-advance onboarding logic
 export const autoAdvanceOnboarding = (user: User): OnboardingStatus | null => {
   if (
     user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
@@ -173,15 +162,9 @@ export const autoAdvanceOnboarding = (user: User): OnboardingStatus | null => {
   return null;
 };
 
-/**
- * Determines the next status after a user's first cube attendance
- * @param user - The user to check
- * @returns The appropriate next onboarding status
- */
 export const determineNextStatusAfterFirstCube = (
   user: User
 ): OnboardingStatus => {
-  // Check if the masterclass was watched
   if (user.onboardingProgress?.watchedMasterclass) {
     return OnboardingStatus.AWAITING_REVISION_CALL;
   }
@@ -189,15 +172,9 @@ export const determineNextStatusAfterFirstCube = (
   return OnboardingStatus.AWAITING_MASTERCLASS;
 };
 
-/**
- * Finalizes onboarding for a user with all validation checks
- * @param user - The user to finalize onboarding for
- * @returns Object with success status and any issues found
- */
 export const finalizeOnboarding = (
   user: User
 ): { success: boolean; issues: string[] } => {
-  // Validate that user can be finalized
   if (user.onboardingStatus !== OnboardingStatus.AWAITING_REVISION_CALL) {
     return {
       success: false,
@@ -205,7 +182,6 @@ export const finalizeOnboarding = (
     };
   }
 
-  // Validate onboarding state
   const validation = validateOnboardingState(user);
   if (!validation.isValid) {
     return {

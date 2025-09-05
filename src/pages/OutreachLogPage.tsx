@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import LogHistory from '@/components/outreach/LogHistory';
 import OutreachTally from '@/components/outreach/OutreachTally';
 import PersonalPerformance from '@/components/outreach/PersonalPerformance';
-// Import the new components
 import QuickLogForm from '@/components/outreach/QuickLogForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,7 +17,6 @@ import {
 import { useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus, Role } from '@/types';
 
-// Modern toggle with clean design
 const OutreachViewToggle: React.FC<{
   view: 'personal' | 'team';
   onViewChange: (view: 'personal' | 'team') => void;
@@ -86,7 +84,6 @@ const OutreachLogPage: React.FC = () => {
       };
     }
 
-    // Default to personal view
     const personalEventIds = new Set(personalLogs.map((log) => log.eventId));
     const userEvents = allEvents.filter(
       (e) =>

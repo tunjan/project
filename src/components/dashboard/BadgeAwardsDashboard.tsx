@@ -109,7 +109,6 @@ const Icons = {
   MinusIcon: Minus,
   ChevronDownIcon: ChevronDown,
   ChevronUpIcon: ChevronUp,
-  // New Lucide icon mappings
   Heart: Heart,
   MapPin: MapPin,
   MessagesSquare: MessagesSquare,

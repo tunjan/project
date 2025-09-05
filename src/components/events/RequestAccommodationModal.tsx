@@ -33,7 +33,6 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
   onClose,
   onCreateRequest,
 }) => {
-  // Set default dates to be more logical - arrival day before event, departure day after
   const eventStartDate = new Date(event.startDate);
   const arrivalDate = new Date(eventStartDate);
   arrivalDate.setDate(eventStartDate.getDate() - 1);

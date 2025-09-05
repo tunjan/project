@@ -40,7 +40,6 @@ const Header: React.FC = () => {
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
-  // Lock body scroll for mobile menu
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
     return () => {

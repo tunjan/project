@@ -9,9 +9,9 @@ export interface NavItem {
   to: string;
   label: string;
   requiresAuth?: boolean;
-  requiresCoreAppAccess?: boolean; // For users past initial review
-  requiresFullAccess?: boolean; // For fully confirmed activists
-  requiresOnboardingInProgress?: boolean; // For users not yet fully confirmed
+  requiresCoreAppAccess?: boolean;
+  requiresFullAccess?: boolean;
+  requiresOnboardingInProgress?: boolean;
   permission?: Permission;
 }
 
@@ -83,7 +83,6 @@ export const useNavItems = () => {
 
   return useMemo(() => {
     if (!currentUser) {
-      // Return only public nav items when not authenticated
       return ALL_NAV_ITEMS.filter((item) => !item.requiresAuth);
     }
 
@@ -100,7 +99,6 @@ export const useNavItems = () => {
     return ALL_NAV_ITEMS.filter((item) => {
       if (item.requiresAuth && !currentUser) return false;
 
-      // Handle role-based visibility using the new `can` function
       if (item.permission && !can(currentUser, item.permission)) {
         return false;
       }

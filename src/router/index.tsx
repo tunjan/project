@@ -34,7 +34,7 @@ const LeaderboardPage = React.lazy(() => import('@/pages/LeaderboardPage'));
 const ViewProfilePage = React.lazy(() => import('@/pages/ViewProfilePage'));
 const ApplicantStatusPage = React.lazy(
   () => import('@/pages/ApplicantStatusPage')
-); // NEW
+);
 const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
 
 export const router = createBrowserRouter([
@@ -42,7 +42,6 @@ export const router = createBrowserRouter([
     path: '/',
     element: <RootSuspense />,
     children: [
-      // Public landing page at root (outside MainLayout to avoid sidebar/margins)
       { index: true, element: <IndexRedirect /> },
       {
         element: <MainLayout />,
@@ -88,7 +87,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'onboarding-status', // NEW ROUTE
+            path: 'onboarding-status',
             element: (
               <ProtectedRoute>
                 <ApplicantStatusPage />

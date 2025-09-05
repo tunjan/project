@@ -62,7 +62,6 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Calculate proper ranks that handle ties
   const rankedData = calculateRanks(data);
 
   const handleChapterClick = (chapterName: string) => {

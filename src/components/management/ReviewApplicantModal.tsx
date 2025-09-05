@@ -15,13 +15,11 @@ import {
 import { useCurrentUser, useUsersActions } from '@/store';
 import { OnboardingStatus, User } from '@/types';
 
-// A small component to display applicant details in a structured way.
 const ApplicantDetail: React.FC<{
   icon: React.ReactNode;
   label: string;
   value?: string;
 }> = ({ icon, label, value }) => {
-  // Special handling for Instagram handles to make them clickable
   const renderValue = () => {
     if (label === 'Instagram' && value && value.startsWith('@')) {
       return (
@@ -55,7 +53,6 @@ const ApplicantDetail: React.FC<{
   );
 };
 
-// A component for displaying the Q&A section.
 const AnswerBlock: React.FC<{ question: string; answer: string }> = ({
   question,
   answer,
@@ -112,7 +109,6 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   const handleNext = () => {
     setRemainingApplicants((prev) => {
       const next = prev.slice(1);
-      // Close the modal when there are no more applicants to review
       if (next.length === 0) {
         onClose();
       }

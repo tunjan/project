@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -27,19 +28,30 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         })),
     }),
     {
-      name: 'auth-storage', // The key in localStorage
+      name: 'auth-storage',
     }
   )
 );
 
 export const useCurrentUser = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
-
   return currentUser;
 };
-export const useAuthActions = () =>
-  useAuthStore((state) => ({
-    login: state.login,
-    logout: state.logout,
-    updateCurrentUser: state.updateCurrentUser,
-  }));
+
+export const useLogin = () => useAuthStore((state) => state.login);
+export const useLogout = () => useAuthStore((state) => state.logout);
+export const useUpdateCurrentUser = () =>
+  useAuthStore((state) => state.updateCurrentUser);
+
+// Keep the old hook for backward compatibility but make it stable
+export const useAuthActions = () => {
+  const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
+  const updateCurrentUser = useAuthStore((state) => state.updateCurrentUser);
+
+  // Return a memoized object to prevent new object creation
+  return useMemo(
+    () => ({ login, logout, updateCurrentUser }),
+    [login, logout, updateCurrentUser]
+  );
+};

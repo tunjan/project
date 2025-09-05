@@ -1,8 +1,5 @@
 import { User } from './user';
 
-/**
- * Roles for tour duties during events.
- */
 export enum TourDutyRole {
   OUTREACH = 'Outreach',
   EQUIPMENT = 'Equipment',
@@ -10,7 +7,7 @@ export enum TourDutyRole {
 }
 
 export interface TourDuty {
-  date: string; // YYYY-MM-DD
+  date: string;
   role: TourDutyRole;
 }
 
@@ -52,7 +49,6 @@ export interface CubeEvent {
   status: EventStatus;
   report?: EventReport;
   cancellationReason?: string;
-  /** Optional image URL for the event card */
   imageUrl?: string;
 }
 

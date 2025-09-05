@@ -39,8 +39,7 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
   );
   const [customName, setCustomName] = useState('');
   const [customDescription, setCustomDescription] = useState('');
-  const customIcon = 'SparklesIcon'; // Use an existing icon for custom recognitions.
-
+  const customIcon = 'SparklesIcon';
   const userBadgeNames = new Set(userToAward.badges.map((b) => b.name));
   const availableBadges = BADGE_TEMPLATES.filter(
     (b) => !userBadgeNames.has(b.name)

@@ -20,10 +20,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   unit,
   currentUser,
 }) => {
-  // Calculate proper ranks that handle ties
   const rankedData = calculateRanks(data);
 
-  // Compute max value so rows can render a compact progress bar (gives visual weight)
   const maxValue = rankedData[0]?.value ?? 0;
 
   const currentUserEntry = rankedData.find(

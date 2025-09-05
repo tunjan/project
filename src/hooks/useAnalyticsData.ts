@@ -9,16 +9,14 @@ import {
   getActivistHoursDistribution,
   getActivistRetention,
   getAverageActivistsPerEvent,
-  getChapterOutreachStats, // NEW
-  getChapterStats,
-  getConversationTrendsByMonth, // NEW
+  getConversationTrendsByMonth,
   getEventTrendsByMonth,
   getEventTurnoutDistribution,
-  getGlobalStats,
   getMemberGrowth,
   getTopActivistsByHours,
   getTotalMembersByMonth,
 } from '@/utils';
+import { calculateAllMetrics, filterMetrics } from '@/utils/metrics';
 
 export function useAnalyticsData() {
   const currentUser = useCurrentUser();
@@ -96,9 +94,10 @@ export function useAnalyticsData() {
   const [selectedCountry, setSelectedCountry] = useState(defaultCountry);
   const [selectedChapter, setSelectedChapter] = useState(defaultChapter);
 
-  // CRITICAL FIX: Removed the problematic useEffect that was causing infinite loops
-  // The useState initialization already handles setting the correct initial values
-  // If defaults need to change (e.g., user login), the component will re-mount with new defaults
+  // ✅ FIX: Removed the problematic useEffect that caused infinite re-render loops.
+  // The useState initializers above are sufficient for setting the initial state.
+  // If the user context changes (e.g., they log in as a different user),
+  // the component will remount and state will be re-initialized with correct defaults.
 
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCountry(e.target.value);
@@ -173,47 +172,41 @@ export function useAnalyticsData() {
     chaptersForFilter,
   ]);
 
-  const {
-    filteredUsers,
-    filteredEvents,
-    filteredChapters,
-    filteredOutreachLogs,
-  } = derivedData;
+  const { filteredUsers, filteredEvents, filteredOutreachLogs } = derivedData;
+
+  const allMetrics = useMemo(() => {
+    return calculateAllMetrics(allUsers, allEvents, chapters, outreachLogs);
+  }, [allUsers, allEvents, chapters, outreachLogs]);
+
+  const filteredMetrics = useMemo(() => {
+    return filterMetrics(allMetrics, selectedCountry, selectedChapter);
+  }, [allMetrics, selectedCountry, selectedChapter]);
 
   const overviewStats = useMemo(
-    () =>
-      getGlobalStats(
-        filteredUsers,
-        filteredEvents,
-        filteredChapters,
-        filteredOutreachLogs
-      ),
-    [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
+    () => filteredMetrics.global,
+    [filteredMetrics]
   );
+
   const chapterStats = useMemo(
-    () =>
-      getChapterStats(
-        filteredUsers,
-        filteredEvents,
-        filteredChapters,
-        filteredOutreachLogs
-      ),
-    [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
+    () => Array.from(filteredMetrics.chapters.stats.values()),
+    [filteredMetrics]
   );
+
   const eventTrends = useMemo(
     () => getEventTrendsByMonth(filteredEvents, 12),
     [filteredEvents]
   );
+
   const memberGrowth = useMemo(
     () => getMemberGrowth(filteredUsers, 12),
     [filteredUsers]
   );
+
   const totalMembersByMonth = useMemo(
     () => getTotalMembersByMonth(filteredUsers, 12),
     [filteredUsers]
   );
 
-  // NEW: Calculate conversation trends
   const conversationTrends = useMemo(
     () => getConversationTrendsByMonth(filteredOutreachLogs, 12),
     [filteredOutreachLogs]
@@ -223,35 +216,25 @@ export function useAnalyticsData() {
     () => getActivistRetention(filteredUsers, filteredEvents),
     [filteredUsers, filteredEvents]
   );
+
   const avgActivistsPerEvent = useMemo(
     () => getAverageActivistsPerEvent(filteredEvents),
     [filteredEvents]
   );
+
   const topActivists = useMemo(
     () => getTopActivistsByHours(filteredUsers, filteredEvents, 5),
     [filteredUsers, filteredEvents]
   );
-  // NEW: Calculate efficiency stats
-  const chapterOutreachStats = useMemo(
-    () =>
-      getChapterOutreachStats(
-        filteredUsers,
-        filteredEvents,
-        filteredChapters,
-        filteredOutreachLogs
-      ),
-    [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
-  );
 
-  // CRITICAL FIX: Call separate functions for hours and conversations distributions
-  const activistPerformanceDistribution = useMemo(
-    () => getActivistHoursDistribution(filteredUsers, filteredEvents),
-    [filteredUsers, filteredEvents]
+  const chapterOutreachStats = useMemo(
+    () => Array.from(filteredMetrics.chapters.outreachStats.values()),
+    [filteredMetrics]
   );
 
   const activistHoursDistribution = useMemo(
-    () => activistPerformanceDistribution,
-    [activistPerformanceDistribution]
+    () => getActivistHoursDistribution(filteredUsers, filteredEvents),
+    [filteredUsers, filteredEvents]
   );
 
   const activistConversationsDistribution = useMemo(
@@ -279,7 +262,7 @@ export function useAnalyticsData() {
     eventTrends,
     memberGrowth,
     totalMembersByMonth,
-    conversationTrends, // NEW: Expose new data
+    conversationTrends,
     activistRetention,
     avgActivistsPerEvent,
     topActivists,

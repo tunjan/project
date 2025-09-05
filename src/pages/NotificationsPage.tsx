@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -77,9 +77,19 @@ const NotificationCard: React.FC<{
 const NotificationsPage: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const notifications = useNotificationsForUser(currentUser?.id);
+  const allNotifications = useNotificationsForUser(currentUser?.id);
   const { markNotificationAsRead, markAllNotificationsAsRead } =
     useNotificationsActions();
+
+  const notifications = useMemo(() => {
+    if (!currentUser?.id) return [];
+    return allNotifications
+      .filter((n) => n.userId === currentUser.id)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+  }, [allNotifications, currentUser?.id]);
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {

@@ -36,20 +36,15 @@ export interface MockDataOptions {
 
 class MockDataService {
   private cache: Map<string, MockDataResponse> = new Map();
-  private cacheTimeout = 5 * 60 * 1000; // 5 minutes
+  private cacheTimeout = 5 * 60 * 1000;
   private cacheTimestamps: Map<string, number> = new Map();
 
-  /**
-   * Fetch mock data from static generated data
-   * No more broken API calls - uses local data directly
-   */
   async fetchMockData(
     options: MockDataOptions = {}
   ): Promise<MockDataResponse> {
     const { scenario = 'default', cache = true } = options;
     const cacheKey = `mock_data_${scenario}`;
 
-    // Check cache first
     if (cache && this.isCacheValid(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (cached) {
@@ -58,7 +53,6 @@ class MockDataService {
     }
 
     try {
-      // Import the static mock data directly
       const mockData = await import('../data/mockData');
 
       const data: MockDataResponse = {
@@ -74,7 +68,6 @@ class MockDataService {
         challenges: mockData.challenges || [],
       };
 
-      // Cache the response
       if (cache) {
         this.cache.set(cacheKey, data);
         this.cacheTimestamps.set(cacheKey, Date.now());
@@ -84,14 +77,10 @@ class MockDataService {
     } catch (error) {
       console.error('❌ Failed to load mock data:', error);
 
-      // Return fallback data if import fails
       return this.getFallbackData();
     }
   }
 
-  /**
-   * Check if cached data is still valid
-   */
   private isCacheValid(cacheKey: string): boolean {
     const timestamp = this.cacheTimestamps.get(cacheKey);
     if (!timestamp) return false;
@@ -99,17 +88,11 @@ class MockDataService {
     return Date.now() - timestamp < this.cacheTimeout;
   }
 
-  /**
-   * Clear the cache
-   */
   clearCache(): void {
     this.cache.clear();
     this.cacheTimestamps.clear();
   }
 
-  /**
-   * Get fallback data if everything else fails
-   */
   private getFallbackData(): MockDataResponse {
     return {
       chapters: [
@@ -155,9 +138,6 @@ class MockDataService {
     };
   }
 
-  /**
-   * Get specific data types with caching
-   */
   async getChapters(): Promise<Chapter[]> {
     const data = await this.fetchMockData();
     return data.chapters;
@@ -211,7 +191,6 @@ class MockDataService {
 
 export const mockDataService = new MockDataService();
 
-// Export individual functions for convenience
 export const {
   fetchMockData,
   getChapters,

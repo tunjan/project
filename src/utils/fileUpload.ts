@@ -1,7 +1,3 @@
-/**
- * Utility functions for handling file uploads
- */
-
 export const readFileAsDataURL = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -20,17 +16,14 @@ export const readFileAsDataURL = (file: File): Promise<string> => {
 export const validateImageFile = (
   file: File
 ): { isValid: boolean; error?: string } => {
-  // Check file type
   if (!file.type.startsWith('image/')) {
     return { isValid: false, error: 'Please select an image file' };
   }
 
-  // Check file size (max 5MB)
-  const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+  const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
     return { isValid: false, error: 'Image must be smaller than 5MB' };
   }
 
-  // Check image dimensions (optional - can be implemented later)
   return { isValid: true };
 };

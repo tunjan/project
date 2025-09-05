@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { toast } from 'sonner';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -282,19 +283,36 @@ export const useEventsStore = create<EventsState & EventsActions>()(
 );
 
 export const useEventsState = () => useEventsStore((s) => s.events);
-export const useEventsActions = () =>
-  useEventsStore((s) => ({
-    createEvent: s.createEvent,
-    updateEvent: s.updateEvent,
-    cancelEvent: s.cancelEvent,
-    rsvp: s.rsvp,
-    cancelRsvp: s.cancelRsvp,
-    approveRsvp: s.approveRsvp,
-    denyRsvp: s.denyRsvp,
-    removeParticipant: s.removeParticipant,
-    logEventReport: s.logEventReport,
-  }));
+export const useEventsActions = () => {
+  const store = useEventsStore();
+  return useMemo(
+    () => ({
+      createEvent: store.createEvent,
+      updateEvent: store.updateEvent,
+      cancelEvent: store.cancelEvent,
+      rsvp: store.rsvp,
+      cancelRsvp: store.cancelRsvp,
+      approveRsvp: store.approveRsvp,
+      denyRsvp: store.denyRsvp,
+      removeParticipant: store.removeParticipant,
+      logEventReport: store.logEventReport,
+    }),
+    [
+      store.createEvent,
+      store.updateEvent,
+      store.cancelEvent,
+      store.rsvp,
+      store.cancelRsvp,
+      store.approveRsvp,
+      store.denyRsvp,
+      store.removeParticipant,
+      store.logEventReport,
+    ]
+  );
+};
 
-// Selectors
 export const useEventById = (eventId?: string) =>
-  useEventsStore((s) => s.events.find((e) => e.id === eventId));
+  useEventsStore((s) => {
+    if (!eventId) return undefined;
+    return s.events.find((event) => event.id === eventId);
+  });

@@ -14,7 +14,6 @@ const useSearch = (query: string) => {
   const chapters = useChapters();
   const events = useEvents();
 
-  // Debounced search function
   const performSearch = useCallback(
     (searchQuery: string) => {
       if (!searchQuery) {
@@ -50,7 +49,6 @@ const useSearch = (query: string) => {
   );
 
   useEffect(() => {
-    // Debounce search with 300ms delay
     const timeoutId = setTimeout(() => {
       performSearch(query);
     }, 300);

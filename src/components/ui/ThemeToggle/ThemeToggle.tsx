@@ -24,13 +24,11 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Prevent hydration mismatch by only rendering after mounting
   useEffect(() => {
     setMounted(true);
   }, []);
 
   if (!mounted) {
-    // Return a placeholder that matches the expected structure
     const iconSize =
       size === 'sm' ? 'h-4 w-4' : size === 'md' ? 'h-5 w-5' : 'h-6 w-6';
 

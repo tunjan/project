@@ -2,24 +2,17 @@ import { Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import UserProfile from '@/components/profile/UserProfile'; // Use the consolidated component
+import UserProfile from '@/components/profile/UserProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useUserById, useUsersActions, useUsersState } from '@/store';
+import { useUserById, useUsersState, useUsersStore } from '@/store';
 
 const ViewProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
-  const user = useUserById(userId);
   const allUsers = useUsersState();
-  const { init, clearPersistedData } = useUsersActions();
+  const user = useUserById(userId);
   const [showResetButton, setShowResetButton] = useState(false);
 
-  // Initialize store when component mounts
-  useEffect(() => {
-    init();
-  }, [init]);
-
-  // Show reset button after 5 seconds if still loading
   useEffect(() => {
     if (!user) {
       const timer = setTimeout(() => setShowResetButton(true), 5000);
@@ -29,11 +22,9 @@ const ViewProfilePage: React.FC = () => {
   }, [user]);
 
   const handleResetStore = () => {
-    clearPersistedData();
+    useUsersStore.getState().clearPersistedData();
     window.location.reload();
   };
-
-  // Debug logging
 
   if (!user) {
     return (
@@ -66,7 +57,6 @@ const ViewProfilePage: React.FC = () => {
     );
   }
 
-  // The page now simply renders the consolidated UserProfile with the fetched user
   return <UserProfile user={user} />;
 };
 

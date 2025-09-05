@@ -8,15 +8,6 @@ import {
 } from '@/types';
 import { INACTIVITY_PERIOD_MONTHS } from '@/utils';
 
-/**
- * Simulates a backend job to generate inactivity notifications for chapter organisers.
- *
- * @param allUsers - The complete list of users.
- * @param allEvents - The complete list of events.
- * @param existingNotifications - The current list of notifications to prevent duplicates.
- * @param currentUser - The organiser for whom to generate notifications.
- * @returns An array of new notification objects to be added to the store.
- */
 export const generateInactivityNotifications = (
   allUsers: User[],
   allEvents: CubeEvent[],
@@ -48,7 +39,6 @@ export const generateInactivityNotifications = (
   );
 
   for (const member of managedMembers) {
-    // Check both login and attendance activity (consistent with isUserInactive)
     const hasRecentLogin =
       member.lastLogin && new Date(member.lastLogin) > inactivityCutoff;
 
@@ -58,7 +48,6 @@ export const generateInactivityNotifications = (
         event.report?.attendance[member.id] === 'Attended'
     );
 
-    // User is inactive if both conditions are false (consistent with isUserInactive)
     const isInactive = !hasRecentLogin && !hasRecentAttendance;
 
     if (isInactive) {

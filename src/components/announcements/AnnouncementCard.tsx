@@ -80,7 +80,6 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
     }
   );
 
-  // Relative timestamp for recent announcements
   const createdDate = new Date(announcement.createdAt);
   const isRecent = differenceInDays(new Date(), createdDate) < 7;
   const relative = isRecent

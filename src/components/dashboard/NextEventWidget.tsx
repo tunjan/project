@@ -3,36 +3,20 @@ import { Calendar, Clock, MapPin } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { useCurrentUser, useEvents } from '@/store';
 import { CubeEvent, EventStatus } from '@/types';
 
 const Countdown: React.FC<{ date: Date }> = ({ date }) => {
-  const [countdown, setCountdown] = useState('');
+  const [countdown, setCountdown] = useState(() =>
+    formatDistanceToNowStrict(date, { addSuffix: true })
+  );
 
   useEffect(() => {
-    const calculateCountdown = () => {
-      const distance = formatDistanceToNowStrict(date, { addSuffix: true });
-      setCountdown(distance);
-    };
-
-    // Calculate immediately
-    calculateCountdown();
-
-    // Set up interval
-    const interval = setInterval(calculateCountdown, 1000 * 60); // Update every minute
-
-    // CRITICAL FIX: Ensure interval is cleared on cleanup or when date changes
-    return () => {
-      clearInterval(interval);
-    };
-  }, [date]); // date dependency ensures effect runs when date changes
+    const interval = setInterval(() => {
+      setCountdown(formatDistanceToNowStrict(date, { addSuffix: true }));
+    }, 1000 * 60); // Update every minute
+    return () => clearInterval(interval);
+  }, [date]);
 
   return <span className="font-bold text-primary">{countdown}</span>;
 };
@@ -42,8 +26,7 @@ const UpcomingEventCard: React.FC<{
   onManage: () => void;
   isNext?: boolean;
 }> = ({ event, onManage, isNext }) => {
-  // FIX: Memoize the Date object to prevent re-creating it on every render
-  const startDate = useMemo(() => new Date(event.startDate), [event.startDate]);
+  const startDate = event.startDate;
 
   if (isNext) {
     return (

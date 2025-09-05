@@ -77,7 +77,6 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
   const canManageThisUser = useMemo(() => {
     if (!currentUser) return false;
 
-    // Regional organisers can manage chapter organisers in their country
     if (
       currentUser.role === Role.REGIONAL_ORGANISER &&
       currentUser.managedCountry
@@ -90,7 +89,6 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
       );
     }
 
-    // Global admins and godmode can manage anyone
     if (
       currentUser.role === Role.GLOBAL_ADMIN ||
       currentUser.role === Role.GODMODE
@@ -108,7 +106,6 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
     try {
       await updateUserRole(organiser.id, selectedRole);
 
-      // If changing to chapter organiser, also update chapter assignments
       if (
         selectedRole === Role.CHAPTER_ORGANISER &&
         selectedChapters.length > 0
@@ -121,7 +118,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
       );
       onUpdate();
       onClose();
-    } catch (error) {
+    } catch {
       toast.error('Failed to update user role');
     } finally {
       setIsLoading(false);
@@ -142,7 +139,7 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
       );
       onUpdate();
       onClose();
-    } catch (error) {
+    } catch {
       toast.error('Failed to update chapter assignments');
     } finally {
       setIsLoading(false);

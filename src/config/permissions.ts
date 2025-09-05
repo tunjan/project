@@ -7,9 +7,7 @@ import {
   type User,
 } from '@/types';
 
-// 1. Define every possible action in the system
 export enum Permission {
-  // User Management
   VIEW_MEMBER_DIRECTORY,
   VIEW_MANAGEMENT_DASHBOARD,
   EDIT_USER_ROLES,
@@ -19,37 +17,31 @@ export enum Permission {
   VIEW_ORGANIZER_NOTES,
   ADD_ORGANIZER_NOTE,
 
-  // Event Management
   CREATE_EVENT,
   EDIT_EVENT,
   CANCEL_EVENT,
   LOG_EVENT_REPORT,
   MANAGE_EVENT_PARTICIPANTS,
 
-  // Chapter Management
   CREATE_CHAPTER,
   EDIT_CHAPTER,
   DELETE_CHAPTER,
   MANAGE_INVENTORY,
 
-  // Announcement Management
   CREATE_ANNOUNCEMENT,
 
-  // Analytics
   VIEW_ANALYTICS,
 
-  // Misc
   AWARD_BADGE,
 }
 
-// 2. Map roles to their permissions
 const ROLES_TO_PERMISSIONS: Record<Role, Permission[]> = {
   [Role.GODMODE]: Object.values(Permission).filter(
     (p): p is Permission => typeof p === 'number'
-  ), // FIX: Use type guard instead of type assertion
+  ),
   [Role.GLOBAL_ADMIN]: Object.values(Permission).filter(
     (p): p is Permission => typeof p === 'number'
-  ), // FIX: Use type guard instead of type assertion
+  ),
   [Role.REGIONAL_ORGANISER]: [
     Permission.VIEW_MEMBER_DIRECTORY,
     Permission.VIEW_MANAGEMENT_DASHBOARD,
@@ -75,10 +67,10 @@ const ROLES_TO_PERMISSIONS: Record<Role, Permission[]> = {
   [Role.CHAPTER_ORGANISER]: [
     Permission.VIEW_MEMBER_DIRECTORY,
     Permission.VIEW_MANAGEMENT_DASHBOARD,
-    Permission.EDIT_USER_ROLES, // But with limitations
-    Permission.EDIT_USER_CHAPTERS, // FIX: Added missing permission
-    Permission.DELETE_USER, // But with chapter-scoped limitations
-    Permission.VERIFY_USER, // But with limitations
+    Permission.EDIT_USER_ROLES,
+    Permission.EDIT_USER_CHAPTERS,
+    Permission.DELETE_USER,
+    Permission.VERIFY_USER,
     Permission.VIEW_ORGANIZER_NOTES,
     Permission.ADD_ORGANIZER_NOTE,
     Permission.CREATE_EVENT,
@@ -90,13 +82,12 @@ const ROLES_TO_PERMISSIONS: Record<Role, Permission[]> = {
     Permission.CREATE_ANNOUNCEMENT,
     Permission.AWARD_BADGE,
     Permission.VIEW_ANALYTICS,
-    Permission.EDIT_CHAPTER, // FIX: Added missing permission for editing own chapters
+    Permission.EDIT_CHAPTER,
   ],
   [Role.ACTIVIST]: [],
   [Role.APPLICANT]: [],
 };
 
-// 3. Create the central permission checker
 type PermissionContext = {
   targetUser?: User;
   event?: CubeEvent;
@@ -111,14 +102,12 @@ export const getAssignableRoles = (user: User): Role[] => {
     return Object.values(Role);
   }
 
-  // Global Admins and Regional Organisers can assign roles up to their own level, but not Godmode.
   if (userLevel >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER]) {
     return Object.values(Role).filter(
       (role) => role !== Role.GODMODE && ROLE_HIERARCHY[role] <= userLevel
     );
   }
 
-  // Chapter Organisers can only assign roles below their own.
   if (user.role === Role.CHAPTER_ORGANISER) {
     return Object.values(Role).filter(
       (role) => role !== Role.GODMODE && ROLE_HIERARCHY[role] < userLevel
@@ -128,18 +117,15 @@ export const getAssignableRoles = (user: User): Role[] => {
   return [];
 };
 
-// Helper for user-related scope and hierarchy checks
 const canManageTargetUser = (
   user: User,
   context: PermissionContext
 ): boolean => {
   if (!context.targetUser) return false;
 
-  // Rule 1: Hierarchy check
   if (ROLE_HIERARCHY[user.role] <= ROLE_HIERARCHY[context.targetUser.role])
     return false;
 
-  // Rule 2: Regional Organisers can only manage users within their country.
   if (user.role === Role.REGIONAL_ORGANISER) {
     if (
       !user.managedCountry ||
@@ -147,7 +133,7 @@ const canManageTargetUser = (
       !context.targetUser?.chapters
     )
       return false;
-    const targetUser = context.targetUser; // Type guard to ensure targetUser is defined
+    const targetUser = context.targetUser;
     const targetUserCountries = new Set(
       context.allChapters
         .filter((c) => targetUser.chapters.includes(c.name))
@@ -156,7 +142,6 @@ const canManageTargetUser = (
     return targetUserCountries.has(user.managedCountry);
   }
 
-  // Rule 3: Chapter Organisers can only manage users within their chapters.
   if (user.role === Role.CHAPTER_ORGANISER) {
     const managedChapters = new Set(user.organiserOf || []);
     return context.targetUser.chapters.some((chapter) =>
@@ -164,18 +149,15 @@ const canManageTargetUser = (
     );
   }
 
-  return true; // GODMODE and GLOBAL_ADMIN pass if hierarchy is respected
+  return true;
 };
 
-// Helper for event management permissions
 const canManageEvent = (user: User, context: PermissionContext): boolean => {
   const { event, allChapters } = context;
   if (!event) return false;
 
-  // Rule 1: The event's designated organizer can always manage it.
   if (user.id === event.organizer.id) return true;
 
-  // Rule 1.5: Any organizer of the event's chapter can manage it.
   if (
     user.role === Role.CHAPTER_ORGANISER &&
     (user.organiserOf || []).includes(event.city)
@@ -183,18 +165,14 @@ const canManageEvent = (user: User, context: PermissionContext): boolean => {
     return true;
   }
 
-  // Rule 2: Higher-level organizers can manage events based on their scope.
   const userLevel = ROLE_HIERARCHY[user.role];
   if (userLevel >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER]) {
     const eventChapter = allChapters?.find((c) => c.name === event.city);
-    if (!eventChapter) return false; // Cannot determine event location
-
-    // Regional Organisers can manage events within their country.
+    if (!eventChapter) return false;
     if (user.role === Role.REGIONAL_ORGANISER) {
       return user.managedCountry === eventChapter.country;
     }
 
-    // Global Admins and Godmode have universal access.
     if (userLevel >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN]) {
       return true;
     }
@@ -203,7 +181,6 @@ const canManageEvent = (user: User, context: PermissionContext): boolean => {
   return false;
 };
 
-// Helper for chapter management permissions
 const canManageChapter = (user: User, context: PermissionContext): boolean => {
   if (!context.chapterName || !context.allChapters) return false;
 
@@ -212,18 +189,15 @@ const canManageChapter = (user: User, context: PermissionContext): boolean => {
   );
   if (!targetChapter) return false;
 
-  // Regional Organisers can only manage chapters in their country
   if (user.role === Role.REGIONAL_ORGANISER) {
     if (!user.managedCountry) return false;
     return targetChapter.country === user.managedCountry;
   }
 
-  // Chapter Organisers can only manage chapters they organize
   if (user.role === Role.CHAPTER_ORGANISER) {
     return (user.organiserOf || []).includes(context.chapterName);
   }
 
-  // Global Admins can manage any chapter
   return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.GLOBAL_ADMIN];
 };
 
@@ -236,10 +210,7 @@ export const can = (
     return false;
   }
 
-  // SPECIAL CASE: GODMODE bypasses all permission checks for development/debugging
-  // This should only be used in development environments
   if (user.role === Role.GODMODE) {
-    // In production, you might want to log this or restrict certain actions
     if (process.env.NODE_ENV === 'production') {
       console.warn('GODMODE permission granted in production environment');
     }
@@ -251,7 +222,6 @@ export const can = (
     return false;
   }
 
-  // Handle fine-grained, context-specific rules
   switch (permission) {
     case Permission.EDIT_USER_ROLES:
     case Permission.DELETE_USER: {
@@ -261,17 +231,20 @@ export const can = (
     case Permission.EDIT_USER_CHAPTERS: {
       return canManageTargetUser(user, context);
     }
+
+    case Permission.VIEW_ORGANIZER_NOTES:
+    case Permission.ADD_ORGANIZER_NOTE: {
+      return canManageTargetUser(user, context);
+    }
+
     case Permission.VERIFY_USER: {
       if (!context.targetUser) return false;
-      // New flow: allow verification for any user not yet confirmed
       if (context.targetUser.onboardingStatus === OnboardingStatus.CONFIRMED)
         return false;
 
-      // Regional+ can verify anyone
       if (ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[Role.REGIONAL_ORGANISER])
         return true;
 
-      // Chapter Organisers can only verify members of their own chapters
       if (user.role === Role.CHAPTER_ORGANISER) {
         const organisedChapters = new Set(user.organiserOf || []);
         return context.targetUser.chapters.some((ch) =>
@@ -293,14 +266,11 @@ export const can = (
     case Permission.AWARD_BADGE: {
       if (!context.targetUser) return false;
 
-      // Rule 1: A user cannot award a badge to themselves.
       if (user.id === context.targetUser.id) return false;
 
-      // Use the same hierarchy and scope checks as other user management permissions
       return canManageTargetUser(user, context);
     }
 
-    // Add explicit cases for permissions that don't need fine-grained checks
     case Permission.VIEW_MEMBER_DIRECTORY:
     case Permission.VIEW_MANAGEMENT_DASHBOARD:
     case Permission.CREATE_EVENT:
@@ -309,9 +279,7 @@ export const can = (
     case Permission.VIEW_ANALYTICS:
       return true;
 
-    // CRITICAL FIX: Add explicit cases for destructive permissions that need context validation
     case Permission.DELETE_CHAPTER: {
-      // Chapter Organisers cannot delete chapters (they can only manage their own)
       if (user.role === Role.CHAPTER_ORGANISER) {
         return false;
       }
@@ -327,9 +295,6 @@ export const can = (
     }
 
     default:
-      // CRITICAL FIX: Changed from return true to return false for security
-      // If no specific rule, permission is denied by default
-      // This prevents accidentally granting permissions without proper context checks
       return false;
   }
 };

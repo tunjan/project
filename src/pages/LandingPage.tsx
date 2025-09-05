@@ -11,20 +11,20 @@ import { type Chapter, EventStatus } from '@/types';
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
-  // Public stats directly from stores (works without auth)
+  // Get raw data from stores
   const users = useUsers();
   const events = useEvents();
   const chapters = useChapters();
   const outreachLogs = useOutreachLogs();
 
+  // Use useMemo to compute stats (this should be stable)
   const stats = useMemo(() => {
-    const totalMembers = users.length;
-    const eventsHeld = events.filter(
-      (e) => e.status === EventStatus.FINISHED
-    ).length;
-    const conversationsLogged = outreachLogs.length;
+    const totalMembers = users?.length || 0;
+    const eventsHeld =
+      events?.filter((e) => e.status === EventStatus.FINISHED)?.length || 0;
+    const conversationsLogged = outreachLogs?.length || 0;
     return { totalMembers, eventsHeld, conversationsLogged };
-  }, [users.length, events, outreachLogs.length]);
+  }, [users, events, outreachLogs]);
 
   const handleSelectChapter = (chapter: Chapter) => {
     navigate('/signup', { state: { chapter: chapter.name } });

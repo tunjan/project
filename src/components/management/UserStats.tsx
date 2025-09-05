@@ -19,7 +19,6 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
   const allEvents = useEvents();
   const allOutreachLogs = useOutreachLogs();
 
-  // Enhanced analytics data
   const userAnalytics = useMemo(() => {
     const userEvents = allEvents.filter((event) =>
       event.participants.some((p) => p.user.id === user.id)
@@ -29,7 +28,6 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
       (log) => log.userId === user.id
     );
 
-    // Event participation details
     const attendedEvents = userEvents.filter(
       (event) => event.report?.attendance[user.id] === 'Attended'
     );
@@ -38,7 +36,6 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
       (event) => event.organizer.id === user.id
     );
 
-    // Outreach performance by outcome
     const outreachByOutcome = userOutreachLogs.reduce(
       (acc, log) => {
         acc[log.outcome] = (acc[log.outcome] || 0) + 1;
@@ -47,16 +44,13 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
       {} as Record<string, number>
     );
 
-    // Monthly trends
     const monthlyData = getConversationTrendsByMonth(userOutreachLogs, 12);
 
-    // City coverage
     const citiesVisited = new Set([
       ...user.stats.cities,
       ...attendedEvents.map((e) => e.city),
     ]);
 
-    // Recent activity (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 

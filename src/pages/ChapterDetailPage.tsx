@@ -40,14 +40,19 @@ const ChapterDetailPage: React.FC = () => {
   const { requestToJoinChapter } = useChaptersActions();
   const chapterJoinRequests = useChapterJoinRequests();
 
-  const chapter = useChapterByName(chapterName);
+  const allChapters = useChapterByName(chapterName);
   const allUsers = useUsers();
   const allEvents = useEvents();
   const allAnnouncements = useAnnouncements();
   const allOutreachLogs = useOutreachLogs();
   const [isPastEventsModalOpen, setIsPastEventsModalOpen] = useState(false);
 
-  // Removed Stage 0: next upcoming public event link
+  const chapter = useMemo(() => {
+    if (!chapterName || !allChapters.length) return undefined;
+    return allChapters.find(
+      (c) => c.name.toLowerCase() === chapterName.toLowerCase()
+    );
+  }, [allChapters, chapterName]);
 
   const isMember = useMemo(() => {
     if (!currentUser || !chapter) return false;

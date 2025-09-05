@@ -9,7 +9,7 @@ import { OnboardingStatus } from '@/types';
 
 interface UserMenuProps {
   variant: 'compact' | 'expanded';
-  onLinkClick?: () => void; // For closing mobile menu
+  onLinkClick?: () => void;
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
@@ -50,7 +50,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
     );
   }
 
-  // Expanded Variant for Sidebar
   return (
     <div className="shrink-0 space-y-4">
       <div className="group relative">

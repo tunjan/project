@@ -132,8 +132,6 @@ const ManagementPage: React.FC = () => {
   const { updateChapterInventory } = useInventoryActions();
 
   const [view, setView] = useState<ManagementView>('dashboard');
-  const [selectedChapterForInventory, setSelectedChapterForInventory] =
-    useState<string>('');
   const [memberFilter, setMemberFilter] = useState<MemberFilter>({});
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
@@ -170,14 +168,27 @@ const ManagementPage: React.FC = () => {
     return '';
   }, [manageableChapters]);
 
-  React.useEffect(() => {
-    if (!selectedChapterForInventory && defaultChapter) {
+  // ✅ FIX: Use a ref to track if we've already set the initial value
+  const hasSetInitialChapter = React.useRef(false);
+  const [selectedChapterForInventory, setSelectedChapterForInventory] =
+    useState<string>('');
+
+  // Update selected chapter when default changes, but only once
+  useEffect(() => {
+    if (defaultChapter && !hasSetInitialChapter.current) {
       setSelectedChapterForInventory(defaultChapter);
+      hasSetInitialChapter.current = true;
     }
-  }, [selectedChapterForInventory, defaultChapter]);
+  }, [defaultChapter]);
 
   // Get notifications actions at component level
   const notificationsActions = useNotificationsActions();
+
+  // Memoize addNotifications to avoid re-running effect
+  const addNotifications = useMemo(
+    () => notificationsActions.addNotifications,
+    [notificationsActions.addNotifications]
+  );
 
   // Simulate a periodic check for inactive members when the dashboard is loaded
   useEffect(() => {
@@ -191,10 +202,10 @@ const ManagementPage: React.FC = () => {
         currentUser
       );
       if (newInactivityNotifications.length > 0) {
-        notificationsActions.addNotifications(newInactivityNotifications);
+        addNotifications(newInactivityNotifications);
       }
     }
-  }, [view, currentUser, allUsers, allEvents, notificationsActions]);
+  }, [view, currentUser, allUsers, allEvents, addNotifications]);
 
   const chapterInventory = useChapterInventory(selectedChapterForInventory);
 

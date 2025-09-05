@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 
 interface SearchState {
@@ -15,5 +16,11 @@ export const useSearchStore = create<SearchState>((set) => ({
 }));
 
 export const useIsSearchOpen = () => useSearchStore((s) => s.isOpen);
-export const useSearchActions = () =>
-  useSearchStore((s) => ({ open: s.open, close: s.close, toggle: s.toggle }));
+
+export const useSearchActions = () => {
+  const open = useSearchStore((s) => s.open);
+  const close = useSearchStore((s) => s.close);
+  const toggle = useSearchStore((s) => s.toggle);
+
+  return useMemo(() => ({ open, close, toggle }), [open, close, toggle]);
+};

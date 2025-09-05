@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -63,7 +64,6 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
           );
 
           if (response === 'Accepted') {
-            // Add badge to user - handled via cross-store communication
             import('./users.store').then(({ useUsersStore }) => {
               const usersStore = useUsersStore.getState();
               const user = usersStore.users.find(
@@ -104,17 +104,19 @@ export const useAwardsStore = create<AwardsState & AwardsActions>()(
 );
 
 export const useAwardsState = () => useAwardsStore((s) => s.badgeAwards);
-export const useAwardsActions = () =>
-  useAwardsStore((s) => ({
-    awardBadge: s.awardBadge,
-    respondToBadgeAward: s.respondToBadgeAward,
-  }));
+export const useAwardsActions = () => {
+  const store = useAwardsStore();
+  return useMemo(
+    () => ({
+      awardBadge: store.awardBadge,
+      respondToBadgeAward: store.respondToBadgeAward,
+    }),
+    [store.awardBadge, store.respondToBadgeAward]
+  );
+};
 
-// Selectors
 export const useBadgeAwardsForUser = (userId?: string) =>
   useAwardsStore((s) => {
     if (!userId) return [];
-    return s.badgeAwards.filter(
-      (award) => award.recipient.id === userId && award.status === 'Pending'
-    );
+    return s.badgeAwards;
   });

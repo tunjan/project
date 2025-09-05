@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -45,20 +46,30 @@ export const useOutreachStore = create<OutreachState & OutreachActions>()(
 );
 
 export const useOutreachLogs = () => useOutreachStore((s) => s.outreachLogs);
-export const useOutreachActions = () =>
-  useOutreachStore((s) => ({
-    addOutreachLog: s.addOutreachLog,
-    removeOutreachLog: s.removeOutreachLog,
-    updateOutreachLog: s.updateOutreachLog,
-  }));
-
-// Selectors
-export const useLogsForEvent = (eventId: string) =>
-  useOutreachStore((s) =>
-    s.outreachLogs.filter((log) => log.eventId === eventId)
+export const useOutreachActions = () => {
+  const store = useOutreachStore();
+  return useMemo(
+    () => ({
+      addOutreachLog: store.addOutreachLog,
+      removeOutreachLog: store.removeOutreachLog,
+      updateOutreachLog: store.updateOutreachLog,
+    }),
+    [store.addOutreachLog, store.removeOutreachLog, store.updateOutreachLog]
   );
+};
 
-export const useOutreachLogsForUser = (userId?: string) =>
-  useOutreachStore((s) =>
-    userId ? s.outreachLogs.filter((log) => log.userId === userId) : []
-  );
+export const useLogsForEvent = (eventId: string) => {
+  const logs = useOutreachStore((s) => s.outreachLogs);
+  return useMemo(() => {
+    if (!eventId) return [];
+    return logs.filter((log) => log.eventId === eventId);
+  }, [logs, eventId]);
+};
+
+export const useOutreachLogsForUser = (userId?: string) => {
+  const logs = useOutreachStore((s) => s.outreachLogs);
+  return useMemo(() => {
+    if (!userId) return [];
+    return logs.filter((log) => log.userId === userId);
+  }, [logs, userId]);
+};

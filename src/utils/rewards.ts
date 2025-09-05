@@ -33,10 +33,8 @@ const TIER_CONFIG: TierConfig[] = [
   },
 ];
 
-// FIX: Cache the reversed array to avoid recreating it on every function call
 const REVERSED_TIER_CONFIG = [...TIER_CONFIG].reverse();
 
-// CRITICAL FIX: Pre-compute tier progression to avoid repeated filtering/sorting
 const TIER_PROGRESSION = new Map<DiscountTierLevel, DiscountTierLevel | null>();
 TIER_CONFIG.forEach((tier, index) => {
   const nextTier =
@@ -52,7 +50,6 @@ export const calculateDiscountTier = (user: User) => {
     hours: stats.totalHours,
   };
 
-  // FIX: Use cached reversed array instead of creating new one each time
   const currentTier = REVERSED_TIER_CONFIG.find((tier) =>
     Object.entries(tier.requirements).every(([key, requiredValue]) => {
       const userValue = userStats[key as RequirementKey];
@@ -66,10 +63,9 @@ export const calculateDiscountTier = (user: User) => {
     return { level, nextTier: null, progress: null };
   }
 
-  // CRITICAL FIX: Use pre-computed tier progression instead of filtering/sorting
   const nextTierLevel = TIER_PROGRESSION.get(level);
   if (!nextTierLevel) {
-    return { level, nextTier: null, progress: null }; // Already at the highest tier
+    return { level, nextTier: null, progress: null };
   }
 
   const nextTierConfig = TIER_CONFIG.find((t) => t.level === nextTierLevel);

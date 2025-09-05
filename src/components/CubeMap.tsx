@@ -20,7 +20,6 @@ const CubeMap: React.FC<CubeMapProps> = ({
   const markers: MapMarker[] = useMemo(() => {
     return events
       .map((event) => {
-        // Find the chapter for this event to get coordinates
         const chapter = chapters.find((c) => c.name === event.city);
         if (!chapter) return null;
 
@@ -52,7 +51,7 @@ const CubeMap: React.FC<CubeMapProps> = ({
         (marker): marker is NonNullable<typeof marker> =>
           marker !== null &&
           marker.position[0] !== 0 &&
-          marker.position[1] !== 0 // Filter out invalid coordinates
+          marker.position[1] !== 0
       );
   }, [events, chapters, onSelectCube, popupActionText]);
 

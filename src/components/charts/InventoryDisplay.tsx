@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -20,20 +20,25 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
   showTitle = true,
   compact = false,
 }) => {
-  const inventory = useChapterInventory(chapterName);
+  const allInventory = useChapterInventory(chapterName);
   const [filter, setFilter] = useState<string>('All');
   const currentUser = useCurrentUser();
 
   const categories = ['All', 'Masks', 'TVs', 'Signs'];
 
-  const filteredInventory =
-    filter === 'All'
+  const inventory = useMemo(() => {
+    if (!chapterName) return [];
+    return allInventory.filter((item) => item.chapterName === chapterName);
+  }, [allInventory, chapterName]);
+
+  const filteredInventory = useMemo(() => {
+    return filter === 'All'
       ? inventory
       : inventory.filter((item) => item.category === filter);
+  }, [filter, inventory]);
 
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Check if user can manage this chapter's inventory
   const canManageInventory =
     currentUser &&
     (currentUser.role === Role.GODMODE ||

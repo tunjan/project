@@ -8,7 +8,7 @@ import { useCurrentUser } from '@/store/auth.store';
 
 import RequestCard from './RequestCard';
 
-interface HostingDashboardProps {}
+type HostingDashboardProps = Record<string, never>;
 
 type HostingView = 'incoming' | 'sent';
 

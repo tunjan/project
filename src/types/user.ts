@@ -62,7 +62,6 @@ export interface User {
   hostingCapacity?: number;
   onboardingStatus: OnboardingStatus;
   onboardingAnswers?: OnboardingAnswers;
-  // Onboarding progress flags
   onboardingProgress?: {
     watchedMasterclass?: boolean;
     selectedOrganiserId?: string;

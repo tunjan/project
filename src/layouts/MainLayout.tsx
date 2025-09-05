@@ -6,26 +6,17 @@ import { useTheme } from 'next-themes';
 import Header from '@/components/header/Header';
 import Sidebar from '@/components/header/Sidebar';
 import CommandPalette from '@/components/search/CommandPalette';
-import { useUsersActions } from '@/store';
 import { useSearchActions } from '@/store/search.store';
 
 const MainLayout: React.FC = () => {
-  const { init } = useUsersActions();
   const { open } = useSearchActions();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Initialize store when layout mounts - only run once
-  useEffect(() => {
-    init();
-  }, []); // Empty dependency array since init should only run once
-
-  // Add global keyboard shortcut for search
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {

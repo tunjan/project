@@ -75,7 +75,6 @@ const ApplicantStatusPage: React.FC = () => {
   const status = currentUser.onboardingStatus;
   const isDenied = status === OnboardingStatus.DENIED;
 
-  // Determine which step is currently active based on status
   const getCurrentStep = () => {
     switch (status) {
       case OnboardingStatus.PENDING_APPLICATION_REVIEW:
@@ -160,7 +159,6 @@ const ApplicantStatusPage: React.FC = () => {
             'Complete the masterclass to deepen your understanding before finalizing.',
           type: 'info' as const,
         };
-        break;
       case OnboardingStatus.AWAITING_REVISION_CALL:
         return {
           title: 'Final Revision Call',

@@ -33,7 +33,6 @@ const LeaderboardPage: React.FC = () => {
     'conversations'
   );
 
-  // UI filters
   const [chapterFilter, setChapterFilter] = useState<string>('');
 
   const leaderboards = useMemo(
@@ -42,15 +41,12 @@ const LeaderboardPage: React.FC = () => {
     [allUsers, allChapters, allOutreachLogs, allEvents]
   );
 
-  // Derived list of chapter names for the chapter filter select
   const chapterNames = useMemo(() => {
-    // allChapters should be typed as Chapter[] from the store hooks
     return Array.from(
       new Set((allChapters as Chapter[]).map((c) => c.name))
     ).filter(Boolean);
   }, [allChapters]);
 
-  // Apply chapter filter to user leaderboard data
   const userData = useMemo(() => {
     const base = (leaderboards.user?.[metric]?.[timeframe] ??
       []) as UserLeaderboardEntry[];

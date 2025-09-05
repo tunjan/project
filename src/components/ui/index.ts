@@ -1,8 +1,7 @@
-export { LeafletMap, type MapMarker } from './LeafletMap';
+export { default as LeafletMap, type MapMarker } from './LeafletMap';
 export { default as LoadingOverlay } from './LoadingOverlay';
 export { ThemeToggle } from './ThemeToggle';
 
-// shadcn/ui components
 export {
   AlertDialog,
   AlertDialogAction,

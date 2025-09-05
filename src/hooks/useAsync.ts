@@ -30,8 +30,7 @@ export function useAsync<T>(
         error: error instanceof Error ? error : new Error(String(error)),
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [asyncFunction, ...dependencies]);
+  }, [asyncFunction, ...dependencies]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     execute();

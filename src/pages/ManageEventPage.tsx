@@ -10,6 +10,7 @@ import { type EventReport } from '@/types';
 const ManageEventPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  // useEventById already returns a single event, not an array
   const event = useEventById(eventId!);
   const { logEventReport } = useEventsActions();
 

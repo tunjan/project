@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-// Import our improved CubeDetail component
 import CubeDetail from '@/components/CubeDetail';
 import { Button } from '@/components/ui/button';
 import { useEventById, useEventsActions } from '@/store';
@@ -15,6 +14,7 @@ const CubeDetailPage: React.FC = () => {
   const currentUser = useCurrentUser();
   const { rsvp, cancelRsvp } = useEventsActions();
 
+  // useEventById already returns a single event, not an array
   const event = useEventById(eventId!);
 
   if (!event) {
@@ -34,15 +34,12 @@ const CubeDetailPage: React.FC = () => {
   const handleRsvp = (eventId: string, duties?: TourDuty[]) => {
     if (!currentUser) return;
 
-    // Check if user is a guest (not from the event's chapter)
     const isGuest = !currentUser.chapters?.includes(event.city);
 
     if (duties && duties.length > 0) {
-      // Handle regional event with duties
       rsvp(eventId, currentUser, isGuest, duties);
       toast.success('Your duties have been registered!');
     } else {
-      // Handle regular RSVP
       rsvp(eventId, currentUser, isGuest);
       toast.success("Successfully RSVP'd to the event!");
     }

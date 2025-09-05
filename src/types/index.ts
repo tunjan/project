@@ -1,4 +1,3 @@
-// User types
 export {
   type EarnedBadge,
   type OnboardingAnswers,
@@ -10,7 +9,6 @@ export {
   type UserStats,
 } from './user';
 
-// Event types
 export {
   type AccommodationRequest,
   type CubeEvent,
@@ -23,7 +21,6 @@ export {
   TourDutyRole,
 } from './event';
 
-// Entity types
 export {
   type Announcement,
   AnnouncementScope,

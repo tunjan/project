@@ -139,11 +139,10 @@ const DashboardPage: React.FC = () => {
   const notifications = useNotificationsState();
   const allChapters = useChapters();
 
-  // Local UI state for onboarding modals
   const [showMasterclassModal, setShowMasterclassModal] = useState(false);
   const [showScheduleCallModal, setShowScheduleCallModal] = useState(false);
   const [selectedOrganiserId, setSelectedOrganiserId] = useState<string>('');
-  const [callWhen, setCallWhen] = useState<string>(''); // datetime-local string
+  const [callWhen, setCallWhen] = useState<string>('');
   const [contactInfo, setContactInfo] = useState('');
   const [showCityAttendanceModal, setShowCityAttendanceModal] = useState(false);
 
@@ -153,12 +152,10 @@ const DashboardPage: React.FC = () => {
     }
   }, [currentUser, navigate]);
 
-  // Auto-open onboarding modals based on status/progress
   useEffect(() => {
     if (!currentUser) return;
     const progress = currentUser.onboardingProgress || {};
 
-    // After onboarding call => status AWAITING_FIRST_CUBE: allow pre-confirming masterclass
     if (
       currentUser.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
       !progress.watchedMasterclass
@@ -167,7 +164,6 @@ const DashboardPage: React.FC = () => {
       return;
     }
 
-    // After first cube and masterclass confirmed => prompt to schedule revision call
     if (
       (currentUser.onboardingStatus ===
         OnboardingStatus.AWAITING_REVISION_CALL &&
@@ -180,7 +176,6 @@ const DashboardPage: React.FC = () => {
       return;
     }
 
-    // If awaiting masterclass and haven't confirmed yet, you may still confirm from dashboard
     if (
       currentUser.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS &&
       !progress.watchedMasterclass
@@ -201,7 +196,6 @@ const DashboardPage: React.FC = () => {
   const dashboardData = useMemo(() => {
     if (!currentUser) return null;
 
-    // Get next event for the user
     const userEvents = allEvents.filter(
       (event) =>
         event.participants.some((p) => p.user.id === currentUser.id) &&
@@ -213,10 +207,8 @@ const DashboardPage: React.FC = () => {
         new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
     )[0];
 
-    // Get pending tasks based on user role
     const tasks = [];
 
-    // Accommodation requests if organizer
     if (
       currentUser.role === 'Chapter Organiser' ||
       currentUser.role === 'Regional Organiser' ||
@@ -240,7 +232,6 @@ const DashboardPage: React.FC = () => {
         });
       }
 
-      // New applicants
       const newApplicants = notifications.filter(
         (n) =>
           n.userId === currentUser.id &&
@@ -260,7 +251,6 @@ const DashboardPage: React.FC = () => {
       }
     }
 
-    // RSVP requests if event organizer
     const userOrganizedEvents = allEvents.filter(
       (event) =>
         event.organizer.id === currentUser.id &&
@@ -292,7 +282,6 @@ const DashboardPage: React.FC = () => {
         .filter(Boolean) || []
     );
 
-    // Get recent announcements relevant to user
     const relevantAnnouncements = announcements
       .filter((ann) => {
         if (ann.scope === 'Global') return true;
@@ -389,7 +378,6 @@ const DashboardPage: React.FC = () => {
                       onClick={() => {
                         confirmWatchedMasterclass(currentUser.id);
                         setShowMasterclassModal(false);
-                        // If this advances to revision phase, open scheduling
                         setTimeout(() => {
                           if (
                             currentUser?.onboardingStatus ===

@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { useChapters, useEvents, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
-import { CubeEvent } from '@/types';
 
 interface ChapterHealth {
   name: string;
@@ -34,73 +33,39 @@ const ChapterHealthSnapshot: React.FC = () => {
     const threeMonthsAgo = subMonths(new Date(), 3);
     const oneMonthAgo = subMonths(new Date(), 1);
 
-    // CRITICAL FIX: Optimize performance by pre-processing data once
-    // Create lookup maps to avoid repeated filtering operations
+    // FIX: Pre-process data into lookup maps for huge performance gains.
+    // This avoids repeatedly filtering large arrays inside a loop.
     const userChapterMap = new Map<string, string[]>();
-    const eventChapterMap = new Map<string, CubeEvent[]>();
-    const userEventMap = new Map<string, CubeEvent[]>();
-
-    // Build user-chapter relationships
     allUsers.forEach((user) => {
-      if (user.chapters) {
-        userChapterMap.set(user.id, user.chapters);
-      }
+      if (user.chapters) userChapterMap.set(user.id, user.chapters);
     });
 
-    // Build event-chapter relationships and user-event relationships
+    const userEventAttendance = new Map<string, Date[]>();
     allEvents.forEach((event) => {
-      if (event.organizer.chapters) {
-        event.organizer.chapters.forEach((chapterName) => {
-          if (!eventChapterMap.has(chapterName)) {
-            eventChapterMap.set(chapterName, []);
-          }
-          eventChapterMap.get(chapterName)!.push(event);
-        });
-
-        // Track user attendance for performance
-        if (event.report?.attendance) {
-          Object.entries(event.report.attendance).forEach(
-            ([userId, status]) => {
-              if (status === 'Attended') {
-                if (!userEventMap.has(userId)) {
-                  userEventMap.set(userId, []);
-                }
-                userEventMap.get(userId)!.push(event);
-              }
+      if (event.report?.attendance) {
+        Object.entries(event.report.attendance).forEach(([userId, status]) => {
+          if (status === 'Attended') {
+            if (!userEventAttendance.has(userId)) {
+              userEventAttendance.set(userId, []);
             }
-          );
-        }
+            userEventAttendance.get(userId)!.push(new Date(event.startDate));
+          }
+        });
       }
     });
 
     return manageableChapters.map((chapter) => {
       const chapterName = chapter.name;
 
-      // Get chapter members efficiently
       const chapterMembers = allUsers.filter((u) =>
         userChapterMap.get(u.id)?.includes(chapterName)
       );
 
-      // Calculate active members efficiently
       const activeMembers = chapterMembers.filter((member) => {
-        const userEvents = userEventMap.get(member.id) || [];
-        const chapterEvents = userEvents.filter((event) =>
-          event.organizer.chapters?.includes(chapterName)
-        );
-
-        if (chapterEvents.length === 0) return false;
-
-        // Find most recent event for this user in this chapter
-        const lastEvent = chapterEvents.reduce((latest, current) =>
-          new Date(current.startDate) > new Date(latest.startDate)
-            ? current
-            : latest
-        );
-
-        return isAfter(new Date(lastEvent.startDate), threeMonthsAgo);
+        const attendedDates = userEventAttendance.get(member.id) || [];
+        return attendedDates.some((date) => isAfter(date, threeMonthsAgo));
       }).length;
 
-      // Calculate member growth efficiently
       const recentMembers = chapterMembers.filter(
         (u) => u.joinDate && isAfter(new Date(u.joinDate), oneMonthAgo)
       ).length;
@@ -123,6 +88,7 @@ const ChapterHealthSnapshot: React.FC = () => {
   }, [manageableChapters, allUsers, allEvents]);
 
   if (!chapterHealthData.length) {
+    // ... (rest of the component remains the same)
     return (
       <Card>
         <CardContent className="flex h-full items-center justify-center p-6 text-center">
@@ -203,5 +169,4 @@ const ChapterHealthSnapshot: React.FC = () => {
     </div>
   );
 };
-
 export default ChapterHealthSnapshot;

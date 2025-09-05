@@ -59,7 +59,7 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
           ),
         };
       })
-      .filter((marker) => marker.position[0] !== 0 && marker.position[1] !== 0); // Filter out invalid coordinates
+      .filter((marker) => marker.position[0] !== 0 && marker.position[1] !== 0);
   }, [chapters, onSelectChapter, popupActionText]);
 
   return <LeafletMap markers={markers} height="600px" />;

@@ -1,5 +1,5 @@
 import { Calendar, ChevronRight, Instagram, MessageCircle } from 'lucide-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,13 @@ const SignUpSuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { name, chapter } = (state || {}) as LocationState;
-  const chapterData = useChapterByName(chapter);
+  const allChapters = useChapterByName(chapter);
+  const chapterData = useMemo(() => {
+    if (!chapter || !allChapters.length) return undefined;
+    return allChapters.find(
+      (c) => c.name.toLowerCase() === chapter.toLowerCase()
+    );
+  }, [allChapters, chapter]);
 
   const instagramUrl = chapterData?.instagram
     ? chapterData.instagram.startsWith('http')

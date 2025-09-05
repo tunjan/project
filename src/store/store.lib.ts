@@ -8,17 +8,10 @@ import {
 import { useNotificationsStore } from './notifications.store';
 import { useUsersStore } from './users.store';
 
-/**
- * Handles the logic for logging an event report, including updating user stats.
- * This function is designed to be called from the events store to avoid circular dependencies.
- * @param event - The event that has finished.
- * @param report - The event report containing attendance and hours.
- */
 export const handleEventReportLogging = (
   event: CubeEvent,
   report?: EventReport
 ) => {
-  // Prepare batch update for user stats
   const usersStore = useUsersStore.getState();
   const statsUpdates: { userId: string; newStats: Partial<User['stats']> }[] =
     [];
@@ -41,10 +34,8 @@ export const handleEventReportLogging = (
   });
 
   if (statsUpdates.length > 0) {
-    // FIX: First update stats, then handle onboarding logic separately
     usersStore.batchUpdateUserStats(statsUpdates);
 
-    // Check for users who just completed their first cube and advance their onboarding
     statsUpdates.forEach((update) => {
       if (update.newStats.cubesAttended === 1) {
         usersStore.advanceOnboardingAfterEvent(update.userId);
@@ -52,7 +43,6 @@ export const handleEventReportLogging = (
     });
   }
 
-  // Notify attendees that their stats have been updated
   const notificationsStore = useNotificationsStore.getState();
   const notificationsToCreate = [];
 
@@ -75,11 +65,6 @@ export const handleEventReportLogging = (
   }
 };
 
-/**
- * Creates and adds notifications for event updates.
- * @param event - The updated event.
- * @param currentUser - The user who initiated the update.
- */
 export const notifyEventUpdate = (event: CubeEvent, currentUser: User) => {
   const notificationsToCreate = event.participants
     .filter((p) => p.user.id !== currentUser.id)

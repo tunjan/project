@@ -26,15 +26,111 @@ interface LoginProps {
   onLogin: (user: User) => void;
 }
 
-const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
-  // Helper to determine organizer
-  const isOrganizer = (u: User) =>
+const isOrganizer = (u: User) =>
+  u.role === Role.GLOBAL_ADMIN ||
+  u.role === Role.REGIONAL_ORGANISER ||
+  u.role === Role.CHAPTER_ORGANISER;
+
+const getStatusBadgeVariant = (u: User) => {
+  if (
     u.role === Role.GLOBAL_ADMIN ||
     u.role === Role.REGIONAL_ORGANISER ||
-    u.role === Role.CHAPTER_ORGANISER;
+    u.role === Role.CHAPTER_ORGANISER
+  )
+    return 'default';
 
-  // Group users for quicker scanning
+  if (u.onboardingStatus === OnboardingStatus.CONFIRMED) return 'default';
+
+  if (
+    u.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE ||
+    u.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS ||
+    u.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
+  )
+    return 'secondary';
+
+  return 'outline';
+};
+
+const ProgressTags: React.FC<{ user: User }> = ({ user }) => {
+  const p = user.onboardingProgress || {};
+  const tags: React.ReactNode[] = [];
+
+  tags.push(
+    <Badge key="status" variant={getStatusBadgeVariant(user)}>
+      {user.onboardingStatus.replace(/_/g, ' ')}
+    </Badge>
+  );
+
+  if (p.watchedMasterclass) {
+    tags.push(
+      <Badge key="mc" variant="default">
+        Masterclass ✓
+      </Badge>
+    );
+  }
+
+  if (p.revisionCallScheduledAt) {
+    tags.push(
+      <Badge key="rev" variant="default">
+        Revision scheduled
+      </Badge>
+    );
+  } else if (
+    user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
+  ) {
+    tags.push(
+      <Badge key="sched" variant="secondary">
+        Schedule revision
+      </Badge>
+    );
+  }
+
+  return <>{tags}</>;
+};
+
+const UserButton: React.FC<{ user: User; onLogin: (user: User) => void }> = ({
+  user,
+  onLogin,
+}) => (
+  <Card
+    key={user.id}
+    className="cursor-pointer transition-all duration-200 hover:shadow-md"
+    onClick={() => onLogin(user)}
+  >
+    <CardContent className="p-4">
+      <div className="flex items-center gap-4">
+        <Avatar className="size-14">
+          <AvatarImage src={user.profilePictureUrl} alt={user.name} />
+          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-semibold text-foreground">
+            {user.name}
+          </p>
+          <p className="truncate text-sm capitalize text-muted-foreground">
+            {user.role.replace('_', ' ').toLowerCase()}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end space-y-2">
+          <ProgressTags user={user} />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
+  // Use useMemo with proper memoization to prevent new object creation
   const groups = useMemo(() => {
+    // Early return for empty users to prevent unnecessary computation
+    if (!users || users.length === 0) {
+      return {
+        adminsAndOrganizers: [],
+        activists: [],
+        applicants: [],
+      };
+    }
+
     const adminsAndOrganizers = users.filter(isOrganizer);
     const activists = users.filter(
       (u) => !isOrganizer(u) && u.role === Role.ACTIVIST
@@ -49,123 +145,6 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       applicants,
     };
   }, [users]);
-
-  const getStatusBadgeVariant = (u: User) => {
-    if (
-      u.role === Role.GLOBAL_ADMIN ||
-      u.role === Role.REGIONAL_ORGANISER ||
-      u.role === Role.CHAPTER_ORGANISER
-    )
-      return 'default';
-
-    if (u.onboardingStatus === OnboardingStatus.CONFIRMED) return 'default';
-
-    // Emphasize actionable onboarding states
-    if (
-      u.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE ||
-      u.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS ||
-      u.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
-    )
-      return 'secondary';
-
-    // Softer color for earlier pipeline stages
-    return 'outline';
-  };
-
-  const ProgressTags: React.FC<{ user: User }> = ({ user }) => {
-    const p = user.onboardingProgress || {};
-    const tags: React.ReactNode[] = [];
-
-    // Status badge based on role/onboarding status
-    if (
-      user.role === Role.GLOBAL_ADMIN ||
-      user.role === Role.REGIONAL_ORGANISER ||
-      user.role === Role.CHAPTER_ORGANISER
-    ) {
-      tags.push(
-        <Badge key="role" variant="default">
-          ORGANIZER
-        </Badge>
-      );
-    } else if (user.onboardingStatus === OnboardingStatus.CONFIRMED) {
-      tags.push(
-        <Badge key="status" variant="default">
-          CONFIRMED
-        </Badge>
-      );
-    } else if (
-      user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE ||
-      user.onboardingStatus === OnboardingStatus.AWAITING_MASTERCLASS ||
-      user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
-    ) {
-      tags.push(
-        <Badge key="status" variant={getStatusBadgeVariant(user)}>
-          {user.onboardingStatus.replace(/_/g, ' ')}
-        </Badge>
-      );
-    } else {
-      tags.push(
-        <Badge key="status" variant="outline">
-          {user.onboardingStatus.replace(/_/g, ' ')}
-        </Badge>
-      );
-    }
-
-    // Progress cues
-    if (p.watchedMasterclass) {
-      tags.push(
-        <Badge key="mc" variant="default">
-          Masterclass ✓
-        </Badge>
-      );
-    }
-
-    if (p.revisionCallScheduledAt) {
-      tags.push(
-        <Badge key="rev" variant="default">
-          Revision scheduled
-        </Badge>
-      );
-    } else if (
-      user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
-    ) {
-      tags.push(
-        <Badge key="sched" variant="secondary">
-          Schedule revision
-        </Badge>
-      );
-    }
-
-    return <>{tags}</>;
-  };
-
-  const UserButton: React.FC<{ user: User }> = ({ user }) => (
-    <Card
-      key={user.id}
-      className="cursor-pointer transition-all duration-200 hover:shadow-md"
-      onClick={() => onLogin(user)}
-    >
-      <CardContent className="p-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="size-14">
-            <AvatarImage src={user.profilePictureUrl} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-lg font-semibold text-foreground">
-              {user.name}
-            </p>
-            <p className="truncate text-sm capitalize text-muted-foreground">
-              {user.role.replace('_', ' ').toLowerCase()}
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-col items-end space-y-2">
-            <ProgressTags user={user} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -210,7 +189,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
                 <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
                   {groups.adminsAndOrganizers.length > 0 ? (
                     groups.adminsAndOrganizers.map((u) => (
-                      <UserButton key={u.id} user={u} />
+                      <UserButton key={u.id} user={u} onLogin={onLogin} />
                     ))
                   ) : (
                     <div className="py-8 text-center text-muted-foreground">
@@ -243,7 +222,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
                 <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
                   {groups.activists.length > 0 ? (
                     groups.activists.map((u) => (
-                      <UserButton key={u.id} user={u} />
+                      <UserButton key={u.id} user={u} onLogin={onLogin} />
                     ))
                   ) : (
                     <div className="py-8 text-center text-muted-foreground">
@@ -276,7 +255,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
                 <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
                   {groups.applicants.length > 0 ? (
                     groups.applicants.map((u) => (
-                      <UserButton key={u.id} user={u} />
+                      <UserButton key={u.id} user={u} onLogin={onLogin} />
                     ))
                   ) : (
                     <div className="py-8 text-center text-muted-foreground">

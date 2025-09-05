@@ -5,7 +5,6 @@ import LineChart from '@/components/analytics/LineChart';
 import { type OutreachLog, OutreachOutcome } from '@/types';
 import { getConversationTrendsByMonth } from '@/utils';
 
-// Modern stat card with clean design
 const Stat: React.FC<{
   icon: React.ReactNode;
   label: string;
@@ -92,7 +91,6 @@ const PersonalPerformance: React.FC<{ logs: OutreachLog[] }> = ({ logs }) => {
     );
     const personalBest = Math.max(...Object.values(eventCounts), 0);
 
-    // Calculate trend for this month vs last month
     const getTrend = (
       current: number,
       previous: number

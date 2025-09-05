@@ -16,7 +16,6 @@ import React from 'react';
 
 import { NotificationType } from '@/types';
 
-// Map notification types to their corresponding icons
 const notificationIconMap: Record<
   NotificationType,
   React.ComponentType<{ className?: string }>

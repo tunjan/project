@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -36,5 +37,10 @@ export const useCommentsStore = create<CommentsState & CommentsActions>()(
 
 export const useEventCommentsState = () =>
   useCommentsStore((s) => s.eventComments);
-export const useCommentsActions = () =>
-  useCommentsStore((s) => ({ postComment: s.postComment }));
+export const useCommentsActions = () => {
+  const store = useCommentsStore();
+  return useMemo(
+    () => ({ postComment: store.postComment }),
+    [store.postComment]
+  );
+};

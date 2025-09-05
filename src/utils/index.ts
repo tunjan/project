@@ -1,4 +1,3 @@
-// Analytics utilities
 export {
   type ChapterOutreachStats,
   type ChapterStats,
@@ -22,23 +21,18 @@ export {
   type MonthlyTrend,
 } from './analytics';
 
-// Centralized metrics calculation
 export {
   calculateAllMetrics,
   type MetricsData,
   type UserStats as MetricsUserStats,
 } from './metrics';
 
-// Auth utilities
 export { getPostableScopes } from './auth';
 
-// Class name utility
 export { cn } from './cn';
 
-// Clipboard utilities
 export { copyToClipboard } from './copyToClipboard';
 
-// Date utilities
 export {
   formatDateSafe,
   getDatesBetween,
@@ -46,10 +40,8 @@ export {
   safeParseDate,
 } from './date';
 
-// File upload utilities
 export { readFileAsDataURL, validateImageFile } from './fileUpload';
 
-// Leaderboard utilities
 export {
   calculateLeaderboards,
   calculateRanks,
@@ -59,19 +51,14 @@ export {
   type UserLeaderboardEntry,
 } from './leaderboard';
 
-// Notification utilities
 export { getNotificationIcon } from './notificationUtils';
 
-// Rewards utilities
 export { calculateDiscountTier, type TierProgress } from './rewards';
 
-// Scorecard utilities
 export { calculateChapterScorecard, type ScorecardData } from './scorecard';
 
-// String utilities
 export { getInitials, stringToColor } from './string';
 
-// User utilities
 export {
   createUserAttendanceMap,
   generateRandomAvatarUrl,

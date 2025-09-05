@@ -84,7 +84,6 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
 }) => {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // Handle escape key press
   React.useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {

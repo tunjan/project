@@ -32,7 +32,6 @@ import {
   type User,
 } from '@/types';
 
-// Process raw data with date strings into data with Date objects
 export const processedUsers: User[] = rawUsers.map((user) => ({
   ...user,
   joinDate: user.joinDate ? new Date(user.joinDate) : undefined,
@@ -111,7 +110,6 @@ export const initialChapters: Chapter[] = rawChapters;
 export const initialResources: Resource[] = rawResources;
 export const initialInventory: InventoryItem[] = rawInventory;
 
-// Re-export enums used by actions for convenience
 export {
   EventStatus,
   NotificationType,

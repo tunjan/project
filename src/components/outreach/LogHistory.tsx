@@ -27,7 +27,6 @@ const LogHistory: React.FC<LogHistoryProps> = ({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [editingLog, setEditingLog] = useState<OutreachLog | null>(null);
-  // Track pending deletions to support Undo without immediate data mutation
   const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
     new Set()
   );
@@ -60,14 +59,11 @@ const LogHistory: React.FC<LogHistoryProps> = ({
     setEditingLog(null);
   };
 
-  // Start a pending delete with Undo option. Only call removeOutreachLog if not undone within 5s.
   const startPendingDelete = (log: OutreachLog) => {
     setPendingDeleteIds((prev) => new Set(prev).add(log.id));
 
-    // Set up delayed removal
     const timerId = window.setTimeout(() => {
       removeOutreachLog(log.id);
-      // Cleanup timer ref and pending state
       setPendingDeleteIds((prev) => {
         const next = new Set(prev);
         next.delete(log.id);
@@ -82,7 +78,6 @@ const LogHistory: React.FC<LogHistoryProps> = ({
       action: {
         label: 'Undo',
         onClick: () => {
-          // Cancel deletion
           const t = deleteTimersRef.current[log.id];
           if (t) {
             clearTimeout(t);
@@ -100,7 +95,6 @@ const LogHistory: React.FC<LogHistoryProps> = ({
     });
   };
 
-  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       Object.values(deleteTimersRef.current).forEach((t) => clearTimeout(t));

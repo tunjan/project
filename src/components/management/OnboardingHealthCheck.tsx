@@ -42,7 +42,6 @@ const OnboardingHealthCheck: React.FC = () => {
     setIsFixing(true);
     fixOnboardingIssues();
 
-    // Wait a bit and then re-check
     setTimeout(() => {
       checkOnboardingHealth();
       setIsFixing(false);

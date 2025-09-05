@@ -14,7 +14,6 @@ interface ChallengesProps {
 const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
   const currentUser = useCurrentUser();
 
-  // FIX: Memoize sorted participants to avoid re-sorting on every render
   const challengesWithSortedParticipants = useMemo(() => {
     return challenges.map((challenge) => ({
       ...challenge,

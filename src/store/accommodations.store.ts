@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -90,8 +91,13 @@ export const useAccommodationsStore = create<
 
 export const useAccommodationsState = () =>
   useAccommodationsStore((s) => s.accommodationRequests);
-export const useAccommodationsActions = () =>
-  useAccommodationsStore((s) => ({
-    createAccommodationRequest: s.createAccommodationRequest,
-    respondToAccommodationRequest: s.respondToAccommodationRequest,
-  }));
+export const useAccommodationsActions = () => {
+  const store = useAccommodationsStore();
+  return useMemo(
+    () => ({
+      createAccommodationRequest: store.createAccommodationRequest,
+      respondToAccommodationRequest: store.respondToAccommodationRequest,
+    }),
+    [store.createAccommodationRequest, store.respondToAccommodationRequest]
+  );
+};

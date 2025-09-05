@@ -50,12 +50,6 @@ export interface LeaderboardData {
   };
 }
 
-/**
- * Calculates proper ranks for leaderboard entries, handling ties correctly.
- * Entries with the same value get the same rank, and subsequent ranks are adjusted accordingly.
- * @param entries - Array of leaderboard entries sorted by value (descending)
- * @returns Array of entries with calculated ranks
- */
 export const calculateRanks = <T extends { value: number }>(
   entries: T[]
 ): (T & { rank: number })[] => {
@@ -68,7 +62,6 @@ export const calculateRanks = <T extends { value: number }>(
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
 
-    // If this entry has a different value than the previous, update the rank
     if (entry.value !== currentValue) {
       currentRank = i + 1;
       currentValue = entry.value;
@@ -110,13 +103,11 @@ export const calculateLeaderboards = (
   const userMap = new Map<string, User>(confirmedUsers.map((u) => [u.id, u]));
   const chapterMap = new Map<string, Chapter>(chapters.map((c) => [c.name, c]));
 
-  // Use pre-computed chapter-to-members map from metrics
   const chapterToMembersMap = metrics.users.byChapter;
 
   const eventToCityMap = new Map<string, string>();
   events.forEach((e) => eventToCityMap.set(e.id, e.city));
 
-  // --- USER LEADERBOARDS ---
   const userHoursAllTime = [...confirmedUsers]
     .map((user) => {
       const userStats = metrics.users.stats.get(user.id);
@@ -128,7 +119,6 @@ export const calculateLeaderboards = (
     .sort((a, b) => b.value - a.value)
     .slice(0, 50);
 
-  // CRITICAL FIX: Optimize performance by processing all time periods in a single pass
   const calculateTimedUserHours = (
     periods: ('week' | 'month' | 'year')[]
   ): Record<'week' | 'month' | 'year', UserLeaderboardEntry[]> => {
@@ -144,7 +134,6 @@ export const calculateLeaderboards = (
       year: getStartDate('year'),
     };
 
-    // Process all events once and bucket by time periods
     const periodHourCounts: Record<
       'week' | 'month' | 'year',
       Record<string, number>
@@ -159,10 +148,8 @@ export const calculateLeaderboards = (
 
       const eventDate = new Date(event.startDate);
 
-      // Check which time periods this event falls into
       for (const period of periods) {
         if (eventDate >= periodStartDates[period]) {
-          // Calculate hours per user based on attendance
           for (const [userId, status] of Object.entries(
             event.report.attendance
           )) {
@@ -176,7 +163,6 @@ export const calculateLeaderboards = (
       }
     }
 
-    // Convert each period's results to leaderboard entries
     for (const period of periods) {
       results[period] = Object.entries(periodHourCounts[period])
         .map(([userId, count]) => ({
@@ -214,7 +200,6 @@ export const calculateLeaderboards = (
       year: getStartDate('year'),
     };
 
-    // Process all outreach logs once and bucket by time periods
     const periodLogCounts: Record<
       'week' | 'month' | 'year',
       Record<string, number>
@@ -229,7 +214,6 @@ export const calculateLeaderboards = (
 
       const logDate = new Date(log.createdAt);
 
-      // Check which time periods this log falls into
       for (const period of periods) {
         if (logDate >= periodStartDates[period]) {
           const currentCount = periodLogCounts[period][log.userId] || 0;
@@ -238,7 +222,6 @@ export const calculateLeaderboards = (
       }
     }
 
-    // Convert each period's results to leaderboard entries
     for (const period of periods) {
       results[period] = Object.entries(periodLogCounts[period])
         .map(([userId, count]) => ({
@@ -252,13 +235,9 @@ export const calculateLeaderboards = (
     return results;
   };
 
-  // --- CHAPTER LEADERBOARDS ---
-  // FIX: Optimize performance by building maps first instead of filtering for each chapter
   const chapterHoursAllTime = (() => {
-    // Build a map of chapter hours efficiently
     const chapterHourMap = new Map<string, number>();
 
-    // Process all events once to build chapter hours
     for (const event of events) {
       if (event.report) {
         const chapterName = event.city;
@@ -273,7 +252,6 @@ export const calculateLeaderboards = (
       }
     }
 
-    // Convert map to array and sort
     return Array.from(chapterHourMap.entries())
       .map(([chapterName, hours]) => ({
         chapter: chapterMap.get(chapterName)!,
@@ -302,7 +280,6 @@ export const calculateLeaderboards = (
       year: getStartDate('year'),
     };
 
-    // Process all events once and bucket by time periods
     const periodHourCounts: Record<
       'week' | 'month' | 'year',
       Record<string, number>
@@ -320,7 +297,6 @@ export const calculateLeaderboards = (
 
       if (!chapterMap.has(chapterName)) continue;
 
-      // Check which time periods this event falls into
       for (const period of periods) {
         if (eventDate >= periodStartDates[period]) {
           const chapterMembers = chapterToMembersMap.get(chapterName) || [];
@@ -336,7 +312,6 @@ export const calculateLeaderboards = (
       }
     }
 
-    // Convert each period's results to leaderboard entries
     for (const period of periods) {
       results[period] = Object.entries(periodHourCounts[period])
         .map(([chapterName, count]) => ({
@@ -351,12 +326,9 @@ export const calculateLeaderboards = (
     return results;
   };
 
-  // Optimized: Use pre-computed eventToCityMap for O(1) lookup
   const chapterConversationsAllTime = (() => {
-    // Build a map of chapter conversations efficiently
     const chapterConversationMap = new Map<string, number>();
 
-    // Process all outreach logs once to build chapter conversation counts
     for (const log of outreachLogs) {
       const chapterName = eventToCityMap.get(log.eventId);
       if (chapterName) {
@@ -365,7 +337,6 @@ export const calculateLeaderboards = (
       }
     }
 
-    // Convert map to array and sort
     return Array.from(chapterConversationMap.entries())
       .map(([chapterName, count]) => ({
         chapter: chapterMap.get(chapterName)!,
@@ -394,7 +365,6 @@ export const calculateLeaderboards = (
       year: getStartDate('year'),
     };
 
-    // Process all outreach logs once and bucket by time periods
     const periodLogCounts: Record<
       'week' | 'month' | 'year',
       Record<string, number>
@@ -410,7 +380,6 @@ export const calculateLeaderboards = (
 
       const logDate = new Date(log.createdAt);
 
-      // Check which time periods this log falls into
       for (const period of periods) {
         if (logDate >= periodStartDates[period]) {
           const currentCount = periodLogCounts[period][chapterName] || 0;
@@ -419,7 +388,6 @@ export const calculateLeaderboards = (
       }
     }
 
-    // Convert each period's results to leaderboard entries
     for (const period of periods) {
       results[period] = Object.entries(periodLogCounts[period])
         .map(([chapterName, count]) => ({
@@ -434,7 +402,6 @@ export const calculateLeaderboards = (
     return results;
   };
 
-  // CRITICAL FIX: Call optimized functions once to get all time periods
   const userHoursByPeriod = calculateTimedUserHours(['week', 'month', 'year']);
   const userConversationsByPeriod = calculateTimedUserConversations([
     'week',

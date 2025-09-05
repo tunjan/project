@@ -173,14 +173,12 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
     itemData: Omit<InventoryItem, 'id' | 'chapterName'>
   ) => {
     if (editingItem) {
-      // Update existing item
       const updatedInventory = inventory.map((item) =>
         item.id === editingItem.id ? { ...item, ...itemData } : item
       );
       onUpdateInventory(updatedInventory);
       toast.success('Item updated successfully');
     } else {
-      // Add new item
       const newItem: InventoryItem = {
         ...itemData,
         id: `item_${Date.now()}`,

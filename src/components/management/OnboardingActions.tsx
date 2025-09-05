@@ -64,7 +64,6 @@ const OnboardingActions: React.FC<OnboardingActionsProps> = ({ user }) => {
     toast.success(`${user.name} passed the revision call and is now verified.`);
   };
 
-  // Render different action buttons based on user's onboarding status
   const renderOnboardingActions = () => {
     switch (user.onboardingStatus) {
       case OnboardingStatus.PENDING_APPLICATION_REVIEW:
@@ -110,7 +109,6 @@ const OnboardingActions: React.FC<OnboardingActionsProps> = ({ user }) => {
     }
   };
 
-  // Don't render anything if onboarding is finished
   if (
     user.onboardingStatus === OnboardingStatus.CONFIRMED ||
     user.onboardingStatus === OnboardingStatus.COMPLETED

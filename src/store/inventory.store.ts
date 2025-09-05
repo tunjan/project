@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -16,8 +17,7 @@ interface InventoryActions {
 export const useInventoryStore = create<InventoryState & InventoryActions>()(
   persist(
     (set) => ({
-      inventory: initialInventory, // Start with initial inventory data
-
+      inventory: initialInventory,
       updateChapterInventory: (chapterName: string, items: InventoryItem[]) => {
         set((state) => ({
           inventory: [
@@ -34,12 +34,20 @@ export const useInventoryStore = create<InventoryState & InventoryActions>()(
 );
 
 export const useInventoryState = () => useInventoryStore((s) => s.inventory);
-export const useInventoryActions = () =>
-  useInventoryStore((s) => ({
-    updateChapterInventory: s.updateChapterInventory,
-  }));
-
-export const useChapterInventory = (chapterName: string) =>
-  useInventoryStore((state) =>
-    state.inventory.filter((item) => item.chapterName === chapterName)
+export const useInventoryActions = () => {
+  const store = useInventoryStore();
+  return useMemo(
+    () => ({
+      updateChapterInventory: store.updateChapterInventory,
+    }),
+    [store.updateChapterInventory]
   );
+};
+
+export const useChapterInventory = (chapterName: string) => {
+  const inventory = useInventoryStore((state) => state.inventory);
+  return useMemo(() => {
+    if (!chapterName) return [];
+    return inventory.filter((item) => item.chapterName === chapterName);
+  }, [inventory, chapterName]);
+};

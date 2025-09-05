@@ -25,7 +25,6 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { type Chapter, type OnboardingAnswers } from '@/types';
 
-// 1. Define the validation schema with Zod
 const signUpSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
@@ -34,7 +33,6 @@ const signUpSchema = z.object({
   veganReason: z
     .string()
     .min(10, 'Please provide a reason (min. 10 characters)'),
-  // Keep as string enum to avoid type conflicts with react-hook-form
   abolitionistAlignment: z.enum(['true', 'false'], {
     message: 'Please select an option',
   }),
@@ -43,7 +41,6 @@ const signUpSchema = z.object({
     .min(10, 'Please provide an answer (min. 10 characters)'),
 });
 
-// 2. Infer the TypeScript type from the schema
 type SignUpFormSchema = z.infer<typeof signUpSchema>;
 
 interface SignUpProps {
@@ -65,7 +62,6 @@ const SignUp: React.FC<SignUpProps> = ({
   onNavigateLogin,
   defaultChapter,
 }) => {
-  // 3. Initialize react-hook-form
   const {
     register,
     handleSubmit,
@@ -77,14 +73,10 @@ const SignUp: React.FC<SignUpProps> = ({
     defaultValues: {
       chapter: defaultChapter || chapters[0]?.name || '',
     },
-    mode: 'onChange', // Change back to onChange to enable real-time validation
+    mode: 'onChange',
   });
 
-  // Helper function to check if a field is valid using react-hook-form state
-
-  // 4. Create a submit handler that receives validated data
   const onSubmit: SubmitHandler<SignUpFormSchema> = (data) => {
-    // Restructure the flat form data to match the expected nested structure for onRegister
     onRegister({
       name: data.name,
       email: data.email,

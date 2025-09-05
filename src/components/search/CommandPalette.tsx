@@ -19,7 +19,6 @@ const CommandPalette: React.FC = () => {
   const { users, chapters, events, loading } = useSearch(query);
 
   useEffect(() => {
-    // Clear query when modal is closed
     if (!isOpen) {
       setQuery('');
     }
