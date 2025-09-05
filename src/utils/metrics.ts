@@ -4,7 +4,7 @@ import {
   type OutreachLog,
   type User,
 } from '@/types';
-import { getConfirmedUsers } from '@/utils';
+import { getConfirmedUsers } from './user';
 
 // Comprehensive metrics data structure
 export interface MetricsData {

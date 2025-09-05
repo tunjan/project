@@ -2,8 +2,8 @@
 // should be performed on the backend. The client should fetch pre-computed data to ensure performance and scalability.
 
 import { type Chapter, type CubeEvent, OutreachLog, type User } from '@/types';
-import { safeParseDate } from '@/utils';
-import { getConfirmedUsers } from '@/utils';
+import { safeParseDate } from './date';
+import { getConfirmedUsers } from './user';
 
 import { calculateAllMetrics } from './metrics';
 
