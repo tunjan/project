@@ -1,15 +1,7 @@
-import { BookOpen, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import React from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { type Resource } from '@/types';
 
 interface ResourceCardProps {
@@ -18,41 +10,51 @@ interface ResourceCardProps {
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   return (
-    <Card className="flex h-full flex-col transition-transform hover:shadow-lg">
-      <CardHeader className="pb-3">
-        <div className="flex items-center space-x-3">
-          <div className="flex size-10 items-center justify-center rounded-md bg-primary">
-            <BookOpen className="size-5 text-primary-foreground" />
-          </div>
-          <CardTitle className="text-lg leading-tight">
+    <div className="group h-full rounded-lg border border-border bg-card p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-md">
+      <div className="flex h-full flex-col">
+        {/* Header */}
+        <div className="mb-4">
+          <h3 className="line-clamp-2 font-semibold leading-tight text-foreground">
             {resource.title}
-          </CardTitle>
+          </h3>
         </div>
-      </CardHeader>
-      <CardContent className="flex-1 space-y-4">
-        <p className="h-20 overflow-hidden text-sm text-muted-foreground">
-          {resource.description}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">{resource.type}</Badge>
-          <Badge variant="outline">{resource.skillLevel}</Badge>
-          <Badge variant="outline">{resource.language}</Badge>
+
+        {/* Content */}
+        <div className="flex-1 space-y-4">
+          <p className="line-clamp-3 text-sm text-muted-foreground">
+            {resource.description}
+          </p>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            <div className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+              {resource.type}
+            </div>
+            <div className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+              {resource.skillLevel}
+            </div>
+            <div className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-600 dark:bg-green-900/20 dark:text-green-400">
+              {resource.language}
+            </div>
+          </div>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button asChild className="w-full">
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center"
-          >
-            View Resource
-            <ExternalLink className="ml-2 size-4" />
-          </a>
-        </Button>
-      </CardFooter>
-    </Card>
+
+        {/* Footer */}
+        <div className="mt-auto pt-4">
+          <Button asChild className="w-full" size="sm">
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2"
+            >
+              <span>View Resource</span>
+              <ExternalLink className="size-3" />
+            </a>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

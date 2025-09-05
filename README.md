@@ -1,10 +1,10 @@
 # Vegan Action Hub
 
-[![React](https://img.shields.io/badge/React-18.2-blue?logo=react)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-19.1-blue?logo=react)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.1-purple?logo=vite)](https://vitejs.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![Zustand](https://img.shields.io/badge/Zustand-4.5-orange)](https://github.com/pmndrs/zustand)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Zustand](https://img.shields.io/badge/Zustand-5.0-orange)](https://github.com/pmndrs/zustand)
 [![Vitest](https://img.shields.io/badge/Vitest-3.2-yellowgreen?logo=vitest)](https://vitest.dev/)
 
 Vegan Action Hub is a comprehensive, feature-rich platform designed to empower vegan activists and organizers. It provides a centralized hub for managing chapters, organizing events ("Cubes of Truth"), tracking outreach impact, and fostering a global community dedicated to animal advocacy.

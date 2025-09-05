@@ -1,3 +1,4 @@
+import { formatDistanceToNowStrict } from 'date-fns';
 import {
   Calendar,
   CheckCircle,
@@ -70,33 +71,58 @@ const TaskItem: React.FC<TaskItemProps> = ({
   actionText = 'View',
   urgent = false,
 }) => (
-  <Card className={`${urgent ? 'border-l-4 border-l-destructive' : ''}`}>
-    <CardContent className="p-4">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <div className={`${urgent ? 'text-destructive' : 'text-primary'}`}>
-            {icon}
-          </div>
-          <div className="flex-1">
-            <div className="mb-1 flex items-center gap-2">
-              <h3 className="font-semibold text-foreground">{title}</h3>
-              {count !== undefined && (
-                <Badge variant={urgent ? 'destructive' : 'default'}>
-                  {count}
-                </Badge>
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">{description}</p>
-          </div>
+  <div
+    className={`group rounded-lg border bg-card p-4 transition-all duration-200 hover:shadow-md ${
+      urgent
+        ? 'border-destructive/30 bg-destructive/5 hover:border-destructive/50'
+        : 'border-border hover:border-primary/30'
+    }`}
+  >
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        <div
+          className={`shrink-0 rounded-full p-2 ${
+            urgent
+              ? 'bg-destructive/10 text-destructive'
+              : 'bg-primary/10 text-primary'
+          }`}
+        >
+          {icon}
         </div>
-        {action && (
-          <Button onClick={action} variant="outline" size="sm">
-            {actionText}
-          </Button>
-        )}
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex items-center gap-2">
+            <h3 className="line-clamp-1 font-semibold text-foreground">
+              {title}
+            </h3>
+            {count !== undefined && (
+              <div
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  urgent
+                    ? 'bg-destructive text-destructive-foreground'
+                    : 'bg-primary text-primary-foreground'
+                }`}
+              >
+                {count}
+              </div>
+            )}
+          </div>
+          <p className="line-clamp-2 text-sm text-muted-foreground">
+            {description}
+          </p>
+        </div>
       </div>
-    </CardContent>
-  </Card>
+      {action && (
+        <Button
+          onClick={action}
+          variant={urgent ? 'destructive' : 'outline'}
+          size="sm"
+          className="shrink-0"
+        >
+          {actionText}
+        </Button>
+      )}
+    </div>
+  </div>
 );
 
 const DashboardPage: React.FC = () => {
@@ -524,8 +550,8 @@ const DashboardPage: React.FC = () => {
                 Your Next Event
               </h2>
               {nextEvent ? (
-                <Card
-                  className="cursor-pointer transition-all duration-200 hover:shadow-md"
+                <div
+                  className="group relative cursor-pointer overflow-hidden rounded-lg border border-primary/30 bg-card p-6 transition-all duration-200 hover:border-primary/50 hover:shadow-lg"
                   onClick={() => navigate(`/cubes/${nextEvent.id}`)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -534,30 +560,65 @@ const DashboardPage: React.FC = () => {
                   }}
                   role="button"
                   tabIndex={0}
+                  aria-label={`View your next event: ${nextEvent.location} in ${nextEvent.city}`}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Calendar className="mt-1 size-6 shrink-0 text-primary" />
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {nextEvent.location}
-                        </h3>
-                        <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="size-4" />
-                            {formatDateSafe(nextEvent.startDate, (d, o) =>
-                              d.toLocaleDateString(undefined, o)
-                            )}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="size-4" />
-                            {nextEvent.city}
-                          </span>
+                  <div className="space-y-4">
+                    {/* Event Title */}
+                    <div>
+                      <h3 className="line-clamp-1 text-xl font-bold text-foreground">
+                        {nextEvent.location}
+                      </h3>
+                    </div>
+
+                    {/* Event Details */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <div className="shrink-0 rounded-full bg-primary/10 p-1.5">
+                          <Clock className="size-4 text-primary" />
                         </div>
+                        <span className="font-medium">
+                          {new Date(nextEvent.startDate).toLocaleDateString(
+                            [],
+                            {
+                              weekday: 'long',
+                              month: 'long',
+                              day: 'numeric',
+                              year: 'numeric',
+                            }
+                          )}{' '}
+                          at{' '}
+                          {new Date(nextEvent.startDate).toLocaleTimeString(
+                            [],
+                            {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            }
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <div className="shrink-0 rounded-full bg-primary/10 p-1.5">
+                          <MapPin className="size-4 text-primary" />
+                        </div>
+                        <span className="font-medium">{nextEvent.city}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    {/* Countdown */}
+                    <div className="flex items-center gap-3 border-t border-border pt-3">
+                      <div className="shrink-0 rounded-full bg-primary/10 p-1.5">
+                        <Calendar className="size-4 text-primary" />
+                      </div>
+                      <span className="text-sm font-semibold text-primary">
+                        {formatDistanceToNowStrict(
+                          new Date(nextEvent.startDate),
+                          { addSuffix: true }
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">
@@ -629,26 +690,22 @@ const DashboardPage: React.FC = () => {
                   {relevantAnnouncements.map((announcement) => (
                     <Card key={announcement.id}>
                       <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <Megaphone className="mt-0.5 size-5 shrink-0 text-primary" />
-                          <div>
-                            <h3 className="text-sm font-semibold text-foreground">
-                              {announcement.title}
-                            </h3>
-                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                              {announcement.content}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                {formatDateSafe(
-                                  announcement.createdAt,
-                                  (d, o) => d.toLocaleDateString(undefined, o)
-                                )}
-                              </span>
-                              <Badge variant="secondary" className="text-xs">
-                                {announcement.scope}
-                              </Badge>
-                            </div>
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground">
+                            {announcement.title}
+                          </h3>
+                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                            {announcement.content}
+                          </p>
+                          <div className="mt-4 flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              {formatDateSafe(announcement.createdAt, (d, o) =>
+                                d.toLocaleDateString(undefined, o)
+                              )}
+                            </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {announcement.scope}
+                            </Badge>
                           </div>
                         </div>
                       </CardContent>

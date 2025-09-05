@@ -41,50 +41,124 @@ const UpcomingEventCard: React.FC<{
   event: CubeEvent;
   onManage: () => void;
   isNext?: boolean;
-}> = ({ event, onManage, isNext }) => (
-  <Card
-    className={`cursor-pointer hover:border-primary ${isNext ? 'border-primary bg-primary/10' : ''}`}
-    onClick={onManage}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onManage();
-      }
-    }}
-    role="button"
-    tabIndex={0}
-    aria-label={`Manage event: ${event.location} in ${event.city}`}
-  >
-    <CardHeader className="flex-row items-start gap-4 space-y-0">
-      <Calendar className="mt-1 size-6 shrink-0 text-primary" />
-      <div className="flex-1">
-        <CardTitle>{event.location}</CardTitle>
-        <CardDescription className="mt-1 flex flex-col gap-1 text-sm sm:flex-row sm:gap-4">
-          <span className="flex items-center gap-1">
-            <Clock className="size-4" />
-            {new Date(event.startDate).toLocaleString([], {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            })}
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="size-4" />
-            {event.city}
-          </span>
-        </CardDescription>
+}> = ({ event, onManage, isNext }) => {
+  if (isNext) {
+    return (
+      <div
+        className="group relative cursor-pointer overflow-hidden rounded-lg border border-primary/30 bg-card p-4 transition-all duration-200 hover:border-primary/50 hover:shadow-lg"
+        onClick={onManage}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onManage();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`Manage next event: ${event.location} in ${event.city}`}
+      >
+        {/* Next Event Badge */}
+        <div className="absolute right-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+          NEXT EVENT
+        </div>
+
+        <div className="space-y-3">
+          {/* Event Title */}
+          <div>
+            <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
+              {event.location}
+            </h3>
+          </div>
+
+          {/* Event Details */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="size-4 shrink-0" />
+              <span>
+                {new Date(event.startDate).toLocaleDateString([], {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}{' '}
+                at{' '}
+                {new Date(event.startDate).toLocaleTimeString([], {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="size-4 shrink-0" />
+              <span>{event.city}</span>
+            </div>
+          </div>
+
+          {/* Countdown */}
+          <div className="flex items-center gap-2 border-t border-border pt-2">
+            <Calendar className="size-4 text-primary" />
+            <span className="text-sm font-medium text-primary">
+              <Countdown date={new Date(event.startDate)} />
+            </span>
+          </div>
+        </div>
       </div>
-    </CardHeader>
-    <CardContent>
-      <div className="text-sm">
-        {isNext ? (
-          <Countdown date={new Date(event.startDate)} />
-        ) : (
-          `${event.participants.length} participants`
-        )}
+    );
+  }
+
+  return (
+    <div
+      className="group cursor-pointer rounded-lg border border-border bg-card p-4 transition-all duration-200 hover:border-primary/30 hover:bg-accent/30 hover:shadow-md"
+      onClick={onManage}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onManage();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Manage event: ${event.location} in ${event.city}`}
+    >
+      <div className="flex items-start gap-3">
+        <div className="shrink-0 rounded-full bg-primary/10 p-2">
+          <Calendar className="size-4 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h4 className="mb-2 line-clamp-1 font-semibold text-foreground">
+            {event.location}
+          </h4>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="size-3 shrink-0" />
+              <span>
+                {new Date(event.startDate).toLocaleDateString([], {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                })}{' '}
+                at{' '}
+                {new Date(event.startDate).toLocaleTimeString([], {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="size-3 shrink-0" />
+              <span>{event.city}</span>
+            </div>
+            <div className="flex items-center gap-2 pt-1 text-xs text-muted-foreground/80">
+              <div className="size-2 rounded-full bg-green-500"></div>
+              <span>{event.participants.length} participants</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </CardContent>
-  </Card>
-);
+    </div>
+  );
+};
 
 const NextEventWidget: React.FC = () => {
   const navigate = useNavigate();
@@ -109,9 +183,15 @@ const NextEventWidget: React.FC = () => {
 
   if (!currentUser || upcomingEvents.length === 0) {
     return (
-      <p className="p-4 text-muted-foreground">
-        No upcoming events you are organizing.
-      </p>
+      <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
+        <div className="mb-3 rounded-full bg-muted p-3">
+          <Calendar className="size-6 text-muted-foreground" />
+        </div>
+        <h3 className="mb-1 font-medium text-foreground">No upcoming events</h3>
+        <p className="text-sm text-muted-foreground">
+          You don't have any events scheduled as an organizer.
+        </p>
+      </div>
     );
   }
 
@@ -119,31 +199,46 @@ const NextEventWidget: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Next Event - Featured */}
       {nextEvent && (
-        <div className="relative">
-          <div className="absolute -top-2 right-4 z-10 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-            NEXT EVENT
-          </div>
-          <UpcomingEventCard
-            key={nextEvent.id}
-            event={nextEvent}
-            onManage={() => navigate(`/manage/event/${nextEvent.id}`)}
-            isNext
-          />
-        </div>
+        <UpcomingEventCard
+          event={nextEvent}
+          onManage={() => navigate(`/manage/event/${nextEvent.id}`)}
+          isNext
+        />
       )}
+
+      {/* Other Upcoming Events */}
       {otherUpcomingEvents.length > 0 && (
-        <div className="space-y-2 pt-2">
-          <h4 className="px-2 text-sm font-bold uppercase text-muted-foreground">
-            Later Events
-          </h4>
-          {otherUpcomingEvents.map((event) => (
-            <UpcomingEventCard
-              key={event.id}
-              event={event}
-              onManage={() => navigate(`/manage/event/${event.id}`)}
-            />
-          ))}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Later Events
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <div className="space-y-2">
+            {otherUpcomingEvents.slice(0, 3).map((event) => (
+              <UpcomingEventCard
+                key={event.id}
+                event={event}
+                onManage={() => navigate(`/manage/event/${event.id}`)}
+              />
+            ))}
+
+            {otherUpcomingEvents.length > 3 && (
+              <div className="pt-2 text-center">
+                <button
+                  className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={() => navigate('/events')}
+                >
+                  +{otherUpcomingEvents.length - 3} more events
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

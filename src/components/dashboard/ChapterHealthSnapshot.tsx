@@ -3,7 +3,7 @@ import { Calendar, TrendingUp, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useChapters, useEvents, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { CubeEvent } from '@/types';
@@ -135,12 +135,12 @@ const ChapterHealthSnapshot: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {chapterHealthData.map((health) => (
-        <Card
+        <div
           key={health.name}
           onClick={() => navigate(`/chapters/${health.name}`)}
-          className="cursor-pointer transition-colors hover:border-primary"
+          className="group cursor-pointer rounded-lg border border-border bg-card p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-md"
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
@@ -150,33 +150,55 @@ const ChapterHealthSnapshot: React.FC = () => {
             }
           }}
         >
-          <CardHeader>
-            <CardTitle>{health.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <Users className="mx-auto size-6 text-primary" />
-                <p className="mt-1 text-2xl font-bold">{health.totalMembers}</p>
-                <p className="text-xs text-muted-foreground">Total Members</p>
-              </div>
-              <div>
-                <TrendingUp className="mx-auto size-6 text-success" />
-                <p className="mt-1 text-2xl font-bold">
-                  {health.activeMembers}
-                </p>
-                <p className="text-xs text-muted-foreground">Active (3mo)</p>
-              </div>
-              <div>
-                <Calendar className="mx-auto size-6 text-primary" />
-                <p className="mt-1 text-2xl font-bold">
-                  {health.memberGrowth.toFixed(0)}%
-                </p>
-                <p className="text-xs text-muted-foreground">Growth (1mo)</p>
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <h3 className="mb-3 line-clamp-1 font-semibold text-foreground">
+                {health.name}
+              </h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="shrink-0 rounded-full bg-primary/10 p-1.5">
+                    <Users className="size-3 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">
+                      {health.totalMembers}
+                    </p>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">
+                      Members
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="shrink-0 rounded-full bg-green-100 p-1.5 dark:bg-green-900/20">
+                    <TrendingUp className="size-3 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">
+                      {health.activeMembers}
+                    </p>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">
+                      Active
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="shrink-0 rounded-full bg-blue-100 p-1.5 dark:bg-blue-900/20">
+                    <Calendar className="size-3 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">
+                      {health.memberGrowth.toFixed(0)}%
+                    </p>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">
+                      Growth
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ))}
     </div>
   );

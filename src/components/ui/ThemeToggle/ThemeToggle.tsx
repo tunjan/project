@@ -1,4 +1,5 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTheme } from '@/contexts/theme-context';
 
 interface ThemeToggleProps {
   className?: string;

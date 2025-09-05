@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { useTheme } from 'next-themes';
 
 import Header from '@/components/header/Header';
 import Sidebar from '@/components/header/Sidebar';
 import CommandPalette from '@/components/search/CommandPalette';
-import { useTheme } from '@/hooks/useTheme';
 import { useUsersActions } from '@/store';
 import { useSearchActions } from '@/store/search.store';
 
 const MainLayout: React.FC = () => {
   const { init } = useUsersActions();
   const { open } = useSearchActions();
-  const { theme = 'light' } = useTheme();
+  const { theme } = useTheme();
 
   // Initialize store when layout mounts
   useEffect(() => {
