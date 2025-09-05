@@ -1,6 +1,6 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,30 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
   showLabel = false,
 }) => {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only rendering after mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Return a placeholder that matches the expected structure
+    return (
+      <Button
+        variant="outline"
+        size="icon"
+        className={className}
+        aria-label="Toggle theme"
+        disabled
+      >
+        <Monitor
+          className={`h-${size === 'sm' ? '4' : size === 'md' ? '5' : '6'} w-${size === 'sm' ? '4' : size === 'md' ? '5' : '6'}`}
+        />
+        {showLabel && <span className="ml-2 text-sm font-bold">System</span>}
+      </Button>
+    );
+  }
 
   const iconSizes = {
     sm: 'h-4 w-4',

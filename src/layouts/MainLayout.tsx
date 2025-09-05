@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useTheme } from 'next-themes';
@@ -13,6 +13,12 @@ const MainLayout: React.FC = () => {
   const { init } = useUsersActions();
   const { open } = useSearchActions();
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Initialize store when layout mounts
   useEffect(() => {
@@ -39,11 +45,14 @@ const MainLayout: React.FC = () => {
         The Toaster is placed here. 
         'richColors' enables different styles for success/error/warning.
         'position' sets the default location on the screen.
+        Only render with theme after mounting to prevent hydration issues
       */}
-      <Toaster
-        position="bottom-right"
-        theme={theme as 'light' | 'dark' | 'system'}
-      />
+      {mounted && (
+        <Toaster
+          position="bottom-right"
+          theme={theme as 'light' | 'dark' | 'system'}
+        />
+      )}
       <CommandPalette />
       <main className="flex-1 sm:px-6 lg:ml-64">
         <Outlet />
