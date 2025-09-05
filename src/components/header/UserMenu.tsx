@@ -1,8 +1,9 @@
+import { LogOut } from 'lucide-react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { Avatar } from '@/components/ui';
-import { LogoutIcon } from '@/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { useAuthActions, useCurrentUser } from '@/store/auth.store';
 import { OnboardingStatus } from '@/types';
 
@@ -34,14 +35,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
       <Link
         to={profileLink}
         onClick={onLinkClick}
-        className="block border-transparent p-1 transition-colors hover:border-black focus:border-black md:border-2"
+        className="block p-1 transition-colors hover:opacity-80"
         aria-label="View your profile"
       >
-        <Avatar
-          src={currentUser.profilePictureUrl}
-          alt="User profile"
-          className="size-10 border-black object-cover md:border-2"
-        />
+        <Avatar className="size-10">
+          <AvatarImage
+            src={currentUser.profilePictureUrl}
+            alt="User profile"
+            className="object-cover"
+          />
+          <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+        </Avatar>
       </Link>
     );
   }
@@ -53,30 +57,34 @@ const UserMenu: React.FC<UserMenuProps> = ({ variant, onLinkClick }) => {
         <Link
           to={profileLink}
           onClick={onLinkClick}
-          className="rounded-nonenone flex items-center space-x-3 border-transparent p-3 transition-colors hover:border-black focus:border-black md:border-2"
+          className="flex items-center space-x-3 rounded-md p-3 transition-colors hover:bg-accent"
         >
-          <Avatar
-            src={currentUser.profilePictureUrl}
-            alt="User profile"
-            className="rounded-nonenone size-10 border-black object-cover md:border-2"
-          />
+          <Avatar className="size-10">
+            <AvatarImage
+              src={currentUser.profilePictureUrl}
+              alt="User profile"
+              className="object-cover"
+            />
+            <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+          </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-black">
+            <p className="truncate text-sm font-medium text-foreground">
               {currentUser.name}
             </p>
-            <p className="truncate text-xs text-neutral-500">
+            <p className="truncate text-xs text-muted-foreground">
               {currentUser.email}
             </p>
           </div>
         </Link>
       </div>
-      <button
+      <Button
         onClick={handleLogout}
-        className="rounded-nonenone flex w-full items-center justify-center space-x-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white md:border-2"
+        variant="outline"
+        className="flex w-full items-center justify-center space-x-2"
       >
-        <LogoutIcon className="size-4" />
+        <LogOut className="size-4" />
         <span>Logout</span>
-      </button>
+      </Button>
     </div>
   );
 };

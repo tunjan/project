@@ -1,8 +1,15 @@
+import { Loader2, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { LoadingSpinner } from '@/components/ui';
-import { Modal } from '@/components/ui';
-import { TrashIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { type User } from '@/types';
 
 interface DeactivateAccountModalProps {
@@ -29,40 +36,45 @@ const DeactivateAccountModal: React.FC<DeactivateAccountModalProps> = ({
     }
   };
   return (
-    <Modal title="Deactivate Account" onClose={onClose} isOpen={isOpen}>
-      <div className="text-center">
-        <div className="mx-auto flex size-12 items-center justify-center bg-primary">
-          <TrashIcon className="size-6 text-white" />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Deactivate Account</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. All your data will be permanently
+            removed.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="text-center">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-destructive">
+            <Trash className="size-6 text-destructive-foreground" />
+          </div>
+          <p className="mt-4 text-destructive">
+            Are you sure you want to permanently delete your account,{' '}
+            <span className="font-bold">{user.name}</span>? This action is
+            irreversible. All of your data, including stats, badges, and
+            outreach logs, will be permanently removed from the system.
+          </p>
         </div>
-        <p className="mt-4 text-danger">
-          Are you sure you want to permanently delete your account,{' '}
-          <span className="font-bold">{user.name}</span>? This action is
-          irreversible. All of your data, including stats, badges, and outreach
-          logs, will be permanently removed from the system.
-        </p>
-      </div>
 
-      <div className="mt-6 flex items-center space-x-4">
-        <button
-          onClick={onClose}
-          disabled={isDeleting}
-          className="btn-outline w-full px-4 py-2 font-bold transition-colors duration-300"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleConfirm}
-          disabled={isDeleting}
-          className="btn-danger flex w-full items-center justify-center px-4 py-2 font-bold text-white transition-colors duration-300"
-        >
-          {isDeleting ? (
-            <LoadingSpinner className="size-5" />
-          ) : (
-            'Yes, Delete My Account'
-          )}
-        </button>
-      </div>
-    </Modal>
+        <DialogFooter>
+          <Button onClick={onClose} disabled={isDeleting} variant="outline">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={isDeleting}
+            variant="destructive"
+          >
+            {isDeleting ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              'Yes, Delete My Account'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

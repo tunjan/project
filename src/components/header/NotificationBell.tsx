@@ -1,7 +1,8 @@
+import { Bell } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { BellIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
 import {
   useNotificationsActions,
   useNotificationsForUser,
@@ -39,20 +40,18 @@ const NotificationBell: React.FC = () => {
 
   return (
     <div className="relative">
-      <button
+      <Button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`relative p-2 transition-colors md:border-2 ${
-          isOpen
-            ? 'border-black bg-white'
-            : 'border-transparent hover:border-black focus:border-black'
-        }`}
+        variant="ghost"
+        size="icon"
+        className="relative"
         aria-label={`View notifications (${unreadCount} unread)`}
       >
-        <BellIcon className="size-6" />
+        <Bell className="size-6" />
         {unreadCount > 0 && (
-          <div className="rounded-nonenone absolute right-1.5 top-1.5 size-2.5 border-white bg-primary md:border-2"></div>
+          <div className="absolute right-1.5 top-1.5 size-2.5 rounded-full bg-primary"></div>
         )}
-      </button>
+      </Button>
 
       {isOpen && (
         <NotificationModal

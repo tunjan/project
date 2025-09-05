@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 interface WidgetProps {
   title: string;
   children: React.ReactNode;
@@ -8,12 +10,12 @@ interface WidgetProps {
 
 const Widget: React.FC<WidgetProps> = ({ title, children, className }) => {
   return (
-    <div className={`card-brutal flex h-full flex-col ${className}`}>
-      <h2 className="h-card-brutal border-b-2 border-black px-4 py-2 font-bold">
-        {title}
-      </h2>
-      <div className="grow overflow-auto p-4">{children}</div>
-    </div>
+    <Card className={`flex h-full flex-col ${className}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-1 overflow-auto">{children}</CardContent>
+    </Card>
   );
 };
 

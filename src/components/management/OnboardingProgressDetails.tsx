@@ -1,14 +1,18 @@
+import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  GraduationCap,
+  Phone,
+  User as UserIcon,
+} from 'lucide-react';
 import React from 'react';
 
-import {
-  AcademicCapIcon,
-  CalendarIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ExclamationTriangleIcon,
-  PhoneIcon,
-  UserIcon,
-} from '@/icons';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { OnboardingStatus, type User } from '@/types';
 
 import ApplicationAnswers from './ApplicationAnswers';
@@ -22,7 +26,7 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
 }) => {
   const getStatusIcon = (status: OnboardingStatus, isCurrent: boolean) => {
     if (isCurrent) {
-      return <ClockIcon className="size-5 text-warning" />;
+      return <Clock className="size-5 text-warning" />;
     }
 
     const completedStatuses = [
@@ -31,14 +35,14 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
     ];
 
     if (completedStatuses.includes(status)) {
-      return <CheckCircleIcon className="size-5 text-success" />;
+      return <CheckCircle className="size-5 text-primary" />;
     }
 
     if (status === OnboardingStatus.DENIED) {
-      return <ExclamationTriangleIcon className="size-5 text-danger" />;
+      return <AlertTriangle className="size-5 text-destructive" />;
     }
 
-    return <UserIcon className="size-5 text-neutral-400" />;
+    return <UserIcon className="size-5 text-muted-foreground" />;
   };
 
   const getStatusColor = (status: OnboardingStatus, isCurrent: boolean) => {
@@ -49,9 +53,9 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
       OnboardingStatus.COMPLETED,
     ];
 
-    if (completedStatuses.includes(status)) return 'text-success';
-    if (status === OnboardingStatus.DENIED) return 'text-danger';
-    return 'text-neutral-500';
+    if (completedStatuses.includes(status)) return 'text-primary';
+    if (status === OnboardingStatus.DENIED) return 'text-destructive';
+    return 'text-muted-foreground';
   };
 
   const getStatusDescription = (status: OnboardingStatus) => {
@@ -95,17 +99,19 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="mb-4 text-xl font-bold text-black">
-          Onboarding Progress
-        </h3>
+      <Card>
+        <CardHeader>
+          <CardTitle>Onboarding Progress</CardTitle>
+        </CardHeader>
+      </Card>
 
-        {/* Current Status Overview */}
-        <div className="mb-6 rounded-none border-black bg-white p-6 md:border-2">
+      {/* Current Status Overview */}
+      <Card>
+        <CardContent className="p-6">
           <div className="mb-4 flex items-center gap-3">
             {getStatusIcon(user.onboardingStatus, true)}
             <div>
-              <h4 className="text-lg font-bold text-black">Current Status</h4>
+              <h4 className="text-lg font-bold">Current Status</h4>
               <p
                 className={`text-lg font-semibold ${getStatusColor(user.onboardingStatus, true)}`}
               >
@@ -113,7 +119,7 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
               </p>
             </div>
           </div>
-          <p className="text-neutral-600">
+          <p className="text-muted-foreground">
             {getStatusDescription(user.onboardingStatus)}
           </p>
 
@@ -121,7 +127,7 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
           {!isDenied && !isInactive && (
             <div className="mt-4">
               <div className="mb-2 flex justify-between text-sm">
-                <span className="text-neutral-600">Progress</span>
+                <Label>Progress</Label>
                 <span className="font-semibold">
                   {Math.round(
                     ((currentStepIndex + 1) / onboardingSteps.length) * 100
@@ -129,105 +135,95 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
                   %
                 </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-neutral-200">
-                <div
-                  className="h-2 rounded-full bg-primary transition-all duration-300"
-                  style={{
-                    width: `${((currentStepIndex + 1) / onboardingSteps.length) * 100}%`,
-                  }}
-                />
-              </div>
+              <Progress
+                value={((currentStepIndex + 1) / onboardingSteps.length) * 100}
+                className="w-full"
+              />
             </div>
           )}
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Onboarding Journey */}
-        <div className="rounded-none border-black bg-white p-6 md:border-2">
-          <h4 className="mb-4 text-lg font-bold text-black">
-            Onboarding Journey
-          </h4>
-          <div className="space-y-4">
-            {onboardingSteps.map((step, index) => {
-              const isCurrent = index === currentStepIndex;
+      {/* Onboarding Journey */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Onboarding Journey</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {onboardingSteps.map((step, index) => {
+            const isCurrent = index === currentStepIndex;
 
-              return (
-                <div key={step} className="flex items-start gap-4">
-                  <div className="shrink-0">
-                    {getStatusIcon(step, isCurrent)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`font-semibold ${getStatusColor(step, isCurrent)}`}
-                      >
-                        {step}
-                      </span>
-                      {isCurrent && (
-                        <span className="rounded bg-warning/10 px-2 py-1 text-xs font-medium text-warning">
-                          Current
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-sm text-neutral-600">
-                      {getStatusDescription(step)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Denied Status */}
-            {isDenied && (
-              <div className="flex items-start gap-4">
-                <div className="shrink-0">
-                  {getStatusIcon(OnboardingStatus.DENIED, false)}
-                </div>
+            return (
+              <div key={step} className="flex items-start gap-4">
+                <div className="shrink-0">{getStatusIcon(step, isCurrent)}</div>
                 <div className="flex-1">
-                  <span className="font-semibold text-danger">
-                    Application Denied
-                  </span>
-                  <p className="mt-1 text-sm text-neutral-600">
-                    The application was reviewed and denied by organizers
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`font-semibold ${getStatusColor(step, isCurrent)}`}
+                    >
+                      {step}
+                    </span>
+                    {isCurrent && <Badge variant="secondary">Current</Badge>}
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {getStatusDescription(step)}
                   </p>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
+            );
+          })}
 
-        {/* Onboarding Details */}
-        {user.onboardingProgress && (
-          <div className="rounded-none border-black bg-white p-6 md:border-2">
-            <h4 className="mb-4 text-lg font-bold text-black">
-              Onboarding Details
-            </h4>
+          {/* Denied Status */}
+          {isDenied && (
+            <div className="flex items-start gap-4">
+              <div className="shrink-0">
+                {getStatusIcon(OnboardingStatus.DENIED, false)}
+              </div>
+              <div className="flex-1">
+                <span className="font-semibold text-destructive">
+                  Application Denied
+                </span>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  The application was reviewed and denied by organizers
+                </p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Onboarding Details */}
+      {user.onboardingProgress && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Onboarding Details</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Masterclass Status */}
               <div className="flex items-center gap-3">
                 <div
-                  className={`flex size-10 items-center justify-center rounded-none ${
+                  className={`flex size-10 items-center justify-center ${
                     user.onboardingProgress.watchedMasterclass
-                      ? 'bg-success/10'
-                      : 'bg-neutral-100'
+                      ? 'bg-primary/10'
+                      : 'bg-muted'
                   }`}
                 >
-                  <AcademicCapIcon
+                  <GraduationCap
                     className={`size-5 ${
                       user.onboardingProgress.watchedMasterclass
-                        ? 'text-success'
-                        : 'text-neutral-400'
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
                     }`}
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-neutral-600">
-                    Masterclass
-                  </p>
+                  <Label className="text-sm font-bold">Masterclass</Label>
                   <p
                     className={`font-semibold ${
                       user.onboardingProgress.watchedMasterclass
-                        ? 'text-success'
-                        : 'text-neutral-500'
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
                     }`}
                   >
                     {user.onboardingProgress.watchedMasterclass
@@ -240,14 +236,14 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
               {/* Selected Organizer */}
               {user.onboardingProgress.selectedOrganiserId && (
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-none bg-primary/10">
+                  <div className="flex size-10 items-center justify-center bg-primary/10">
                     <UserIcon className="size-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-neutral-600">
+                    <Label className="text-sm font-bold">
                       Selected Organizer
-                    </p>
-                    <p className="font-semibold text-black">
+                    </Label>
+                    <p className="font-semibold">
                       ID: {user.onboardingProgress.selectedOrganiserId}
                     </p>
                   </div>
@@ -257,20 +253,18 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
               {/* Onboarding Call */}
               {user.onboardingProgress.onboardingCallScheduledAt && (
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-none bg-warning/10">
-                    <PhoneIcon className="size-5 text-warning" />
+                  <div className="flex size-10 items-center justify-center bg-warning/10">
+                    <Phone className="size-5 text-warning" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-neutral-600">
-                      Onboarding Call
-                    </p>
-                    <p className="font-semibold text-black">
+                    <Label className="text-sm font-bold">Onboarding Call</Label>
+                    <p className="font-semibold">
                       {new Date(
                         user.onboardingProgress.onboardingCallScheduledAt
                       ).toLocaleDateString()}
                     </p>
                     {user.onboardingProgress.onboardingCallContactInfo && (
-                      <p className="text-sm text-neutral-600">
+                      <p className="text-sm text-muted-foreground">
                         Contact:{' '}
                         {user.onboardingProgress.onboardingCallContactInfo}
                       </p>
@@ -282,20 +276,18 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
               {/* Revision Call */}
               {user.onboardingProgress.revisionCallScheduledAt && (
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-none bg-info/10">
-                    <PhoneIcon className="size-5 text-info" />
+                  <div className="flex size-10 items-center justify-center bg-primary/10">
+                    <Phone className="size-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-neutral-600">
-                      Revision Call
-                    </p>
-                    <p className="font-semibold text-black">
+                    <Label className="text-sm font-bold">Revision Call</Label>
+                    <p className="font-semibold">
                       {new Date(
                         user.onboardingProgress.revisionCallScheduledAt
                       ).toLocaleDateString()}
                     </p>
                     {user.onboardingProgress.revisionCallContactInfo && (
-                      <p className="text-sm text-neutral-600">
+                      <p className="text-sm text-muted-foreground">
                         Contact:{' '}
                         {user.onboardingProgress.revisionCallContactInfo}
                       </p>
@@ -304,32 +296,31 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
                 </div>
               )}
             </div>
-          </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Application Answers - Only show for approved members */}
+      {user.onboardingAnswers &&
+        user.onboardingStatus !== OnboardingStatus.PENDING_APPLICATION_REVIEW &&
+        user.onboardingStatus !== OnboardingStatus.DENIED && (
+          <ApplicationAnswers user={user} />
         )}
 
-        {/* Application Answers - Only show for approved members */}
-        {user.onboardingAnswers &&
-          user.onboardingStatus !==
-            OnboardingStatus.PENDING_APPLICATION_REVIEW &&
-          user.onboardingStatus !== OnboardingStatus.DENIED && (
-            <ApplicationAnswers user={user} />
-          )}
-
-        {/* Join Date */}
-        {user.joinDate && (
-          <div className="rounded-none border-black bg-white p-6 md:border-2">
+      {/* Join Date */}
+      {user.joinDate && (
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-none bg-success/10">
-                <CalendarIcon className="size-5 text-success" />
+              <div className="flex size-10 items-center justify-center bg-primary/10">
+                <Calendar className="size-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Member Since
-                </p>
-                <p className="font-semibold text-black">
+                <Label className="text-sm font-bold">Member Since</Label>
+                <p className="font-semibold">
                   {new Date(user.joinDate).toLocaleDateString()}
                 </p>
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-muted-foreground">
                   {Math.floor(
                     (Date.now() - new Date(user.joinDate).getTime()) /
                       (1000 * 60 * 60 * 24)
@@ -338,9 +329,9 @@ const OnboardingProgressDetails: React.FC<OnboardingProgressDetailsProps> = ({
                 </p>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

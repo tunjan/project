@@ -1,8 +1,9 @@
 import { isAfter, subMonths } from 'date-fns';
+import { Calendar, TrendingUp, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { CalendarIcon, TrendingUpIcon, UserGroupIcon } from '@/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useChapters, useEvents, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { CubeEvent } from '@/types';
@@ -123,41 +124,59 @@ const ChapterHealthSnapshot: React.FC = () => {
 
   if (!chapterHealthData.length) {
     return (
-      <div className="flex h-full items-center justify-center text-center text-neutral-600">
-        <p>You are not managing any chapters.</p>
-      </div>
+      <Card>
+        <CardContent className="flex h-full items-center justify-center p-6 text-center">
+          <p className="text-muted-foreground">
+            You are not managing any chapters.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-4">
       {chapterHealthData.map((health) => (
-        <button
+        <Card
           key={health.name}
           onClick={() => navigate(`/chapters/${health.name}`)}
-          className="w-full border-black bg-white p-4 text-left hover:shadow-brutal md:border-2"
+          className="cursor-pointer transition-colors hover:border-primary"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              navigate(`/chapters/${health.name}`);
+            }
+          }}
         >
-          <h4 className="h-card mb-4">{health.name}</h4>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <UserGroupIcon className="mx-auto size-6 text-primary" />
-              <p className="mt-1 text-2xl font-bold">{health.totalMembers}</p>
-              <p className="text-xs text-neutral-600">Total Members</p>
+          <CardHeader>
+            <CardTitle>{health.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <Users className="mx-auto size-6 text-primary" />
+                <p className="mt-1 text-2xl font-bold">{health.totalMembers}</p>
+                <p className="text-xs text-muted-foreground">Total Members</p>
+              </div>
+              <div>
+                <TrendingUp className="mx-auto size-6 text-success" />
+                <p className="mt-1 text-2xl font-bold">
+                  {health.activeMembers}
+                </p>
+                <p className="text-xs text-muted-foreground">Active (3mo)</p>
+              </div>
+              <div>
+                <Calendar className="mx-auto size-6 text-primary" />
+                <p className="mt-1 text-2xl font-bold">
+                  {health.memberGrowth.toFixed(0)}%
+                </p>
+                <p className="text-xs text-muted-foreground">Growth (1mo)</p>
+              </div>
             </div>
-            <div>
-              <TrendingUpIcon className="mx-auto size-6 text-success" />
-              <p className="mt-1 text-2xl font-bold">{health.activeMembers}</p>
-              <p className="text-xs text-neutral-600">Active (3mo)</p>
-            </div>
-            <div>
-              <CalendarIcon className="mx-auto size-6 text-primary" />
-              <p className="mt-1 text-2xl font-bold">
-                {health.memberGrowth.toFixed(0)}%
-              </p>
-              <p className="text-xs text-neutral-600">Growth (1mo)</p>
-            </div>
-          </div>
-        </button>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );

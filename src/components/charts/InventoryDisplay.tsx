@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useCurrentUser } from '@/store/auth.store';
 import { useChapterInventory } from '@/store/inventory.store';
 import { type InventoryItem } from '@/types';
@@ -41,66 +44,65 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
 
   if (inventory.length === 0) {
     return (
-      <div className="card-brutal card-padding text-center">
-        <h3 className="text-lg font-bold uppercase tracking-wider text-black">
-          No inventory items
-        </h3>
-        <p className="text-grey-600 mt-2 font-mono text-sm">
-          This chapter hasn't added any inventory items yet.
-        </p>
-        {canManageInventory && (
-          <div className="mt-4">
-            <Link
-              to="/manage"
-              className="btn-primary inline-flex items-center gap-2"
-            >
-              Manage Inventory
-            </Link>
-          </div>
-        )}
-      </div>
+      <Card>
+        <CardContent className="p-6 text-center">
+          <h3 className="text-lg font-bold uppercase tracking-wider text-foreground">
+            No inventory items
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This chapter hasn't added any inventory items yet.
+          </p>
+          {canManageInventory && (
+            <div className="mt-4">
+              <Button asChild>
+                <Link to="/manage">Manage Inventory</Link>
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="section-spacing">
+    <div className="space-y-6">
       {showTitle && (
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div>
-            <h2 className="h-section">{chapterName} Inventory</h2>
-            <p className="text-grey-600 font-mono text-sm uppercase tracking-wider">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {chapterName} Inventory
+            </h2>
+            <p className="text-sm uppercase tracking-wider text-muted-foreground">
               {inventory.length} item types • {totalItems} total items
             </p>
           </div>
           {canManageInventory && (
-            <Link to="/manage" className="btn-outline text-sm">
-              Manage Inventory
-            </Link>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/manage">Manage Inventory</Link>
+            </Button>
           )}
         </div>
       )}
 
       {/* Filter */}
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
-          <button
+          <Button
             key={category}
             onClick={() => setFilter(category)}
-            className={`px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${
-              filter === category
-                ? 'border-primary bg-primary text-white md:border-2'
-                : 'btn-outline'
-            }`}
+            variant={filter === category ? 'default' : 'outline'}
+            size="sm"
+            className="text-xs font-bold uppercase tracking-wider"
           >
             {category}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Inventory List */}
       {filteredInventory.length > 0 ? (
         <div
-          className={`grid-spacing grid ${
+          className={`grid gap-4 ${
             compact
               ? 'grid-cols-1 md:grid-cols-2'
               : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
@@ -111,14 +113,16 @@ const InventoryDisplay: React.FC<InventoryDisplayProps> = ({
           ))}
         </div>
       ) : (
-        <div className="card-brutal card-padding text-center">
-          <h3 className="text-lg font-bold uppercase tracking-wider text-black">
-            No {filter.toLowerCase()} found
-          </h3>
-          <p className="text-grey-600 mt-2 font-mono text-sm">
-            Try a different category.
-          </p>
-        </div>
+        <Card>
+          <CardContent className="p-6 text-center">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-foreground">
+              No {filter.toLowerCase()} found
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Try a different category.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -130,34 +134,46 @@ const InventoryItemCard: React.FC<{
 }> = ({ item, compact = false }) => {
   if (compact) {
     return (
-      <div className="card-brutal card-padding">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="tag-brutal text-xs">{item.category}</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <span className="font-bold text-black">QTY: {item.quantity}</span>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="mb-2 flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  {item.category}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <span className="font-bold text-foreground">
+                  QTY: {item.quantity}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="card-brutal card-padding">
-      <div className="flex justify-between">
-        <div className="flex-1">
-          <div className="mb-3">
-            <h3 className="h-card">{item.category}</h3>
-          </div>
-          <div className="mb-3 flex items-center gap-4 text-sm">
-            <span className="font-bold text-black">QTY: {item.quantity}</span>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex justify-between">
+          <div className="flex-1">
+            <div className="mb-3">
+              <h3 className="text-lg font-semibold text-foreground">
+                {item.category}
+              </h3>
+            </div>
+            <div className="mb-3 flex items-center gap-4 text-sm">
+              <span className="font-bold text-foreground">
+                QTY: {item.quantity}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

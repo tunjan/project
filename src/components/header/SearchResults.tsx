@@ -1,7 +1,8 @@
+import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { LoadingSpinner } from '@/components/ui';
+import { Card, CardContent } from '@/components/ui/card';
 import { type Chapter, type CubeEvent, type User } from '@/types';
 
 interface SearchResultsProps {
@@ -23,11 +24,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     users.length > 0 || chapters.length > 0 || events.length > 0;
 
   return (
-    <div className="rounded-nonenone absolute left-0 top-full mt-2 w-full border-black bg-white shadow-brutal md:border-2">
-      <div className="max-h-96 overflow-y-auto p-4">
-        {loading && <LoadingSpinner />}
+    <Card className="absolute left-0 top-full mt-2 w-full">
+      <CardContent className="max-h-96 overflow-y-auto p-4">
+        {loading && (
+          <Loader2 className="mx-auto size-6 animate-spin text-primary" />
+        )}
         {!loading && !hasResults && (
-          <p className="text-center text-sm text-neutral-500">
+          <p className="text-center text-sm text-muted-foreground">
             No results found.
           </p>
         )}
@@ -35,14 +38,16 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="space-y-4">
             {users.length > 0 && (
               <div>
-                <h3 className="text-red text-xs font-bold uppercase">Users</h3>
+                <h3 className="text-xs font-bold uppercase text-primary">
+                  Users
+                </h3>
                 <ul className="mt-2 space-y-1">
                   {users.map((user) => (
                     <li key={user.id}>
                       <Link
                         to={`/members/${user.id}`}
                         onClick={onClose}
-                        className="rounded-nonenone block p-2 font-bold hover:bg-white"
+                        className="block rounded-md p-2 font-bold hover:bg-accent"
                       >
                         {user.name}
                       </Link>
@@ -53,7 +58,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
             {chapters.length > 0 && (
               <div>
-                <h3 className="text-red text-xs font-bold uppercase">
+                <h3 className="text-xs font-bold uppercase text-primary">
                   Chapters
                 </h3>
                 <ul className="mt-2 space-y-1">
@@ -62,7 +67,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                       <Link
                         to={`/chapters/${chapter.name}`}
                         onClick={onClose}
-                        className="rounded-nonenone block p-2 font-bold hover:bg-white"
+                        className="block rounded-md p-2 font-bold hover:bg-accent"
                       >
                         {chapter.name}
                       </Link>
@@ -73,14 +78,16 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
             {events.length > 0 && (
               <div>
-                <h3 className="text-red text-xs font-bold uppercase">Events</h3>
+                <h3 className="text-xs font-bold uppercase text-primary">
+                  Events
+                </h3>
                 <ul className="mt-2 space-y-1">
                   {events.map((event) => (
                     <li key={event.id}>
                       <Link
                         to={`/cubes/${event.id}`}
                         onClick={onClose}
-                        className="rounded-nonenone block p-2 font-bold hover:bg-white"
+                        className="block rounded-md p-2 font-bold hover:bg-accent"
                       >
                         {event.location}
                       </Link>
@@ -91,8 +98,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             )}
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

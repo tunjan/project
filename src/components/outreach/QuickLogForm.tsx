@@ -1,14 +1,46 @@
+import {
+  BrainCircuit,
+  HelpCircle,
+  Leaf,
+  MessageCircle,
+  Minus,
+  Pencil,
+  Plus,
+  Star,
+  Target,
+  Undo2,
+  X,
+} from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { SelectField } from '@/components/ui';
-import { ArrowUturnLeftIcon, MinusIcon, PencilIcon, PlusIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   type CubeEvent,
   type OutreachLog,
   OutreachOutcome,
   type User,
 } from '@/types';
+
+const OUTCOME_LABELS: Record<OutreachOutcome, string> = {
+  [OutreachOutcome.BECAME_VEGAN_ACTIVIST]: 'Became Activist',
+  [OutreachOutcome.BECAME_VEGAN]: 'Became Vegan',
+  [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: 'Vegan to Activist',
+  [OutreachOutcome.MOSTLY_SURE]: 'Mostly Sure',
+  [OutreachOutcome.NOT_SURE]: 'Not Sure',
+  [OutreachOutcome.NO_CHANGE]: 'No Change',
+};
 
 interface QuickLogFormProps {
   currentUser: User;
@@ -19,57 +51,65 @@ interface QuickLogFormProps {
   isTeamView: boolean;
 }
 
-// Enhanced tab button with better visual feedback
-const TabButton: React.FC<{
-  isActive: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}> = ({ isActive, onClick, children }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`flex-1 border-b-2 px-6 py-4 text-sm font-bold ${
-      isActive
-        ? 'border-primary bg-primary text-white shadow-inner'
-        : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:text-black active:bg-neutral-100'
-    }`}
-  >
-    {children}
-  </button>
-);
-
-// Enhanced outcome button with better visual distinction
+// Modern outcome button with clean design
 const OutcomeButton: React.FC<{
   outcome: OutreachOutcome;
   onClick: () => void;
   className?: string;
 }> = ({ outcome, onClick, className = '' }) => {
-  const getOutcomeColor = (outcome: OutreachOutcome) => {
+  const getOutcomeStyling = (outcome: OutreachOutcome) => {
     switch (outcome) {
       case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
-        return 'bg-success text-white border-success hover:bg-success-hover';
+        return {
+          variant: 'outline' as const,
+          Icon: Target,
+        };
       case OutreachOutcome.BECAME_VEGAN:
-        return 'bg-primary text-white border-primary hover:bg-primary-hover';
+        return {
+          variant: 'outline' as const,
+          Icon: Leaf,
+        };
       case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
-        return 'bg-info text-white border-info hover:bg-info-hover';
+        return {
+          variant: 'outline' as const,
+          Icon: Star,
+        };
       case OutreachOutcome.MOSTLY_SURE:
-        return 'bg-warning text-black border-warning hover:bg-warning-hover';
+        return {
+          variant: 'outline' as const,
+          Icon: BrainCircuit,
+        };
       case OutreachOutcome.NOT_SURE:
-        return 'bg-neutral-600 text-white border-neutral-600 hover:bg-neutral-700';
+        return {
+          variant: 'outline' as const,
+          Icon: HelpCircle,
+        };
       case OutreachOutcome.NO_CHANGE:
-        return 'bg-neutral-400 text-white border-neutral-400 hover:bg-neutral-500';
+        return {
+          variant: 'destructive' as const,
+          Icon: X,
+        };
       default:
-        return 'bg-white text-black border-black hover:bg-black hover:text-white';
+        return {
+          variant: 'outline' as const,
+          Icon: MessageCircle,
+        };
     }
   };
 
+  const styling = getOutcomeStyling(outcome);
+
   return (
-    <button
+    <Button
       onClick={onClick}
-      className={`btn-outline h-16 w-full font-bold md:border-2 ${getOutcomeColor(outcome)} ${className}`}
+      variant={styling.variant}
+      className={`group relative h-20 w-full flex-col gap-2 border-2 transition-all duration-200 ${className}`}
     >
-      {outcome}
-    </button>
+      <styling.Icon className="size-6" />
+      <span className="text-xs font-medium leading-tight">
+        {OUTCOME_LABELS[outcome]}
+      </span>
+    </Button>
   );
 };
 
@@ -91,6 +131,25 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
         Object.values(OutreachOutcome).map((o) => [o, 0])
       ) as Record<OutreachOutcome, number>
   );
+
+  const getOutcomeStyling = (outcome: OutreachOutcome) => {
+    switch (outcome) {
+      case OutreachOutcome.BECAME_VEGAN_ACTIVIST:
+        return { Icon: Target };
+      case OutreachOutcome.BECAME_VEGAN:
+        return { Icon: Leaf };
+      case OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST:
+        return { Icon: Star };
+      case OutreachOutcome.MOSTLY_SURE:
+        return { Icon: BrainCircuit };
+      case OutreachOutcome.NOT_SURE:
+        return { Icon: HelpCircle };
+      case OutreachOutcome.NO_CHANGE:
+        return { Icon: X };
+      default:
+        return { Icon: MessageCircle };
+    }
+  };
 
   const pastEvents = useMemo(() => {
     const now = new Date();
@@ -132,7 +191,7 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
         label: 'Undo',
         onClick: () => removeOutreachLog(logId),
       },
-      icon: <ArrowUturnLeftIcon className="size-5" />,
+      icon: <Undo2 className="size-5" />,
     });
     setNotes('');
   };
@@ -168,131 +227,164 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
 
   if (pastEvents.length === 0) {
     return (
-      <section>
-        <h2 className="mb-6 border-b-4 border-primary pb-3 text-2xl font-extrabold tracking-tight text-black">
-          Quick Log
-        </h2>
-        <div className="card-brutal card-padding text-center shadow-brutal hover:shadow-brutal-lg">
-          <div className="py-12">
-            <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
-              <PencilIcon className="size-8 text-neutral-400" />
-            </div>
-            <p className="text-lg font-semibold text-neutral-700">
-              Attend an event to start logging conversations
-            </p>
-            <p className="mt-2 text-sm text-neutral-500">
-              Your first outreach conversation will appear here
-            </p>
+      <Card className="border-0 bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm">
+        <CardContent className="py-16 text-center">
+          <div className="mx-auto mb-6 size-20 rounded-full bg-muted/50 p-4">
+            <Pencil className="size-12 text-muted-foreground" />
           </div>
-        </div>
-      </section>
+          <h3 className="text-xl font-semibold text-foreground">
+            Ready to start logging?
+          </h3>
+          <p className="mx-auto mt-3 max-w-sm text-muted-foreground">
+            Attend your first event to begin tracking meaningful conversations
+            and measuring your impact.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <section>
-      <h2 className="mb-6 border-b-4 border-primary pb-3 text-2xl font-extrabold tracking-tight text-black">
-        Quick Log
-      </h2>
-
-      <div className="card-brutal shadow-brutal hover:shadow-brutal-lg">
-        {/* Enhanced Form Section with Better Spacing */}
-        <div className="space-y-6 p-8">
-          <div className="grid grid-cols-1 gap-6">
-            <SelectField
-              label="Event"
-              id="event-select"
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-            >
-              {pastEvents.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.location} ({new Date(e.startDate).toLocaleDateString()})
-                </option>
-              ))}
-            </SelectField>
+    <Card className="border-0 bg-card/50 shadow-lg backdrop-blur-sm">
+      <CardHeader className="px-0 pb-6">
+        <CardTitle className="flex items-center gap-2 text-xl font-semibold">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+            <Plus className="size-4 text-primary" />
+          </div>
+          Quick Log
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-8 px-0">
+        {/* Form Section */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Event</Label>
+              <Select
+                value={selectedEventId}
+                onValueChange={setSelectedEventId}
+              >
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue placeholder="Select an event" />
+                </SelectTrigger>
+                <SelectContent>
+                  {pastEvents.map((e) => (
+                    <SelectItem key={e.id} value={e.id}>
+                      <div className="flex w-full items-center justify-between gap-4">
+                        <span className="font-medium">{e.location}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(e.startDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             {isTeamView && (
-              <SelectField
-                label="Log for Member"
-                id="user-select"
-                value={selectedUserId}
-                onChange={(e) => setSelectedUserId(e.target.value)}
-              >
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.name}
-                  </option>
-                ))}
-              </SelectField>
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Log for Member</Label>
+                <Select
+                  value={selectedUserId}
+                  onValueChange={setSelectedUserId}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select a member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users.map((u) => (
+                      <SelectItem key={u.id} value={u.id}>
+                        {u.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </div>
 
-          {/* Enhanced Notes Input */}
-          <div className="relative">
-            <PencilIcon className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-neutral-500" />
-            <input
-              type="text"
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Notes (optional)</Label>
+            <Input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add quick notes about your conversation (optional)"
-              className="w-full border-black bg-white p-4 pl-12 text-black placeholder:text-neutral-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-neutral-500 md:border-2"
+              placeholder="Add context about your conversation..."
+              className="h-11"
             />
           </div>
         </div>
 
-        {/* Enhanced Tab Section */}
-        <div className="border-t-2 border-black dark:border-white">
-          <div className="flex border-b border-neutral-200">
-            <TabButton
-              isActive={mode === 'single'}
-              onClick={() => setMode('single')}
-            >
-              Single Log
-            </TabButton>
-            <TabButton
-              isActive={mode === 'bulk'}
-              onClick={() => setMode('bulk')}
-            >
-              Bulk Log
-            </TabButton>
+        {/* Outcome Selection */}
+        <div className="space-y-4">
+          <div className="text-center">
+            <h3 className="mb-2 text-lg font-medium text-foreground">
+              How did the conversation go?
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Select the outcome that best describes your interaction
+            </p>
           </div>
 
-          <div className="p-8">
-            {mode === 'single' ? (
-              // Enhanced Single Log Mode
-              <div className="space-y-4">
-                <p className="text-sm font-medium text-neutral-600">
-                  Select the outcome of your conversation:
-                </p>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {Object.values(OutreachOutcome).map((outcome) => (
-                    <OutcomeButton
-                      key={outcome}
-                      outcome={outcome}
-                      onClick={() => handleLog(outcome)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              // Enhanced Bulk Log Mode
-              <div className="space-y-6">
-                <p className="text-sm font-medium text-neutral-600">
-                  Count multiple conversations by outcome:
-                </p>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+            {Object.values(OutreachOutcome).map((outcome) => (
+              <OutcomeButton
+                key={outcome}
+                outcome={outcome}
+                onClick={() => handleLog(outcome)}
+              />
+            ))}
+          </div>
+        </div>
 
-                <div className="space-y-4">
-                  {Object.entries(bulkCounts).map(([outcome, count]) => (
+        {/* Bulk Logging Section */}
+        <div className="border-t border-border/50 pt-6">
+          <Tabs
+            value={mode}
+            onValueChange={(value: string) =>
+              setMode(value as 'single' | 'bulk')
+            }
+          >
+            <TabsList className="grid h-10 w-full grid-cols-2">
+              <TabsTrigger value="single" className="text-sm">
+                Quick Log
+              </TabsTrigger>
+              <TabsTrigger value="bulk" className="text-sm">
+                Bulk Entry
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="bulk" className="mt-6 space-y-6">
+              <div className="text-center">
+                <h4 className="mb-2 font-medium text-foreground">
+                  Bulk Conversation Logging
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Count multiple conversations by outcome type
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {Object.entries(bulkCounts).map(([outcome, count]) => {
+                  const { Icon } = getOutcomeStyling(
+                    outcome as OutreachOutcome
+                  );
+                  return (
                     <div
                       key={outcome}
-                      className="flex items-center justify-between rounded-none border-neutral-200 bg-neutral-50 p-4 hover:border-neutral-300 hover:bg-white dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500 dark:hover:bg-gray-700 md:border-2"
+                      className="flex items-center justify-between rounded-lg border bg-muted/30 p-4"
                     >
-                      <span className="text-sm font-semibold text-neutral-700">
-                        {outcome}
-                      </span>
                       <div className="flex items-center gap-3">
-                        <button
+                        <Icon className="size-5" />
+                        <span className="text-sm font-medium">
+                          {OUTCOME_LABELS[outcome as OutreachOutcome]}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="size-8"
                           onClick={() =>
                             setBulkCounts((p) => ({
                               ...p,
@@ -302,41 +394,43 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
                               ),
                             }))
                           }
-                          className="flex size-10 items-center justify-center rounded-none border-black bg-white text-lg font-bold hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black md:border-2"
                         >
-                          <MinusIcon className="size-5" />
-                        </button>
-                        <span className="w-12 text-center text-xl font-bold text-black">
+                          <Minus className="size-3" />
+                        </Button>
+                        <span className="w-8 text-center text-lg font-semibold">
                           {count}
                         </span>
-                        <button
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="size-8"
                           onClick={() =>
                             setBulkCounts((p) => ({
                               ...p,
                               [outcome]: p[outcome as OutreachOutcome] + 1,
                             }))
                           }
-                          className="flex size-10 items-center justify-center rounded-none border-black bg-white text-lg font-bold hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black md:border-2"
                         >
-                          <PlusIcon className="size-5" />
-                        </button>
+                          <Plus className="size-3" />
+                        </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={handleBulkSubmit}
-                  className="btn-primary w-full py-4 text-lg font-bold shadow-brutal hover:shadow-brutal-lg"
-                >
-                  Submit Bulk Logs
-                </button>
+                  );
+                })}
               </div>
-            )}
-          </div>
+
+              <Button
+                onClick={handleBulkSubmit}
+                className="h-11 w-full"
+                size="lg"
+              >
+                Submit Bulk Logs
+              </Button>
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 };
 

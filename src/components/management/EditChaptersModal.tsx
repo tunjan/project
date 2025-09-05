@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { type Chapter, type User } from '@/types';
 
 interface EditChaptersModalProps {
@@ -33,50 +43,51 @@ const EditChaptersModal: React.FC<EditChaptersModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Edit Chapter Memberships"
-      onClose={onClose}
-      description={`Select the chapters ${user.name} is a member of.`}
-    >
-      <div className="my-6">
-        <div className="max-h-64 space-y-2 overflow-y-auto border border-black p-4">
-          {allChapters
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((chapter) => (
-              <label
-                key={chapter.name}
-                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedChapters.includes(chapter.name)}
-                  onChange={() => handleCheckboxChange(chapter.name)}
-                  className="size-5 accent-primary"
-                />
-                <span className="font-bold text-black">{chapter.name}</span>
-                <span className="text-sm text-neutral-500">
-                  ({chapter.country})
-                </span>
-              </label>
-            ))}
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Chapter Memberships</DialogTitle>
+          <DialogDescription>
+            Select the chapters {user.name} is a member of.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="my-6">
+          <div className="max-h-64 space-y-3 overflow-y-auto rounded border border-border p-4">
+            {allChapters
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((chapter) => (
+                <div key={chapter.name} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={chapter.name}
+                    checked={selectedChapters.includes(chapter.name)}
+                    onCheckedChange={() => handleCheckboxChange(chapter.name)}
+                  />
+                  <Label
+                    htmlFor={chapter.name}
+                    className="cursor-pointer text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    <span className="font-bold text-foreground">
+                      {chapter.name}
+                    </span>
+                    <span className="ml-2 text-muted-foreground">
+                      ({chapter.country})
+                    </span>
+                  </Label>
+                </div>
+              ))}
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-        >
-          Save Changes
-        </button>
-      </div>
-    </Modal>
+        <DialogFooter className="flex space-x-4">
+          <Button onClick={onClose} variant="outline" className="w-full">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} className="w-full">
+            Save Changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

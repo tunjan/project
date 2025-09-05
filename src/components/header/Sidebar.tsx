@@ -18,10 +18,10 @@ const NavLinkStyled: React.FC<{
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `text-md rounded-nonenone relative flex h-12 items-center px-4 font-bold transition-colors duration-200 ${
+      `relative flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-all duration-200 ${
         isActive
-          ? 'bg-black text-white dark:bg-white dark:text-black'
-          : 'text-gray-500 hover:bg-white hover:text-black focus:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white dark:focus:text-white'
+          ? 'bg-accent text-accent-foreground'
+          : 'text-muted-foreground hover:rounded-lg hover:border hover:bg-accent hover:text-accent-foreground'
       }`
     }
   >
@@ -38,13 +38,13 @@ const Sidebar: React.FC = () => {
   }
 
   return (
-    <div className="hidden dark:border-white dark:bg-black lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col lg:border-r-2 lg:border-black lg:bg-white">
+    <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col lg:rounded-lg lg:border-r-2 lg:bg-card">
       <div className="flex grow flex-col overflow-y-auto pb-4 pt-5">
         {/* Logo */}
         <div className="mb-8 flex shrink-0 items-center justify-center px-4">
           <Link
             to="/"
-            className="text-2xl font-extrabold tracking-tighter text-black dark:text-white"
+            className="text-2xl font-extrabold tracking-tighter text-foreground"
           >
             AV<span className="text-primary">.</span>
           </Link>
@@ -63,15 +63,17 @@ const Sidebar: React.FC = () => {
             </NavLinkStyled>
           ))}
         </nav>
-
         {/* Bottom section with notifications, theme toggle, and user */}
         <div className="shrink-0 space-y-4 px-4">
-          <div className="flex w-full items-center justify-center">
-            <NotificationBell />
+          <div className="items-col flex justify-evenly py-4">
+            <div className="flex w-full items-center justify-center">
+              <NotificationBell />
+            </div>
+            <div className="flex w-full items-center justify-center">
+              <ThemeToggle size="md" />
+            </div>
           </div>
-          <div className="flex w-full items-center justify-center">
-            <ThemeToggle size="md" />
-          </div>
+
           <UserMenu variant="expanded" />
         </div>
       </div>

@@ -1,8 +1,19 @@
+import { ChevronRight, Search } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Stat } from '@/components/ui';
-import { SearchIcon } from '@/icons';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
 import { type Chapter, Role } from '@/types';
 import { ChapterStats, getChapterStats } from '@/utils';
@@ -17,43 +28,71 @@ const ChapterRow: React.FC<{
   isFirst?: boolean;
 }> = ({ chapterStats, onSelect, isFirst = false }) => {
   return (
-    <button
-      className={`group w-full cursor-pointer bg-white p-4 text-left even:bg-neutral-100 hover:bg-primary-lightest hover:shadow-brutal dark:bg-black dark:even:bg-gray-800 dark:hover:bg-gray-700 md:grid md:grid-cols-6 md:items-center ${
-        isFirst ? 'border-t-2 border-black dark:border-white md:border-t-0' : ''
+    <Card
+      className={`group cursor-pointer transition-all duration-200 hover:shadow-md ${
+        isFirst ? 'border-t-2 border-t-primary' : ''
       }`}
       onClick={onSelect}
-      type="button"
-      aria-label={`View details for ${chapterStats.name} chapter`}
     >
-      {/* Chapter Name */}
-      <div className="md:col-span-2">
-        <Link
-          to={`/chapters/${chapterStats.name}`}
-          className="block font-bold text-black transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 group-hover:text-primary"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {chapterStats.name}
-        </Link>
-        <p className="text-sm text-neutral-500 transition-colors duration-300 group-hover:text-black">
-          {chapterStats.country}
-        </p>
-      </div>
+      <CardContent className="p-4">
+        <div className="md:grid md:grid-cols-6 md:items-center">
+          {/* Chapter Name */}
+          <div className="md:col-span-1">
+            <Link
+              to={`/chapters/${chapterStats.name}`}
+              className="block font-semibold text-foreground transition-colors duration-300 hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {chapterStats.name}
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              {chapterStats.country}
+            </p>
+          </div>
 
-      {/* Stats - Mobile: Grid layout, Desktop: Individual columns */}
-      <div className="mt-4 grid grid-cols-2 gap-4 border-t-2 border-black pt-4 dark:border-white md:mt-0 md:grid-cols-4 md:border-t-0 md:pt-0">
-        <Stat label="Members" value={chapterStats.memberCount} />
-        <Stat label="Events" value={chapterStats.eventsHeld} />
-        <Stat label="Hours" value={Math.round(chapterStats.totalHours)} />
-        <Stat label="Convos" value={chapterStats.totalConversations} />
-      </div>
+          {/* Stats - Mobile: Grid layout, Desktop: Individual columns */}
+          <div className="mt-4 grid grid-cols-2 gap-4 md:col-span-4 md:mt-0 md:grid-cols-4">
+            <div className="text-center">
+              <p className="font-mono text-xl font-bold">
+                {chapterStats.memberCount}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Members
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="font-mono text-xl font-bold">
+                {chapterStats.eventsHeld}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Events
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="font-mono text-xl font-bold">
+                {Math.round(chapterStats.totalHours)}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Hours
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="font-mono text-xl font-bold">
+                {chapterStats.totalConversations}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Convos
+              </p>
+            </div>
+          </div>
 
-      {/* Desktop arrow indicator */}
-      <div className="hidden items-center justify-end md:flex">
-        <span className="text-2xl text-neutral-500 group-hover:text-primary">
-          →
-        </span>
-      </div>
-    </button>
+          {/* Desktop arrow indicator */}
+          <div className="hidden items-center justify-end md:flex">
+            <ChevronRight className="size-6 text-muted-foreground transition-colors group-hover:text-primary" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -119,220 +158,191 @@ const ChapterList: React.FC<ChapterListProps> = ({ onNavigateToChapter }) => {
   }, [selectedRegion, searchTerm, allChapters]);
 
   return (
-    <div className="py-8 md:py-12">
-      {/* Enhanced Header Section */}
-      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-2 bg-primary"></div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-              {selectedRegion === 'all'
-                ? 'Global Chapters'
-                : `${selectedRegion} Chapters`}
-            </h1>
-          </div>
-          <p className="max-w-3xl px-2 text-base leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
-            An operational directory of our global network of activist chapters.
-          </p>
-        </div>
-      </div>
-
-      {/* Search and Filter Controls */}
-      <div className="mb-8">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="md:col-span-1">
-            <label
-              htmlFor="search-filter"
-              className="mb-1 block text-sm font-bold text-black"
-            >
-              Search by Name or Country
-            </label>
-            <div className="relative border-2 border-black dark:border-white sm:border-0">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="size-5 text-neutral-500" />
-              </div>
-              <input
-                id="search-filter"
-                type="text"
-                placeholder="Search by chapter..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="rounded-nonenone block h-[42px] w-full border-black bg-white p-2 pl-10 pr-3 text-sm font-semibold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary dark:border-white dark:bg-black dark:text-white dark:placeholder:text-neutral-500 md:border-2"
-              />
-            </div>
-          </div>
-          <div className="md:col-span-1">
-            <label
-              htmlFor="region-filter"
-              className="mb-1 block text-sm font-bold text-black"
-            >
-              Filter by Region
-            </label>
-            <select
-              id="region-filter"
-              name="region-filter"
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block h-[42px] w-full border-black bg-white p-2 text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-white dark:bg-black dark:text-white sm:text-sm md:border-2"
-            >
-              {availableRegions.map((region) => (
-                <option key={region} value={region}>
-                  {region === 'all' ? 'All Regions' : region}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="md:col-span-1">
-            <div className="mb-1 block text-sm font-bold text-black">
-              View Mode
-            </div>
-            <div className="flex border-black dark:border-white md:border-2">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`hidden flex-1 p-2 text-sm font-bold transition-colors md:block ${
-                  viewMode === 'list'
-                    ? 'bg-black text-white'
-                    : 'bg-white text-black hover:bg-gray-100'
-                }`}
-              >
-                List
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`flex-1 p-2 text-sm font-bold transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-black text-white'
-                    : 'bg-white text-black hover:bg-gray-100'
-                }`}
-              >
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode('map')}
-                className={`flex-1 p-2 text-sm font-bold transition-colors ${
-                  viewMode === 'map'
-                    ? 'bg-black text-white'
-                    : 'bg-white text-black hover:bg-gray-100'
-                }`}
-              >
-                Map
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {regionalOrganiser && <RegionalOrganiserCard user={regionalOrganiser} />}
-
-      {/* Map View */}
-      {viewMode === 'map' && (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        {/* Header Section */}
         <div className="mb-8">
-          <ChapterMap
-            chapters={filteredChapters}
-            onSelectChapter={onNavigateToChapter}
-          />
-        </div>
-      )}
-
-      {/* List and Grid Views */}
-      {viewMode === 'list' && (
-        <div className="border-black bg-white dark:border-white dark:bg-black lg:md:border-2">
-          {/* Desktop Header */}
-          <div className="hidden grid-cols-6 items-center border-b-2 border-black bg-white p-4 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:border-white dark:bg-black dark:text-gray-400 md:grid">
-            <p className="col-span-2">Chapter</p>
-            <p>Members</p>
-            <p>Events</p>
-            <p>Hours</p>
-            <p>Conversations</p>
-          </div>
-
-          {/* CRITICAL FIX: Add semantic table structure for screen readers */}
-          <table className="sr-only">
-            <thead>
-              <tr>
-                <th scope="col">Chapter</th>
-                <th scope="col">Country</th>
-                <th scope="col">Members</th>
-                <th scope="col">Events</th>
-                <th scope="col">Hours</th>
-                <th scope="col">Conversations</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredAndSortedStats.map((stat) => (
-                <tr key={stat.name}>
-                  <td>{stat.name}</td>
-                  <td>{stat.country}</td>
-                  <td>{stat.memberCount}</td>
-                  <td>{stat.eventsHeld}</td>
-                  <td>{Math.round(stat.totalHours)}</td>
-                  <td>{stat.totalConversations}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filteredAndSortedStats.length > 0 ? (
-            <div className="divide-y-2 divide-black">
-              {filteredAndSortedStats.map((stat, index) => {
-                const chapter = allChapters.find((c) => c.name === stat.name)!;
-                return (
-                  <ChapterRow
-                    key={stat.name}
-                    chapterStats={stat}
-                    onSelect={() => onNavigateToChapter(chapter)}
-                    isFirst={index === 0}
-                  />
-                );
-              })}
-            </div>
-          ) : (
-            <div className="p-8 text-center">
-              <h3 className="text-xl font-bold text-black">
-                No chapters found.
-              </h3>
-              <p className="mt-2 text-neutral-500">
-                Try adjusting your search or filters.
+          <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                {selectedRegion === 'all'
+                  ? 'Global Chapters'
+                  : `${selectedRegion} Chapters`}
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                An operational directory of our global network of activist
+                chapters.
               </p>
             </div>
-          )}
+          </div>
+          <Separator />
         </div>
-      )}
 
-      {/* Grid View */}
-      {viewMode === 'grid' && (
-        <>
-          {filteredAndSortedStats.length > 0 ? (
-            <div
-              className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : ''}`}
-            >
-              {filteredAndSortedStats.map((stat, index) => {
-                const chapter = allChapters.find((c) => c.name === stat.name)!;
-                return (
-                  <div key={stat.name}>
+        {/* Search and Filter Controls */}
+        <div className="mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="md:col-span-1">
+                  <label
+                    htmlFor="search-filter"
+                    className="mb-2 block text-sm font-medium text-foreground"
+                  >
+                    Search by Name or Country
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="search-filter"
+                      type="text"
+                      placeholder="Search by chapter..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="md:col-span-1">
+                  <Label htmlFor="region-filter">Filter by Region</Label>
+                  <Select
+                    value={selectedRegion}
+                    onValueChange={setSelectedRegion}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableRegions.map((region) => (
+                        <SelectItem key={region} value={region}>
+                          {region === 'all' ? 'All Regions' : region}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="md:col-span-1">
+                  <Label>View Mode</Label>
+                  <ToggleGroup
+                    type="single"
+                    value={viewMode}
+                    onValueChange={(value) => {
+                      if (value) setViewMode(value as 'list' | 'map' | 'grid');
+                    }}
+                    className="w-full"
+                  >
+                    <ToggleGroupItem
+                      value="list"
+                      className="flex-1"
+                      aria-label="List view"
+                    >
+                      List
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="grid"
+                      className="flex-1"
+                      aria-label="Grid view"
+                    >
+                      Grid
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="map"
+                      className="flex-1"
+                      aria-label="Map view"
+                    >
+                      Map
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {regionalOrganiser && (
+          <RegionalOrganiserCard user={regionalOrganiser} />
+        )}
+
+        {/* Map View */}
+        {viewMode === 'map' && (
+          <div className="mb-8">
+            <Card>
+              <CardContent className="p-6">
+                <ChapterMap
+                  chapters={filteredChapters}
+                  onSelectChapter={onNavigateToChapter}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* List and Grid Views */}
+        {viewMode === 'list' && (
+          <div className="mb-8">
+            {filteredAndSortedStats.length > 0 ? (
+              <div className="space-y-4">
+                {filteredAndSortedStats.map((stat, index) => {
+                  const chapter = allChapters.find(
+                    (c) => c.name === stat.name
+                  )!;
+                  return (
+                    <ChapterRow
+                      key={stat.name}
+                      chapterStats={stat}
+                      onSelect={() => onNavigateToChapter(chapter)}
+                      isFirst={index === 0}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    No chapters found.
+                  </h3>
+                  <p className="mt-2 text-muted-foreground">
+                    Try adjusting your search or filters.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* Grid View */}
+        {viewMode === 'grid' && (
+          <div className="mb-8">
+            {filteredAndSortedStats.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredAndSortedStats.map((stat) => {
+                  const chapter = allChapters.find(
+                    (c) => c.name === stat.name
+                  )!;
+                  return (
                     <ChapterCard
+                      key={stat.name}
                       chapterStats={stat}
                       onSelect={() => onNavigateToChapter(chapter)}
                     />
-                    {/* Add divider between cards on mobile, but not after the last one */}
-                    {index < filteredAndSortedStats.length - 1 && (
-                      <div className="border-b border-gray-300 md:hidden"></div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="border-black bg-white p-8 text-center dark:border-white dark:bg-black md:border-2">
-              <h3 className="text-xl font-bold text-black">
-                No chapters found.
-              </h3>
-              <p className="mt-2 text-neutral-500">
-                Try adjusting your search or filters.
-              </p>
-            </div>
-          )}
-        </>
-      )}
+                  );
+                })}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    No chapters found.
+                  </h3>
+                  <p className="mt-2 text-muted-foreground">
+                    Try adjusting your search or filters.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

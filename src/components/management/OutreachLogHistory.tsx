@@ -1,13 +1,21 @@
+import {
+  Calendar,
+  CheckCircle,
+  Map,
+  MessageSquare,
+  Minus,
+  XCircle,
+} from 'lucide-react';
 import React, { useMemo } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import {
-  CalendarIcon,
-  ChatBubbleLeftRightIcon,
-  CheckCircleIcon,
-  MapIcon,
-  MinusIcon,
-  XCircleIcon,
-} from '@/icons';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useEvents, useOutreachLogs } from '@/store';
 import {
   type CubeEvent,
@@ -103,43 +111,54 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
     };
   }, [user, allEvents, allOutreachLogs]);
 
-  const getOutcomeColor = (outcome: OutreachOutcome) => {
+  const getOutcomeStyling = (outcome: OutreachOutcome) => {
     const positiveOutcomes = [
       OutreachOutcome.BECAME_VEGAN_ACTIVIST,
       OutreachOutcome.BECAME_VEGAN,
       OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST,
     ];
 
-    if (positiveOutcomes.includes(outcome)) return 'text-success';
-    if (outcome === OutreachOutcome.NO_CHANGE) return 'text-neutral-500';
-    return 'text-warning';
-  };
-
-  const getOutcomeIcon = (outcome: OutreachOutcome) => {
-    const positiveOutcomes = [
-      OutreachOutcome.BECAME_VEGAN_ACTIVIST,
-      OutreachOutcome.BECAME_VEGAN,
-      OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST,
-    ];
-
-    if (positiveOutcomes.includes(outcome))
-      return <CheckCircleIcon className="size-4 text-success" />;
-    if (outcome === OutreachOutcome.NO_CHANGE)
-      return <MinusIcon className="size-4 text-neutral-400" />;
-    return <XCircleIcon className="size-4 text-warning" />;
+    if (positiveOutcomes.includes(outcome)) {
+      return {
+        variant: 'default' as const,
+        icon: <CheckCircle className="size-4 text-success" />,
+        textColor: 'text-success',
+        badgeVariant: 'default' as const,
+        badgeClassName:
+          'border-transparent bg-success text-success-foreground hover:bg-success/80',
+      };
+    }
+    if (outcome === OutreachOutcome.NO_CHANGE) {
+      return {
+        variant: 'secondary' as const,
+        icon: <Minus className="size-4 text-muted-foreground" />,
+        textColor: 'text-muted-foreground',
+        badgeVariant: 'secondary' as const,
+        badgeClassName: '',
+      };
+    }
+    return {
+      variant: 'destructive' as const,
+      icon: <XCircle className="size-4 text-destructive" />,
+      textColor: 'text-destructive',
+      badgeVariant: 'destructive' as const,
+      badgeClassName: '',
+    };
   };
 
   if (userOutreachData.userLogs.length === 0) {
     return (
-      <div className="rounded-none border-black bg-white p-8 text-center shadow-brutal md:border-2">
-        <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
-          <ChatBubbleLeftRightIcon className="size-8 text-neutral-400" />
-        </div>
-        <h3 className="text-xl font-bold text-black">No Outreach History</h3>
-        <p className="mt-2 text-neutral-600">
-          This member hasn't logged any outreach conversations yet.
-        </p>
-      </div>
+      <Card className="p-8 text-center">
+        <CardContent>
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-muted">
+            <MessageSquare className="size-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-bold">No Outreach History</h3>
+          <p className="mt-2 text-muted-foreground">
+            This member hasn't logged any outreach conversations yet.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -147,158 +166,164 @@ const OutreachLogHistory: React.FC<OutreachLogHistoryProps> = ({ user }) => {
     <div className="space-y-6">
       {/* Overview Statistics */}
       <div>
-        <h3 className="mb-4 text-xl font-bold text-black">Outreach Overview</h3>
+        <h3 className="h-section">Outreach Overview</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-black">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Total Conversations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
                 {userOutreachData.totalConversations}
               </p>
-              <p className="text-sm text-neutral-600">Total Conversations</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="text-center">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Success Rate</CardDescription>
+            </CardHeader>
+            <CardContent>
               <p className="text-2xl font-bold text-success">
                 {userOutreachData.successRate}%
               </p>
-              <p className="text-sm text-neutral-600">Success Rate</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="text-center">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Events with Logs</CardDescription>
+            </CardHeader>
+            <CardContent>
               <p className="text-2xl font-bold text-primary">
                 {userOutreachData.eventsWithLogs}
               </p>
-              <p className="text-sm text-neutral-600">Events with Logs</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-warning">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Recent (30d)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-yellow-500">
                 {userOutreachData.recentLogs.length}
               </p>
-              <p className="text-sm text-neutral-600">Recent (30d)</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Outcomes Breakdown */}
-      <div className="rounded-none border-black bg-white p-6 md:border-2">
-        <h4 className="mb-4 text-lg font-bold text-black">
-          Conversation Outcomes Breakdown
-        </h4>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Conversation Outcomes Breakdown</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(userOutreachData.outcomesBreakdown).map(
-            ([outcome, count]) => (
-              <div
-                key={outcome}
-                className="flex items-center justify-between bg-neutral-50 p-3"
-              >
-                <div className="flex items-center gap-2">
-                  {getOutcomeIcon(outcome as OutreachOutcome)}
-                  <span className="text-sm font-medium text-neutral-700">
-                    {outcome}
+            ([outcome, count]) => {
+              const styling = getOutcomeStyling(outcome as OutreachOutcome);
+              return (
+                <div
+                  key={outcome}
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
+                >
+                  <div className="flex items-center gap-2">
+                    {styling.icon}
+                    <span className="text-sm font-medium text-foreground">
+                      {outcome}
+                    </span>
+                  </div>
+                  <span className={`text-lg font-bold ${styling.textColor}`}>
+                    {count}
                   </span>
                 </div>
-                <span
-                  className={`text-lg font-bold ${getOutcomeColor(outcome as OutreachOutcome)}`}
-                >
-                  {count}
-                </span>
-              </div>
-            )
+              );
+            }
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Detailed Logs by Event */}
       <div>
-        <h4 className="mb-4 text-lg font-bold text-black">
-          Conversations by Event
-        </h4>
+        <h3 className="h-section">Conversations by Event</h3>
         <div className="space-y-4">
           {Object.values(userOutreachData.logsByEvent).map(
             ({ event, logs, totalConversations, outcomes }) => (
-              <div
-                key={event.id}
-                className="rounded-none border-black bg-white p-6 md:border-2"
-              >
-                <div className="mb-4">
-                  <h5 className="text-lg font-bold text-black">{event.name}</h5>
-                  <div className="flex items-center gap-4 text-sm text-neutral-600">
+              <Card key={event.id}>
+                <CardHeader>
+                  <CardTitle>{event.name}</CardTitle>
+                  <CardDescription className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     <span className="flex items-center gap-1">
-                      <MapIcon className="size-4" />
+                      <Map className="size-4" />
                       {event.city}, {event.location}
                     </span>
                     <span className="flex items-center gap-1">
-                      <CalendarIcon className="size-4" />
+                      <Calendar className="size-4" />
                       {new Date(event.startDate).toLocaleDateString()}
                     </span>
                     <span className="flex items-center gap-1">
-                      <ChatBubbleLeftRightIcon className="size-4" />
+                      <MessageSquare className="size-4" />
                       {totalConversations} conversations
                     </span>
-                  </div>
-                </div>
-
-                {/* Outcomes for this event */}
-                <div className="mb-4">
-                  <p className="mb-2 text-sm font-bold text-neutral-600">
-                    Outcomes at this event:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(outcomes).map(([outcome, count]) => (
-                      <span
-                        key={outcome}
-                        className={`rounded px-2 py-1 text-xs font-medium ${
-                          getOutcomeColor(outcome as OutreachOutcome) ===
-                          'text-success'
-                            ? 'bg-success/10 text-success'
-                            : getOutcomeColor(outcome as OutreachOutcome) ===
-                                'text-warning'
-                              ? 'bg-warning/10 text-warning'
-                              : 'bg-neutral-100 text-neutral-700'
-                        }`}
-                      >
-                        {outcome}: {count}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Individual log entries */}
-                <div className="space-y-2">
-                  {logs.map((log) => (
-                    <div key={log.id} className="bg-neutral-50 p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="mb-1 flex items-center gap-2">
-                            {getOutcomeIcon(log.outcome)}
-                            <span
-                              className={`font-semibold ${getOutcomeColor(log.outcome)}`}
-                            >
-                              {log.outcome}
-                            </span>
-                            <span className="text-xs text-neutral-500">
-                              {new Date(log.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          {log.notes && (
-                            <p className="mt-1 text-sm text-neutral-700">
-                              {log.notes}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* Outcomes for this event */}
+                  <div className="mb-4">
+                    <p className="mb-2 text-sm font-bold text-muted-foreground">
+                      Outcomes at this event:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(outcomes).map(([outcome, count]) => {
+                        const styling = getOutcomeStyling(
+                          outcome as OutreachOutcome
+                        );
+                        return (
+                          <Badge
+                            key={outcome}
+                            variant={styling.badgeVariant}
+                            className={styling.badgeClassName}
+                          >
+                            {outcome}: {count}
+                          </Badge>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+
+                  {/* Individual log entries */}
+                  <div className="space-y-2">
+                    {logs.map((log) => {
+                      const styling = getOutcomeStyling(log.outcome);
+                      return (
+                        <div key={log.id} className="rounded-md bg-muted p-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="mb-1 flex items-center gap-2">
+                                {styling.icon}
+                                <span
+                                  className={`font-semibold ${styling.textColor}`}
+                                >
+                                  {log.outcome}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(log.createdAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                              {log.notes && (
+                                <p className="mt-1 text-sm text-foreground">
+                                  {log.notes}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
             )
           )}
         </div>

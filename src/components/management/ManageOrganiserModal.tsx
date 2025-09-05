@@ -1,9 +1,27 @@
+import { Loader2, Pencil, Users } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Modal } from '@/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { getAssignableRoles } from '@/config';
-import { PencilIcon, UsersIcon } from '@/icons';
 import { useChapters, useUsersActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Role, User } from '@/types';
@@ -141,137 +159,180 @@ const ManageOrganiserModal: React.FC<ManageOrganiserModalProps> = ({
 
   if (!canManageThisUser) {
     return (
-      <Modal
-        title="Access Denied"
-        onClose={onClose}
-        description="You don't have permission to manage this user."
-      >
-        <div className="my-6 text-center">
-          <p className="font-semibold text-danger">
-            You don't have permission to manage {organiser.name}.
-          </p>
-        </div>
-      </Modal>
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Access Denied</DialogTitle>
+            <DialogDescription>
+              You don't have permission to manage this user.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="my-6 text-center">
+            <p className="font-semibold text-destructive">
+              You don't have permission to manage {organiser.name}.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 
   return (
-    <Modal
-      title={`Manage ${organiser.name}`}
-      onClose={onClose}
-      description="Update role and chapter assignments for this organiser."
-    >
-      <div className="my-6 space-y-6">
-        {/* User Info */}
-        <div className="flex items-center space-x-3 border-b border-black pb-4">
-          <img
-            src={organiser.profilePictureUrl}
-            alt={organiser.name}
-            className="rounded-nonefull size-12 object-cover"
-          />
-          <div>
-            <h3 className="text-lg font-bold text-black">{organiser.name}</h3>
-            <p className="text-sm text-neutral-600">{organiser.email}</p>
-            <p className="text-xs text-neutral-500">
-              Current role: {organiser.role}
-            </p>
-          </div>
-        </div>
-
-        {/* Role Management */}
-        <div>
-          <h4 className="mb-3 flex items-center text-sm font-bold text-black">
-            <PencilIcon className="mr-2 size-4" />
-            Change Role
-          </h4>
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="w-full border-black bg-white p-2 text-black md:border-2"
-          >
-            {assignableRoles.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleRoleChange}
-            disabled={selectedRole === organiser.role || isLoading}
-            className="hover:bg-red mt-2 w-full bg-black px-4 py-2 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? 'Updating...' : 'Update Role'}
-          </button>
-        </div>
-
-        {/* Chapter Assignment Management */}
-        {selectedRole === Role.CHAPTER_ORGANISER && (
-          <div>
-            <h4 className="mb-3 flex items-center text-sm font-bold text-black">
-              <UsersIcon className="mr-2 size-4" />
-              Manage Chapter Assignments
-            </h4>
-            <div className="max-h-48 space-y-2 overflow-y-auto border border-black p-4">
-              {manageableChapters.map((chapter) => (
-                <label
-                  key={chapter.name}
-                  className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedChapters.includes(chapter.name)}
-                    onChange={() => handleChapterCheckboxChange(chapter.name)}
-                    className="size-4 accent-primary"
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Manage {organiser.name}</DialogTitle>
+          <DialogDescription>
+            Update role and chapter assignments for this organiser.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="my-6 space-y-6">
+          {/* User Info */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-3">
+                <Avatar className="size-12">
+                  <AvatarImage
+                    src={organiser.profilePictureUrl}
+                    alt={organiser.name}
                   />
-                  <span className="font-semibold text-black">
-                    {chapter.name}
-                  </span>
-                  <span className="text-sm text-neutral-500">
-                    ({chapter.country})
-                  </span>
-                </label>
-              ))}
-            </div>
-            <button
-              onClick={handleChapterAssignmentChange}
-              disabled={isLoading}
-              className="mt-2 w-full bg-black px-4 py-2 font-bold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLoading ? 'Updating...' : 'Update Chapter Assignments'}
-            </button>
-          </div>
-        )}
+                  <AvatarFallback>{organiser.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold">{organiser.name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {organiser.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Current role: {organiser.role}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Current Chapter Assignments Display */}
-        {organiser.organiserOf && organiser.organiserOf.length > 0 && (
-          <div>
-            <h4 className="mb-3 text-sm font-bold text-black">
-              Current Chapter Assignments
-            </h4>
-            <div className="space-y-1">
-              {organiser.organiserOf.map((chapterName) => {
-                const chapter = allChapters.find((c) => c.name === chapterName);
-                return (
-                  <div
-                    key={chapterName}
-                    className="flex items-center justify-between bg-white p-2"
-                  >
-                    <span className="font-semibold text-black">
-                      {chapterName}
-                    </span>
-                    {chapter && (
-                      <span className="text-xs text-neutral-500">
-                        {chapter.country}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-    </Modal>
+          {/* Role Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-sm">
+                <Pencil className="mr-2 size-4" />
+                Change Role
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="role-select">Select Role</Label>
+                <Select
+                  value={selectedRole}
+                  onValueChange={(value) => setSelectedRole(value as Role)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {assignableRoles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={handleRoleChange}
+                disabled={selectedRole === organiser.role || isLoading}
+                className="w-full"
+              >
+                {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
+                {isLoading ? 'Updating...' : 'Update Role'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Chapter Assignment Management */}
+          {selectedRole === Role.CHAPTER_ORGANISER && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-sm">
+                  <Users className="mr-2 size-4" />
+                  Manage Chapter Assignments
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="max-h-48 space-y-3 overflow-y-auto">
+                  {manageableChapters.map((chapter) => (
+                    <div
+                      key={chapter.name}
+                      className="flex items-center space-x-3 rounded-md border p-3"
+                    >
+                      <Checkbox
+                        id={`chapter-${chapter.name}`}
+                        checked={selectedChapters.includes(chapter.name)}
+                        onCheckedChange={() =>
+                          handleChapterCheckboxChange(chapter.name)
+                        }
+                      />
+                      <Label
+                        htmlFor={`chapter-${chapter.name}`}
+                        className="flex-1 cursor-pointer"
+                      >
+                        <span className="font-medium">{chapter.name}</span>
+                        <span className="ml-2 text-sm text-muted-foreground">
+                          ({chapter.country})
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  onClick={handleChapterAssignmentChange}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading && (
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  )}
+                  {isLoading ? 'Updating...' : 'Update Chapter Assignments'}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Current Chapter Assignments Display */}
+          {organiser.organiserOf && organiser.organiserOf.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">
+                  Current Chapter Assignments
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {organiser.organiserOf.map((chapterName) => {
+                    const chapter = allChapters.find(
+                      (c) => c.name === chapterName
+                    );
+                    return (
+                      <div
+                        key={chapterName}
+                        className="flex items-center justify-between rounded-md border p-3"
+                      >
+                        <span className="font-medium">{chapterName}</span>
+                        {chapter && (
+                          <span className="text-sm text-muted-foreground">
+                            {chapter.country}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -45,7 +45,7 @@ The application is built with a modern, brutalist design aesthetic and features 
 - **Frontend:** [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/)
 - **State Management:** [Zustand](https://github.com/pmndrs/zustand) (with persistence)
 - **Routing:** [React Router](https://reactrouter.com/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) with a custom "Modern Brutalism" design system
+- **Styling:** [shadcn/ui](https://ui.shadcn.com/)
 - **Forms:** [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/) for validation
 - **Charts & Maps:** [Recharts](https://recharts.org/) for analytics & [Leaflet](https://leafletjs.com/) with OpenStreetMap for maps
 - **UI Components:** [FullCalendar](https://fullcalendar.io/), [Sonner](https://sonner.emilkowal.ski/) (for toasts)
@@ -118,19 +118,6 @@ This project includes a sophisticated TypeScript script (`scripts/generate-mock-
 - **Typed Output:** Generates a fully typed `mockData.ts` file, ensuring type safety throughout the application.
 
 For more details, see the [Mock Data Documentation](./README_MOCK_DATA.md).
-
-## 🎨 Design System
-
-The application features a "Modern Brutalism" design system implemented with Tailwind CSS. Key characteristics include:
-
-- Sharp corners (no border-radius).
-- Strong, 2px black borders on most elements.
-- Bold typography using the "Libre Franklin" font.
-- A high-contrast, limited color palette with semantic color names (`primary`, `success`, `danger`).
-- Brutal-style box shadows (`4px 4px 0 #000`).
-- A library of reusable UI components in `src/components/ui`.
-
-For more details on its implementation, see the [Design System Updates Summary](./DESIGN_SYSTEM_UPDATES.md).
 
 ## ☁️ Deployment
 

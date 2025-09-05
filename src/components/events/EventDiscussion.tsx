@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { useCommentsActions, useEventComments } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type EventComment } from '@/types';
@@ -16,17 +19,25 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({ comment }) => {
 
   return (
     <div className="flex items-start space-x-3 py-4">
-      <img
-        src={comment.author.profilePictureUrl}
-        alt={comment.author.name}
-        className="size-10 object-cover"
-      />
+      <Avatar className="size-10">
+        <AvatarImage
+          src={comment.author.profilePictureUrl}
+          alt={comment.author.name}
+        />
+        <AvatarFallback>
+          {comment.author.name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .slice(0, 2)}
+        </AvatarFallback>
+      </Avatar>
       <div className="flex-1">
         <div className="flex items-baseline space-x-2">
-          <p className="font-bold text-black">{comment.author.name}</p>
-          <p className="text-xs text-neutral-500">{formattedTime}</p>
+          <p className="font-bold text-foreground">{comment.author.name}</p>
+          <p className="text-xs text-muted-foreground">{formattedTime}</p>
         </div>
-        <p className="whitespace-pre-wrap text-sm text-black">
+        <p className="whitespace-pre-wrap text-sm text-foreground">
           {comment.content}
         </p>
       </div>
@@ -57,11 +68,13 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
   };
 
   return (
-    <div className="bg-white">
-      <div className="p-6 md:p-8">
-        <h2 className="mb-4 text-xl font-bold text-black">Event Discussion</h2>
+    <div className="bg-background">
+      <div className="p-2 md:p-4">
+        <h2 className="mb-4 text-xl font-bold text-foreground">
+          Event Discussion
+        </h2>
 
-        <div className="divide-y-2 divide-black">
+        <div className="divide-y-2 divide-border">
           {comments.length > 0 ? (
             comments
               .sort(
@@ -73,7 +86,7 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
                 <EventCommentCard key={comment.id} comment={comment} />
               ))
           ) : (
-            <p className="py-4 text-sm text-neutral-500">
+            <p className="py-4 text-sm text-muted-foreground">
               No comments yet. Start the conversation!
             </p>
           )}
@@ -83,26 +96,30 @@ const EventDiscussion: React.FC<EventDiscussionProps> = ({ eventId }) => {
           onSubmit={handleSubmit}
           className="mt-6 flex items-start space-x-3"
         >
-          <img
-            src={currentUser.profilePictureUrl}
-            alt={currentUser.name}
-            className="size-10 object-cover"
-          />
+          <Avatar className="size-10">
+            <AvatarImage
+              src={currentUser.profilePictureUrl}
+              alt={currentUser.name}
+            />
+            <AvatarFallback>
+              {currentUser.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
           <div className="flex-1">
-            <textarea
+            <Textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add to the discussion..."
               rows={2}
-              className="block w-full border border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
               required
             />
-            <button
-              type="submit"
-              className="mt-2 bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
-            >
+            <Button type="submit" className="mt-2" size="sm">
               Post Comment
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -90,6 +90,7 @@ const ROLES_TO_PERMISSIONS: Record<Role, Permission[]> = {
     Permission.CREATE_ANNOUNCEMENT,
     Permission.AWARD_BADGE,
     Permission.VIEW_ANALYTICS,
+    Permission.EDIT_CHAPTER, // FIX: Added missing permission for editing own chapters
   ],
   [Role.ACTIVIST]: [],
   [Role.APPLICANT]: [],

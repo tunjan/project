@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, TextAreaField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { type AccommodationRequest, type CubeEvent, type User } from '@/types';
 
 interface RequestAccommodationModalProps {
@@ -57,54 +67,60 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
   };
 
   return (
-    <Modal
-      title={`Request Stay with ${host.name}`}
-      onClose={onClose}
-      description={`For the ${event.location} event.`}
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <InputField
-            label="Arrival Date"
-            id="start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <InputField
-            label="Departure Date"
-            id="end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-        <TextAreaField
-          label={`Message to ${host.name}`}
-          id="message"
-          rows={4}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          required
-          placeholder="Introduce yourself, mention your travel plans, etc."
-        />
-        <div className="flex items-center space-x-4 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-          >
-            Send Request
-          </button>
-        </div>
-      </form>
-    </Modal>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Request Stay with {host.name}</DialogTitle>
+          <DialogDescription>For the {event.location} event.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start-date">Arrival Date</Label>
+              <Input
+                id="start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end-date">Departure Date</Label>
+              <Input
+                id="end-date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="message">Message to {host.name}</Label>
+            <Textarea
+              id="message"
+              rows={4}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+              placeholder="Introduce yourself, mention your travel plans, etc."
+            />
+          </div>
+          <DialogFooter className="flex space-x-4 pt-2">
+            <Button
+              type="button"
+              onClick={onClose}
+              variant="outline"
+              className="w-full"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="w-full">
+              Send Request
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

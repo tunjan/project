@@ -1,9 +1,21 @@
+import { Pencil, Plus, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { ConfirmationModal, TextAreaField } from '@/components/ui';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { ROLE_HIERARCHY } from '@/constants';
-import { PencilIcon, PlusIcon, TrashIcon } from '@/icons';
 import { useCurrentUser } from '@/store/auth.store';
 import { useUsersActions, useUsersState } from '@/store/users.store';
 import { type User } from '@/types';
@@ -63,23 +75,38 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
 
   return (
     <>
-      <ConfirmationModal
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          if (noteToDelete) {
-            handleDeleteNote(noteToDelete);
-          }
-        }}
-        title="Delete Note"
-        message="Are you sure you want to delete this note? This action cannot be undone."
-        confirmText="Delete"
-        variant="danger"
-      />
+      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Note</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this note? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (noteToDelete) {
+                    handleDeleteNote(noteToDelete);
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      <section>
-        <h2 className="h-section">Organizer Notes</h2>
-        <div className="card-brutal space-y-4 p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Organizer Notes</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="max-h-64 space-y-4 overflow-y-auto pr-2">
             {user.organizerNotes && user.organizerNotes.length > 0 ? (
               [...user.organizerNotes]
@@ -98,59 +125,59 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                     (authorLevel !== -1 && currentUserLevel > authorLevel);
 
                   return (
-                    <div key={note.id} className="border-b-2 border-black pb-3">
+                    <div key={note.id} className="border-b pb-3">
                       {editingNoteId === note.id ? (
                         <div>
-                          <TextAreaField
-                            label="Edit note"
-                            id={`edit-note-${note.id}`}
+                          <Textarea
                             value={editedContent}
                             onChange={(e) => setEditedContent(e.target.value)}
                             rows={3}
+                            className="mb-2"
                           />
-                          <div className="mt-2 flex items-center space-x-2">
-                            <button
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={handleCancelEdit}
-                              className="text-red text-xs font-semibold hover:underline"
                             >
                               Cancel
-                            </button>
-                            <button
-                              onClick={handleSaveEdit}
-                              className="bg-primary px-2 py-1 text-xs font-bold text-white"
-                            >
+                            </Button>
+                            <Button size="sm" onClick={handleSaveEdit}>
                               Save
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       ) : (
                         <>
-                          <p className="whitespace-pre-wrap text-sm text-black">
+                          <p className="whitespace-pre-wrap text-sm">
                             {note.content}
                           </p>
                           <div className="mt-2 flex items-center justify-between">
-                            <p className="text-xs text-neutral-500">
+                            <p className="text-xs text-muted-foreground">
                               - {note.authorName} on{' '}
                               {new Date(note.createdAt).toLocaleDateString()}
                             </p>
                             {canManageNote && (
-                              <div className="flex items-center space-x-2">
-                                <button
+                              <div className="flex items-center space-x-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() =>
                                     handleStartEdit(note.id, note.content)
                                   }
-                                  className="text-neutral-500 hover:text-black"
                                   aria-label="Edit note"
                                 >
-                                  <PencilIcon className="size-4" />
-                                </button>
-                                <button
+                                  <Pencil className="size-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="hover:text-destructive"
                                   onClick={() => openDeleteModal(note.id)}
-                                  className="text-neutral-500 hover:text-primary"
                                   aria-label="Delete note"
                                 >
-                                  <TrashIcon className="size-4" />
-                                </button>
+                                  <Trash className="size-4" />
+                                </Button>
                               </div>
                             )}
                           </div>
@@ -160,32 +187,26 @@ const OrganizerNotes: React.FC<OrganizerNotesProps> = ({ user }) => {
                   );
                 })
             ) : (
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-muted-foreground">
                 No notes for this user yet.
               </p>
             )}
           </div>
-          <form
-            onSubmit={handleSubmitNote}
-            className="border-t-2 border-black pt-4"
-          >
-            <TextAreaField
-              label="Add a new note (visible only to organizers)"
-              id="organizer-note"
+          <form onSubmit={handleSubmitNote} className="border-t pt-4">
+            <Textarea
+              placeholder="Add a new note (visible only to organizers)"
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
               rows={3}
+              className="mb-2"
             />
-            <button
-              type="submit"
-              className="card-brutal-hover mt-2 flex w-full items-center justify-center bg-black py-2 font-bold text-white"
-            >
-              <PlusIcon className="mr-2 size-4" />
+            <Button type="submit" className="w-full">
+              <Plus className="mr-2 size-4" />
               Add Note
-            </button>
+            </Button>
           </form>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </>
   );
 };

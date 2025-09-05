@@ -1,7 +1,9 @@
 import React from 'react';
 import { toast } from 'sonner';
 
-import { Avatar } from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useChaptersActions } from '@/store';
 import { type ChapterJoinRequest, type User } from '@/types';
 
@@ -16,41 +18,44 @@ const RequestCard: React.FC<{
   onDeny: (requestId: string) => void;
 }> = ({ request, onApprove, onDeny }) => {
   return (
-    <div className="border border-black bg-white">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-4">
-          <Avatar
-            src={request.user.profilePictureUrl}
-            alt={request.user.name}
-            className="size-12 object-cover"
-          />
-          <div>
-            <p className="font-bold text-black">{request.user.name}</p>
-            <p className="text-sm text-neutral-500">
-              Wants to join:
-              <span className="font-semibold text-black">
-                {' '}
-                {request.chapterName}
-              </span>
-            </p>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Avatar className="size-12">
+              <AvatarImage
+                src={request.user.profilePictureUrl}
+                alt={request.user.name}
+                className="object-cover"
+              />
+              <AvatarFallback>{request.user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-bold text-foreground">{request.user.name}</p>
+              <p className="text-sm text-muted-foreground">
+                Wants to join:
+                <span className="font-semibold text-foreground">
+                  {' '}
+                  {request.chapterName}
+                </span>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => onDeny(request.id)}
+              variant="destructive"
+              size="sm"
+            >
+              Deny
+            </Button>
+            <Button onClick={() => onApprove(request.id)} size="sm">
+              Approve
+            </Button>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => onDeny(request.id)}
-            className="bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-black"
-          >
-            Deny
-          </button>
-          <button
-            onClick={() => onApprove(request.id)}
-            className="bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
-          >
-            Approve
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -77,7 +82,7 @@ const ChapterRequestQueue: React.FC<ChapterRequestQueueProps> = ({
 
   return (
     <div>
-      <h2 className="mb-4 border-b-2 border-black pb-2 text-2xl font-bold text-black">
+      <h2 className="mb-4 text-2xl font-bold tracking-tight text-foreground">
         Chapter Join Requests ({requests.length})
       </h2>
       <div className="space-y-4">

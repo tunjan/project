@@ -1,3 +1,10 @@
+import {
+  ChevronLeft,
+  Map,
+  MessageCircle,
+  Pencil,
+  ShieldCheck,
+} from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // QR flow deprecated
@@ -13,14 +20,10 @@ import ParticipationHistory from '@/components/dashboard/ParticipationHistory';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
 import UserActivityChart from '@/components/profile/UserActivityChart';
-import { Avatar } from '@/components/ui';
-import {
-  ChatBubbleLeftRightIcon,
-  ChevronLeftIcon,
-  MapIcon,
-  PencilIcon,
-  ShieldCheckIcon,
-} from '@/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { useBadgeAwardsForUser, useEvents, useUsersActions } from '@/store';
 import { useCurrentUser } from '@/store';
 import { OnboardingStatus, type User } from '@/types';
@@ -36,13 +39,15 @@ const QuickActionButton: React.FC<{
   text: string;
   onClick: () => void;
 }> = ({ icon, text, onClick }) => (
-  <button
-    onClick={onClick}
-    className="card-brutal-hover flex size-full flex-col items-center justify-center p-6 text-center"
-  >
-    <div className="text-primary">{icon}</div>
-    <p className="mt-2 text-lg font-bold text-black">{text}</p>
-  </button>
+  <Card className="cursor-pointer transition-all duration-200 hover:shadow-md">
+    <CardContent
+      className="flex size-full flex-col items-center justify-center p-6 text-center"
+      onClick={onClick}
+    >
+      <div className="text-primary">{icon}</div>
+      <p className="mt-2 text-lg font-semibold text-foreground">{text}</p>
+    </CardContent>
+  </Card>
 );
 
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
@@ -93,16 +98,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
     }
   };
 
-  const handleAvatarChange = (newImageUrl: string) => {
-    updateProfile(user.id, {
-      name: user.name,
-      instagram: user.instagram || '',
-      hostingAvailability: user.hostingAvailability,
-      hostingCapacity: user.hostingCapacity || 1,
-      profilePictureUrl: newImageUrl,
-    });
-  };
-
   return (
     <>
       {/* MODAL LOGIC (OWNER ONLY) */}
@@ -129,138 +124,165 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
           onClose={() => setIsCityModalOpen(false)}
         />
       )}
-      <div className="py-8 md:py-12">
-        {/* Verification banner removed with new onboarding pipeline */}
-
-        {/* BACK BUTTON (PUBLIC/MANAGEMENT VIEW ONLY) */}
-        {!isOwnProfile && (
-          <button
-            onClick={() => navigate(-1)}
-            className="mb-6 inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
-          >
-            <ChevronLeftIcon className="mr-1 size-5" /> Back
-          </button>
-        )}
-
-        {/* HEADER SECTION */}
-        <div className="card-brutal mb-12 flex flex-col items-center gap-6 p-6 text-center sm:flex-row sm:text-left md:gap-8">
-          <div className="flex flex-col items-center">
-            <Avatar
-              src={user.profilePictureUrl}
-              alt={user.name}
-              className="border-brutal size-24 shrink-0 object-cover md:size-32"
-              editable={isOwnProfile}
-              onImageChange={handleAvatarChange}
-            />
-            {isOwnProfile && (
-              <p className="mt-2 text-center text-xs text-white">
-                Click to upload new avatar
-              </p>
-            )}
-          </div>
-          <div className="grow">
-            <p className="text-lg font-bold text-primary">
-              {getUserRoleDisplay(user)}
-            </p>
-            <h1 className="flex items-center gap-2 text-3xl font-extrabold text-black md:text-5xl">
-              {user.name}
-            </h1>
-            {user.instagram && (
-              <a
-                href={`https://instagram.com/${user.instagram.replace('@', '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-red font-semibold hover:text-primary hover:underline"
-              >
-                {user.instagram}
-              </a>
-            )}
-            {user.onboardingStatus === OnboardingStatus.CONFIRMED && (
-              <span
-                className="mt-4 inline-flex items-center gap-1 rounded bg-green-100 px-2 py-1 text-sm font-bold text-green-700"
-                title="Verified activist"
-              >
-                <ShieldCheckIcon className="size-5" /> Verified
-              </span>
-            )}
-          </div>
-          {/* EDIT BUTTON (OWNER ONLY) */}
-          {isOwnProfile && (
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="border-brutal group flex size-14 shrink-0 items-center justify-center bg-black hover:bg-primary"
-              aria-label="Edit Profile"
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-7xl px-4 py-8">
+          {/* BACK BUTTON (PUBLIC/MANAGEMENT VIEW ONLY) */}
+          {!isOwnProfile && (
+            <Button
+              onClick={() => navigate(-1)}
+              variant="ghost"
+              className="mb-6 inline-flex items-center"
             >
-              <PencilIcon className="size-6 text-white" />
-            </button>
+              <ChevronLeft className="mr-1 size-5" /> Back
+            </Button>
           )}
-        </div>
 
-        {/* MAIN CONTENT GRID */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="space-y-8 lg:col-span-2">
-            {/* PENDING AWARDS (OWNER ONLY) */}
-            {isOwnProfile && (
-              <BadgeAwardsDashboard pendingAwards={pendingAwards} />
-            )}
-
-            {/* QUICK ACTIONS (OWNER ONLY) */}
-            {isOwnProfile && (
-              <section>
-                <h2 className="h-section">Quick Actions</h2>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <QuickActionButton
-                    icon={<MapIcon className="size-10" />}
-                    text="Find a Cube"
-                    onClick={() => navigate('/cubes')}
-                  />
-                  <QuickActionButton
-                    icon={<ChatBubbleLeftRightIcon className="size-10" />}
-                    text="Log Outreach"
-                    onClick={() => navigate('/outreach')}
-                  />
+          {/* HEADER SECTION */}
+          <Card className="mb-8">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left md:gap-8">
+                <div className="flex flex-col items-center">
+                  <Avatar className="size-24 shrink-0 md:size-32">
+                    <AvatarImage
+                      src={user.profilePictureUrl}
+                      alt={user.name}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="text-2xl">
+                      {user.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  {isOwnProfile && (
+                    <p className="mt-2 text-center text-xs text-muted-foreground">
+                      Click to upload new avatar
+                    </p>
+                  )}
                 </div>
-              </section>
-            )}
+                <div className="grow">
+                  <p className="text-lg font-semibold text-primary">
+                    {getUserRoleDisplay(user)}
+                  </p>
+                  <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-foreground md:text-5xl">
+                    {user.name}
+                  </h1>
+                  {user.instagram && (
+                    <a
+                      href={`https://instagram.com/${user.instagram.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-primary hover:underline"
+                    >
+                      {user.instagram}
+                    </a>
+                  )}
+                  {user.onboardingStatus === OnboardingStatus.CONFIRMED && (
+                    <span
+                      className="mt-4 inline-flex items-center gap-1 rounded bg-green-100 px-2 py-1 text-sm font-semibold text-green-700"
+                      title="Verified activist"
+                    >
+                      <ShieldCheck className="size-5" /> Verified
+                    </span>
+                  )}
+                </div>
+                {/* EDIT BUTTON (OWNER ONLY) */}
+                {isOwnProfile && (
+                  <Button
+                    onClick={() => setIsEditModalOpen(true)}
+                    size="icon"
+                    className="size-14 shrink-0"
+                    aria-label="Edit Profile"
+                  >
+                    <Pencil className="size-6" />
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          <Separator className="mb-8" />
 
-            <section>
-              <h2 className="h-section">Activity Statistics</h2>
-              <StatsGrid
-                stats={user.stats}
-                showPrivateStats={isOwnProfile}
-                onCityClick={() => setIsCityModalOpen(true)}
-              />
-            </section>
+          {/* MAIN CONTENT GRID */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-8 lg:col-span-2">
+              {/* PENDING AWARDS (OWNER ONLY) */}
+              {isOwnProfile && (
+                <BadgeAwardsDashboard pendingAwards={pendingAwards} />
+              )}
 
-            <section>
-              <h2 className="h-section">Participation History</h2>
-              <ParticipationHistory userId={user.id} />
-            </section>
+              {/* QUICK ACTIONS (OWNER ONLY) */}
+              {isOwnProfile && (
+                <section>
+                  <h2 className="mb-6 text-xl font-semibold text-foreground">
+                    Quick Actions
+                  </h2>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <QuickActionButton
+                      icon={<Map className="size-10" />}
+                      text="Find a Cube"
+                      onClick={() => navigate('/cubes')}
+                    />
+                    <QuickActionButton
+                      icon={<MessageCircle className="size-10" />}
+                      text="Log Outreach"
+                      onClick={() => navigate('/outreach')}
+                    />
+                  </div>
+                </section>
+              )}
 
-            <section>
-              <h2 className="h-section">Monthly Activity</h2>
-              <UserActivityChart userId={user.id} />
-            </section>
-          </div>
-
-          <div className="space-y-8 lg:col-span-1">
-            <section>
-              <h2 className="h-section">Recognitions</h2>
-              <BadgeList badges={user.badges} />
-            </section>
-
-            <section>
-              <h2 className="h-section">Reward Tier</h2>
-              <DiscountTierProgress user={user} />
-            </section>
-
-            {/* HOSTING DASHBOARD (OWNER ONLY) */}
-            {isOwnProfile && (
               <section>
-                <h2 className="h-section">Hosting</h2>
-                <HostingDashboard />
+                <h2 className="mb-6 text-xl font-semibold text-foreground">
+                  Activity Statistics
+                </h2>
+                <StatsGrid
+                  stats={user.stats}
+                  showPrivateStats={isOwnProfile}
+                  onCityClick={() => setIsCityModalOpen(true)}
+                />
               </section>
-            )}
+
+              <section>
+                <h2 className="mb-6 text-xl font-semibold text-foreground">
+                  Participation History
+                </h2>
+                <ParticipationHistory userId={user.id} />
+              </section>
+
+              <section>
+                <h2 className="mb-6 text-xl font-semibold text-foreground">
+                  Monthly Activity
+                </h2>
+                <UserActivityChart userId={user.id} />
+              </section>
+            </div>
+
+            <div className="space-y-8 lg:col-span-1">
+              <section>
+                <h2 className="mb-6 text-xl font-semibold text-foreground">
+                  Recognitions
+                </h2>
+                <BadgeList badges={user.badges} />
+              </section>
+
+              <section>
+                <h2 className="mb-6 text-xl font-semibold text-foreground">
+                  Reward Tier
+                </h2>
+                <DiscountTierProgress user={user} />
+              </section>
+
+              {/* HOSTING DASHBOARD (OWNER ONLY) */}
+              {isOwnProfile && (
+                <section>
+                  <h2 className="mb-6 text-xl font-semibold text-foreground">
+                    Hosting
+                  </h2>
+                  <HostingDashboard />
+                </section>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -1,3 +1,12 @@
+import {
+  Building2,
+  ChevronLeft,
+  Clock,
+  Instagram,
+  MessageCircle,
+  Plus,
+  Users,
+} from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -7,15 +16,9 @@ import MemberCard from '@/components/chapters/MemberCard';
 import PastEventsModal from '@/components/chapters/PastEventsModal';
 import StatCard from '@/components/chapters/StatCard';
 import InventoryDisplay from '@/components/charts/InventoryDisplay';
-import {
-  BuildingOfficeIcon,
-  ChatBubbleLeftRightIcon,
-  ChevronLeftIcon,
-  ClockIcon,
-  InstagramIcon,
-  PlusIcon,
-  UsersIcon,
-} from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   useChapterByName,
   useChapterJoinRequests,
@@ -150,160 +153,176 @@ const ChapterDetailPage: React.FC = () => {
         events={pastChapterEvents}
         onClose={() => setIsPastEventsModalOpen(false)}
       />
-      <div className="animate-fade-in py-8 md:py-12">
-        <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
-          <button
-            onClick={() => navigate('/chapters')}
-            className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
-          >
-            <ChevronLeftIcon className="mr-1 size-5" />
-            Back to all chapters
-          </button>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
+            <Button
+              onClick={() => navigate('/chapters')}
+              variant="ghost"
+              className="inline-flex items-center"
+            >
+              <ChevronLeft className="mr-1 size-5" />
+              Back to all chapters
+            </Button>
 
-          <div className="flex items-center space-x-4">
-            {currentUser && !isMember && (
-              <button
-                onClick={handleRequestJoin}
-                disabled={hasPendingRequest}
-                className="disabled:bg-red inline-flex items-center bg-primary px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:text-white"
+            <div className="flex items-center space-x-4">
+              {currentUser && !isMember && (
+                <Button
+                  onClick={handleRequestJoin}
+                  disabled={hasPendingRequest}
+                  className="inline-flex items-center"
+                >
+                  <Plus className="mr-2 size-4" />
+                  {hasPendingRequest ? 'Request Pending' : 'Request to Join'}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="my-8">
+            <p className="text-base font-semibold uppercase tracking-wide text-primary">
+              {chapter.country}
+            </p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">
+              {chapter.name} Chapter
+            </h1>
+
+            {chapter.instagram && (
+              <a
+                href={`https://instagram.com/${chapter.instagram.replace('@', '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center text-sm font-semibold text-muted-foreground transition hover:text-primary"
               >
-                <PlusIcon className="mr-2 size-4" />
-                {hasPendingRequest ? 'Request Pending' : 'Request to Join'}
-              </button>
+                <Instagram className="mr-2 size-5" />
+                {chapter.instagram}
+              </a>
             )}
           </div>
-        </div>
+          <Separator className="mb-8" />
 
-        <div className="my-8">
-          <p className="text-base font-semibold uppercase tracking-wide text-primary">
-            {chapter.country}
-          </p>
-          <h1 className="mt-1 text-2xl font-extrabold text-black sm:text-3xl md:text-4xl lg:text-5xl">
-            {chapter.name} Chapter
-          </h1>
-
-          {chapter.instagram && (
-            <a
-              href={`https://instagram.com/${chapter.instagram.replace('@', '')}`} // FIX: Use backticks for template literal interpolation
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-grey-600 mt-6 inline-flex items-center text-sm font-semibold transition hover:text-black"
-            >
-              <InstagramIcon className="mr-2 size-5" />
-              {chapter.instagram}
-            </a>
-          )}
-        </div>
-
-        <section className="mb-12">
-          <h2 className="h-section">Chapter Statistics</h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <StatCard
-              icon={<UsersIcon className="size-6" />}
-              title="Members"
-              value={stats.memberCount}
-            />
-            <button
-              type="button"
-              aria-label="View past events"
-              className="transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-black"
-              onClick={() => setIsPastEventsModalOpen(true)}
-            >
-              <StatCard
-                icon={<BuildingOfficeIcon className="size-6" />}
-                title="Events Held"
-                value={stats.eventsHeld}
-              />
-            </button>
-            <StatCard
-              icon={<ClockIcon className="size-6" />}
-              title="Total Hours"
-              value={Math.round(stats.totalHours).toLocaleString()}
-            />
-            <StatCard
-              icon={<ChatBubbleLeftRightIcon className="size-6" />}
-              title="Total Conversations"
-              value={stats.totalConversations.toLocaleString()}
-            />
-          </div>
-        </section>
-
-        <div className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-1">
-            <div>
-              <h2 className="mb-4 text-xl font-bold text-black">Organisers</h2>
-              <div className="border-black bg-white p-4 md:border-2">
-                {chapterOrganisers.length > 0 ? (
-                  <div className="space-y-2 divide-y divide-neutral-200">
-                    {chapterOrganisers.map((m) => (
-                      <MemberCard
-                        key={m.id}
-                        member={m}
-                        onMemberClick={handleMemberClick}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="p-2 text-sm text-neutral-500">
-                    No organisers assigned.
-                  </p>
-                )}
-              </div>
-            </div>
-            <div>
-              <h2 className="mb-4 text-xl font-bold text-black">Members</h2>
-              <div className="max-h-96 overflow-y-auto border-black bg-white p-4 md:border-2">
-                {regularMembers.length > 0 ? (
-                  <div className="space-y-2 divide-y divide-neutral-200">
-                    {regularMembers.map((m) => (
-                      <MemberCard
-                        key={m.id}
-                        member={m}
-                        onMemberClick={handleMemberClick}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="p-2 text-sm text-neutral-500">
-                    No members yet.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2">
-            <h2 className="mb-4 text-xl font-bold text-black">
-              Chapter Announcements
+          <section className="mb-12">
+            <h2 className="mb-6 text-xl font-semibold text-foreground">
+              Chapter Statistics
             </h2>
-            {chapterAnnouncements.length > 0 ? (
-              <div className="space-y-6">
-                {chapterAnnouncements.map((announcement) => (
-                  <AnnouncementCard
-                    key={announcement.id}
-                    announcement={announcement}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="border-black bg-white p-8 text-center md:border-2">
-                <h3 className="text-lg font-bold text-black">
-                  No chapter-specific announcements.
-                </h3>
-                <p className="mt-1 text-neutral-500">
-                  Check the main announcements page for global and regional
-                  news.
-                </p>
-              </div>
-            )}
-
-            {/* Chapter Inventory */}
-            <div className="mt-8">
-              <InventoryDisplay
-                chapterName={chapter.name}
-                showTitle={true}
-                compact={false}
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <StatCard
+                icon={<Users className="size-6" />}
+                title="Members"
+                value={stats.memberCount}
               />
+              <button
+                type="button"
+                aria-label="View past events"
+                className="transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
+                onClick={() => setIsPastEventsModalOpen(true)}
+              >
+                <StatCard
+                  icon={<Building2 className="size-6" />}
+                  title="Events Held"
+                  value={stats.eventsHeld}
+                />
+              </button>
+              <StatCard
+                icon={<Clock className="size-6" />}
+                title="Total Hours"
+                value={Math.round(stats.totalHours).toLocaleString()}
+              />
+              <StatCard
+                icon={<MessageCircle className="size-6" />}
+                title="Total Conversations"
+                value={stats.totalConversations.toLocaleString()}
+              />
+            </div>
+          </section>
+
+          <div className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-1">
+              <div>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">
+                  Organisers
+                </h2>
+                <Card>
+                  <CardContent className="p-4">
+                    {chapterOrganisers.length > 0 ? (
+                      <div className="space-y-2 divide-y divide-border">
+                        {chapterOrganisers.map((m) => (
+                          <MemberCard
+                            key={m.id}
+                            member={m}
+                            onMemberClick={handleMemberClick}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="p-2 text-sm text-muted-foreground">
+                        No organisers assigned.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+              <div>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">
+                  Members
+                </h2>
+                <Card>
+                  <CardContent className="max-h-96 overflow-y-auto p-4">
+                    {regularMembers.length > 0 ? (
+                      <div className="space-y-2 divide-y divide-border">
+                        {regularMembers.map((m) => (
+                          <MemberCard
+                            key={m.id}
+                            member={m}
+                            onMemberClick={handleMemberClick}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="p-2 text-sm text-muted-foreground">
+                        No members yet.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <h2 className="mb-4 text-xl font-semibold text-foreground">
+                Chapter Announcements
+              </h2>
+              {chapterAnnouncements.length > 0 ? (
+                <div className="space-y-6">
+                  {chapterAnnouncements.map((announcement) => (
+                    <AnnouncementCard
+                      key={announcement.id}
+                      announcement={announcement}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <h3 className="text-lg font-semibold text-foreground">
+                      No chapter-specific announcements.
+                    </h3>
+                    <p className="mt-1 text-muted-foreground">
+                      Check the main announcements page for global and regional
+                      news.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Chapter Inventory */}
+              <div className="mt-8">
+                <InventoryDisplay
+                  chapterName={chapter.name}
+                  showTitle={true}
+                  compact={false}
+                />
+              </div>
             </div>
           </div>
         </div>

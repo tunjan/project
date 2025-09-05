@@ -1,7 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, SelectField } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Chapter, Role } from '@/types';
@@ -134,147 +151,162 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
   };
 
   return (
-    <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-2xl border-black bg-white md:border-2">
-        <div className="border-b-2 border-black p-8">
-          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
-            Create New Event
-          </h1>
-          <p className="text-red mt-2">
+    <div className="container mx-auto max-w-2xl py-12">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Create New Event</CardTitle>
+          <CardDescription>
             Schedule a standard chapter cube or organize a special multi-day
             regional event.
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-6 p-8">
-          <InputField
-            label="Event Name"
-            id="event-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <SelectField
-            label="Event Type"
-            id="event-type"
-            value={eventType}
-            onChange={(e) => setEventType(e.target.value as EventType)}
-          >
-            <option value="Chapter">Standard Chapter Cube</option>
-            <option value="Special">Special Event</option>
-          </SelectField>
-
-          {eventType === 'Special' && (
-            <SelectField
-              label="Scope"
-              id="scope"
-              value={scope}
-              onChange={(e) =>
-                setScope(e.target.value as 'Regional' | 'Global')
-              }
-            >
-              <option value="Regional">Regional Event</option>
-              {}
-            </SelectField>
-          )}
-
-          {eventType === 'Special' && scope === 'Regional' && (
-            <SelectField
-              label="Target Region"
-              id="target-region"
-              value={targetRegion}
-              onChange={(e) => setTargetRegion(e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                Select a region
-              </option>
-              {availableRegions.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </SelectField>
-          )}
-
-          <SelectField
-            label="Host City"
-            id="city"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            required
-            disabled={organizableChapters.length === 0}
-          >
-            <option value="" disabled>
-              Select a host city
-            </option>
-            {organizableChapters.map((chapterName) => (
-              <option key={chapterName} value={chapterName}>
-                {chapterName}
-              </option>
-            ))}
-          </SelectField>
-
-          <InputField
-            label="Exact Location"
-            id="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <InputField
-              label="Start Date"
-              id="start-date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <InputField
-              label="Start Time"
-              id="start-time"
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </div>
-          {eventType === 'Special' && (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <InputField
-                label="End Date (Optional)"
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required={false}
-              />
-              <InputField
-                label="End Time (Optional)"
-                id="end-time"
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required={false}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="event-name">Event Name</Label>
+              <Input
+                id="event-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Weekly Cube of Truth"
+                required
               />
             </div>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="event-type">Event Type</Label>
+              <Select
+                value={eventType}
+                onValueChange={(value) => setEventType(value as EventType)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select event type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Chapter">Standard Chapter Cube</SelectItem>
+                  <SelectItem value="Special">Special Event</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="flex items-center space-x-4 pt-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-black"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-            >
-              Create Event
-            </button>
-          </div>
-        </form>
-      </div>
+            {eventType === 'Special' && (
+              <div className="space-y-2">
+                <Label htmlFor="scope">Scope</Label>
+                <Select
+                  value={scope}
+                  onValueChange={(value) =>
+                    setScope(value as 'Regional' | 'Global')
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select scope" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Regional">Regional Event</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {eventType === 'Special' && scope === 'Regional' && (
+              <div className="space-y-2">
+                <Label htmlFor="target-region">Target Region</Label>
+                <Select value={targetRegion} onValueChange={setTargetRegion}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a region" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableRegions.map((region) => (
+                      <SelectItem key={region} value={region}>
+                        {region}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="city">Host City</Label>
+              <Select value={city} onValueChange={setCity} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a host city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizableChapters.map((chapterName) => (
+                    <SelectItem key={chapterName} value={chapterName}>
+                      {chapterName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="location">Exact Location</Label>
+              <Input
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g., Central Square"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="start-date">Start Date</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="start-time">Start Time</Label>
+                <Input
+                  id="start-time"
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            {eventType === 'Special' && (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="end-date">End Date (Optional)</Label>
+                  <Input
+                    id="end-date"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end-time">End Time (Optional)</Label>
+                  <Input
+                    id="end-time"
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleSubmit}>
+            Create Event
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

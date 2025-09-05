@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { TextAreaField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { type CubeEvent } from '@/types';
 
 interface CancelEventModalProps {
@@ -27,36 +36,42 @@ const CancelEventModal: React.FC<CancelEventModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Cancel Event"
-      onClose={onClose}
-      description={`You are about to cancel "${event.location}". This cannot be undone.`}
-    >
-      <div className="my-6">
-        <TextAreaField
-          label="Reason for Cancellation (required, will be sent to participants)"
-          id="cancellation-reason"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          rows={4}
-          required
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-        >
-          Go Back
-        </button>
-        <button
-          onClick={handleConfirm}
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-        >
-          Confirm Cancellation
-        </button>
-      </div>
-    </Modal>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Cancel Event</DialogTitle>
+          <DialogDescription>
+            You are about to cancel "{event.location}". This cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="my-6">
+          <div className="space-y-2">
+            <Label htmlFor="cancellation-reason">
+              Reason for Cancellation (required, will be sent to participants)
+            </Label>
+            <Textarea
+              id="cancellation-reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={4}
+              required
+            />
+          </div>
+        </div>
+        <DialogFooter className="flex space-x-4">
+          <Button onClick={onClose} variant="outline" className="w-full">
+            Go Back
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            variant="destructive"
+            className="w-full"
+          >
+            Confirm Cancellation
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -20,47 +20,47 @@ export const BADGE_TEMPLATES: BadgeTemplate[] = [
   {
     name: 'First Blood',
     description: 'Attended your first cube event',
-    icon: 'HeartIcon',
+    icon: 'Heart',
   },
   {
     name: 'Nomad',
     description: 'Attended cubes in 5 or more cities',
-    icon: 'MapPinIcon',
+    icon: 'MapPin',
   },
   {
     name: 'Voice of Truth',
     description: 'Had 100+ conversations about veganism',
-    icon: 'ChatBubbleLeftRightIcon',
+    icon: 'MessagesSquare',
   },
   {
     name: 'Centurion',
     description: 'Completed 100+ hours of activism',
-    icon: 'ClockIcon',
+    icon: 'Clock',
   },
   {
     name: 'Veteran',
     description: 'Attended 25+ cube events',
-    icon: 'TrophyIcon',
+    icon: 'Trophy',
   },
   {
     name: 'Chapter Anchor',
     description: 'Dedicated chapter member with 10+ events and 50+ hours',
-    icon: 'BuildingOfficeIcon',
+    icon: 'Building2',
   },
   {
     name: 'Guide',
     description: 'Helped others with 50+ conversations and 5+ conversions',
-    icon: 'UserGroupIcon',
+    icon: 'Users',
   },
   {
     name: 'Steel Resolve',
     description: 'High activity level with 15+ events attended',
-    icon: 'ShieldCheckIcon',
+    icon: 'ShieldCheck',
   },
   {
     name: 'Tactical Mind',
     description:
       'Strategic activist with 75+ conversations and 10+ conversions',
-    icon: 'LightBulbIcon',
+    icon: 'Lightbulb',
   },
 ];

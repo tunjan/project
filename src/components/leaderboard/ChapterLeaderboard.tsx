@@ -1,7 +1,10 @@
+import { Building2, Trophy } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { BuildingOfficeIcon, TrophyIcon } from '@/icons';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateRanks, type ChapterLeaderboardEntry } from '@/utils';
 
 interface ChapterLeaderboardProps {
@@ -11,20 +14,43 @@ interface ChapterLeaderboardProps {
 }
 
 const ChapterRankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
-  const rankStyles = {
-    1: 'bg-yellow text-black border-black',
-    2: 'bg-grey-300 text-black border-black',
-    3: 'bg-yellow-700 text-white border-black', // Bronze color
+  const getRankBadge = () => {
+    if (rank === 1) {
+      return (
+        <Badge
+          variant="default"
+          className="bg-yellow-400 text-yellow-900 dark:bg-yellow-600 dark:text-yellow-100"
+        >
+          <Trophy className="size-4" />
+        </Badge>
+      );
+    }
+    if (rank === 2) {
+      return (
+        <Badge
+          variant="secondary"
+          className="bg-gray-300 text-gray-900 dark:bg-gray-600 dark:text-gray-100"
+        >
+          <Trophy className="size-4" />
+        </Badge>
+      );
+    }
+    if (rank === 3) {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-amber-600 text-amber-100 dark:bg-amber-700 dark:text-amber-100"
+        >
+          <Trophy className="size-4" />
+        </Badge>
+      );
+    }
+    return <Badge variant="outline">{rank}</Badge>;
   };
 
-  const baseStyle =
-    'flex w-16 flex-shrink-0 items-center justify-center  border-black text-2xl font-black';
-  const rankClass =
-    rank <= 3 ? rankStyles[rank as 1 | 2 | 3] : 'bg-white text-black';
-
   return (
-    <div className={`${baseStyle} ${rankClass}`}>
-      {rank <= 3 ? <TrophyIcon className="size-6" /> : <span>{rank}</span>}
+    <div className="flex w-16 shrink-0 items-center justify-center">
+      {getRankBadge()}
     </div>
   );
 };
@@ -44,58 +70,64 @@ const ChapterLeaderboard: React.FC<ChapterLeaderboardProps> = ({
   };
 
   return (
-    <div className="flex h-full flex-col border-y border-neutral-200 sm:border-black sm:bg-white sm:md:border-2">
-      <h2 className="border-b border-neutral-200 p-4 text-xl font-bold text-black sm:border-b-2 sm:border-black">
-        {title}
-      </h2>
-      <div className="grow overflow-y-auto">
+    <Card className="flex h-full flex-col">
+      <CardHeader>
+        <CardTitle className="text-xl">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="grow overflow-y-auto p-0">
         {rankedData.length > 0 ? (
-          <ul className="space-y-0">
+          <ul className="space-y-2 p-4">
             {rankedData.map(({ chapter, value, rank }) => {
               return (
-                <li key={chapter.name}>
-                  <button
+                <li
+                  key={chapter.name}
+                  className="rounded-lg transition-all duration-200 hover:shadow-md"
+                >
+                  <Button
                     onClick={() => handleChapterClick(chapter.name)}
-                    className="sm:border-1 flex w-full transform-gpu cursor-pointer items-stretch border-y border-neutral-200 hover:-translate-y-1 hover:shadow-brutal sm:border-black sm:bg-white"
+                    variant="ghost"
+                    className="flex h-auto w-full cursor-pointer items-stretch p-0 hover:bg-accent"
                   >
                     <ChapterRankIndicator rank={rank} />
                     <div className="flex grow items-center p-3">
-                      <div className="flex size-12 shrink-0 items-center justify-center border-black bg-black md:border-2">
-                        <BuildingOfficeIcon className="size-6 text-white" />
+                      <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted">
+                        <Building2 className="size-6 text-muted-foreground" />
                       </div>
-                      <div className="ml-4 grow">
-                        <p className="truncate font-bold text-black">
+                      <div className="ml-4 grow text-left">
+                        <p className="truncate font-bold text-foreground">
                           {chapter.name}
                         </p>
-                        <p className="text-sm text-neutral-500">
+                        <p className="text-sm text-muted-foreground">
                           {chapter.country}
                         </p>
                       </div>
                       <div className="ml-4 shrink-0 text-right">
-                        <p className="text-2xl font-extrabold text-black">
+                        <p className="text-2xl font-extrabold text-foreground">
                           {value.toLocaleString()}
                         </p>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                           {unit}
                         </p>
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 </li>
               );
             })}
           </ul>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center p-8 text-center text-neutral-500">
-            <BuildingOfficeIcon className="size-12" />
-            <p className="mt-2 font-semibold text-black">No data available.</p>
+          <div className="flex h-full flex-col items-center justify-center p-8 text-center text-muted-foreground">
+            <Building2 className="size-12" />
+            <p className="mt-2 font-semibold text-foreground">
+              No data available.
+            </p>
             <p className="text-sm">
               There is no activity for this time period.
             </p>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

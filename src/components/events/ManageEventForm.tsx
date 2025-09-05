@@ -1,7 +1,17 @@
+import { CheckCircle, ChevronLeft, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { CheckCircleIcon, ChevronLeftIcon, XCircleIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { useOutreachLogs } from '@/store';
 import { type CubeEvent, type EventReport, type OutreachLog } from '@/types';
 
@@ -53,155 +63,173 @@ const ManageEventForm: React.FC<ManageEventFormProps> = ({
   };
 
   return (
-    <div className="animate-fade-in py-8 md:py-12">
-      <div className="mb-6">
-        <button
-          onClick={onCancel}
-          className="inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
-        >
-          <ChevronLeftIcon className="mr-1 size-5" />
-          Back to Event
-        </button>
-      </div>
-      <div className="mx-auto max-w-4xl border border-black bg-white">
-        <div className="border-b border-black p-8">
-          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
-            Log Event Report
-          </h1>
-          <p className="text-red mt-2">
-            Submit the final details for{' '}
-            <span className="font-bold">{event.location}</span> in{' '}
-            <span className="font-bold">{event.city}</span>. This will update
-            stats for all attendees.
-          </p>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-4xl px-4 py-8">
+        <div className="mb-6">
+          <Button
+            onClick={onCancel}
+            variant="ghost"
+            className="inline-flex items-center"
+          >
+            <ChevronLeft className="mr-1 size-5" />
+            Back to Event
+          </Button>
         </div>
-        <form onSubmit={handleSubmit}>
-          {}
-          <div className="border-b border-black p-8">
-            <h2 className="mb-4 text-xl font-bold text-black">
-              Impact Metrics
-            </h2>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+              Log Event Report
+            </CardTitle>
+            <CardDescription>
+              Submit the final details for{' '}
+              <span className="font-semibold">{event.location}</span> in{' '}
+              <span className="font-semibold">{event.city}</span>. This will
+              update stats for all attendees.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-8">
               <div>
-                <label
-                  htmlFor="hours"
-                  className="mb-1 block text-sm font-bold text-black"
-                >
-                  Event Duration (Hours)
-                </label>
-                <input
-                  type="number"
-                  id="hours"
-                  value={hours}
-                  onChange={(e) =>
-                    setHours(
-                      e.target.value === '' ? '' : parseFloat(e.target.value)
-                    )
-                  }
-                  required
-                  min="0.1"
-                  step="0.1"
-                  className="block w-full border border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
-                  placeholder="e.g., 4.5"
-                />
-              </div>
-              <div>{}</div>
-            </div>
-          </div>
-
-          {}
-          <div className="border-b border-black p-8">
-            <h2 className="mb-4 text-xl font-bold text-black">
-              Outreach Log for This Event
-            </h2>
-            {eventLogs.length > 0 ? (
-              <div className="max-h-60 space-y-2 overflow-y-auto pr-2">
-                {eventLogs.map((log: OutreachLog) => (
-                  <div
-                    key={log.id}
-                    className="border-black bg-white p-3 md:border-2"
-                  >
-                    <p className="font-semibold">{log.outcome}</p>
-                    {log.notes && (
-                      <p className="text-red text-sm">{log.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-white">
-                No outreach outcomes have been logged for this event by
-                participants yet.
-              </p>
-            )}
-            <p className="text-red mt-4 text-sm">
-              Note: Individual activists log their own outreach outcomes from
-              the 'Outreach' page. This is a summary.
-            </p>
-          </div>
-
-          {}
-          <div className="p-8">
-            <h2 className="mb-4 text-xl font-bold text-black">Attendance</h2>
-            <ul className="divide-y-2 divide-black border-y-2 border-black">
-              {event.participants.map(({ user }) => (
-                <li
-                  key={user.id}
-                  className="flex items-center justify-between p-3"
-                >
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={user.profilePictureUrl}
-                      alt={user.name}
-                      className="size-10 object-cover"
-                    />
-                    <div>
-                      <p className="font-bold text-black">{user.name}</p>
-                      <p className="text-sm text-white">{user.role}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleAttendanceChange(user.id, 'Attended')
+                <h2 className="mb-4 text-xl font-semibold text-foreground">
+                  Impact Metrics
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="hours"
+                      className="mb-2 block text-sm font-medium text-foreground"
+                    >
+                      Event Duration (Hours)
+                    </label>
+                    <Input
+                      type="number"
+                      id="hours"
+                      value={hours}
+                      onChange={(e) =>
+                        setHours(
+                          e.target.value === ''
+                            ? ''
+                            : parseFloat(e.target.value)
+                        )
                       }
-                      className={`flex w-full items-center justify-center px-3 py-2 text-sm font-semibold transition-colors sm:w-28 ${
-                        attendance[user.id] === 'Attended'
-                          ? 'btn-primary'
-                          : 'btn-outline'
-                      }`}
-                    >
-                      <CheckCircleIcon className="mr-1.5 size-5" />
-                      Attended
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAttendanceChange(user.id, 'Absent')}
-                      className={`flex w-full items-center justify-center px-3 py-2 text-sm font-semibold transition-colors sm:w-28 ${
-                        attendance[user.id] === 'Absent'
-                          ? 'btn-secondary'
-                          : 'btn-outline'
-                      }`}
-                    >
-                      <XCircleIcon className="mr-1.5 size-5" />
-                      Absent
-                    </button>
+                      required
+                      min="0.1"
+                      step="0.1"
+                      placeholder="e.g., 4.5"
+                    />
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+              </div>
+              <Separator />
 
-          <div className="border-t border-black p-8">
-            <button
-              type="submit"
-              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-            >
-              Submit Final Report
-            </button>
-          </div>
-        </form>
+              <div>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">
+                  Outreach Log for This Event
+                </h2>
+                {eventLogs.length > 0 ? (
+                  <div className="max-h-60 space-y-2 overflow-y-auto pr-2">
+                    {eventLogs.map((log: OutreachLog) => (
+                      <Card key={log.id}>
+                        <CardContent className="p-3">
+                          <p className="font-semibold text-foreground">
+                            {log.outcome}
+                          </p>
+                          {log.notes && (
+                            <p className="text-sm text-muted-foreground">
+                              {log.notes}
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">
+                    No outreach outcomes have been logged for this event by
+                    participants yet.
+                  </p>
+                )}
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Note: Individual activists log their own outreach outcomes
+                  from the 'Outreach' page. This is a summary.
+                </p>
+              </div>
+              <Separator />
+
+              <div>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">
+                  Attendance
+                </h2>
+                <div className="space-y-4">
+                  {event.participants.map(({ user }) => (
+                    <Card key={user.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <img
+                              src={user.profilePictureUrl}
+                              alt={user.name}
+                              className="size-10 rounded-full object-cover"
+                            />
+                            <div>
+                              <p className="font-semibold text-foreground">
+                                {user.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.role}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
+                            <Button
+                              type="button"
+                              onClick={() =>
+                                handleAttendanceChange(user.id, 'Attended')
+                              }
+                              variant={
+                                attendance[user.id] === 'Attended'
+                                  ? 'default'
+                                  : 'outline'
+                              }
+                              size="sm"
+                              className="sm:w-28"
+                            >
+                              <CheckCircle className="mr-1.5 size-4" />
+                              Attended
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() =>
+                                handleAttendanceChange(user.id, 'Absent')
+                              }
+                              variant={
+                                attendance[user.id] === 'Absent'
+                                  ? 'destructive'
+                                  : 'outline'
+                              }
+                              size="sm"
+                              className="sm:w-28"
+                            >
+                              <XCircle className="mr-1.5 size-4" />
+                              Absent
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <Button type="submit" className="w-full">
+                  Submit Final Report
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,8 +1,10 @@
+import { Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import UserProfile from '@/components/profile/UserProfile'; // Use the consolidated component
-import { LoadingSpinner } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useUserById, useUsersActions, useUsersState } from '@/store';
 
 const ViewProfilePage: React.FC = () => {
@@ -35,25 +37,30 @@ const ViewProfilePage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="flex min-h-[50vh] w-full items-center justify-center px-4">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-center text-neutral-600">
-            Loading profile...
-          </p>
-          <p className="mt-2 text-center text-sm text-neutral-500">
-            User ID: {userId} | Total users: {allUsers.length}
-          </p>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-7xl px-4 py-8">
+          <div className="flex min-h-[50vh] w-full items-center justify-center">
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Loader2 className="size-8 animate-spin text-primary" />
+                <p className="mt-4 text-foreground">Loading profile...</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  User ID: {userId} | Total users: {allUsers.length}
+                </p>
 
-          {/* Add a button to reset store data if loading takes too long */}
-          {showResetButton && (
-            <button
-              onClick={handleResetStore}
-              className="bg-red mt-4 rounded px-4 py-2 text-sm text-white hover:bg-black"
-            >
-              Reset Store Data
-            </button>
-          )}
+                {/* Add a button to reset store data if loading takes too long */}
+                {showResetButton && (
+                  <Button
+                    onClick={handleResetStore}
+                    variant="destructive"
+                    className="mt-4"
+                  >
+                    Reset Store Data
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );

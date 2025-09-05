@@ -1,7 +1,17 @@
+import { Search } from 'lucide-react';
 import React from 'react';
 
-import { SelectField } from '@/components/ui';
-import { SearchIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ResourceType, SkillLevel } from '@/types';
 
 interface ResourceFiltersProps {
@@ -18,89 +28,102 @@ interface ResourceFiltersProps {
 
 const ResourceFilters: React.FC<ResourceFiltersProps> = (props) => {
   return (
-    <div className="border-black bg-white p-4 md:border-2">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div className="md:col-span-4">
-          <label htmlFor="keyword-search" className="sr-only">
-            Search by keyword
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchIcon className="size-5 text-neutral-500" />
+    <Card>
+      <CardContent className="p-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="md:col-span-4">
+            <Label htmlFor="keyword-search" className="sr-only">
+              Search by keyword
+            </Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                id="keyword-search"
+                placeholder="Search by keyword..."
+                value={props.searchTerm}
+                onChange={(e) => props.setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <input
-              type="text"
-              id="keyword-search"
-              placeholder="Search by keyword..."
-              value={props.searchTerm}
-              onChange={(e) => props.setSearchTerm(e.target.value)}
-              className="rounded-nonenone block w-full border border-black bg-white py-2 pl-10 pr-3 text-black placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm"
-            />
+          </div>
+          <div>
+            <Label htmlFor="type-filter">Type</Label>
+            <Select
+              value={props.selectedType}
+              onValueChange={(value: string) =>
+                props.setSelectedType(value as ResourceType | 'all')
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {Object.values(ResourceType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="level-filter">Skill Level</Label>
+            <Select
+              value={props.selectedLevel}
+              onValueChange={(value: string) =>
+                props.setSelectedLevel(value as SkillLevel | 'all')
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Skill Levels</SelectItem>
+                {Object.values(SkillLevel).map((level) => (
+                  <SelectItem key={level} value={level}>
+                    {level}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="lang-filter">Language</Label>
+            <Select
+              value={props.selectedLang}
+              onValueChange={(value: string) => props.setSelectedLang(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {props.languages.map((lang) => (
+                  <SelectItem key={lang} value={lang}>
+                    {lang === 'all' ? 'All Languages' : lang}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="self-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                props.setSearchTerm('');
+                props.setSelectedType('all');
+                props.setSelectedLevel('all');
+                props.setSelectedLang('all');
+              }}
+              className="w-full"
+            >
+              Reset
+            </Button>
           </div>
         </div>
-        <div>
-          <SelectField
-            label="Type"
-            id="type-filter"
-            value={props.selectedType}
-            onChange={(e) =>
-              props.setSelectedType(e.target.value as ResourceType | 'all')
-            }
-          >
-            <option value="all">All Types</option>
-            {Object.values(ResourceType).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </SelectField>
-        </div>
-        <div>
-          <SelectField
-            label="Skill Level"
-            id="level-filter"
-            value={props.selectedLevel}
-            onChange={(e) =>
-              props.setSelectedLevel(e.target.value as SkillLevel | 'all')
-            }
-          >
-            <option value="all">All Skill Levels</option>
-            {Object.values(SkillLevel).map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </SelectField>
-        </div>
-        <div>
-          <SelectField
-            label="Language"
-            id="lang-filter"
-            value={props.selectedLang}
-            onChange={(e) => props.setSelectedLang(e.target.value)}
-          >
-            {props.languages.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang === 'all' ? 'All Languages' : lang}
-              </option>
-            ))}
-          </SelectField>
-        </div>
-        <div className="self-end">
-          <button
-            onClick={() => {
-              props.setSearchTerm('');
-              props.setSelectedType('all');
-              props.setSelectedLevel('all');
-              props.setSelectedLang('all');
-            }}
-            className="size-full border-black bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black md:border-2"
-          >
-            Reset
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 export default ResourceFilters;

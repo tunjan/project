@@ -1,9 +1,28 @@
+import { Pencil, Plus, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { ConfirmationModal } from '@/components/ui';
-import { InputField, SelectField } from '@/components/ui';
-import { PencilIcon, PlusIcon, TrashIcon } from '@/icons';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { type InventoryItem } from '@/types';
 
 interface ChapterInventoryProps {
@@ -30,51 +49,61 @@ const ItemForm: React.FC<ItemFormProps> = ({ item, onSave, onCancel }) => {
   };
 
   return (
-    <div className="border-black bg-white p-4 md:border-2">
-      <h3 className="h-subsection">{item ? 'Edit Item' : 'Add New Item'}</h3>
-      <form onSubmit={handleSubmit} className="form-spacing">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <SelectField
-            label="Category"
-            id="category"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                category: e.target.value as InventoryItem['category'],
-              })
-            }
-          >
-            <option value="Masks">Masks</option>
-            <option value="TVs">TVs</option>
-            <option value="Signs">Signs</option>
-          </SelectField>
+    <Card>
+      <CardHeader>
+        <CardTitle>{item ? 'Edit Item' : 'Add New Item'}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    category: value as InventoryItem['category'],
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Masks">Masks</SelectItem>
+                  <SelectItem value="TVs">TVs</SelectItem>
+                  <SelectItem value="Signs">Signs</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <InputField
-            label="Quantity"
-            id="quantity"
-            type="number"
-            min="0"
-            value={formData.quantity}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                quantity: parseInt(e.target.value) || 0,
-              })
-            }
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min="0"
+                value={formData.quantity}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    quantity: parseInt(e.target.value) || 0,
+                  })
+                }
+              />
+            </div>
+          </div>
 
-        <div className="flex gap-3 pt-4">
-          <button type="submit" className="btn-primary">
-            {item ? 'Update Item' : 'Add Item'}
-          </button>
-          <button type="button" onClick={onCancel} className="btn-secondary">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
+          <div className="flex gap-3 pt-4">
+            <Button type="submit">{item ? 'Update Item' : 'Add Item'}</Button>
+            <Button type="button" onClick={onCancel} variant="outline">
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -84,34 +113,43 @@ const InventoryItemCard: React.FC<{
   onDelete: () => void;
 }> = ({ item, onEdit, onDelete }) => {
   return (
-    <div className="border-black bg-white p-4 md:border-2">
-      <div className="flex justify-between">
-        <div className="flex-1">
-          <div className="mb-3">
-            <h3 className="h-card">{item.category}</h3>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex justify-between">
+          <div className="flex-1">
+            <div className="mb-3">
+              <h3 className="text-lg font-bold text-foreground">
+                {item.category}
+              </h3>
+            </div>
+            <div className="mb-3 flex items-center gap-4 text-sm">
+              <span className="font-bold text-foreground">
+                QTY: {item.quantity}
+              </span>
+            </div>
           </div>
-          <div className="mb-3 flex items-center gap-4 text-sm">
-            <span className="font-bold text-black">QTY: {item.quantity}</span>
+          <div className="flex gap-2">
+            <Button
+              onClick={onEdit}
+              variant="ghost"
+              size="icon"
+              title="Edit item"
+            >
+              <Pencil className="size-4" />
+            </Button>
+            <Button
+              onClick={onDelete}
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive"
+              title="Delete item"
+            >
+              <Trash className="size-4" />
+            </Button>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={onEdit}
-            className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-black hover:text-white"
-            title="Edit item"
-          >
-            <PencilIcon className="size-4" />
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-2 text-neutral-600 transition-colors duration-300 hover:bg-primary hover:text-white"
-            title="Delete item"
-          >
-            <TrashIcon className="size-4" />
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -177,35 +215,48 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="section-spacing">
-      <ConfirmationModal
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          if (itemToDelete) {
-            handleDeleteItem(itemToDelete);
-          }
-        }}
-        title="Delete Item"
-        message="Are you sure you want to delete this item? This action cannot be undone."
-        confirmText="Delete"
-        variant="danger"
-      />
+    <div className="space-y-6">
+      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Item</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this item? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (itemToDelete) {
+                  handleDeleteItem(itemToDelete);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="h-section">{chapterName} Inventory</h2>
-          <p className="font-mono text-sm uppercase tracking-wider text-neutral-600">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            {chapterName} Inventory
+          </h2>
+          <p className="text-sm tracking-wide text-muted-foreground">
             {inventory.length} item types • {totalItems} total items
           </p>
         </div>
-        <button
+        <Button
           onClick={() => setShowForm(true)}
-          className="btn-primary flex items-center gap-2"
+          className="flex items-center gap-2"
         >
-          <PlusIcon className="size-4" />
+          <Plus className="size-4" />
           Add Item
-        </button>
+        </Button>
       </div>
 
       {showForm && (
@@ -222,23 +273,21 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
       {/* Filter */}
       <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
-          <button
+          <Button
             key={category}
             onClick={() => setFilter(category)}
-            className={`px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${
-              filter === category
-                ? 'border-primary bg-primary text-white md:border-2'
-                : 'btn-outline'
-            }`}
+            variant={filter === category ? 'default' : 'outline'}
+            size="sm"
+            className="text-xs font-bold uppercase tracking-wider"
           >
             {category}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Inventory List */}
       {filteredInventory.length > 0 ? (
-        <div className="grid-spacing grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredInventory.map((item) => (
             <InventoryItemCard
               key={item.id}
@@ -249,18 +298,20 @@ const ChapterInventory: React.FC<ChapterInventoryProps> = ({
           ))}
         </div>
       ) : (
-        <div className="card-brutal card-padding text-center">
-          <h3 className="text-xl font-bold uppercase tracking-wider text-black">
-            {filter === 'All'
-              ? 'No inventory items yet'
-              : `No ${filter.toLowerCase()} found`}
-          </h3>
-          <p className="mt-3 font-mono text-sm text-neutral-600">
-            {filter === 'All'
-              ? 'Start building your chapter inventory by adding equipment.'
-              : 'Try a different category or add new items.'}
-          </p>
-        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <h3 className="text-xl font-bold text-foreground">
+              {filter === 'All'
+                ? 'No inventory items yet'
+                : `No ${filter.toLowerCase()} found`}
+            </h3>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {filter === 'All'
+                ? 'Start building your chapter inventory by adding equipment.'
+                : 'Try a different category or add new items.'}
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

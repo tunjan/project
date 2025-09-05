@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 // Import our improved CubeDetail component
 import CubeDetail from '@/components/CubeDetail';
+import { Button } from '@/components/ui/button';
 import { useEventById, useEventsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { TourDuty } from '@/types';
@@ -20,12 +21,12 @@ const CubeDetailPage: React.FC = () => {
     return (
       <div className="py-16 text-center">
         <h1 className="text-2xl font-bold">Event Not Found</h1>
-        <p className="mt-2 text-neutral-600">
+        <p className="mt-2 text-muted-foreground">
           The event you are looking for does not exist.
         </p>
-        <button onClick={() => navigate('/cubes')} className="btn-primary mt-4">
+        <Button onClick={() => navigate('/cubes')} className="mt-4">
           Back to All Cubes
-        </button>
+        </Button>
       </div>
     );
   }

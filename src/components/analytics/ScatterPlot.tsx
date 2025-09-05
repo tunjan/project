@@ -1,13 +1,11 @@
 import React from 'react';
+import { CartesianGrid, Scatter, ScatterChart, XAxis, YAxis } from 'recharts';
+
 import {
-  CartesianGrid,
-  ResponsiveContainer,
-  Scatter,
-  ScatterChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 
 export interface ScatterPlotData {
   label: string;
@@ -22,114 +20,79 @@ interface ScatterPlotProps {
   yAxisLabel: string;
 }
 
-const CustomTooltip = ({
-  active,
-  payload,
-}: {
-  active?: boolean;
-  payload?: Array<{ payload: ScatterPlotData }>;
-}) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="border-black bg-white p-3 shadow-brutal md:border-2">
-        <p className="font-bold text-black">{data.label}</p>
-        <p className="text-primary">
-          {data.y.toLocaleString()} conversations / {data.x.toLocaleString()}{' '}
-          hours
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
-
 const ScatterPlot: React.FC<ScatterPlotProps> = ({
   data,
-  title,
   xAxisLabel,
   yAxisLabel,
 }) => {
   if (data.length === 0) {
     return (
-      <div className="border-black bg-white p-4 md:border-2 md:p-6">
-        <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-        <div className="flex h-[350px] items-center justify-center text-neutral-500">
-          Not enough data to display chart.
-        </div>
+      <div className="flex h-[340px] items-center justify-center text-muted-foreground">
+        Not enough data to display chart.
       </div>
     );
   }
 
-  // Transform data for Recharts format
   const chartData = data.map((item) => ({
     ...item,
     name: item.label,
   }));
 
+  const chartConfig = {
+    y: {
+      label: yAxisLabel,
+      color: 'hsl(var(--primary))',
+    },
+    x: {
+      label: xAxisLabel,
+      color: 'hsl(var(--muted-foreground))',
+    },
+  };
+
   return (
-    <div className="border-black bg-white p-4 md:border-2 md:p-6">
-      <h3 className="mb-4 text-lg font-bold text-black">{title}</h3>
-      <div className="h-80 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart
-            data={chartData}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 60,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis
-              type="number"
-              dataKey="x"
-              name={xAxisLabel}
-              tick={{ fontSize: 12, fill: '#000000' }}
-              axisLine={{ stroke: '#000000' }}
-              tickLine={{ stroke: '#000000' }}
-              label={{
-                value: xAxisLabel,
-                position: 'insideBottom',
-                offset: -10,
-                style: {
-                  textAnchor: 'middle',
-                  fill: '#000000',
-                  fontSize: '12px',
-                },
-              }}
-            />
-            <YAxis
-              type="number"
-              dataKey="y"
-              name={yAxisLabel}
-              tick={{ fontSize: 12, fill: '#6b7280' }}
-              axisLine={{ stroke: '#000000' }}
-              tickLine={{ stroke: '#000000' }}
-              label={{
-                value: yAxisLabel,
-                angle: -90,
-                position: 'insideLeft',
-                style: {
-                  textAnchor: 'middle',
-                  fill: '#000000',
-                  fontSize: '12px',
-                },
-              }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Scatter
-              dataKey="y"
-              fill="#d81313"
-              stroke="#000000"
-              strokeWidth={1}
-              r={6}
-            />
-          </ScatterChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+    <ChartContainer config={chartConfig} className="h-80 w-full">
+      <ScatterChart
+        data={chartData}
+        margin={{
+          top: 20,
+          right: 20,
+          left: 0,
+          bottom: 20,
+        }}
+      >
+        <CartesianGrid vertical={false} />
+        <XAxis
+          type="number"
+          dataKey="x"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          tick={{ fontSize: 12 }}
+          label={{
+            value: xAxisLabel,
+            position: 'insideBottom',
+            offset: -15,
+            style: {
+              textAnchor: 'middle',
+              fontSize: '12px',
+            },
+          }}
+        />
+        <YAxis
+          type="number"
+          dataKey="y"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          tick={{ fontSize: 12 }}
+        />
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent labelKey="name" indicator="dot" />}
+        />
+        <Scatter dataKey="y" fill="var(--color-y)" radius={6} />
+      </ScatterChart>
+    </ChartContainer>
   );
 };
 

@@ -130,7 +130,31 @@ export const calculateAllMetrics = (
     },
   };
 
-  // Process users
+  // FIX: Optimize performance by building user attendance and outreach maps first
+  const userAttendance = new Map<string, Set<string>>(); // userId -> Set of attended eventIds
+  const userOutreachCount = new Map<string, number>(); // userId -> conversation count
+
+  // Build attendance map from events
+  events.forEach((event) => {
+    if (event.report) {
+      for (const [userId, status] of Object.entries(event.report.attendance)) {
+        if (status === 'Attended') {
+          if (!userAttendance.has(userId)) {
+            userAttendance.set(userId, new Set());
+          }
+          userAttendance.get(userId)!.add(event.id);
+        }
+      }
+    }
+  });
+
+  // Build outreach map from logs
+  outreachLogs.forEach((log) => {
+    const currentCount = userOutreachCount.get(log.userId) || 0;
+    userOutreachCount.set(log.userId, currentCount + 1);
+  });
+
+  // Process users with optimized data
   confirmedUsers.forEach((user) => {
     // Group by chapter
     user.chapters.forEach((chapterName) => {
@@ -146,8 +170,14 @@ export const calculateAllMetrics = (
     }
     metrics.users.byRole.get(user.role)!.push(user);
 
-    // Calculate user stats
-    const userStats = calculateUserStats(user, events, outreachLogs);
+    // Calculate user stats using pre-built maps
+    const userStats = calculateUserStatsOptimized(
+      user,
+      events,
+      userAttendance.get(user.id) || new Set(),
+      userOutreachCount.get(user.id) || 0,
+      outreachLogs
+    );
     metrics.users.stats.set(user.id, userStats);
   });
 
@@ -185,7 +215,10 @@ export const calculateAllMetrics = (
     metrics.events.byChapter.get(event.city)!.push(event);
 
     // Group by month
-    const monthKey = `${event.startDate.getFullYear()}-${String(event.startDate.getMonth() + 1).padStart(2, '0')}`;
+    const startDate = new Date(event.startDate);
+    const monthKey = `${startDate.getFullYear()}-${String(
+      startDate.getMonth() + 1
+    ).padStart(2, '0')}`;
     if (!metrics.events.byMonth.has(monthKey)) {
       metrics.events.byMonth.set(monthKey, []);
     }
@@ -212,8 +245,10 @@ export const calculateAllMetrics = (
     }
     metrics.outreach.byEvent.get(log.eventId)!.push(log);
 
-    // Group by month
-    const monthKey = `${log.createdAt.getFullYear()}-${String(log.createdAt.getMonth() + 1).padStart(2, '0')}`;
+    // Group by month - ensure createdAt is a Date object
+    const createdAt =
+      log.createdAt instanceof Date ? log.createdAt : new Date(log.createdAt);
+    const monthKey = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
     if (!metrics.outreach.byMonth.has(monthKey)) {
       metrics.outreach.byMonth.set(monthKey, []);
     }
@@ -226,25 +261,24 @@ export const calculateAllMetrics = (
   return metrics;
 };
 
-// Helper functions
-const calculateUserStats = (
+// Optimized helper function using pre-built maps
+const calculateUserStatsOptimized = (
   user: User,
   events: CubeEvent[],
-  outreachLogs: OutreachLog[]
+  attendedEventIds: Set<string>,
+  outreachCount: number,
+  allOutreachLogs: OutreachLog[]
 ): UserStats => {
-  const userEvents = events.filter((e) =>
-    e.participants.some(
-      (p) => p.user.id === user.id && p.status === 'Attending'
-    )
+  const userEvents = events.filter((e) => attendedEventIds.has(e.id));
+  const userOutreachLogs = allOutreachLogs.filter(
+    (log) => log.userId === user.id
   );
-
-  const userOutreachLogs = outreachLogs.filter((log) => log.userId === user.id);
 
   const totalHours = userEvents.reduce(
     (sum, event) => sum + (event.report?.hours || 0),
     0
   );
-  const totalConversations = userOutreachLogs.length;
+
   const veganConversions = userOutreachLogs.filter(
     (log) =>
       log.outcome === 'Became vegan and activist' ||
@@ -257,7 +291,7 @@ const calculateUserStats = (
     totalHours,
     cubesAttended: userEvents.length,
     veganConversions,
-    totalConversations,
+    totalConversations: outreachCount,
     cities,
   };
 };

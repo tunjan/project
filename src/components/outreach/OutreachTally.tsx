@@ -1,13 +1,22 @@
+import {
+  CheckCircle,
+  TrendingUp,
+  UserPlus,
+  Users,
+  XCircle,
+} from 'lucide-react';
 import React, { useMemo } from 'react';
 
-import {
-  CheckCircleIcon,
-  TrendingUpIcon,
-  UserAddIcon,
-  UsersIcon,
-  XCircleIcon,
-} from '@/icons';
 import { type OutreachLog, OutreachOutcome } from '@/types';
+
+const OUTCOME_LABELS: Record<OutreachOutcome, string> = {
+  [OutreachOutcome.BECAME_VEGAN_ACTIVIST]: 'Became Activist',
+  [OutreachOutcome.BECAME_VEGAN]: 'Became Vegan',
+  [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: 'Vegan to Activist',
+  [OutreachOutcome.MOSTLY_SURE]: 'Mostly Sure',
+  [OutreachOutcome.NOT_SURE]: 'Not Sure',
+  [OutreachOutcome.NO_CHANGE]: 'No Change',
+};
 
 interface OutreachTallyProps {
   logs: OutreachLog[];
@@ -17,45 +26,38 @@ const outcomeMeta: Record<
   OutreachOutcome,
   {
     icon: React.FC<{ className?: string }>;
-    color: string;
-    bgColor: string;
+    variant: 'default' | 'secondary' | 'destructive' | 'outline';
     description: string;
   }
 > = {
   [OutreachOutcome.BECAME_VEGAN_ACTIVIST]: {
-    icon: UsersIcon,
-    color: 'text-success',
-    bgColor: 'bg-success/10',
+    icon: Users,
+    variant: 'default',
     description: 'New vegan activists',
   },
   [OutreachOutcome.BECAME_VEGAN]: {
-    icon: CheckCircleIcon,
-    color: 'text-primary',
-    bgColor: 'bg-primary/10',
+    icon: CheckCircle,
+    variant: 'default',
     description: 'New vegans',
   },
   [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: {
-    icon: UserAddIcon,
-    color: 'text-info',
-    bgColor: 'bg-info/10',
+    icon: UserPlus,
+    variant: 'secondary',
     description: 'Vegans turned activists',
   },
   [OutreachOutcome.MOSTLY_SURE]: {
-    icon: TrendingUpIcon,
-    color: 'text-warning',
-    bgColor: 'bg-warning/10',
+    icon: TrendingUp,
+    variant: 'outline',
     description: 'Mostly convinced',
   },
   [OutreachOutcome.NOT_SURE]: {
-    icon: TrendingUpIcon,
-    color: 'text-neutral-600',
-    bgColor: 'bg-neutral-100',
+    icon: TrendingUp,
+    variant: 'outline',
     description: 'Still considering',
   },
   [OutreachOutcome.NO_CHANGE]: {
-    icon: XCircleIcon,
-    color: 'text-neutral-400',
-    bgColor: 'bg-neutral-50',
+    icon: XCircle,
+    variant: 'destructive',
     description: 'No change in stance',
   },
 };
@@ -85,88 +87,76 @@ const OutreachTally: React.FC<OutreachTallyProps> = ({ logs }) => {
   }, [tally]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-none border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg md:border-2">
-          <div className="text-2xl font-bold text-black">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className="text-center">
+          <div className="mb-2 text-4xl font-bold text-foreground">
             {totalConversations}
           </div>
-          <div className="text-sm font-medium text-neutral-600">
+          <div className="text-sm font-medium text-muted-foreground">
             Total Conversations
           </div>
         </div>
-        <div className="rounded-none border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg md:border-2">
-          <div className="text-2xl font-bold text-success">
+        <div className="text-center">
+          <div className="mb-2 text-4xl font-bold text-green-600">
             {positiveOutcomes}
           </div>
-          <div className="text-sm font-medium text-neutral-600">
+          <div className="text-sm font-medium text-muted-foreground">
             Positive Outcomes
           </div>
         </div>
-        <div className="rounded-none border-black bg-white p-4 text-center shadow-brutal hover:shadow-brutal-lg md:border-2">
-          <div className="text-2xl font-bold text-primary">
+        <div className="text-center">
+          <div className="mb-2 text-4xl font-bold text-primary">
             {totalConversations > 0
               ? Math.round((positiveOutcomes / totalConversations) * 100)
               : 0}
             %
           </div>
-          <div className="text-sm font-medium text-neutral-600">
+          <div className="text-sm font-medium text-muted-foreground">
             Success Rate
           </div>
         </div>
       </div>
 
       {/* Detailed Breakdown */}
-      <div className="rounded-none border-black bg-white p-6 md:border-2">
-        <h3 className="mb-4 text-lg font-bold text-black">Outcome Breakdown</h3>
-        <div className="space-y-4">
+      <div className="space-y-4">
+        <h4 className="text-lg font-semibold text-foreground">
+          Outcome Breakdown
+        </h4>
+        <div className="space-y-3">
           {Object.entries(tally).map(([outcome, count]) => {
-            const {
-              icon: Icon,
-              color,
-              bgColor,
-              description,
-            } = outcomeMeta[outcome as OutreachOutcome];
+            const { icon: Icon, description } =
+              outcomeMeta[outcome as OutreachOutcome];
             const percentage =
               totalConversations > 0 ? (count / totalConversations) * 100 : 0;
 
             return (
               <div
                 key={outcome}
-                className="group relative overflow-hidden rounded-none border border-neutral-200 bg-white p-4 hover:border-neutral-300 hover:bg-neutral-50"
+                className="flex items-center justify-between rounded-xl border bg-card/50 p-4 transition-colors hover:bg-card/80"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`flex size-12 items-center justify-center rounded-none ${bgColor}`}
-                    >
-                      <Icon className={`size-6 ${color}`} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-black">{outcome}</div>
-                      <div className="text-sm text-neutral-600">
-                        {description}
-                      </div>
-                    </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-muted/50">
+                    <Icon className="size-6 text-muted-foreground" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-black">{count}</div>
-                    <div className="text-sm text-neutral-500">
-                      {percentage.toFixed(1)}%
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {OUTCOME_LABELS[outcome as OutreachOutcome]}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {description}
                     </div>
                   </div>
                 </div>
-
-                {/* Progress bar */}
-                {totalConversations > 0 && (
-                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-neutral-200">
-                    <div
-                      className={`h-full ${bgColor.replace('/10', '')}`}
-                      style={{ width: `${percentage}%` }}
-                    />
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-foreground">
+                    {count}
                   </div>
-                )}
+                  <div className="text-xs text-muted-foreground">
+                    {percentage.toFixed(1)}%
+                  </div>
+                </div>
               </div>
             );
           })}

@@ -1,8 +1,11 @@
+import { Bell, X } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Avatar } from '@/components/ui';
-import { BellIcon, XIcon } from '@/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { type Notification } from '@/types';
 import { formatDateSafe } from '@/utils';
 import { getNotificationIcon } from '@/utils';
@@ -24,29 +27,33 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <button
       onClick={() => onNotificationClick(notification)}
-      className="w-full p-3 text-left transition-colors duration-200 hover:bg-neutral-100 dark:hover:bg-gray-700"
+      className="w-full rounded-md p-3 text-left transition-colors duration-200 hover:bg-accent"
     >
       <div className="flex items-start space-x-3">
         {!notification.isRead && (
-          <div className="rounded-nonefull mt-1.5 size-2 shrink-0 bg-primary"></div>
+          <div className="mt-1.5 size-2 shrink-0 rounded-full bg-primary"></div>
         )}
         <div className={`shrink-0 ${iconColorClass}`}>{icon}</div>
         {notification.relatedUser && (
-          <Avatar
-            src={notification.relatedUser.profilePictureUrl}
-            alt={notification.relatedUser.name}
-            className="size-8 shrink-0"
-          />
+          <Avatar className="size-8 shrink-0">
+            <AvatarImage
+              src={notification.relatedUser.profilePictureUrl}
+              alt={notification.relatedUser.name}
+            />
+            <AvatarFallback>
+              {notification.relatedUser.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
         )}
         <div
           className={`flex-1 ${
             !notification.isRead ? 'font-semibold' : 'font-normal'
           }`}
         >
-          <p className="text-sm leading-tight text-black dark:text-white">
+          <p className="text-sm leading-tight text-foreground">
             {notification.message}
           </p>
-          <p className="mt-1 text-xs text-neutral-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-muted-foreground">
             {formatDateSafe(
               notification.createdAt,
               (d, o) => d.toLocaleString(undefined, o),
@@ -102,64 +109,63 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
         onClick={onClose}
         aria-label="Close modal"
       />
-      <div
-        className="animate-fade-in animate-scale-in flex max-h-[calc(100vh-8rem)] w-full max-w-md flex-col border-black bg-neutral-50 shadow-brutal dark:border-white dark:bg-gray-800 md:border-2"
-        role="document"
-      >
-        <div className="flex shrink-0 items-center justify-between border-b-2 border-black p-3 dark:border-white">
-          <h3 className="font-bold text-black dark:text-white">
-            Notifications
-          </h3>
+      <Card className="flex max-h-[calc(100vh-8rem)] w-full max-w-md flex-col">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-lg font-semibold">Notifications</CardTitle>
           <div className="flex items-center space-x-2">
             {unreadCount > 0 && (
-              <button
+              <Button
                 onClick={onMarkAllRead}
-                className="text-xs font-semibold text-primary hover:underline"
+                variant="ghost"
+                size="sm"
+                className="text-xs"
               >
                 Mark all as read
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={onClose}
-              className="p-1 hover:bg-white dark:hover:bg-gray-700"
+              variant="ghost"
+              size="icon"
+              className="size-8"
             >
-              <XIcon className="size-5" />
-            </button>
+              <X className="size-4" />
+            </Button>
           </div>
-        </div>
+        </CardHeader>
 
-        <div className="min-h-0 flex-1 divide-y divide-neutral-200 overflow-y-auto">
+        <CardContent className="flex-1 overflow-y-auto p-0">
           {notifications.length > 0 ? (
-            notifications
-              .slice(0, 5)
-              .map((n) => (
+            <div className="space-y-1 p-3">
+              {notifications.slice(0, 5).map((n) => (
                 <NotificationItem
                   key={n.id}
                   notification={n}
                   onNotificationClick={onNotificationClick}
                 />
-              ))
+              ))}
+            </div>
           ) : (
-            <div className="p-8 text-center text-neutral-500 dark:text-gray-400">
-              <BellIcon className="mx-auto size-8 text-neutral-400 dark:text-gray-500" />
-              <p className="mt-2 text-sm dark:text-gray-300">
-                You have no notifications.
-              </p>
+            <div className="p-8 text-center text-muted-foreground">
+              <Bell className="mx-auto size-8 text-muted-foreground/50" />
+              <p className="mt-2 text-sm">You have no notifications.</p>
             </div>
           )}
-        </div>
+        </CardContent>
+
         {notifications.length > 0 && (
-          <div className="shrink-0 border-t-2 border-black p-2 text-center dark:border-white">
-            <Link
-              to="/notifications"
-              onClick={onClose}
-              className="text-sm font-bold text-primary hover:underline"
-            >
-              View All Notifications
-            </Link>
-          </div>
+          <>
+            <Separator />
+            <div className="p-3 text-center">
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/notifications" onClick={onClose} className="text-sm">
+                  View All Notifications
+                </Link>
+              </Button>
+            </div>
+          </>
         )}
-      </div>
+      </Card>
     </div>
   );
 };

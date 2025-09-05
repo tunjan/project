@@ -1,8 +1,11 @@
+import { Calendar, Filter, X } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField } from '@/components/ui';
-import { CalendarIcon, FunnelIcon, XMarkIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { type CubeEvent, type OutreachLog } from '@/types';
 
 import EditLogModal from './EditLogModal';
@@ -108,11 +111,7 @@ const LogHistory: React.FC<LogHistoryProps> = ({
   const hasActiveFilters = startDate || endDate;
 
   return (
-    <section>
-      <h2 className="mb-6 border-b-4 border-primary pb-3 text-2xl font-extrabold tracking-tight text-black">
-        Log History
-      </h2>
-
+    <div className="space-y-4">
       {editingLog && (
         <EditLogModal
           log={editingLog}
@@ -122,68 +121,59 @@ const LogHistory: React.FC<LogHistoryProps> = ({
         />
       )}
 
-      {/* Enhanced Filter Section */}
-      <div className="mb-6 border-black bg-white p-6 dark:border-white dark:bg-black md:border-2">
-        <div className="mb-4 flex items-center gap-2">
-          <FunnelIcon className="size-5 text-neutral-600" />
-          <h3 className="text-lg font-bold text-black">Filter Logs</h3>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <InputField
-            label="Start Date"
-            id="start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <InputField
-            label="End Date"
-            id="end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          <div className="flex items-end">
-            <button
-              onClick={() => {
-                setStartDate('');
-                setEndDate('');
-              }}
-              className="btn-outline flex w-full items-center justify-center"
-            >
-              <XMarkIcon className="mr-2 size-4" />
-              Clear Filters
-            </button>
-          </div>
-        </div>
-
-        {hasActiveFilters && (
-          <div className="mt-4 bg-neutral-50 p-3">
-            <p className="text-sm text-neutral-600">
-              <CalendarIcon className="mr-2 inline size-4" />
-              Showing {filteredLogs.length} of {logs.length} logs
-              {startDate && ` from ${startDate}`}
-              {endDate && ` to ${endDate}`}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Enhanced Log List */}
-      {sortedLogs.length > 0 ? (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-black">
-              Recent Conversations ({sortedLogs.length})
-            </h3>
-            <div className="text-sm text-neutral-600">
-              Sorted by most recent
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Filter className="size-5 text-muted-foreground" />
+              <CardTitle>
+                History ({hasActiveFilters ? filteredLogs.length : logs.length})
+              </CardTitle>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="start-date" className="text-sm">
+                  From
+                </Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="h-8 w-[150px]"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="end-date" className="text-sm">
+                  To
+                </Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="h-8 w-[150px]"
+                />
+              </div>
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setStartDate('');
+                    setEndDate('');
+                  }}
+                >
+                  <X className="mr-2 size-4" />
+                  Clear
+                </Button>
+              )}
             </div>
           </div>
-
-          <div className="max-h-[70vh] overflow-y-auto border-black bg-white shadow-brutal dark:border-white dark:bg-black md:border-2">
-            <div className="divide-y-2 divide-neutral-200">
+        </CardHeader>
+        <CardContent>
+          {sortedLogs.length > 0 ? (
+            <div className="space-y-2">
               {sortedLogs
                 .filter((log) => !pendingDeleteIds.has(log.id))
                 .map((log) => {
@@ -199,33 +189,24 @@ const LogHistory: React.FC<LogHistoryProps> = ({
                   );
                 })}
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="border-black bg-white p-12 text-center shadow-brutal dark:border-white dark:bg-black md:border-2">
-          <div className="mx-auto mb-4 size-16 rounded-full bg-neutral-100 p-4">
-            <CalendarIcon className="size-8 text-neutral-400" />
-          </div>
-          <h3 className="text-xl font-bold text-black">No logs found</h3>
-          <p className="mt-2 text-neutral-600">
-            {hasActiveFilters
-              ? 'Try adjusting your date filters or clear them to see all logs.'
-              : 'Use the quick log tool above to start tracking your conversations.'}
-          </p>
-          {hasActiveFilters && (
-            <button
-              onClick={() => {
-                setStartDate('');
-                setEndDate('');
-              }}
-              className="btn-outline mt-4"
-            >
-              Clear Filters
-            </button>
+          ) : (
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-4 size-12 rounded-full bg-muted p-3">
+                <Calendar className="size-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">
+                No logs found
+              </h3>
+              <p className="mt-1 text-muted-foreground">
+                {hasActiveFilters
+                  ? 'Try adjusting your date filters.'
+                  : 'Log a conversation to see your history.'}
+              </p>
+            </div>
           )}
-        </div>
-      )}
-    </section>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

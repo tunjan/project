@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react';
 
-import { InputField } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { type Chapter, Role, type User } from '@/types';
 
 const CreateChapterForm: React.FC<{
@@ -46,73 +49,81 @@ const CreateChapterForm: React.FC<{
   const isCountryLocked = currentUser.role === Role.REGIONAL_ORGANISER;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 border-black bg-white p-6 md:border-2"
-    >
-      <InputField
-        label="Chapter Name"
-        id="chapter-name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <div>
-        <label
-          htmlFor="country"
-          className="mb-1 block text-sm font-bold text-black"
-        >
-          Country
-        </label>
-        <input
-          type="text"
-          id="country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          required
-          disabled={isCountryLocked}
-          list="country-list"
-          className="rounded-nonenone block w-full border border-black bg-white p-2 text-black placeholder:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-white sm:text-sm"
-        />
-      </div>
-      {!isCountryLocked && (
-        <datalist id="country-list">
-          {existingCountries.map((c) => (
-            <option key={c} value={c} />
-          ))}
-        </datalist>
-      )}
-      <InputField
-        label="Instagram Handle (e.g. @av.london)"
-        id="instagram"
-        value={instagram}
-        onChange={(e) => setInstagram(e.target.value)}
-        required={false}
-      />
-      <div className="grid grid-cols-2 gap-4">
-        <InputField
-          label="Latitude"
-          id="lat"
-          type="number"
-          value={lat}
-          onChange={(e) => setLat(e.target.value)}
-          step="any"
-        />
-        <InputField
-          label="Longitude"
-          id="lng"
-          type="number"
-          value={lng}
-          onChange={(e) => setLng(e.target.value)}
-          step="any"
-        />
-      </div>
-      <button
-        type="submit"
-        className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-      >
-        Create Chapter
-      </button>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Create New Chapter</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="chapter-name">Chapter Name</Label>
+            <Input
+              id="chapter-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="country">Country</Label>
+            <Input
+              type="text"
+              id="country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              required
+              disabled={isCountryLocked}
+              list="country-list"
+            />
+            {!isCountryLocked && (
+              <datalist id="country-list">
+                {existingCountries.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="instagram">
+              Instagram Handle (e.g. @av.london)
+            </Label>
+            <Input
+              id="instagram"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              placeholder="@av.london"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="lat">Latitude</Label>
+              <Input
+                id="lat"
+                type="number"
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+                step="any"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lng">Longitude</Label>
+              <Input
+                id="lng"
+                type="number"
+                value={lng}
+                onChange={(e) => setLng(e.target.value)}
+                step="any"
+                required
+              />
+            </div>
+          </div>
+          <Button type="submit" className="w-full">
+            Create Chapter
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

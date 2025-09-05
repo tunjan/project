@@ -1,10 +1,28 @@
 import { differenceInDays, formatDistanceToNow } from 'date-fns';
+import { ChevronRight, Pencil, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { Avatar, ConfirmationModal } from '@/components/ui';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import { ROLE_HIERARCHY } from '@/constants';
-import { ChevronRightIcon, PencilIcon, TrashIcon } from '@/icons';
 import { useAnnouncementsActions } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type Announcement, AnnouncementScope, Role } from '@/types';
@@ -16,31 +34,27 @@ const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
   scope,
   target,
 }) => {
-  let bgColor = 'bg-black';
-  let textColor = 'text-white';
+  let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';
   let text = scope.toUpperCase();
 
   switch (scope) {
     case AnnouncementScope.GLOBAL:
-      bgColor = 'bg-primary';
+      variant = 'default';
       break;
     case AnnouncementScope.REGIONAL:
-      bgColor = 'bg-black';
+      variant = 'secondary';
       text = target ? `${target.toUpperCase()} REGION` : text;
       break;
     case AnnouncementScope.CHAPTER:
-      bgColor = 'bg-neutral-300';
-      textColor = 'text-black';
+      variant = 'outline';
       text = target ? `${target.toUpperCase()} CHAPTER` : text;
       break;
   }
 
   return (
-    <span
-      className={`px-2.5 py-1 text-xs font-bold tracking-wider ${bgColor} ${textColor}`}
-    >
+    <Badge variant={variant} className="text-xs font-bold tracking-wider">
       {text}
-    </span>
+    </Badge>
   );
 };
 
@@ -94,86 +108,114 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         />
       )}
 
-      <ConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDelete}
-        title="Delete Announcement"
-        message="Are you sure you want to delete this announcement? This action cannot be undone."
-        confirmText="Delete"
-        variant="danger"
-      />
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Announcement</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this announcement? This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      <div className="overflow-hidden border-black bg-white dark:border-white dark:bg-black md:border-2">
-        <div className="p-6">
-          <div className="mb-4 flex justify-between">
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between">
             <ScopeBadge
               scope={announcement.scope}
               target={announcement.country || announcement.chapter}
             />
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-neutral-500" title={formattedDate}>
+              <p
+                className="text-sm text-muted-foreground"
+                title={formattedDate}
+              >
                 {relative ?? formattedDate}
               </p>
               {canManage && (
                 <>
-                  <button
+                  <Button
                     onClick={() => setIsEditing(true)}
-                    className="p-1 text-neutral-500 hover:text-black"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
                     aria-label="Edit announcement"
                   >
-                    <PencilIcon className="size-4" />
-                  </button>
-                  <button
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
                     onClick={() => setIsDeleteModalOpen(true)}
-                    className="p-1 text-neutral-500 hover:text-primary"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
                     aria-label="Delete announcement"
                   >
-                    <TrashIcon className="size-4" />
-                  </button>
+                    <Trash2 className="size-4" />
+                  </Button>
                 </>
               )}
             </div>
           </div>
+        </CardHeader>
 
-          <h3 className="text-2xl font-bold text-black">
+        <CardContent>
+          <h3 className="text-2xl font-bold text-foreground">
             {announcement.title}
           </h3>
-          <p className="mt-3 whitespace-pre-wrap text-black">
+          <p className="mt-3 whitespace-pre-wrap text-foreground">
             {announcement.content}
           </p>
 
           {announcement.ctaLink && (
             <div className="mt-6">
-              <a
-                href={announcement.ctaLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center"
-              >
-                {announcement.ctaText || 'Learn More'}
-                <ChevronRightIcon className="ml-2 size-4" />
-              </a>
+              <Button asChild>
+                <a
+                  href={announcement.ctaLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {announcement.ctaText || 'Learn More'}
+                  <ChevronRight className="ml-2 size-4" />
+                </a>
+              </Button>
             </div>
           )}
+        </CardContent>
 
-          <div className="mt-6 flex items-center border-t border-neutral-200 pt-4">
-            <Avatar
-              src={announcement.author.profilePictureUrl}
-              alt={announcement.author.name}
-              className="size-10 object-cover"
-            />
+        <CardFooter className="border-t p-6">
+          <div className="flex items-center">
+            <Avatar className="size-10">
+              <AvatarImage
+                src={announcement.author.profilePictureUrl}
+                alt={announcement.author.name}
+                className="object-cover"
+              />
+              <AvatarFallback>
+                {announcement.author.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
             <div className="ml-3">
-              <p className="text-sm font-semibold text-black">
+              <p className="text-sm font-semibold text-foreground">
                 {announcement.author.name}
               </p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-muted-foreground">
                 {announcement.author.role}
               </p>
             </div>
           </div>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
     </>
   );
 };

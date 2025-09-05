@@ -1,7 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Modal } from '@/components/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Label,
+} from '@/components/ui';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Role, type User } from '@/types';
@@ -68,64 +78,62 @@ const PromoteToOrganiserModal: React.FC<PromoteToOrganiserModalProps> = ({
   const buttonText = isEditing ? 'Save Changes' : 'Promote User';
 
   return (
-    <Modal
-      title={modalTitle}
-      onClose={onClose}
-      description={`Select which chapter(s) ${userToManage.name} will organize.`}
-    >
-      <div className="my-6">
-        {promotableChapters.length > 0 ? (
-          <div className="max-h-64 space-y-2 overflow-y-auto border border-black p-4">
-            {promotableChapters.map((chapter) => (
-              <label
-                key={chapter.name}
-                className="flex cursor-pointer items-center space-x-3 p-2 hover:bg-white"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedChapters.includes(chapter.name)}
-                  onChange={() => handleCheckboxChange(chapter.name)}
-                  className="size-5 accent-primary"
-                />
-                <span className="font-bold text-black">{chapter.name}</span>
-                <span className="text-sm text-neutral-500">
-                  ({chapter.country})
-                </span>
-              </label>
-            ))}
-          </div>
-        ) : (
-          <div className="border border-black bg-white p-4 text-center">
-            <p className="font-bold text-black">
-              No promotable chapters found.
-            </p>
-            <p className="mt-1 text-sm text-neutral-600">
-              {currentUser?.role === Role.REGIONAL_ORGANISER
-                ? `This user is not a member of any chapters within your managed region (${currentUser.managedCountry}).`
-                : 'This user is not a member of any chapters.'}
-            </p>
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={
-            promotableChapters.length === 0 || selectedChapters.length === 0
-          }
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {buttonText}
-        </button>
-      </div>
-    </Modal>
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogDescription>
+            Select which chapter(s) {userToManage.name} will organize.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="my-6">
+          {promotableChapters.length > 0 ? (
+            <div className="max-h-64 space-y-2 overflow-y-auto rounded-md border p-4">
+              {promotableChapters.map((chapter) => (
+                <div key={chapter.name} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`chapter-${chapter.name}`}
+                    checked={selectedChapters.includes(chapter.name)}
+                    onCheckedChange={() => handleCheckboxChange(chapter.name)}
+                  />
+                  <Label
+                    htmlFor={`chapter-${chapter.name}`}
+                    className="flex-1 cursor-pointer"
+                  >
+                    <span className="font-medium">{chapter.name}</span>
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      ({chapter.country})
+                    </span>
+                  </Label>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-md border bg-muted p-4 text-center">
+              <p className="font-semibold">No promotable chapters found.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {currentUser?.role === Role.REGIONAL_ORGANISER
+                  ? `This user is not a member of any chapters within your managed region (${currentUser.managedCountry}).`
+                  : 'This user is not a member of any chapters.'}
+              </p>
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={
+              promotableChapters.length === 0 || selectedChapters.length === 0
+            }
+          >
+            {buttonText}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

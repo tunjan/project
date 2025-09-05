@@ -2,7 +2,16 @@ import React, { useMemo, useState } from 'react';
 
 import ChapterLeaderboard from '@/components/leaderboard/ChapterLeaderboard';
 import Leaderboard from '@/components/leaderboard/Leaderboard';
-import { TrophyIcon } from '@/icons';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import type { Chapter } from '@/types';
@@ -11,40 +20,6 @@ import {
   type Timeframe,
   type UserLeaderboardEntry,
 } from '@/utils';
-
-const SectionTab: React.FC<{
-  onClick: () => void;
-  isActive: boolean;
-  children: React.ReactNode;
-}> = ({ onClick, isActive, children }) => (
-  <button
-    onClick={onClick}
-    className={`flex min-h-[44px] flex-1 items-center justify-center space-x-1 border-r border-black px-3 py-2.5 text-xs font-semibold last:border-r-0 sm:flex-initial sm:space-x-2 sm:px-3 sm:py-2 sm:text-sm ${
-      isActive
-        ? 'bg-black text-white'
-        : 'bg-white text-black hover:bg-gray-50 active:bg-gray-100'
-    } touch-manipulation transition-colors duration-200`}
-  >
-    {children}
-  </button>
-);
-
-const TimeframeTab: React.FC<{
-  onClick: () => void;
-  isActive: boolean;
-  children: React.ReactNode;
-}> = ({ onClick, isActive, children }) => (
-  <button
-    onClick={onClick}
-    className={`flex min-h-[44px] flex-1 items-center justify-center space-x-1 border-r-2 border-black px-3 py-2.5 text-xs font-semibold last:border-r-0 sm:flex-initial sm:space-x-2 sm:px-3 sm:py-2 sm:text-sm ${
-      isActive
-        ? 'bg-black text-white'
-        : 'bg-white text-black hover:bg-gray-50 active:bg-gray-100'
-    } touch-manipulation transition-colors duration-200`}
-  >
-    {children}
-  </button>
-);
 
 const LeaderboardPage: React.FC = () => {
   const allUsers = useUsers();
@@ -89,110 +64,115 @@ const LeaderboardPage: React.FC = () => {
   }, [leaderboards, metric, timeframe, chapterFilter]);
 
   return (
-    <div className="py-8 md:py-12">
-      {/* Enhanced Header Section */}
-      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-2 bg-primary"></div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-              Leaderboards
-            </h1>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                Leaderboards
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                See who our most dedicated activists are. Your stats are
+                highlighted.
+              </p>
+            </div>
           </div>
-          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
-            See who our most dedicated activists are. Your stats are
-            highlighted.
-          </p>
-        </div>
-        <div className="shrink-0">
-          <TrophyIcon className="size-6 text-primary sm:size-12" />
-        </div>
-      </div>
-
-      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <div className="flex w-full justify-center md:w-auto md:justify-start">
-          <div className="flex w-full items-center border-2 border-black bg-white md:w-auto">
-            <SectionTab
-              onClick={() => setMetric('conversations')}
-              isActive={metric === 'conversations'}
-            >
-              Conversations
-            </SectionTab>
-            <SectionTab
-              onClick={() => setMetric('hours')}
-              isActive={metric === 'hours'}
-            >
-              Hours
-            </SectionTab>
-          </div>
+          <Separator />
         </div>
 
-        <div className="flex w-full justify-center md:w-auto md:justify-start">
-          <div className="flex w-full items-center border-2 border-black bg-white md:w-auto">
-            <TimeframeTab
-              onClick={() => setTimeframe('week')}
-              isActive={timeframe === 'week'}
-            >
-              Week
-            </TimeframeTab>
-            <TimeframeTab
-              onClick={() => setTimeframe('month')}
-              isActive={timeframe === 'month'}
-            >
-              Month
-            </TimeframeTab>
-            <TimeframeTab
-              onClick={() => setTimeframe('year')}
-              isActive={timeframe === 'year'}
-            >
-              Year
-            </TimeframeTab>
-            <TimeframeTab
-              onClick={() => setTimeframe('allTime')}
-              isActive={timeframe === 'allTime'}
-            >
-              All Time
-            </TimeframeTab>
-          </div>
-        </div>
+        <Card className="mb-8">
+          <CardContent className="p-4 md:p-6">
+            <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-3">
+              <div className="flex flex-col gap-2">
+                <div className="text-sm font-medium text-foreground">
+                  Metric
+                </div>
+                <Tabs
+                  value={metric}
+                  onValueChange={(value) => {
+                    if (value) setMetric(value as 'conversations' | 'hours');
+                  }}
+                  className="w-full"
+                >
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="conversations">
+                      Conversations
+                    </TabsTrigger>
+                    <TabsTrigger value="hours">Hours</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
 
-        <div className="flex w-full justify-center md:w-auto md:justify-start">
-          <select
-            value={chapterFilter}
-            onChange={(e) => setChapterFilter(e.target.value)}
-            className="block w-full border-black bg-white px-3 py-2.5 text-sm font-semibold text-black focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary md:w-40 md:border-2 md:py-2"
-            aria-label="Filter by chapter"
-          >
-            <option value="">All Chapters</option>
-            {chapterNames.map((name) => (
-              <option value={name} key={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+              <div className="flex flex-col gap-2">
+                <div className="text-sm font-medium text-foreground">
+                  Timeframe
+                </div>
+                <Tabs
+                  value={timeframe}
+                  onValueChange={(value) => {
+                    if (value) setTimeframe(value as Timeframe);
+                  }}
+                  className="w-full"
+                >
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="week">Week</TabsTrigger>
+                    <TabsTrigger value="month">Month</TabsTrigger>
+                    <TabsTrigger value="year">Year</TabsTrigger>
+                    <TabsTrigger value="allTime">All Time</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <Leaderboard
-          title={
-            metric === 'conversations'
-              ? 'Most Conversations (Activists)'
-              : 'Most Hours (Activists)'
-          }
-          data={userData}
-          unit={metric === 'conversations' ? 'Convos' : 'Hours'}
-          currentUser={currentUser}
-        />
-        <ChapterLeaderboard
-          title={
-            metric === 'conversations'
-              ? 'Most Conversations (Chapters)'
-              : 'Most Hours (Chapters)'
-          }
-          data={leaderboards.chapter[metric][timeframe]}
-          unit={metric === 'conversations' ? 'Convos' : 'Hours'}
-        />
+              <div className="flex flex-col gap-2">
+                <div className="text-sm font-medium text-foreground">
+                  Chapter
+                </div>
+                <Select
+                  value={chapterFilter}
+                  onValueChange={(value) =>
+                    setChapterFilter(value === 'all' ? '' : value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Chapters" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Chapters</SelectItem>
+                    {chapterNames.map((name) => (
+                      <SelectItem value={name} key={name}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <Leaderboard
+            title={
+              metric === 'conversations'
+                ? 'Most Conversations (Activists)'
+                : 'Most Hours (Activists)'
+            }
+            data={userData}
+            unit={metric === 'conversations' ? 'Convos' : 'Hours'}
+            currentUser={currentUser}
+          />
+          <ChapterLeaderboard
+            title={
+              metric === 'conversations'
+                ? 'Most Conversations (Chapters)'
+                : 'Most Hours (Chapters)'
+            }
+            data={leaderboards.chapter[metric][timeframe]}
+            unit={metric === 'conversations' ? 'Convos' : 'Hours'}
+          />
+        </div>
       </div>
     </div>
   );

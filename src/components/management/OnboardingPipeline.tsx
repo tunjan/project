@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Avatar } from '@/components/ui';
-import { Tag } from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEvents } from '@/store';
 import { EventStatus, OnboardingStatus, type User } from '@/types';
 
@@ -23,7 +24,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
   );
 
   return (
-    <div
+    <Card
       onClick={() => onNavigate(user)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -33,46 +34,49 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({
       }}
       role="button"
       tabIndex={0}
-      className="cursor-pointer border-black bg-white p-3 transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal md:border-2"
+      className="cursor-pointer transition-all duration-200 hover:shadow-md"
     >
-      <div className="flex items-center justify-between">
-        <div className="flex min-w-0 items-center space-x-3">
-          <Avatar
-            src={user.profilePictureUrl}
-            alt={user.name}
-            className="size-10 shrink-0 object-cover"
-          />
-          <div className="min-w-0">
-            <p className="truncate font-bold text-black">{user.name}</p>
-            <p className="truncate text-sm text-neutral-500">
-              {user.chapters?.join(', ') || 'No chapters'}
-            </p>
-            <div className="mt-1.5 flex flex-wrap gap-1">
-              {user.onboardingStatus ===
-                OnboardingStatus.PENDING_ONBOARDING_CALL &&
-                user.onboardingProgress?.revisionCallScheduledAt && (
-                  <Tag variant="info" size="sm">
-                    Call Scheduled
-                  </Tag>
-                )}
-              {user.onboardingStatus === OnboardingStatus.AWAITING_FIRST_CUBE &&
-                upcomingRsvp && (
-                  <Tag variant="success" size="sm">
-                    RSVP'd
-                  </Tag>
-                )}
-              {user.onboardingStatus ===
-                OnboardingStatus.AWAITING_REVISION_CALL &&
-                user.onboardingProgress?.revisionCallScheduledAt && (
-                  <Tag variant="info" size="sm">
-                    Call Scheduled
-                  </Tag>
-                )}
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex min-w-0 items-center space-x-3">
+            <Avatar className="size-10 shrink-0">
+              <AvatarImage
+                src={user.profilePictureUrl}
+                alt={user.name}
+                className="object-cover"
+              />
+              <AvatarFallback className="text-xs">
+                {user.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate font-bold text-foreground">{user.name}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {user.chapters?.join(', ') || 'No chapters'}
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                {user.onboardingStatus ===
+                  OnboardingStatus.PENDING_ONBOARDING_CALL &&
+                  user.onboardingProgress?.revisionCallScheduledAt && (
+                    <Badge variant="secondary">Call Scheduled</Badge>
+                  )}
+                {user.onboardingStatus ===
+                  OnboardingStatus.AWAITING_FIRST_CUBE &&
+                  upcomingRsvp && <Badge variant="default">RSVP'd</Badge>}
+                {user.onboardingStatus ===
+                  OnboardingStatus.AWAITING_REVISION_CALL &&
+                  user.onboardingProgress?.revisionCallScheduledAt && (
+                    <Badge variant="secondary">Call Scheduled</Badge>
+                  )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -87,23 +91,29 @@ const PipelineColumn: React.FC<PipelineColumnProps> = ({
   users,
   onNavigate,
 }) => (
-  <div className="flex flex-col border-black bg-white md:border-2">
-    <h3 className="border-b-2 border-black bg-white p-3 text-sm font-extrabold uppercase tracking-wider text-black">
-      {title}{' '}
-      <span className="font-normal text-neutral-500">({users.length})</span>
-    </h3>
-    <div className="max-h-[60vh] min-h-[40vh] space-y-2 overflow-y-auto p-2">
-      {users.length > 0 ? (
-        users.map((user) => (
-          <OnboardingCard key={user.id} user={user} onNavigate={onNavigate} />
-        ))
-      ) : (
-        <div className="flex h-full items-center justify-center p-4 text-center">
-          <p className="text-sm text-neutral-500">Empty</p>
-        </div>
-      )}
-    </div>
-  </div>
+  <Card className="flex flex-col">
+    <CardHeader className="pb-3">
+      <CardTitle className="text-sm font-semibold uppercase tracking-wider text-foreground">
+        {title}{' '}
+        <span className="font-normal text-muted-foreground">
+          ({users.length})
+        </span>
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="flex-1 p-2">
+      <div className="max-h-[60vh] min-h-[40vh] space-y-2 overflow-y-auto">
+        {users.length > 0 ? (
+          users.map((user) => (
+            <OnboardingCard key={user.id} user={user} onNavigate={onNavigate} />
+          ))
+        ) : (
+          <div className="flex h-full items-center justify-center p-4 text-center">
+            <p className="text-sm text-muted-foreground">Empty</p>
+          </div>
+        )}
+      </div>
+    </CardContent>
+  </Card>
 );
 
 interface OnboardingPipelineProps {

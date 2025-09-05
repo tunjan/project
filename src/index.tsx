@@ -20,9 +20,8 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    {/* ADD THIS WRAPPER */}
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="system">
         <ErrorBoundary>
           <RouterProvider router={router} />
         </ErrorBoundary>

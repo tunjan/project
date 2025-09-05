@@ -1,6 +1,5 @@
-import React from 'react';
-
-import { Avatar } from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { type User } from '@/types';
 
 interface MemberCardProps {
@@ -9,21 +8,26 @@ interface MemberCardProps {
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({ member, onMemberClick }) => (
-  <button
-    type="button"
+  <Button
+    variant="ghost"
     onClick={() => onMemberClick(member)}
-    className="flex w-full items-center space-x-3 p-2 text-left transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-black"
+    className="flex h-auto w-full items-center justify-start space-x-3 p-2 text-left"
   >
-    <Avatar
-      src={member.profilePictureUrl}
-      alt={member.name}
-      className="size-10 object-cover"
-    />
+    <Avatar className="size-10">
+      <AvatarImage
+        src={member.profilePictureUrl}
+        alt={member.name}
+        className="object-cover"
+      />
+      <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+    </Avatar>
     <div>
-      <p className="font-bold text-black">{member.name}</p>
-      <p className="text-sm text-neutral-500">{member.role}</p>
+      <p className="font-semibold text-foreground">{member.name}</p>
+      <p className="text-sm capitalize text-muted-foreground">
+        {member.role.replace('_', ' ').toLowerCase()}
+      </p>
     </div>
-  </button>
+  </Button>
 );
 
 export default MemberCard;

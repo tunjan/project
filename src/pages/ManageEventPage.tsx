@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import ManageEventForm from '@/components/events/ManageEventForm';
+import { Card, CardContent } from '@/components/ui/card';
 import { useEventById, useEventsActions } from '@/store';
 import { type EventReport } from '@/types';
 
@@ -13,7 +14,17 @@ const ManageEventPage: React.FC = () => {
   const { logEventReport } = useEventsActions();
 
   if (!event) {
-    return <div className="py-16 text-center">Event not found.</div>;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-7xl px-4 py-8">
+          <Card>
+            <CardContent className="p-8 text-center">
+              <p className="text-foreground">Event not found.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   const handleLogReport = (id: string, report: EventReport) => {

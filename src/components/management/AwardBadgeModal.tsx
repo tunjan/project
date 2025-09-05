@@ -1,10 +1,26 @@
+import { Sparkles, Trophy } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { InputField, TextAreaField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { BADGE_TEMPLATES } from '@/constants';
-import * as Icons from '@/icons';
 import { type BadgeTemplate, type User } from '@/types';
+
+const Icons: Record<string, React.FC<{ className?: string }>> = {
+  SparklesIcon: Sparkles,
+  TrophyIcon: Trophy,
+};
 
 interface AwardBadgeModalProps {
   userToAward: User;
@@ -42,125 +58,103 @@ const AwardBadgeModal: React.FC<AwardBadgeModalProps> = ({
     }
   };
 
-  const TabButton: React.FC<{
-    isActive: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-  }> = ({ isActive, onClick, children }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`-mb-px border-b-2 px-4 py-2 text-sm font-bold ${
-        isActive
-          ? 'border-primary text-primary'
-          : 'border-transparent text-white hover:text-black'
-      }`}
-    >
-      {children}
-    </button>
-  );
-
   return (
-    <Modal
-      title={`Award Recognition to ${userToAward.name}`}
-      description="Select a standard recognition or create a custom recognition."
-      onClose={onClose}
-    >
-      <div className="mb-4 border-b border-black">
-        <TabButton
-          isActive={awardType === 'standard'}
-          onClick={() => {
-            setAwardType('standard');
-            setCustomName('');
-            setCustomDescription('');
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Award Recognition to {userToAward.name}</DialogTitle>
+          <DialogDescription>
+            Select a standard recognition or create a custom recognition.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Tabs
+          value={awardType}
+          onValueChange={(value) => {
+            setAwardType(value as 'standard' | 'custom');
+            if (value === 'standard') {
+              setCustomName('');
+              setCustomDescription('');
+            } else {
+              setSelectedBadge(null);
+            }
           }}
         >
-          Standard Recognitions
-        </TabButton>
-        <TabButton
-          isActive={awardType === 'custom'}
-          onClick={() => {
-            setAwardType('custom');
-            setSelectedBadge(null);
-          }}
-        >
-          Custom Recognition
-        </TabButton>
-      </div>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="standard">Standard Recognitions</TabsTrigger>
+            <TabsTrigger value="custom">Custom Recognition</TabsTrigger>
+          </TabsList>
 
-      <div className="my-6 max-h-80 min-h-[180px] space-y-2 overflow-y-auto">
-        {awardType === 'standard' ? (
-          availableBadges.map((badge) => {
-            const IconComponent =
-              Icons[badge.icon as keyof typeof Icons] || Icons.TrophyIcon;
-            const isSelected = selectedBadge?.name === badge.name;
-            return (
-              <button
-                key={badge.name}
-                onClick={() => setSelectedBadge(badge)}
-                className={`flex w-full items-center space-x-4 p-3 text-left transition-all md:border-2 ${
-                  isSelected
-                    ? 'border-primary bg-primary/10'
-                    : 'border-black bg-white hover:bg-white'
-                }`}
-              >
-                <div
-                  className={`flex size-10 shrink-0 items-center justify-center ${
-                    isSelected ? 'bg-primary text-white' : 'bg-black text-white'
-                  }`}
-                >
-                  <IconComponent className="size-6" />
-                </div>
-                <div>
-                  <p className="font-bold text-black">{badge.name}</p>
-                  <p className="text-red text-sm">{badge.description}</p>
-                </div>
-              </button>
-            );
-          })
-        ) : (
-          <div className="space-y-4 p-1">
-            <InputField
-              id="custom-name"
-              label="Recognition Name"
-              value={customName}
-              onChange={(e) => setCustomName(e.target.value)}
-              placeholder="e.g., 'Chapter MVP'"
-              required
-            />
-            <TextAreaField
-              id="custom-description"
-              label="Description"
-              value={customDescription}
-              onChange={(e) => setCustomDescription(e.target.value)}
-              placeholder="e.g., For outstanding contributions in Q3."
-              rows={3}
-            />
-          </div>
-        )}
-      </div>
+          <TabsContent value="standard" className="mt-6">
+            <div className="max-h-80 min-h-[180px] space-y-2 overflow-y-auto">
+              {availableBadges.map((badge) => {
+                const IconComponent =
+                  Icons[badge.icon as keyof typeof Icons] || Icons.TrophyIcon;
+                const isSelected = selectedBadge?.name === badge.name;
+                return (
+                  <Button
+                    key={badge.name}
+                    onClick={() => setSelectedBadge(badge)}
+                    variant={isSelected ? 'default' : 'outline'}
+                    className="flex h-auto w-full items-center justify-start space-x-4 p-3"
+                  >
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded bg-primary text-primary-foreground">
+                      <IconComponent className="size-6" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold text-foreground">{badge.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {badge.description}
+                      </p>
+                    </div>
+                  </Button>
+                );
+              })}
+            </div>
+          </TabsContent>
 
-      <div className="flex items-center space-x-4 pt-4">
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleConfirm}
-          disabled={
-            (awardType === 'standard' && !selectedBadge) ||
-            (awardType === 'custom' && !customName.trim())
-          }
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Award Recognition
-        </button>
-      </div>
-    </Modal>
+          <TabsContent value="custom" className="mt-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="custom-name">Recognition Name</Label>
+                <Input
+                  id="custom-name"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="e.g., 'Chapter MVP'"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-description">Description</Label>
+                <Textarea
+                  id="custom-description"
+                  value={customDescription}
+                  onChange={(e) => setCustomDescription(e.target.value)}
+                  placeholder="e.g., For outstanding contributions in Q3."
+                  rows={3}
+                />
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={
+              (awardType === 'standard' && !selectedBadge) ||
+              (awardType === 'custom' && !customName.trim())
+            }
+          >
+            Award Recognition
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

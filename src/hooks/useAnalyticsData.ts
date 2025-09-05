@@ -5,7 +5,8 @@ import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { Role } from '@/types';
 import {
-  getActivistPerformanceDistribution,
+  getActivistConversationsDistribution,
+  getActivistHoursDistribution,
   getActivistRetention,
   getAverageActivistsPerEvent,
   getChapterOutreachStats, // NEW
@@ -243,15 +244,10 @@ export function useAnalyticsData() {
     [filteredUsers, filteredEvents, filteredChapters, filteredOutreachLogs]
   );
 
-  // CRITICAL FIX: Call getActivistPerformanceDistribution only once since it ignores the metric parameter
+  // CRITICAL FIX: Call separate functions for hours and conversations distributions
   const activistPerformanceDistribution = useMemo(
-    () =>
-      getActivistPerformanceDistribution(
-        filteredUsers,
-        filteredEvents,
-        filteredOutreachLogs
-      ),
-    [filteredUsers, filteredEvents, filteredOutreachLogs]
+    () => getActivistHoursDistribution(filteredUsers, filteredEvents),
+    [filteredUsers, filteredEvents]
   );
 
   const activistHoursDistribution = useMemo(
@@ -260,8 +256,9 @@ export function useAnalyticsData() {
   );
 
   const activistConversationsDistribution = useMemo(
-    () => activistPerformanceDistribution,
-    [activistPerformanceDistribution]
+    () =>
+      getActivistConversationsDistribution(filteredUsers, filteredOutreachLogs),
+    [filteredUsers, filteredOutreachLogs]
   );
 
   const eventTurnoutDistribution = useMemo(

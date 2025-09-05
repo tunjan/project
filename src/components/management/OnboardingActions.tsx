@@ -70,10 +70,10 @@ const OnboardingActions: React.FC<OnboardingActionsProps> = ({ user }) => {
       case OnboardingStatus.PENDING_APPLICATION_REVIEW:
         return (
           <div className="flex space-x-2">
-            <Button onClick={handleApprove} variant="primary">
+            <Button onClick={handleApprove} variant="default">
               Approve Application
             </Button>
-            <Button onClick={handleDeny} variant="danger">
+            <Button onClick={handleDeny} variant="destructive">
               Deny Application
             </Button>
           </div>
@@ -81,14 +81,14 @@ const OnboardingActions: React.FC<OnboardingActionsProps> = ({ user }) => {
 
       case OnboardingStatus.PENDING_ONBOARDING_CALL:
         return (
-          <Button onClick={handleOnboardingCallPassed} variant="primary">
+          <Button onClick={handleOnboardingCallPassed} variant="default">
             Onboarding Call Passed
           </Button>
         );
 
       case OnboardingStatus.AWAITING_FIRST_CUBE:
         return (
-          <Button onClick={handleConfirmFirstCube} variant="primary">
+          <Button onClick={handleConfirmFirstCube} variant="default">
             Confirm First Cube Attendance
           </Button>
         );
@@ -96,7 +96,7 @@ const OnboardingActions: React.FC<OnboardingActionsProps> = ({ user }) => {
       case OnboardingStatus.AWAITING_REVISION_CALL:
         return (
           <div className="flex space-x-2">
-            <Button onClick={handleRevisionCallPassed} variant="primary">
+            <Button onClick={handleRevisionCallPassed} variant="default">
               Revision Call Passed
             </Button>
             <Button onClick={handleManualVerify} variant="secondary">

@@ -1,7 +1,17 @@
-import React from 'react';
+import { Megaphone, Plus } from 'lucide-react';
+import React, { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { can, Permission } from '@/config';
-import { MegaphoneIcon, PlusIcon } from '@/icons';
 import { useChapters } from '@/store';
 import { useAnnouncementsState as useAnnouncements } from '@/store/announcements.store';
 import { useCurrentUser } from '@/store/auth.store';
@@ -22,6 +32,7 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
   const currentUser = useCurrentUser();
   const allAnnouncements = useAnnouncements();
   const chapters = useChapters();
+  const [filter, setFilter] = useState('all');
 
   if (!currentUser) return null;
 
@@ -50,15 +61,28 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
         currentUser.role
       );
 
-      if (highLevelRole) return true;
+      if (highLevelRole) {
+        if (filter === 'all') return true;
+        if (filter === 'global') return a.scope === AnnouncementScope.GLOBAL;
+        if (filter === 'regional')
+          return a.scope === AnnouncementScope.REGIONAL;
+        if (filter === 'chapter') return a.scope === AnnouncementScope.CHAPTER;
+        return true;
+      }
 
       switch (a.scope) {
         case AnnouncementScope.GLOBAL:
-          return true;
+          return filter === 'all' || filter === 'global';
         case AnnouncementScope.REGIONAL:
-          return a.country ? userCountries.includes(a.country) : false;
+          return (
+            (filter === 'all' || filter === 'regional') &&
+            (a.country ? userCountries.includes(a.country) : false)
+          );
         case AnnouncementScope.CHAPTER:
-          return a.chapter ? currentUser.chapters?.includes(a.chapter) : false;
+          return (
+            (filter === 'all' || filter === 'chapter') &&
+            (a.chapter ? currentUser.chapters?.includes(a.chapter) : false)
+          );
         default:
           return false;
       }
@@ -69,51 +93,43 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
     );
 
   return (
-    <div className="py-8 md:py-12">
-      {/* Enhanced Header Section */}
-      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-2 bg-primary"></div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-              Announcements
-            </h1>
-            <div className="flex shrink-0 items-center gap-4">
-              <MegaphoneIcon className="size-6 text-primary sm:size-12" />
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                Announcements
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                Stay up to date with the latest news and updates.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder="Filter by scope" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Scopes</SelectItem>
+                  <SelectItem value="global">Global</SelectItem>
+                  <SelectItem value="regional">Regional</SelectItem>
+                  <SelectItem value="chapter">Chapter</SelectItem>
+                </SelectContent>
+              </Select>
+              {can(currentUser, Permission.CREATE_ANNOUNCEMENT) && (
+                <Button onClick={onCreate} className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  Create
+                </Button>
+              )}
             </div>
           </div>
-          <p className="max-w-3xl px-4 text-base leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
-            Stay up to date with the latest news, updates, and important
-            information from your chapters and the global movement.
-          </p>
+          <Separator />
         </div>
-        {can(currentUser, Permission.CREATE_ANNOUNCEMENT) && (
-          <button
-            onClick={onCreate}
-            className="flex w-full justify-center self-end bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover sm:w-fit"
-          >
-            <PlusIcon className="mr-2 size-5" />
-            Create Announcement
-          </button>
-        )}
-      </div>
-      {filteredAnnouncements.length > 0 ? (
-        <>
-          {/* Mobile: Single column with dividers */}
-          <div className="md:hidden">
-            {filteredAnnouncements.map((announcement: Announcement, index) => (
-              <div key={announcement.id}>
-                <AnnouncementCard announcement={announcement} />
-                {/* Add divider between cards, but not after the last one */}
-                {index < filteredAnnouncements.length - 1 && (
-                  <div className="border-b border-gray-300"></div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop: Original layout with spacing */}
-          <div className="hidden space-y-6 md:block">
+        {filteredAnnouncements.length > 0 ? (
+          <div className="space-y-6">
             {filteredAnnouncements.map((announcement: Announcement) => (
               <AnnouncementCard
                 key={announcement.id}
@@ -121,16 +137,20 @@ const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ onCreate }) => {
               />
             ))}
           </div>
-        </>
-      ) : (
-        <div className="border-y border-neutral-200 px-0 py-4 text-center dark:border-gray-600 sm:border-black sm:bg-white sm:p-8 dark:sm:border-white dark:sm:bg-black sm:md:border-2">
-          <MegaphoneIcon className="mx-auto size-12 text-neutral-500" />
-          <h3 className="mt-4 text-xl font-bold text-black">
-            No announcements yet.
-          </h3>
-          <p className="mt-2 text-neutral-600">Check back later for updates.</p>
-        </div>
-      )}
+        ) : (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Megaphone className="mx-auto size-12 text-muted-foreground" />
+              <h3 className="mt-4 text-xl font-semibold text-foreground">
+                No announcements yet.
+              </h3>
+              <p className="mt-2 text-muted-foreground">
+                Check back later for updates.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

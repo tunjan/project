@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { LeafletMap, type MapMarker } from '@/components/ui';
+import { Button } from '@/components/ui/button';
 import { type Chapter } from '@/types';
 
 interface ChapterMapProps {
@@ -24,22 +25,22 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
           popupContent: (
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-bold leading-tight text-black">
+                <h3 className="text-lg font-bold leading-tight text-foreground">
                   {chapter.name}
                 </h3>
-                <p className="text-neutral-secondary text-sm font-semibold uppercase tracking-wide">
+                <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                   {chapter.country}
                 </p>
               </div>
               {chapter.instagram && (
-                <div className="border-t-2 border-black pt-3">
-                  <p className="text-sm font-medium text-neutral">
+                <div className="border-t border-border pt-3">
+                  <p className="text-sm font-medium text-foreground">
                     Instagram:{' '}
                     <a
                       href={`https://instagram.com/${chapter.instagram.replace('@', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-red underline transition-colors duration-200 hover:text-primary"
+                      className="text-primary underline transition-colors duration-200 hover:text-primary/80"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {chapter.instagram}
@@ -47,12 +48,13 @@ const ChapterMap: React.FC<ChapterMapProps> = ({
                   </p>
                 </div>
               )}
-              <button
+              <Button
                 onClick={() => onSelectChapter(chapter)}
-                className="w-full border-black bg-black px-4 py-2 text-sm font-bold text-white hover:bg-black hover:shadow-brutal md:border-2"
+                className="w-full"
+                size="sm"
               >
                 {popupActionText}
-              </button>
+              </Button>
             </div>
           ),
         };

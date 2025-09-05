@@ -1,15 +1,17 @@
+import { Calendar, Check, Hash, Mail, UserCircle, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { TextAreaField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  CalendarIcon,
-  CheckIcon,
-  HashtagIcon,
-  MailIcon,
-  UserCircleIcon,
-  XIcon,
-} from '@/icons';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useCurrentUser, useUsersActions } from '@/store';
 import { OnboardingStatus, User } from '@/types';
 
@@ -34,7 +36,7 @@ const ApplicantDetail: React.FC<{
       );
     }
     return (
-      <span className="font-semibold text-black">
+      <span className="font-semibold text-foreground">
         {value || 'Not provided'}
       </span>
     );
@@ -42,26 +44,30 @@ const ApplicantDetail: React.FC<{
 
   return (
     <div className="flex items-start gap-3">
-      <div className="mt-1 shrink-0 text-neutral-500">{icon}</div>
+      <div className="mt-1 shrink-0 text-muted-foreground">{icon}</div>
       <div>
-        <p className="text-xs font-bold uppercase text-neutral-500">{label}</p>
+        <p className="text-xs font-bold uppercase text-muted-foreground">
+          {label}
+        </p>
         {renderValue()}
       </div>
     </div>
   );
 };
 
-// A component for displaying the Q&A section in brutalist style.
+// A component for displaying the Q&A section.
 const AnswerBlock: React.FC<{ question: string; answer: string }> = ({
   question,
   answer,
 }) => (
-  <div>
-    <p className="mb-1 text-sm font-bold text-black">{question}</p>
-    <div className="border-black bg-white p-3 md:border-2">
-      <p className="text-sm text-neutral-700">{answer}</p>
-    </div>
-  </div>
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-sm">{question}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p className="text-sm text-muted-foreground">{answer}</p>
+    </CardContent>
+  </Card>
 );
 
 interface ReviewApplicantModalProps {
@@ -120,112 +126,130 @@ const ReviewApplicantModal: React.FC<ReviewApplicantModalProps> = ({
   })`;
 
   return (
-    <Modal title={modalTitle} onClose={onClose} size="lg" isOpen={isOpen}>
-      <div className="space-y-6">
-        {/* Applicant Header */}
-        <div className="flex flex-col items-center gap-6 border-b-2 border-black pb-6 sm:flex-row">
-          <img
-            src={currentApplicant.profilePictureUrl}
-            alt={currentApplicant.name}
-            className="size-24 shrink-0 border-black object-cover md:border-2"
-          />
-          <div className="grid w-full grid-cols-1 gap-4">
-            <ApplicantDetail
-              icon={<UserCircleIcon className="size-5" />}
-              label="Name"
-              value={currentApplicant.name}
-            />
-            <ApplicantDetail
-              icon={<CalendarIcon className="size-5" />}
-              label="Applying to"
-              value={`${currentApplicant.chapters?.join(', ')} Chapter`}
-            />
-            <ApplicantDetail
-              icon={<MailIcon className="size-5" />}
-              label="Email"
-              value={currentApplicant.email}
-            />
-            <ApplicantDetail
-              icon={<HashtagIcon className="size-5" />}
-              label="Instagram"
-              value={currentApplicant.instagram}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogDescription>
+            Review the applicant's information and make a decision
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Applicant Header */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center gap-6 sm:flex-row">
+                <img
+                  src={currentApplicant.profilePictureUrl}
+                  alt={currentApplicant.name}
+                  className="size-24 shrink-0 rounded-lg border object-cover"
+                />
+                <div className="grid w-full grid-cols-1 gap-4">
+                  <ApplicantDetail
+                    icon={<UserCircle className="size-5" />}
+                    label="Name"
+                    value={currentApplicant.name}
+                  />
+                  <ApplicantDetail
+                    icon={<Calendar className="size-5" />}
+                    label="Applying to"
+                    value={`${currentApplicant.chapters?.join(', ')} Chapter`}
+                  />
+                  <ApplicantDetail
+                    icon={<Mail className="size-5" />}
+                    label="Email"
+                    value={currentApplicant.email}
+                  />
+                  <ApplicantDetail
+                    icon={<Hash className="size-5" />}
+                    label="Instagram"
+                    value={currentApplicant.instagram}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Onboarding Answers */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-extrabold text-foreground">
+              Application Answers
+            </h3>
+            {currentApplicant.onboardingAnswers ? (
+              <div className="space-y-4">
+                <AnswerBlock
+                  question="Why did you go vegan?"
+                  answer={currentApplicant.onboardingAnswers.veganReason}
+                />
+                <AnswerBlock
+                  question="Are you aligned with our abolitionist values?"
+                  answer={
+                    currentApplicant.onboardingAnswers.abolitionistAlignment
+                      ? 'Yes'
+                      : 'No / Unsure'
+                  }
+                />
+                <AnswerBlock
+                  question="How can you best contribute to your local chapter?"
+                  answer={currentApplicant.onboardingAnswers.customAnswer}
+                />
+              </div>
+            ) : (
+              <Card className="border-warning bg-warning/10">
+                <CardContent className="p-4">
+                  <p className="font-bold text-warning-foreground">
+                    ⚠️ No Onboarding Answers
+                  </p>
+                  <p className="text-sm text-warning-foreground">
+                    This applicant doesn't have answers recorded. This may
+                    indicate an issue with the signup process.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Organizer Note */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-extrabold text-foreground">
+              Add Note (Optional)
+            </h3>
+            <TextAreaField
+              label="Visible only to other organizers"
+              id="organizer-note"
+              value={note}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setNote(e.target.value)
+              }
+              placeholder="e.g., 'Strong application, seems dedicated...'"
+              rows={3}
             />
           </div>
         </div>
 
-        {/* Onboarding Answers */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-extrabold text-black">
-            Application Answers
-          </h3>
-          {currentApplicant.onboardingAnswers ? (
-            <div className="space-y-4 border-black bg-neutral-100 p-4 md:border-2">
-              <AnswerBlock
-                question="Why did you go vegan?"
-                answer={currentApplicant.onboardingAnswers.veganReason}
-              />
-              <AnswerBlock
-                question="Are you aligned with our abolitionist values?"
-                answer={
-                  currentApplicant.onboardingAnswers.abolitionistAlignment
-                    ? 'Yes'
-                    : 'No / Unsure'
-                }
-              />
-              <AnswerBlock
-                question="How can you best contribute to your local chapter?"
-                answer={currentApplicant.onboardingAnswers.customAnswer}
-              />
-            </div>
-          ) : (
-            <div className="border-warning bg-warning/10 p-4 md:border-2">
-              <p className="font-bold text-yellow-700">
-                ⚠️ No Onboarding Answers
-              </p>
-              <p className="text-sm text-yellow-700">
-                This applicant doesn't have answers recorded. This may indicate
-                an issue with the signup process.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Organizer Note */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-extrabold text-black">
-            Add Note (Optional)
-          </h3>
-          <TextAreaField
-            label="Visible only to other organizers"
-            id="organizer-note"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="e.g., 'Strong application, seems dedicated...'"
-            rows={3}
-          />
-        </div>
-
-        {/* Actions */}
-        <div className="grid grid-cols-2 gap-4 border-t-2 border-black pt-6">
-          <button
+        <DialogFooter className="grid grid-cols-2 gap-4">
+          <Button
             onClick={() => handleAction(OnboardingStatus.DENIED)}
-            className="flex w-full items-center justify-center gap-2 border-black bg-danger py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg md:border-2"
+            variant="destructive"
+            className="w-full"
           >
-            <XIcon className="size-5" />
+            <X className="mr-2 size-5" />
             Reject
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() =>
               handleAction(OnboardingStatus.PENDING_ONBOARDING_CALL)
             }
-            className="flex w-full items-center justify-center gap-2 border-black bg-success py-3 font-bold text-white shadow-brutal transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg md:border-2"
+            variant="default"
+            className="w-full"
           >
-            <CheckIcon className="size-5" />
+            <Check className="mr-2 size-5" />
             Approve
-          </button>
-        </div>
-      </div>
-    </Modal>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

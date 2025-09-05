@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Card, CardContent } from '@/components/ui/card';
 import { CubeEvent } from '@/types';
 
 import EventRoster from './EventRoster';
@@ -11,9 +12,13 @@ interface EventRosterWrapperProps {
 const EventRosterWrapper: React.FC<EventRosterWrapperProps> = ({ event }) => {
   if (!event.endDate || event.scope !== 'Regional') {
     return (
-      <div className="card-brutal bg-white p-6 text-center">
-        <p className="text-neutral-500">This event doesn't have a roster.</p>
-      </div>
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-muted-foreground">
+            This event doesn't have a roster.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 

@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { type CubeEvent, type TourDuty, TourDutyRole } from '@/types';
 
 interface TourOfDutyModalProps {
@@ -54,63 +61,66 @@ const TourOfDutyModal: React.FC<TourOfDutyModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Sign Up for Duties"
-      description={`Select your availability for "${event.location}"`}
-      onClose={onClose}
-    >
-      <div className="my-6 max-h-[60vh] space-y-4 overflow-y-auto pr-2">
-        {eventDays.map((day) => {
-          const dateString = new Date(day).toISOString().split('T')[0];
-          return (
-            <div
-              key={dateString}
-              className="border-black bg-white p-4 md:border-2"
-            >
-              <h4 className="font-bold">
-                {new Date(day).toLocaleDateString(undefined, {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </h4>
-              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {availableRoles.map((role) => (
-                  <label
-                    key={role}
-                    className="flex cursor-pointer items-center space-x-2 border-black p-2 text-sm transition-colors has-[:checked]:bg-primary has-[:checked]:text-white md:border-2"
-                  >
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={duties.some(
-                        (d) => d.date === dateString && d.role === role
-                      )}
-                      onChange={() => handleDutyChange(dateString, role)}
-                    />
-                    <span className="font-semibold">{role}</span>
-                  </label>
-                ))}
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[80vh] overflow-hidden">
+        <DialogHeader>
+          <DialogTitle>Sign Up for Duties</DialogTitle>
+          <DialogDescription>
+            Select your availability for "{event.location}"
+          </DialogDescription>
+        </DialogHeader>
+        <div className="my-6 max-h-[60vh] space-y-4 overflow-y-auto pr-2">
+          {eventDays.map((day) => {
+            const dateString = new Date(day).toISOString().split('T')[0];
+            return (
+              <div
+                key={dateString}
+                className="border border-border bg-background p-4"
+              >
+                <h4 className="font-bold text-foreground">
+                  {new Date(day).toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </h4>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {availableRoles.map((role) => (
+                    <label
+                      key={role}
+                      className="flex cursor-pointer items-center space-x-2 border border-border p-2 text-sm transition-colors has-[:checked]:bg-primary has-[:checked]:text-primary-foreground"
+                    >
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={duties.some(
+                          (d) => d.date === dateString && d.role === role
+                        )}
+                        onChange={() => handleDutyChange(dateString, role)}
+                      />
+                      <span className="font-semibold">{role}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={onClose}
-          className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleConfirmClick}
-          className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-        >
-          Confirm My Duties
-        </button>
-      </div>
-    </Modal>
+            );
+          })}
+        </div>
+        <div className="flex items-center space-x-4">
+          <Button
+            onClick={onClose}
+            variant="outline"
+            size="lg"
+            className="w-full"
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmClick} size="lg" className="w-full">
+            Confirm My Duties
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

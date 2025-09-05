@@ -1,6 +1,7 @@
+import { Users } from 'lucide-react';
 import React from 'react';
 
-import { UsersIcon } from '@/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type User } from '@/types';
 import { calculateRanks, type UserLeaderboardEntry } from '@/utils';
 
@@ -34,11 +35,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   );
 
   return (
-    <div className="flex h-full flex-col border-y border-neutral-200 sm:border-black sm:bg-white sm:md:border-2">
-      <h2 className="border-b border-neutral-200 p-4 text-xl font-bold text-black sm:border-b-2 sm:border-black">
-        {title}
-      </h2>
-      <div className="grow overflow-y-auto">
+    <Card className="flex h-full flex-col">
+      <CardHeader>
+        <CardTitle className="text-xl">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="grow overflow-y-auto p-0">
         {rankedData.length > 0 ? (
           <ul className="space-y-0">
             {topEntries.map((entry) => (
@@ -72,13 +73,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           </ul>
         ) : (
           <div className="flex h-full flex-col items-center justify-center p-8 text-center text-neutral-500">
-            <UsersIcon className="size-12" />
+            <Users className="size-12" />
             <p className="mt-2 font-semibold text-black">No data available.</p>
             <p className="text-sm">No activity for this time period.</p>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

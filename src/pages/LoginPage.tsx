@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Login from '@/components/auth/Login';
 import { useUsers } from '@/store';
 import { useAuthActions } from '@/store/auth.store';
-import { OnboardingStatus, Role, type User } from '@/types';
+import { OnboardingStatus, type User } from '@/types';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,10 +20,6 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const organizers = users.filter(
-    (u) => u.role === Role.GLOBAL_ADMIN || u.role === Role.REGIONAL_ORGANISER
-  );
-
   const loginableUsers = users.filter(
     (u) =>
       u.onboardingStatus === OnboardingStatus.CONFIRMED ||
@@ -34,13 +30,7 @@ const LoginPage: React.FC = () => {
       u.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL
   );
 
-  return (
-    <Login
-      users={loginableUsers}
-      onLogin={handleLogin}
-      organizers={organizers}
-    />
-  );
+  return <Login users={loginableUsers} onLogin={handleLogin} />;
 };
 
 export default LoginPage;

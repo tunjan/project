@@ -2,23 +2,27 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import Widget from '@/components/dashboard/Widget';
+import { Button } from '@/components/ui/button';
 import { CubeEvent, ParticipantStatus, User } from '@/types';
 
 const MemberCard: React.FC<{ user: User }> = ({ user }) => (
-  <Link
-    to={`/members/${user.id}`}
-    className="flex items-center gap-3 p-2 text-left transition hover:bg-neutral-100"
+  <Button
+    variant="ghost"
+    asChild
+    className="flex w-full items-center justify-start gap-3 p-2 text-left transition hover:bg-accent"
   >
-    <img
-      src={user.profilePictureUrl}
-      alt={user.name}
-      className="size-10 object-cover"
-    />
-    <div>
-      <p className="font-bold text-black">{user.name}</p>
-      <p className="text-sm text-neutral-500">{user.role}</p>
-    </div>
-  </Link>
+    <Link to={`/members/${user.id}`}>
+      <img
+        src={user.profilePictureUrl}
+        alt={user.name}
+        className="size-10 object-cover"
+      />
+      <div>
+        <p className="font-bold text-foreground">{user.name}</p>
+        <p className="text-sm text-muted-foreground">{user.role}</p>
+      </div>
+    </Link>
+  </Button>
 );
 
 interface EventSidebarProps {
@@ -57,7 +61,7 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
             ))}
           </ul>
         ) : (
-          <p className="text-center text-sm text-neutral-500">
+          <p className="text-center text-sm text-muted-foreground">
             No one has RSVP'd yet.
           </p>
         )}
@@ -71,18 +75,16 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
                 <div className="flex items-center justify-between">
                   <MemberCard user={p.user} />
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => onDenyRsvp(p.user.id)}
-                      className="btn-secondary btn-sm"
+                      variant="outline"
+                      size="sm"
                     >
                       Deny
-                    </button>
-                    <button
-                      onClick={() => onAcceptRsvp(p.user.id)}
-                      className="btn-primary btn-sm"
-                    >
+                    </Button>
+                    <Button onClick={() => onAcceptRsvp(p.user.id)} size="sm">
                       Approve
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </li>
@@ -98,12 +100,9 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
               <li key={host.id} className="p-2">
                 <div className="flex items-center justify-between">
                   <MemberCard user={host} />
-                  <button
-                    onClick={() => onRequestStay(host)}
-                    className="btn-primary btn-sm"
-                  >
+                  <Button onClick={() => onRequestStay(host)} size="sm">
                     Request Stay
-                  </button>
+                  </Button>
                 </div>
               </li>
             ))}

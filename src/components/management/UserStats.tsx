@@ -1,16 +1,12 @@
+import { Calendar, Clock, Map, MessageCircle, Target } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 import LineChart from '@/components/analytics/LineChart';
 import BadgeList from '@/components/dashboard/BadgeList';
 import DiscountTierProgress from '@/components/dashboard/DiscountTierProgress';
 import StatsGrid from '@/components/dashboard/StatsGrid';
-import {
-  CalendarIcon,
-  ChatBubbleLeftRightIcon,
-  ClockIcon,
-  MapIcon,
-  TargetIcon,
-} from '@/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { useEvents, useOutreachLogs } from '@/store';
 import { type User } from '@/types';
 import { getConversationTrendsByMonth } from '@/utils';
@@ -96,214 +92,236 @@ const UserStats: React.FC<UserStatsProps> = ({ user }) => {
   return (
     <div className="space-y-8">
       {/* Enhanced Statistics Grid */}
-      <div>
-        <h3 className="mb-4 text-xl font-bold text-black">
-          Performance Overview
-        </h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-none bg-primary/10">
-                <CalendarIcon className="size-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Events Attended
-                </p>
-                <p className="text-2xl font-bold text-black">
-                  {userAnalytics.attendedEvents.length}
-                </p>
-              </div>
-            </div>
-          </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Performance Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center bg-primary/10">
+                    <Calendar className="size-5 text-primary" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-bold">Events Attended</Label>
+                    <p className="text-2xl font-bold">
+                      {userAnalytics.attendedEvents.length}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-none bg-success/10">
-                <ChatBubbleLeftRightIcon className="size-5 text-success" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Total Conversations
-                </p>
-                <p className="text-2xl font-bold text-black">
-                  {userAnalytics.userOutreachLogs.length}
-                </p>
-              </div>
-            </div>
-          </div>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center bg-primary/10">
+                    <MessageCircle className="size-5 text-primary" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-bold">
+                      Total Conversations
+                    </Label>
+                    <p className="text-2xl font-bold">
+                      {userAnalytics.userOutreachLogs.length}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-none bg-warning/10">
-                <ClockIcon className="size-5 text-warning" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Total Hours
-                </p>
-                <p className="text-2xl font-bold text-black">
-                  {userAnalytics.totalHours}
-                </p>
-              </div>
-            </div>
-          </div>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center bg-warning/10">
+                    <Clock className="size-5 text-warning" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-bold">Total Hours</Label>
+                    <p className="text-2xl font-bold">
+                      {userAnalytics.totalHours}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          <div className="rounded-none border-black bg-white p-4 md:border-2">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-none bg-info/10">
-                <MapIcon className="size-5 text-info" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-neutral-600">
-                  Cities Visited
-                </p>
-                <p className="text-2xl font-bold text-black">
-                  {userAnalytics.citiesVisited.length}
-                </p>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center bg-muted">
+                    <Map className="size-5 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-bold">Cities Visited</Label>
+                    <p className="text-2xl font-bold">
+                      {userAnalytics.citiesVisited.length}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Outreach Performance Breakdown */}
-      <div>
-        <h3 className="mb-4 text-xl font-bold text-black">
-          Outreach Performance
-        </h3>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Monthly Trends Chart */}
-          <div className="rounded-none border-black bg-white p-6 md:border-2">
-            <h4 className="mb-4 text-lg font-bold text-black">
-              Monthly Conversation Trends
-            </h4>
-            <LineChart
-              data={userAnalytics.monthlyData.map((d) => ({
-                label: new Date(d.month + '-02').toLocaleString('default', {
-                  month: 'short',
-                }),
-                value: d.count,
-              }))}
-              title="Conversations per Month"
-            />
-          </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Outreach Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Monthly Trends Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Monthly Conversation Trends</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LineChart
+                  data={userAnalytics.monthlyData.map((d) => ({
+                    label: new Date(d.month + '-02').toLocaleString('default', {
+                      month: 'short',
+                    }),
+                    value: d.count,
+                  }))}
+                  title="Conversations per Month"
+                />
+              </CardContent>
+            </Card>
 
-          {/* Outreach Outcomes Breakdown */}
-          <div className="rounded-none border-black bg-white p-6 md:border-2">
-            <h4 className="mb-4 text-lg font-bold text-black">
-              Conversation Outcomes
-            </h4>
-            <div className="space-y-3">
-              {Object.entries(userAnalytics.outreachByOutcome).map(
-                ([outcome, count]) => (
-                  <div
-                    key={outcome}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="text-sm font-medium text-neutral-700">
-                      {outcome}
-                    </span>
-                    <span className="text-lg font-bold text-black">
-                      {count}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-            <div className="mt-4 bg-neutral-50 p-3">
-              <p className="text-sm text-neutral-600">
-                <TargetIcon className="mr-2 inline size-4" />
-                Avg: {userAnalytics.averageConversationsPerEvent} conversations
-                per event
-              </p>
-            </div>
+            {/* Outreach Outcomes Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Conversation Outcomes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {Object.entries(userAnalytics.outreachByOutcome).map(
+                    ([outcome, count]) => (
+                      <div
+                        key={outcome}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {outcome}
+                        </span>
+                        <span className="text-lg font-bold">{count}</span>
+                      </div>
+                    )
+                  )}
+                </div>
+                <div className="mt-4 bg-muted p-3">
+                  <p className="text-sm text-muted-foreground">
+                    <Target className="mr-2 inline size-4" />
+                    Avg: {userAnalytics.averageConversationsPerEvent}{' '}
+                    conversations per event
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Event Participation Details */}
-      <div>
-        <h3 className="mb-4 text-xl font-bold text-black">
-          Event Participation
-        </h3>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Recent Activity */}
-          <div className="rounded-none border-black bg-white p-6 md:border-2">
-            <h4 className="mb-4 text-lg font-bold text-black">
-              Recent Activity (30 days)
-            </h4>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-neutral-700">
-                  New Conversations
-                </span>
-                <span className="text-lg font-bold text-black">
-                  {userAnalytics.recentOutreach}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-neutral-700">
-                  Events Attended
-                </span>
-                <span className="text-lg font-bold text-black">
-                  {userAnalytics.recentEvents}
-                </span>
-              </div>
-            </div>
-          </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Event Participation</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Recent Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity (30 days)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      New Conversations
+                    </span>
+                    <span className="text-lg font-bold">
+                      {userAnalytics.recentOutreach}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Events Attended
+                    </span>
+                    <span className="text-lg font-bold">
+                      {userAnalytics.recentEvents}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Event Organization */}
-          <div className="rounded-none border-black bg-white p-6 md:border-2">
-            <h4 className="mb-4 text-lg font-bold text-black">
-              Event Organization
-            </h4>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-neutral-700">
-                  Events Organized
-                </span>
-                <span className="text-lg font-bold text-black">
-                  {userAnalytics.organizedEvents.length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-neutral-700">
-                  Total Participants
-                </span>
-                <span className="text-lg font-bold text-black">
-                  {userAnalytics.organizedEvents.reduce(
-                    (sum, event) => sum + event.participants.length,
-                    0
-                  )}
-                </span>
-              </div>
-            </div>
+            {/* Event Organization */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Event Organization</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Events Organized
+                    </span>
+                    <span className="text-lg font-bold">
+                      {userAnalytics.organizedEvents.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Total Participants
+                    </span>
+                    <span className="text-lg font-bold">
+                      {userAnalytics.organizedEvents.reduce(
+                        (sum, event) => sum + event.participants.length,
+                        0
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Original Stats Components */}
-      <div>
-        <h3 className="mb-4 text-xl font-bold text-black">Core Statistics</h3>
-        <StatsGrid stats={user.stats} />
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Core Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <StatsGrid stats={user.stats} />
+        </CardContent>
+      </Card>
 
       {user.badges && user.badges.length > 0 && (
-        <div>
-          <h3 className="mb-4 text-xl font-bold text-black">
-            Recognitions & Badges
-          </h3>
-          <BadgeList badges={user.badges} />
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recognitions & Badges</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BadgeList badges={user.badges} />
+          </CardContent>
+        </Card>
       )}
 
-      <div>
-        <h3 className="mb-4 text-xl font-bold text-black">
-          Discount Tier Progress
-        </h3>
-        <DiscountTierProgress user={user} />
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Discount Tier Progress</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DiscountTierProgress user={user} />
+        </CardContent>
+      </Card>
     </div>
   );
 };

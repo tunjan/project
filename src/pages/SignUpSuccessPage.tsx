@@ -1,12 +1,9 @@
+import { Calendar, ChevronRight, Instagram, MessageCircle } from 'lucide-react';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import {
-  CalendarIcon,
-  ChatBubbleLeftRightIcon,
-  ChevronRightIcon,
-  InstagramIcon,
-} from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useChapterByName } from '@/store';
 
 interface LocationState {
@@ -28,77 +25,81 @@ const SignUpSuccessPage: React.FC = () => {
 
   return (
     <div className="mx-auto w-full max-w-2xl p-6">
-      <div className="card-brutal card-padding bg-primary-lightest">
-        <h1 className="h-card mb-2">
-          Thanks for applying{name ? `, ${name}` : ''}!
-        </h1>
-        <p className="text-grey-700">
-          We've received your application for{' '}
-          {chapter ? <strong>{chapter}</strong> : 'your chapter'}.
-        </p>
-        <div className="rounded-nonenone mt-4 border-black bg-white p-4 shadow-brutal md:border-2">
-          <div className="flex items-start gap-3">
-            <CalendarIcon className="mt-0.5 size-5 text-primary" />
-            <div>
-              <p className="font-semibold">What happens next?</p>
-              <ul className="text-grey-700 mt-1 list-disc pl-5 text-sm">
-                <li>
-                  An organizer from the {chapter || 'chapter'} team will review
-                  your application.
-                </li>
-                <li>
-                  Expect a decision in 3–5 days. You'll receive a notification
-                  and email if enabled.
-                </li>
-                <li>
-                  If approved, you'll be asked to get verified in person at your
-                  next event.
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">
+            Thanks for applying{name ? `, ${name}` : ''}!
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            We've received your application for{' '}
+            {chapter ? <strong>{chapter}</strong> : 'your chapter'}.
+          </p>
+          <Card className="mt-4">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <Calendar className="mt-0.5 size-5 text-primary" />
+                <div>
+                  <p className="font-semibold">What happens next?</p>
+                  <ul className="mt-1 list-disc pl-5 text-sm text-muted-foreground">
+                    <li>
+                      An organizer from the {chapter || 'chapter'} team will
+                      review your application.
+                    </li>
+                    <li>
+                      Expect a decision in 3–5 days. You'll receive a
+                      notification and email if enabled.
+                    </li>
+                    <li>
+                      If approved, you'll be asked to get verified in person at
+                      your next event.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <button
-            className="btn-primary flex items-center"
-            onClick={() => navigate('/login')}
-          >
-            Continue to login
-            <ChevronRightIcon className="ml-2 size-4" />
-          </button>
-          <button
-            className="btn-primary flex items-center"
-            onClick={() => navigate('/resources')}
-          >
-            Explore resources
-            <ChevronRightIcon className="ml-2 size-4" />
-          </button>
-        </div>
-
-        <div className="rounded-nonenone mt-6 border-black bg-white p-4 shadow-brutal md:border-2">
-          <p className="mb-2 font-semibold">Stay in the loop</p>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            {instagramUrl && (
-              <a
-                href={instagramUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 underline"
-              >
-                <InstagramIcon className="size-4" /> Chapter Instagram
-              </a>
-            )}
-            <span className="text-grey-600">·</span>
-            <button
-              className="inline-flex items-center gap-1 underline"
-              onClick={() => navigate('/login')}
-            >
-              Contact organizers <ChatBubbleLeftRightIcon className="size-4" />
-            </button>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <Button onClick={() => navigate('/login')}>
+              Continue to login
+              <ChevronRight className="ml-2 size-4" />
+            </Button>
+            <Button variant="secondary" onClick={() => navigate('/resources')}>
+              Explore resources
+              <ChevronRight className="ml-2 size-4" />
+            </Button>
           </div>
-        </div>
-      </div>
+
+          <Card className="mt-6">
+            <CardContent className="p-4">
+              <p className="mb-2 font-semibold">Stay in the loop</p>
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                {instagramUrl && (
+                  <Button
+                    variant="link"
+                    asChild
+                    className="inline-flex items-center gap-1 p-0"
+                  >
+                    <a href={instagramUrl} target="_blank" rel="noreferrer">
+                      <Instagram className="size-4" /> Chapter Instagram
+                    </a>
+                  </Button>
+                )}
+                <span className="text-muted-foreground">·</span>
+                <Button
+                  variant="link"
+                  className="inline-flex items-center gap-1 p-0"
+                  onClick={() => navigate('/login')}
+                >
+                  Contact organizers <MessageCircle className="size-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </CardContent>
+      </Card>
     </div>
   );
 };

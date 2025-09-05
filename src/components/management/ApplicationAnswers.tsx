@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { type User } from '@/types';
 
 interface ApplicationAnswersProps {
@@ -12,35 +14,35 @@ const ApplicationAnswers: React.FC<ApplicationAnswersProps> = ({ user }) => {
   }
 
   return (
-    <div className="rounded-none border-black bg-white p-6 md:border-2">
-      <h4 className="mb-4 text-lg font-bold text-black">Application Answers</h4>
-      <div className="space-y-4">
+    <Card>
+      <CardHeader>
+        <CardTitle>Application Answers</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <div>
-          <p className="text-sm font-bold text-neutral-600">
-            Why are you vegan?
+          <Label className="text-sm font-bold">Why are you vegan?</Label>
+          <p className="text-sm text-muted-foreground">
+            {user.onboardingAnswers.veganReason}
           </p>
-          <p className="text-black">{user.onboardingAnswers.veganReason}</p>
         </div>
 
         <div>
-          <p className="text-sm font-bold text-neutral-600">
-            Abolitionist Alignment
-          </p>
-          <p className="text-black">
+          <Label className="text-sm font-bold">Abolitionist Alignment</Label>
+          <p className="text-sm text-muted-foreground">
             {user.onboardingAnswers.abolitionistAlignment ? 'Yes' : 'No'}
           </p>
         </div>
 
         {user.onboardingAnswers.customAnswer && (
           <div>
-            <p className="text-sm font-bold text-neutral-600">
-              Additional Information
+            <Label className="text-sm font-bold">Additional Information</Label>
+            <p className="text-sm text-muted-foreground">
+              {user.onboardingAnswers.customAnswer}
             </p>
-            <p className="text-black">{user.onboardingAnswers.customAnswer}</p>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

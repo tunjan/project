@@ -1,20 +1,22 @@
+import { Search } from 'lucide-react';
 import React from 'react';
 
-import { SearchIcon } from '@/icons';
+import { Button } from '@/components/ui';
 import { useSearchActions } from '@/store/search.store';
 
 const SidebarSearch: React.FC = () => {
   const { open } = useSearchActions();
 
   return (
-    <button
+    <Button
+      variant="outline"
       onClick={open}
-      className="rounded-nonenone flex w-full items-center gap-3 border-black bg-white p-2 text-left text-neutral-500 transition-colors hover:border-primary md:border-2"
+      className="flex w-full items-center justify-start gap-3 text-muted-foreground"
     >
-      <SearchIcon className="size-5" />
-      <span className="text-sm font-bold">Search...</span>
+      <Search className="size-4" />
+      <span className="text-sm font-semibold">Search...</span>
       <span className="ml-auto text-xs font-semibold">⌘K</span>
-    </button>
+    </Button>
   );
 };
 

@@ -1,9 +1,20 @@
+import { Users } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Avatar } from '@/components/ui';
-import { InputField } from '@/components/ui';
-import { Modal } from '@/components/ui';
-import { UsersIcon } from '@/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { type User } from '@/types';
 
 import { generateRandomAvatarUrl } from '../../utils/user';
@@ -55,117 +66,125 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Edit Profile"
-      onClose={onClose}
-      description="Update your personal and hosting information."
-      size="lg"
-    >
-      <div className="my-6 space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center space-x-4">
-            <Avatar
-              src={profilePictureUrl}
-              alt="Profile avatar"
-              className="size-20 object-cover"
-              editable={true}
-              onImageChange={(newImageUrl: string) => {
-                setProfilePictureUrl(newImageUrl);
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleGenerateAvatar}
-              className="flex items-center space-x-2 border-black bg-white px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white md:border-2"
-            >
-              <UsersIcon className="size-4" />
-              <span>New Avatar</span>
-            </button>
-          </div>
-          <p className="text-sm text-neutral-600">
-            💡 Click on your avatar to upload a custom image, or use the "New
-            Avatar" button for a random one.
-          </p>
-        </div>
-
-        <InputField
-          label="Full Name"
-          id="edit-name"
-          value={name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setName(e.target.value)
-          }
-        />
-        <InputField
-          label="Instagram Handle"
-          id="edit-instagram"
-          value={instagram}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setInstagram(e.target.value)
-          }
-          required={false}
-        />
-        <div className="border-t border-black pt-4">
-          <label className="flex cursor-pointer items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={hostingAvailability}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setHostingAvailability(e.target.checked)
-              }
-              className="size-5 accent-primary"
-            />
-            <span className="font-bold text-black">
-              I am available to host other activists
-            </span>
-          </label>
-          {hostingAvailability && (
-            <div className="mt-3 pl-8">
-              <label
-                htmlFor="hosting-capacity"
-                className="mb-1 block text-sm font-bold text-black"
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>
+            Update your personal and hosting information.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="my-6 space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-4">
+              <Avatar className="size-20">
+                <AvatarImage
+                  src={profilePictureUrl}
+                  alt="Profile avatar"
+                  className="object-cover"
+                />
+                <AvatarFallback>Profile</AvatarFallback>
+              </Avatar>
+              <Button
+                type="button"
+                onClick={handleGenerateAvatar}
+                variant="outline"
+                className="flex items-center space-x-2"
               >
-                How many people can you host?
-              </label>
-              <input
-                type="number"
-                id="hosting-capacity"
-                value={hostingCapacity}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setHostingCapacity(Number(e.target.value))
-                }
-                min="1"
-                className="block border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm md:border-2"
-              />
+                <Users className="size-4" />
+                <span>New Avatar</span>
+              </Button>
             </div>
-          )}
-        </div>
-      </div>
+            <p className="text-sm text-muted-foreground">
+              💡 Click on your avatar to upload a custom image, or use the "New
+              Avatar" button for a random one.
+            </p>
+          </div>
 
-      {}
-      <div className="mt-8 space-y-4 border-t-4 border-primary pt-4">
-        <h3 className="font-extrabold text-black">Danger Zone</h3>
-        <div>
-          <p className="text-sm font-bold text-black">Deactivate Account</p>
-          <p className="mb-2 text-sm text-danger">
-            Permanently delete your account and all associated data. This action
-            cannot be undone.
-          </p>
-          <button onClick={onDeactivate} className="btn-outline w-full">
-            Delete My Account
-          </button>
+          <div className="space-y-2">
+            <Label htmlFor="edit-name">Full Name</Label>
+            <Input
+              id="edit-name"
+              value={name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setName(e.target.value)
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-instagram">Instagram Handle</Label>
+            <Input
+              id="edit-instagram"
+              value={instagram}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setInstagram(e.target.value)
+              }
+            />
+          </div>
+          <Separator />
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hosting-availability"
+                checked={hostingAvailability}
+                onCheckedChange={(checked) =>
+                  setHostingAvailability(checked as boolean)
+                }
+              />
+              <Label
+                htmlFor="hosting-availability"
+                className="font-bold text-foreground"
+              >
+                I am available to host other activists
+              </Label>
+            </div>
+            {hostingAvailability && (
+              <div className="pl-6">
+                <Label htmlFor="hosting-capacity" className="text-sm font-bold">
+                  How many people can you host?
+                </Label>
+                <Input
+                  type="number"
+                  id="hosting-capacity"
+                  value={hostingCapacity}
+                  onChange={(e) => setHostingCapacity(Number(e.target.value))}
+                  min="1"
+                  className="mt-1"
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="mt-8 flex items-center space-x-4">
-        <button onClick={onClose} className="btn-secondary w-full">
-          Cancel
-        </button>
-        <button onClick={handleSubmit} className="btn-primary w-full">
-          Save Changes
-        </button>
-      </div>
-    </Modal>
+        <Separator />
+        <div className="space-y-4 border-l-4 border-destructive pl-4">
+          <h3 className="font-extrabold text-foreground">Danger Zone</h3>
+          <div>
+            <p className="text-sm font-bold text-foreground">
+              Deactivate Account
+            </p>
+            <p className="mb-2 text-sm text-destructive">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <Button
+              onClick={onDeactivate}
+              variant="destructive"
+              className="w-full"
+            >
+              Delete My Account
+            </Button>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button onClick={onClose} variant="outline">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit}>Save Changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

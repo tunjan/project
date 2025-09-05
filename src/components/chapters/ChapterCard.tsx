@@ -1,12 +1,7 @@
+import { Building2, Clock, MessageCircle, Users } from 'lucide-react';
 import React from 'react';
 
-import { Stat } from '@/components/ui';
-import {
-  BuildingOfficeIcon,
-  ChatBubbleLeftRightIcon,
-  ClockIcon,
-  UsersIcon,
-} from '@/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type ChapterStats } from '@/utils';
 
 interface ChapterCardProps {
@@ -19,46 +14,75 @@ const ChapterCard: React.FC<ChapterCardProps> = ({
   onSelect,
 }) => {
   return (
-    <button
+    <Card
       onClick={onSelect}
-      className="card-brutal-hover hover-raise w-full cursor-pointer overflow-hidden text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      className="w-full cursor-pointer overflow-hidden text-left transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
     >
-      <div className="p-6">
+      <CardHeader className="pb-3">
         <p className="text-sm font-semibold uppercase tracking-wide text-primary">
           {chapterStats.country}
         </p>
-        <h3 className="mt-1 truncate text-2xl font-bold text-black">
+        <CardTitle className="mt-1 truncate text-2xl font-bold">
           {chapterStats.name}
-        </h3>
-
-        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 border-t-2 border-black pt-6 dark:border-white">
-          <Stat
-            icon={<UsersIcon className="size-5" />}
-            value={chapterStats.memberCount}
-            label="Members"
-            variant="detailed"
-          />
-          <Stat
-            icon={<BuildingOfficeIcon className="size-5" />}
-            value={chapterStats.eventsHeld}
-            label="Events"
-            variant="detailed"
-          />
-          <Stat
-            icon={<ClockIcon className="size-5" />}
-            value={Math.round(chapterStats.totalHours)}
-            label="Hours"
-            variant="detailed"
-          />
-          <Stat
-            icon={<ChatBubbleLeftRightIcon className="size-5" />}
-            value={chapterStats.totalConversations}
-            label="Convos"
-            variant="detailed"
-          />
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <div className="flex items-center gap-2">
+            <div className="text-muted-foreground">
+              <Users className="size-5" />
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold">
+                {chapterStats.memberCount}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Members
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-muted-foreground">
+              <Building2 className="size-5" />
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold">
+                {chapterStats.eventsHeld}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Events
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-muted-foreground">
+              <Clock className="size-5" />
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold">
+                {Math.round(chapterStats.totalHours)}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Hours
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-muted-foreground">
+              <MessageCircle className="size-5" />
+            </div>
+            <div>
+              <p className="font-mono text-lg font-bold">
+                {chapterStats.totalConversations}
+              </p>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Convos
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </button>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,540 +1,100 @@
-/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  body {
-    /* Modern Brutalism: Clean background, better typography */
-    @apply bg-white font-sans leading-relaxed text-black antialiased;
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --footer: 210 40% 96.1%;
+    --footer-foreground: 222.2 47.4% 11.2%;
   }
 
-  /* Dark mode base styles */
-  .dark body {
-    @apply bg-black text-gray-100;
-  }
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-  .dark .text-gray-500 {
-    @apply text-gray-400;
-  }
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-  .dark .text-gray-600 {
-    @apply text-gray-300;
-  }
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-  .dark .text-gray-700 {
-    @apply text-gray-200;
-  }
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-  .dark .text-gray-800 {
-    @apply text-gray-100;
-  }
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-  .dark .text-gray-900 {
-    @apply text-white;
-  }
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-  /* Themed scrollbars (modern brutalist) */
-  /* WebKit */
-  ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #ffffff;
-    border-left: 2px solid #000000;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #e5e7eb; /* gray-200 */
-    border: 2px solid #000000;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #d1d5db; /* gray-300 */
-  }
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-  /* Dark mode scrollbars */
-  .dark ::-webkit-scrollbar-track {
-    background: #000000;
-    border-left: 2px solid #ffffff;
-  }
-  .dark ::-webkit-scrollbar-thumb {
-    background: #374151; /* gray-700 */
-    border: 2px solid #ffffff;
-  }
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #4b5563; /* gray-600 */
-  }
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-  /* Firefox */
+    --warning: 48 96% 53%;
+    --warning-foreground: 26 83% 14%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 215 20.2% 65.1%;
+
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --footer: 217.2 32.6% 17.5%;
+    --footer-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
   * {
-    scrollbar-width: thin;
-    scrollbar-color: #000000 #ffffff;
+    @apply border-border;
   }
-
-  .dark * {
-    scrollbar-color: #ffffff #000000;
-  }
-
-  /* Enhanced typography hierarchy */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply leading-tight;
-  }
-
-  /* Enhanced spacing */
-  button,
-  a {
-    /* Transitions removed for performance */
-  }
-
-  /* Better spacing for text content */
-  p {
-    @apply leading-relaxed;
-  }
-
-  /* React Grid Layout styles override */
-  .react-grid-layout {
-    position: relative;
-  }
-
-  .react-grid-item {
-    transition: all 200ms ease;
-    transition-property: left, top;
-  }
-
-  .react-grid-item.cssTransforms {
-    transition-property: transform;
-  }
-
-  .react-grid-item > .react-resizable-handle {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    bottom: 0;
-    right: 0;
-    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA2IDYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgb3BhY2l0eT0iLjMwMiI+PHBhdGggZD0ibTYgNmgtNnYtNmg2djZ6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0ibTUgNWgtNHYtNGg0djR6IiBmaWxsPSIjNjY2Ii8+PC9nPjwvZz48L3N2Zz4=');
-    background-position: bottom right;
-    padding: 0 3px 3px 0;
-    background-repeat: no-repeat;
-    background-origin: content-box;
-    box-sizing: border-box;
-    cursor: se-resize;
-  }
-
-  .react-grid-item.react-grid-placeholder {
-    background: #000;
-    opacity: 0.2;
-    transition-duration: 100ms;
-    z-index: 2;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-  }
-}
-
-@layer components {
-  /* Standardized Card Styles */
-  .card-base {
-    @apply border-black bg-white dark:border-white dark:bg-black md:border-2;
-  }
-
-  .card-hover {
-    @apply transition-all duration-200 hover:shadow-brutal active:translate-x-1 active:translate-y-1 active:shadow-none;
-  }
-
-  .card-brutal {
-    @apply border-black bg-white dark:border-white dark:bg-black md:border-2;
-  }
-
-  .card-brutal-hover {
-    @apply border-black bg-white transition-all duration-200 hover:shadow-brutal active:translate-x-1 active:translate-y-1 active:shadow-none dark:border-white dark:bg-black md:border-2;
-  }
-
-  .card-padding {
-    @apply p-4 sm:p-6;
-  }
-
-  .h-card-brutal {
-    @apply border-b-2 border-black px-4 py-2 font-bold text-black dark:border-white dark:text-white;
-  }
-
-  /* Standardized Section Header Styles */
-  .h-section {
-    @apply mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black;
-  }
-
-  .react-add-to-calendar__wrapper {
-    @apply relative;
-  }
-  .react-add-to-calendar__button {
-    @apply hover:bg-red w-full border-black bg-black px-4 py-2 text-sm font-bold text-white md:border-2 !important;
-  }
-  .react-add-to-calendar__dropdown {
-    @apply w-full border-black bg-white md:border-2 !important;
-  }
-  .react-add-to-calendar__dropdown a {
-    @apply hover:bg-red block p-2 text-sm text-black hover:text-white !important;
-  }
-
-  /* FullCalendar Brutalist Overrides */
-  /* Base */
-  .fc,
-  .fc * {
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
-  .fc {
-    font-family: inherit !important;
-    color: #000000 !important;
-    background: #ffffff !important;
-  }
-
-  /* Toolbar */
-  .fc .fc-toolbar {
-    border-bottom: 2px solid #000000 !important;
-    padding-bottom: 8px !important;
-    margin-bottom: 12px !important;
-  }
-  .fc .fc-toolbar-title {
-    font-weight: 800 !important;
-    letter-spacing: -0.01em !important;
-  }
-  .fc .fc-button {
-    border: 2px solid #000000 !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    text-transform: uppercase !important;
-    font-weight: 800 !important;
-    border-radius: 0 !important;
-    padding: 6px 10px !important;
-  }
-  .fc .fc-button:hover,
-  .fc .fc-button:focus {
-    background: #000000 !important;
-    color: #ffffff !important;
-  }
-  .fc .fc-button:disabled {
-    opacity: 0.5 !important;
-    background: #f5f5f5 !important;
-    color: #6b7280 !important;
-  }
-
-  /* Grid and headers */
-  .fc-theme-standard .fc-scrollgrid,
-  .fc-theme-standard td,
-  .fc-theme-standard th {
-    border-color: #000000 !important;
-  }
-  .fc-theme-standard .fc-scrollgrid {
-    border: 2px solid #000000 !important;
-  }
-  .fc .fc-col-header {
-    border-bottom: 2px solid #000000 !important;
-    background: #ffffff !important;
-  }
-  .fc .fc-col-header-cell-cushion {
-    font-weight: 800 !important;
-    color: #111827 !important; /* neutral-900 */
-    padding: 10px 8px !important;
-  }
-
-  /* Today highlight */
-  .fc .fc-day-today {
-    background: #fff4f4 !important; /* subtle red tint */
-    outline: 2px solid #000000 !important;
-    outline-offset: -2px !important;
-  }
-
-  /* Events */
-  .fc .fc-daygrid-event,
-  .fc .fc-timegrid-event {
-    border: 2px solid #000000 !important;
-    border-left-width: 2px !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-weight: 700 !important;
-    padding: 2px 4px !important;
-  }
-  .fc .fc-daygrid-event:hover,
-  .fc .fc-timegrid-event:hover {
-    background: #f3f4f6 !important; /* gray-100 */
-  }
-  .fc .fc-event-title {
-    color: #000000 !important;
-  }
-  .fc .fc-event-time {
-    color: #6b7280 !important; /* neutral-500 */
-    font-weight: 600 !important;
-  }
-
-  /* Now indicator */
-  .fc .fc-timegrid-now-indicator-line {
-    border-color: #d81313 !important; /* primary red */
-  }
-  .fc .fc-timegrid-now-indicator-arrow {
-    border-top-color: #d81313 !important;
-  }
-
-  /* Popover (more events) */
-  .fc .fc-popover {
-    border: 2px solid #000000 !important;
-    background: #ffffff !important;
-  }
-  .fc .fc-popover-header {
-    border-bottom: 2px solid #000000 !important;
-    background: #ffffff !important;
-    font-weight: 800 !important;
-  }
-  .fc .fc-popover-close {
-    border: 2px solid #000000 !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  /* List view */
-  .fc .fc-list {
-    border: 2px solid #000000 !important;
-  }
-  .fc .fc-list-table td,
-  .fc .fc-list-table th {
-    border-color: #000000 !important;
-  }
-  .fc .fc-list-event:hover td {
-    background: #f3f4f6 !important;
-  }
-
-  /* Brutalist Select Styling - Override Safari Defaults */
-  select {
-    /* Reset Safari's default appearance */
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-
-    /* Custom styling */
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
-    background-position: right 0.5rem center !important;
-    background-repeat: no-repeat !important;
-    background-size: 1.5em 1.5em !important;
-
-    /* Ensure consistent styling across browsers */
-    border: 2px solid #000000 !important;
-    border-radius: 0 !important;
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    line-height: inherit !important;
-    padding: 0.5rem 2.5rem 0.5rem 0.5rem !important;
-
-    /* Remove default focus styles */
-    outline: none !important;
-
-    /* Ensure proper sizing */
-    box-sizing: border-box !important;
-    width: 100% !important;
-    min-height: 2.5rem !important;
-  }
-
-  /* Focus state for select elements */
-  select:focus {
-    border-color: #d81313 !important;
-    box-shadow: 0 0 0 2px rgba(216, 19, 19, 0.2) !important;
-  }
-
-  /* Disabled state for select elements */
-  select:disabled {
-    background-color: #f3f4f6 !important;
-    color: #6b7280 !important;
-    cursor: not-allowed !important;
-    opacity: 0.6 !important;
-  }
-
-  /* Hover state for select elements */
-  select:hover:not(:disabled) {
-    background-color: #f9fafb !important;
-  }
-
-  /* Option styling */
-  select option {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    padding: 0.5rem !important;
-    border: none !important;
-  }
-
-  /* Option hover state */
-  select option:hover {
-    background-color: #f3f4f6 !important;
-  }
-
-  /* Option selected state */
-  select option:checked {
-    background-color: #d81313 !important;
-    color: #ffffff !important;
-  }
-
-  /* Select with error state */
-  select.border-danger {
-    border-color: #d81313 !important;
-  }
-
-  /* Select with success state */
-  select.border-success {
-    border-color: #22c55e !important; /* Tailwind's green-500 */
-  }
-
-  /* Custom select arrow positioning */
-  select::-ms-expand {
-    display: none !important;
-  }
-
-  /* Safari-specific overrides */
-  @supports (-webkit-appearance: none) {
-    select {
-      /* Force webkit appearance reset */
-      -webkit-appearance: none !important;
-      -webkit-border-radius: 0 !important;
-      -webkit-box-shadow: none !important;
-
-      /* Ensure proper text rendering */
-      -webkit-font-smoothing: antialiased !important;
-      -moz-osx-font-smoothing: grayscale !important;
-    }
-
-    /* Override Safari's default select button */
-    select::-webkit-select-placeholder {
-      color: #6b7280 !important;
-    }
-
-    /* Remove Safari's default focus ring */
-    select:focus {
-      -webkit-box-shadow: 0 0 0 2px rgba(216, 19, 19, 0.2) !important;
-      -webkit-outline: none !important;
-    }
-  }
-
-  /* Firefox-specific overrides */
-  @-moz-document url-prefix() {
-    select {
-      /* Ensure Firefox respects our styling */
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
-      background-position: right 0.5rem center !important;
-      background-repeat: no-repeat !important;
-      background-size: 1.5em 1.5em !important;
-    }
-  }
-
-  /* Edge-specific overrides */
-}
-
-@layer utilities {
-  /* Animation classes removed for performance */
-
-  /* Brutalist Shadow Utilities */
-  .shadow-brutal {
-    box-shadow: 4px 4px 0 #000000;
-  }
-
-  .shadow-brutal-lg {
-    box-shadow: 8px 8px 0 #000000;
-  }
-
-  /* Button Utilities */
-  .btn-primary {
-    @apply bg-primary px-4 py-2 font-bold text-white transition-all duration-200 hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
-  }
-
-  .btn-sm {
-    @apply px-3 py-1.5 text-sm;
-  }
-
-  /* Border Radius Utilities */
-  .rounded-none {
-    border-radius: 0;
-  }
-
-  .rounded-nonenone {
-    border-radius: 0;
-  }
-
-  /* Mobile-first utilities */
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Touch-friendly interactions */
-  .touch-manipulation {
-    touch-action: manipulation;
-  }
-
-  /* Mobile-optimized hover effects */
-  @media (hover: hover) and (pointer: fine) {
-    .hover-raise:hover {
-      transform: translateY(-2px);
-      box-shadow: 6px 6px 0 #000000;
-    }
-  }
-
-  /* Mobile-specific breakpoint utilities */
-  @media (max-width: 480px) {
-    .xs\:inline {
-      display: inline;
-    }
-
-    .xs\:hidden {
-      display: none;
-    }
-
-    .xs\:block {
-      display: block;
-    }
-
-    .xs\:flex {
-      display: flex;
-    }
-  }
-
-  /* Improved focus states for mobile accessibility */
-  .focus-visible-ring:focus-visible {
-    outline: 2px solid #d81313;
-    outline-offset: 2px;
-  }
-
-  /* Better spacing for mobile cards */
-  .mobile-card-spacing {
-    @apply p-4 sm:p-5 md:p-6;
-  }
-
-  /* Mobile-optimized text sizes */
-  .text-mobile-sm {
-    @apply text-sm sm:text-base;
-  }
-
-  .text-mobile-base {
-    @apply text-base sm:text-lg;
-  }
-
-  .text-mobile-lg {
-    @apply text-lg sm:text-xl md:text-2xl;
+  body {
+    @apply bg-background text-foreground;
   }
 }

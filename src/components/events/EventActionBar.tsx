@@ -1,12 +1,14 @@
+import {
+  CheckCircle,
+  ClipboardCheck,
+  LogOut,
+  Pencil,
+  XCircle,
+} from 'lucide-react';
 import React from 'react';
 
-import {
-  CheckCircleIcon,
-  ClipboardCheckIcon,
-  LogoutIcon,
-  PencilIcon,
-  XCircleIcon,
-} from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { CubeEvent, EventStatus } from '@/types';
 
 interface EventActionBarProps {
@@ -45,61 +47,72 @@ const EventActionBar: React.FC<EventActionBarProps> = ({
 
   if (isCancelled) {
     return (
-      <div className="card-brutal mb-6 flex items-center justify-center bg-danger p-4 text-center font-bold text-white">
-        <XCircleIcon className="mr-2 size-6" />
-        This event has been cancelled.
-      </div>
+      <Card className="mb-6 border-destructive bg-destructive/10">
+        <CardContent className="flex items-center justify-center p-4 text-center">
+          <XCircle className="mr-2 size-6 text-destructive" />
+          <span className="font-semibold text-destructive">
+            This event has been cancelled.
+          </span>
+        </CardContent>
+      </Card>
     );
   }
 
   if (isPastEvent) {
     return (
-      <div className="card-brutal mb-6 flex items-center justify-between bg-white p-4">
-        <p className="font-bold text-black">This event has ended.</p>
-        {canManageEvent && (
-          <button onClick={onManageEvent} className="btn-primary">
-            <ClipboardCheckIcon className="mr-2 size-5" />
-            Log Event Report
-          </button>
-        )}
-      </div>
+      <Card className="mb-6">
+        <CardContent className="flex items-center justify-between p-4">
+          <p className="font-semibold">This event has ended.</p>
+          {canManageEvent && (
+            <Button onClick={onManageEvent}>
+              <ClipboardCheck className="mr-2 size-4" />
+              Log Event Report
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     );
   }
 
   if (isAttending) {
     return (
-      <div className="card-brutal mb-6 flex flex-col items-center justify-between gap-4 bg-primary-lightest p-4 sm:flex-row">
-        <div className="flex items-center font-bold text-black">
-          <CheckCircleIcon className="mr-2 size-6 text-success" />
-          You are attending this event!
-        </div>
-        <div className="flex w-full gap-2 sm:w-auto">
-          {isRegionalEvent && (
-            <button onClick={onRsvp} className="btn-primary flex-1">
-              <PencilIcon className="mr-2 size-4" /> Update Duties
-            </button>
-          )}
-          <button
-            onClick={onCancelRsvp}
-            className="btn-outline flex items-center"
-          >
-            <LogoutIcon className="mr-2 size-4" /> Cancel RSVP
-          </button>
-        </div>
-      </div>
+      <Card className="mb-6 border-primary bg-primary/10">
+        <CardContent className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+          <div className="flex items-center font-semibold">
+            <CheckCircle className="mr-2 size-6 text-primary" />
+            You are attending this event!
+          </div>
+          <div className="flex w-full gap-2 sm:w-auto">
+            {isRegionalEvent && (
+              <Button onClick={onRsvp} className="flex-1">
+                <Pencil className="mr-2 size-4" /> Update Duties
+              </Button>
+            )}
+            <Button
+              onClick={onCancelRsvp}
+              variant="outline"
+              className="flex items-center"
+            >
+              <LogOut className="mr-2 size-4" /> Cancel RSVP
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (isPending) {
     return (
-      <div className="card-brutal mb-6 flex flex-col items-center justify-between gap-4 bg-yellow-100 p-4 sm:flex-row">
-        <p className="font-bold text-black">
-          Your request to join is pending approval.
-        </p>
-        <button onClick={onCancelRsvp} className="btn-outline">
-          Cancel Request
-        </button>
-      </div>
+      <Card className="mb-6 border-warning bg-warning/10">
+        <CardContent className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+          <p className="font-semibold">
+            Your request to join is pending approval.
+          </p>
+          <Button onClick={onCancelRsvp} variant="outline">
+            Cancel Request
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -112,22 +125,28 @@ const EventActionBar: React.FC<EventActionBarProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="card-brutal bg-white p-4">
-        <button onClick={onRsvp} className="btn-primary w-full">
-          {rsvpText}
-        </button>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <Button onClick={onRsvp} className="w-full">
+            {rsvpText}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Event Management Buttons */}
       {canEditEvent && (
-        <button onClick={onEditEvent} className="btn-outline w-full">
+        <Button onClick={onEditEvent} variant="outline" className="w-full">
           Edit Event
-        </button>
+        </Button>
       )}
       {canCancelEvent && (
-        <button onClick={onCancelEvent} className="btn-danger w-full">
+        <Button
+          onClick={onCancelEvent}
+          variant="destructive"
+          className="w-full"
+        >
           Cancel Event
-        </button>
+        </Button>
       )}
     </div>
   );

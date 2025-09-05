@@ -1,8 +1,11 @@
+import { CheckCircle, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Avatar } from '@/components/ui';
-import { Tag } from '@/components/ui';
-import { CheckCircleIcon, XCircleIcon } from '@/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { useAccommodationsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type AccommodationRequest } from '@/types';
@@ -16,15 +19,15 @@ const StatusBadge: React.FC<{ status: AccommodationRequest['status'] }> = ({
   status,
 }) => {
   const variantMap = {
-    Pending: 'warning' as const,
-    Accepted: 'success' as const,
-    Denied: 'danger' as const,
+    Pending: 'secondary' as const,
+    Accepted: 'default' as const,
+    Denied: 'destructive' as const,
   };
 
   return (
-    <Tag variant={variantMap[status]} size="sm">
+    <Badge variant={variantMap[status]} className="text-xs">
       {status.toUpperCase()}
-    </Tag>
+    </Badge>
   );
 };
 
@@ -59,87 +62,94 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   };
 
   return (
-    <div className="border-black bg-white p-4 md:border-2">
-      <div className="mb-3 flex flex-col justify-between border-b-2 border-black pb-3 sm:flex-row sm:items-center">
-        <div className="mb-2 sm:mb-0">
-          <p className="text-sm text-neutral-600">
-            {isHostView ? 'Request From' : 'Request To'}
-          </p>
-          <div className="flex items-center space-x-2">
-            <Avatar
-              src={otherUser.profilePictureUrl}
-              alt={otherUser.name}
-              className="size-8 object-cover"
-            />
-            <p className="font-bold text-black">{otherUser.name}</p>
-          </div>
-        </div>
-        <div className="text-left sm:text-right">
-          <p className="text-sm text-neutral-600">For Event</p>
-          <p className="font-bold text-black">
-            {request.event.location}, {request.event.city}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <p className="mb-1 text-sm font-semibold text-black">Message:</p>
-          <p className="border-black bg-white p-2 text-sm text-black md:border-2">
-            {request.message}
-          </p>
-
-          {request.hostReply && (
-            <div className="mt-2">
-              <p className="mb-1 text-sm font-semibold text-black">
-                Host's Reply:
-              </p>
-              <p className="border-primary bg-primary/10 p-2 text-sm text-black md:border-2">
-                {request.hostReply}
-              </p>
+    <Card className="p-4">
+      <CardContent className="p-0">
+        <div className="mb-3 flex flex-col justify-between border-b border-border pb-3 sm:flex-row sm:items-center">
+          <div className="mb-2 sm:mb-0">
+            <p className="text-sm text-muted-foreground">
+              {isHostView ? 'Request From' : 'Request To'}
+            </p>
+            <div className="flex items-center space-x-2">
+              <Avatar className="size-8">
+                <AvatarImage
+                  src={otherUser.profilePictureUrl}
+                  alt={otherUser.name}
+                  className="object-cover"
+                />
+                <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <p className="font-bold text-foreground">{otherUser.name}</p>
             </div>
-          )}
-        </div>
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm font-semibold text-black">Dates</p>
-            <p className="text-sm text-neutral-600">
-              {formatDateRange(request.startDate, request.endDate)}
+          </div>
+          <div className="text-left sm:text-right">
+            <p className="text-sm text-muted-foreground">For Event</p>
+            <p className="font-bold text-foreground">
+              {request.event.location}, {request.event.city}
             </p>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-black">Status</p>
-            <StatusBadge status={request.status} />
-          </div>
         </div>
-      </div>
 
-      {isHostView && request.status === 'Pending' && (
-        <div className="mt-4 space-y-3 border-t-2 border-black pt-4">
-          <textarea
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder="Optional: Reply with a message..."
-            rows={2}
-            className="block w-full border-black bg-white p-2 text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:text-sm md:border-2"
-          />
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleRespond('Denied')}
-              className="btn-secondary flex w-full items-center justify-center"
-            >
-              <XCircleIcon className="mr-1.5 size-5" /> Deny
-            </button>
-            <button
-              onClick={() => handleRespond('Accepted')}
-              className="btn-primary flex w-full items-center justify-center"
-            >
-              <CheckCircleIcon className="mr-1.5 size-5" /> Accept
-            </button>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <p className="mb-1 text-sm font-semibold text-foreground">
+              Message:
+            </p>
+            <Card className="p-2">
+              <p className="text-sm text-foreground">{request.message}</p>
+            </Card>
+
+            {request.hostReply && (
+              <div className="mt-2">
+                <p className="mb-1 text-sm font-semibold text-foreground">
+                  Host's Reply:
+                </p>
+                <Card className="bg-primary/10 p-2">
+                  <p className="text-sm text-foreground">{request.hostReply}</p>
+                </Card>
+              </div>
+            )}
+          </div>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Dates</p>
+              <p className="text-sm text-muted-foreground">
+                {formatDateRange(request.startDate, request.endDate)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Status</p>
+              <StatusBadge status={request.status} />
+            </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {isHostView && request.status === 'Pending' && (
+          <div className="mt-4 space-y-3 border-t border-border pt-4">
+            <Textarea
+              value={reply}
+              onChange={(e) => setReply(e.target.value)}
+              placeholder="Optional: Reply with a message..."
+              rows={2}
+            />
+            <div className="flex items-center space-x-2">
+              <Button
+                onClick={() => handleRespond('Denied')}
+                variant="outline"
+                className="w-full"
+              >
+                <XCircle className="mr-1.5 size-4" /> Deny
+              </Button>
+              <Button
+                onClick={() => handleRespond('Accepted')}
+                className="w-full"
+              >
+                <CheckCircle className="mr-1.5 size-4" /> Accept
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,12 +1,9 @@
+import { Calendar, ChevronLeft, Clock, MessageCircle } from 'lucide-react';
 import React, { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { can, Permission } from '@/config';
-import {
-  CalendarIcon,
-  ChatBubbleLeftRightIcon,
-  ChevronLeftIcon,
-  ClockIcon,
-} from '@/icons';
 import { useChapters, useCurrentUser } from '@/store';
 import { useAwardsActions } from '@/store/awards.store';
 import { useUsersActions } from '@/store/users.store';
@@ -164,12 +161,13 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         />
       )}
       <div className="animate-fade-in py-8 md:py-12">
-        <button
+        <Button
           onClick={onBack}
-          className="mb-6 inline-flex items-center text-sm font-semibold text-primary transition hover:text-black"
+          variant="ghost"
+          className="mb-6 text-sm font-semibold text-primary hover:text-black"
         >
-          <ChevronLeftIcon className="mr-1 size-5" /> Back to Member Directory
-        </button>
+          <ChevronLeft className="mr-1 size-5" /> Back to Member Directory
+        </Button>
 
         <MemberProfileHeader user={user} />
 
@@ -180,13 +178,15 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
         {(user.onboardingStatus === OnboardingStatus.PENDING_ONBOARDING_CALL ||
           user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL) &&
           user.onboardingProgress?.onboardingCallScheduledAt && (
-            <section className="mb-8 border-black bg-white p-6 md:border-2">
-              <h2 className="mb-4 text-2xl font-bold text-black">
-                Onboarding Call Scheduled
-              </h2>
-              <div className="space-y-4">
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-2xl">
+                  Onboarding Call Scheduled
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="size-5 text-neutral-500" />
+                  <Calendar className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.onboardingCallScheduledAt
@@ -196,7 +196,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <ClockIcon className="size-5 text-neutral-500" />
+                  <Clock className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.onboardingCallScheduledAt
@@ -206,29 +206,31 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ChatBubbleLeftRightIcon className="mt-0.5 size-5 text-neutral-500" />
+                  <MessageCircle className="mt-0.5 size-5 text-neutral-500" />
                   <div>
                     <p className="font-semibold">Provided Contact Info:</p>
-                    <p className="rounded-nonemd border-black bg-neutral-100 p-2 font-mono text-sm md:border-2">
+                    <p className="border bg-muted p-2 font-mono text-sm">
                       {user.onboardingProgress.onboardingCallContactInfo ||
                         'Not provided'}
                     </p>
                   </div>
                 </div>
-              </div>
-            </section>
+              </CardContent>
+            </Card>
           )}
 
         {/* Revision Call Scheduled Info */}
         {user.onboardingStatus === OnboardingStatus.AWAITING_REVISION_CALL &&
           user.onboardingProgress?.revisionCallScheduledAt && (
-            <section className="mb-8 border-black bg-white p-6 md:border-2">
-              <h2 className="mb-4 text-2xl font-bold text-black">
-                Revision Call Scheduled
-              </h2>
-              <div className="space-y-4">
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-2xl">
+                  Revision Call Scheduled
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="size-5 text-neutral-500" />
+                  <Calendar className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.revisionCallScheduledAt
@@ -238,7 +240,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <ClockIcon className="size-5 text-neutral-500" />
+                  <Clock className="size-5 text-neutral-500" />
                   <span className="font-semibold">
                     {new Date(
                       user.onboardingProgress.revisionCallScheduledAt
@@ -248,17 +250,17 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ChatBubbleLeftRightIcon className="mt-0.5 size-5 text-neutral-500" />
+                  <MessageCircle className="mt-0.5 size-5 text-neutral-500" />
                   <div>
                     <p className="font-semibold">Provided Contact Info:</p>
-                    <p className="rounded-nonemd border-black bg-neutral-100 p-2 font-mono text-sm md:border-2">
+                    <p className="border bg-muted p-2 font-mono text-sm">
                       {user.onboardingProgress.revisionCallContactInfo ||
                         'Not provided'}
                     </p>
                   </div>
                 </div>
-              </div>
-            </section>
+              </CardContent>
+            </Card>
           )}
 
         {/* Application Answers - Show first for unapproved members */}

@@ -374,19 +374,16 @@ const createHistogramData = (
 };
 
 /**
- * NEW: Generates data for activist performance distribution histograms.
+ * NEW: Generates data for activist hours distribution histogram.
  */
-export const getActivistPerformanceDistribution = (
+export const getActivistHoursDistribution = (
   users: User[],
-  allEvents: CubeEvent[],
-  allLogs: OutreachLog[]
+  allEvents: CubeEvent[]
 ): { name: string; value: number }[] => {
   const confirmedUsers = getConfirmedUsers(users);
 
-  // FIX: Optimize performance by building maps first instead of filtering for each user
   // Build a map of user hours from events
   const userHours = new Map<string, number>();
-  const userConversations = new Map<string, number>();
 
   // Process all events once to build user hours map
   for (const event of allEvents) {
@@ -400,29 +397,46 @@ export const getActivistPerformanceDistribution = (
     }
   }
 
+  // Calculate hours for each user
+  const usersWithHours = confirmedUsers.map((user) => ({
+    ...user,
+    totalHours: userHours.get(user.id) || 0,
+  }));
+
+  return usersWithHours
+    .sort((a, b) => b.totalHours - a.totalHours)
+    .slice(0, 10)
+    .map((u) => ({ name: u.name, value: Math.round(u.totalHours) }));
+};
+
+/**
+ * NEW: Generates data for activist conversations distribution histogram.
+ */
+export const getActivistConversationsDistribution = (
+  users: User[],
+  allLogs: OutreachLog[]
+): { name: string; value: number }[] => {
+  const confirmedUsers = getConfirmedUsers(users);
+
+  // Build a map of user conversations from logs
+  const userConversations = new Map<string, number>();
+
   // Process all logs once to build user conversations map
   for (const log of allLogs) {
     const currentCount = userConversations.get(log.userId) || 0;
     userConversations.set(log.userId, currentCount + 1);
   }
 
-  // Calculate performance scores efficiently
-  const usersWithScores = confirmedUsers.map((user) => {
-    const hours = userHours.get(user.id) || 0;
-    const conversations = userConversations.get(user.id) || 0;
-    // Simple scoring: hours + conversations (can be adjusted)
-    const score = hours + conversations;
+  // Calculate conversations for each user
+  const usersWithConversations = confirmedUsers.map((user) => ({
+    ...user,
+    totalConversations: userConversations.get(user.id) || 0,
+  }));
 
-    return {
-      ...user,
-      score,
-    };
-  });
-
-  return usersWithScores
-    .sort((a, b) => b.score - a.score)
+  return usersWithConversations
+    .sort((a, b) => b.totalConversations - a.totalConversations)
     .slice(0, 10)
-    .map((u) => ({ name: u.name, value: Math.round(u.score) }));
+    .map((u) => ({ name: u.name, value: u.totalConversations }));
 };
 
 /**

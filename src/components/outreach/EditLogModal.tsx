@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 
-import { SelectField, TextAreaField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+} from '@/components/ui';
+import { Label } from '@/components/ui/label';
 import { type OutreachLog, OutreachOutcome } from '@/types';
 
 interface EditLogModalProps {
@@ -26,38 +38,55 @@ const EditLogModal: React.FC<EditLogModalProps> = ({
   };
 
   return (
-    <Modal title="Edit Log Entry" onClose={onClose} size="md" isOpen={isOpen}>
-      <div className="space-y-4">
-        <SelectField
-          label="Outcome"
-          id="edit-outcome"
-          value={outcome}
-          onChange={(e) => setOutcome(e.target.value as OutreachOutcome)}
-        >
-          {Object.values(OutreachOutcome).map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </SelectField>
-        <TextAreaField
-          label="Notes"
-          id="edit-notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={4}
-          placeholder="Add notes about this conversation..."
-        />
-        <div className="flex gap-4 pt-4">
-          <button onClick={handleSave} className="btn-primary flex-1">
-            Save Changes
-          </button>
-          <button onClick={onClose} className="btn-secondary flex-1">
-            Cancel
-          </button>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Log Entry</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="edit-outcome">Outcome</Label>
+            <Select
+              value={outcome}
+              onValueChange={(value: string) =>
+                setOutcome(value as OutreachOutcome)
+              }
+            >
+              <SelectTrigger id="edit-outcome">
+                <SelectValue placeholder="Select an outcome" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(OutreachOutcome).map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="edit-notes">Notes</Label>
+            <Textarea
+              id="edit-notes"
+              value={notes}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setNotes(e.target.value)
+              }
+              rows={4}
+              placeholder="Add notes about this conversation..."
+            />
+          </div>
+          <div className="flex gap-4 pt-4">
+            <Button onClick={handleSave} className="flex-1">
+              Save Changes
+            </Button>
+            <Button onClick={onClose} variant="secondary" className="flex-1">
+              Cancel
+            </Button>
+          </div>
         </div>
-      </div>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };
 

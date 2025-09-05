@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, TextAreaField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useAnnouncementsActions } from '@/store/announcements.store';
 import { type Announcement } from '@/types';
 
@@ -31,58 +40,70 @@ const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
   };
 
   return (
-    <Modal title="Edit Announcement" onClose={onClose} isOpen={isOpen}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <InputField
-          label="Title"
-          id="edit-title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <TextAreaField
-          label="Content"
-          id="edit-content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={8}
-        />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Announcement</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="edit-title">Title</Label>
+            <Input
+              id="edit-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-content">Content</Label>
+            <Textarea
+              id="edit-content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={8}
+            />
+          </div>
 
-        <div className="mt-4 space-y-4 border-t-2 border-black pt-4">
-          <h3 className="text-lg font-bold text-black">
-            Optional: Call to Action
-          </h3>
-          <InputField
-            label="CTA Link"
-            id="edit-ctaLink"
-            value={ctaLink}
-            onChange={(e) => setCtaLink(e.target.value)}
-            placeholder="https://example.com/more-info"
-          />
-          <InputField
-            label="CTA Button Text"
-            id="edit-ctaText"
-            value={ctaText}
-            onChange={(e) => setCtaText(e.target.value)}
-            placeholder="Learn More"
-          />
-        </div>
-        <div className="flex items-center space-x-4 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-          >
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </Modal>
+          <div className="mt-4 space-y-4 border-t border-border pt-4">
+            <h3 className="text-lg font-bold text-foreground">
+              Optional: Call to Action
+            </h3>
+            <div className="space-y-2">
+              <Label htmlFor="edit-ctaLink">CTA Link</Label>
+              <Input
+                id="edit-ctaLink"
+                value={ctaLink}
+                onChange={(e) => setCtaLink(e.target.value)}
+                placeholder="https://example.com/more-info"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-ctaText">CTA Button Text</Label>
+              <Input
+                id="edit-ctaText"
+                value={ctaText}
+                onChange={(e) => setCtaText(e.target.value)}
+                placeholder="Learn More"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="flex space-x-4 pt-4">
+            <Button
+              type="button"
+              onClick={onClose}
+              variant="outline"
+              className="w-full"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="w-full">
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

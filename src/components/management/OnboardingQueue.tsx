@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-import { Avatar } from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { type User } from '@/types';
 
 interface OnboardingQueueProps {
@@ -21,71 +23,76 @@ const ApplicantCard: React.FC<{
       : 'No chapter';
 
   return (
-    <div className="border-black bg-white md:border-2">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-4">
-          <Avatar
-            src={user.profilePictureUrl}
-            alt={user.name}
-            className="size-12 object-cover"
-          />
-          <div>
-            <p className="font-bold text-black">{user.name}</p>
-            <p className="text-sm text-neutral-500">{chapterText}</p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Avatar className="size-12">
+              <AvatarImage
+                src={user.profilePictureUrl}
+                alt={user.name}
+                className="object-cover"
+              />
+              <AvatarFallback>
+                {user.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-bold text-foreground">{user.name}</p>
+              <p className="text-sm text-muted-foreground">{chapterText}</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            {user.onboardingAnswers && (
+              <Button
+                onClick={() => setIsExpanded(!isExpanded)}
+                variant="ghost"
+                size="sm"
+              >
+                {isExpanded ? 'Hide' : 'Review'} Answers
+              </Button>
+            )}
+            <Button onClick={onDeny} variant="destructive" size="sm">
+              Deny
+            </Button>
+            <Button onClick={onApprove} variant="default" size="sm">
+              Approve
+            </Button>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          {user.onboardingAnswers && (
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 text-sm font-semibold text-black hover:bg-white"
-            >
-              {isExpanded ? 'Hide' : 'Review'} Answers
-            </button>
-          )}
-          <button
-            onClick={onDeny}
-            className="bg-black px-3 py-2 text-sm font-semibold text-white hover:bg-black"
-          >
-            Deny
-          </button>
-          <button
-            onClick={onApprove}
-            className="bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover"
-          >
-            Approve
-          </button>
-        </div>
-      </div>
+      </CardHeader>
       {isExpanded && user.onboardingAnswers && (
-        <div className="space-y-3 border-t-2 border-black bg-white p-4">
+        <CardContent className="space-y-3 border-t">
           <div>
-            <p className="text-xs font-bold uppercase text-neutral-500">
+            <p className="text-xs font-bold uppercase text-muted-foreground">
               Why did you go vegan?
             </p>
-            <p className="text-sm text-black">
+            <p className="text-sm text-foreground">
               {user.onboardingAnswers.veganReason}
             </p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-neutral-500">
+            <p className="text-xs font-bold uppercase text-muted-foreground">
               Are you aligned with our abolitionist values?
             </p>
-            <p className="text-sm text-black">
+            <p className="text-sm text-foreground">
               {user.onboardingAnswers.abolitionistAlignment ? 'Yes' : 'No'}
             </p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-neutral-500">
+            <p className="text-xs font-bold uppercase text-muted-foreground">
               Chapter Question: How can you contribute?
             </p>
-            <p className="text-sm text-black">
+            <p className="text-sm text-foreground">
               {user.onboardingAnswers.customAnswer}
             </p>
           </div>
-        </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -96,12 +103,16 @@ const OnboardingQueue: React.FC<OnboardingQueueProps> = ({
 }) => {
   if (applicants.length === 0) {
     return (
-      <div className="border-black bg-white p-8 text-center md:border-2">
-        <h3 className="text-xl font-bold text-black">The queue is empty.</h3>
-        <p className="mt-2 text-neutral-500">
-          There are no new applicants to review at this time.
-        </p>
-      </div>
+      <Card>
+        <CardContent className="p-8 text-center">
+          <h3 className="text-xl font-bold text-foreground">
+            The queue is empty.
+          </h3>
+          <p className="mt-2 text-muted-foreground">
+            There are no new applicants to review at this time.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 

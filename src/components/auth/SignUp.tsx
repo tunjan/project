@@ -3,8 +3,26 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { InputField, SelectField, TextAreaField } from '@/components/ui';
-import { CheckIcon } from '@/icons';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { type Chapter, type OnboardingAnswers } from '@/types';
 
 // 1. Define the validation schema with Zod
@@ -53,6 +71,8 @@ const SignUp: React.FC<SignUpProps> = ({
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<SignUpFormSchema>({
     resolver: zodResolver(signUpSchema),
@@ -81,130 +101,165 @@ const SignUp: React.FC<SignUpProps> = ({
   };
 
   return (
-    <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-2xl border border-black bg-white">
-        <div className="border-b border-black p-8">
-          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
-            Join the Movement
-          </h1>
-          <p className="mt-2 text-neutral-600">
-            Complete the application below. An organizer from your selected
-            chapter will review it.
-          </p>
-        </div>
-        {/* 5. Connect handleSubmit to the form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-8">
-          {/* 6. Connect fields with `register` and pass errors */}
-          <InputField
-            label="Full Name"
-            id="name"
-            {...register('name')}
-            error={errors.name?.message}
-          />
-          <InputField
-            label="Email Address"
-            id="email"
-            type="email"
-            {...register('email')}
-            error={errors.email?.message}
-          />
-          <InputField
-            label="Instagram Handle (Optional)"
-            id="instagram"
-            {...register('instagram')}
-            error={errors.instagram?.message}
-          />
-          <SelectField
-            label="Local Chapter"
-            id="chapter"
-            {...register('chapter')}
-            error={errors.chapter?.message}
-          >
-            {chapters.map((ch) => (
-              <option key={ch.name} value={ch.name}>
-                {ch.name}
-              </option>
-            ))}
-          </SelectField>
-
-          <hr className="border-black" />
-
-          <TextAreaField
-            label="Why did you go vegan?"
-            id="veganReason"
-            {...register('veganReason')}
-            rows={3}
-            error={errors.veganReason?.message}
-          />
-
-          <fieldset className="relative">
-            <legend className="mb-2 text-sm font-bold text-black">
-              Are you aligned with our abolitionist values (a consistent
-              anti-oppression stance)?
-            </legend>
-            <div className="flex items-center space-x-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value="true"
-                  {...register('abolitionistAlignment')}
-                  className="accent-primary"
-                />
-                <span>Yes</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value="false"
-                  {...register('abolitionistAlignment')}
-                  className="accent-primary"
-                />
-                <span>No / Unsure</span>
-              </label>
-            </div>
-            {errors.abolitionistAlignment && (
-              <p className="mt-1 text-xs font-semibold text-primary">
-                {errors.abolitionistAlignment.message}
-              </p>
-            )}
-            {/* Show checkmark for radio button selection */}
-            {!errors.abolitionistAlignment && (
-              <div className="absolute right-0 top-0 flex items-center text-success">
-                <CheckIcon className="mr-1 size-4" />
-                <span className="text-xs font-medium">✓</span>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-2xl px-4 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold tracking-tight text-foreground">
+              Join the Movement
+            </CardTitle>
+            <CardDescription>
+              Complete the application below. An organizer from your selected
+              chapter will review it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* 5. Connect handleSubmit to the form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* 6. Connect fields with `register` and pass errors */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" {...register('name')} />
+                {errors.name?.message && (
+                  <p className="text-sm text-destructive">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
-            )}
-          </fieldset>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" {...register('email')} />
+                {errors.email?.message && (
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="instagram">Instagram Handle (Optional)</Label>
+                <Input id="instagram" {...register('instagram')} />
+                {errors.instagram?.message && (
+                  <p className="text-sm text-destructive">
+                    {errors.instagram.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="chapter">Local Chapter</Label>
+                <Select
+                  value={watch('chapter')}
+                  onValueChange={(value) => setValue('chapter', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a chapter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {chapters.map((ch) => (
+                      <SelectItem key={ch.name} value={ch.name}>
+                        {ch.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.chapter?.message && (
+                  <p className="text-sm text-destructive">
+                    {errors.chapter.message}
+                  </p>
+                )}
+              </div>
 
-          <TextAreaField
-            label="How can you best contribute to your local chapter? (e.g., skills, availability)"
-            id="customAnswer"
-            {...register('customAnswer')}
-            rows={3}
-            error={errors.customAnswer?.message}
-          />
+              <Separator />
 
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={Object.keys(errors).length > 0}
-              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Submit Application
-            </button>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="veganReason">Why did you go vegan?</Label>
+                <Textarea
+                  id="veganReason"
+                  rows={3}
+                  {...register('veganReason')}
+                />
+                {errors.veganReason?.message && (
+                  <p className="text-sm text-destructive">
+                    {errors.veganReason.message}
+                  </p>
+                )}
+              </div>
 
-          <p className="text-center text-sm text-neutral-600">
-            Already have an account?{' '}
-            <button
-              type="button"
-              onClick={onNavigateLogin}
-              className="font-bold text-primary hover:underline"
-            >
-              Log In
-            </button>
-          </p>
-        </form>
+              <div className="space-y-3">
+                <Label className="text-sm font-bold text-foreground">
+                  Are you aligned with our abolitionist values (a consistent
+                  anti-oppression stance)?
+                </Label>
+                <RadioGroup
+                  value={watch('abolitionistAlignment') ? 'true' : 'false'}
+                  onValueChange={(value: string) =>
+                    setValue('abolitionistAlignment', value === 'true')
+                  }
+                  className="flex flex-col space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="abolitionist-yes" />
+                    <Label
+                      htmlFor="abolitionist-yes"
+                      className="cursor-pointer"
+                    >
+                      Yes
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="abolitionist-no" />
+                    <Label htmlFor="abolitionist-no" className="cursor-pointer">
+                      No / Unsure
+                    </Label>
+                  </div>
+                </RadioGroup>
+                {errors.abolitionistAlignment && (
+                  <p className="text-sm text-destructive">
+                    {errors.abolitionistAlignment.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customAnswer">
+                  How can you best contribute to your local chapter? (e.g.,
+                  skills, availability)
+                </Label>
+                <Textarea
+                  id="customAnswer"
+                  rows={3}
+                  {...register('customAnswer')}
+                />
+                {errors.customAnswer?.message && (
+                  <p className="text-sm text-destructive">
+                    {errors.customAnswer.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="pt-4">
+                <Button
+                  type="submit"
+                  disabled={Object.keys(errors).length > 0}
+                  className="w-full"
+                >
+                  Submit Application
+                </Button>
+              </div>
+
+              <p className="text-center text-sm text-muted-foreground">
+                Already have an account?{' '}
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={onNavigateLogin}
+                  className="h-auto p-0 font-bold"
+                >
+                  Log In
+                </Button>
+              </p>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

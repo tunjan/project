@@ -1,7 +1,16 @@
+import { Trash } from 'lucide-react';
 import React from 'react';
 
-import { Modal } from '@/components/ui';
-import { TrashIcon } from '@/icons';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { type User } from '@/types';
 
 interface DeleteUserModalProps {
@@ -18,33 +27,35 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   isOpen,
 }) => {
   return (
-    <Modal title="Delete User" onClose={onClose} isOpen={isOpen}>
-      <div className="text-center">
-        <div className="mx-auto flex size-12 items-center justify-center bg-primary">
-          <TrashIcon className="size-6 text-white" />
-        </div>
-        <p className="mt-4 text-sm text-danger">
-          Are you sure you want to delete{' '}
-          <span className="font-bold">{user.name}</span>? This action is
-          permanent and cannot be undone. All associated data will be removed.
-        </p>
-      </div>
-
-      <div className="mt-6 flex items-center space-x-4">
-        <button
-          onClick={onClose}
-          className="btn-outline w-full px-4 py-2 font-bold transition-colors duration-300"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          className="btn-danger w-full px-4 py-2 font-bold transition-colors duration-300"
-        >
-          Confirm Deletion
-        </button>
-      </div>
-    </Modal>
+    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete User</AlertDialogTitle>
+          <AlertDialogDescription>
+            <div className="text-center">
+              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-destructive text-destructive-foreground">
+                <Trash className="size-6" />
+              </div>
+              <p className="mt-4 text-sm">
+                Are you sure you want to delete{' '}
+                <span className="font-bold">{user.name}</span>? This action is
+                permanent and cannot be undone. All associated data will be
+                removed.
+              </p>
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Confirm Deletion
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

@@ -22,9 +22,7 @@ describe('<SignUp />', () => {
 
     expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('combobox', { name: /Local Chapter/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Berlin/i })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Submit Application/i })
     ).toBeInTheDocument();
@@ -70,10 +68,7 @@ describe('<SignUp />', () => {
       screen.getByLabelText(/Email Address/i),
       'test@example.com'
     );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Local Chapter/i }),
-      'Berlin'
-    );
+    await user.click(screen.getByRole('button', { name: /Berlin/i }));
     await user.type(
       screen.getByLabelText(/Why did you go vegan?/i),
       'This is a valid reason.'
@@ -117,10 +112,7 @@ describe('<SignUp />', () => {
       screen.getByLabelText(/Email Address/i),
       'test@example.com'
     );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Local Chapter/i }),
-      'Berlin'
-    );
+    await user.click(screen.getByRole('button', { name: /Berlin/i }));
     await user.type(screen.getByLabelText(/Instagram Handle/i), '@testuser');
     await user.type(
       screen.getByLabelText(/Why did you go vegan?/i),
@@ -252,10 +244,7 @@ describe('<SignUp />', () => {
       screen.getByLabelText(/Email Address/i),
       'test@example.com'
     );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Local Chapter/i }),
-      'Berlin'
-    );
+    await user.click(screen.getByRole('button', { name: /Berlin/i }));
     // Don't provide vegan reason
     await user.click(screen.getByLabelText('Yes'));
     await user.type(
@@ -287,10 +276,7 @@ describe('<SignUp />', () => {
       screen.getByLabelText(/Email Address/i),
       'test@example.com'
     );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Local Chapter/i }),
-      'Berlin'
-    );
+    await user.click(screen.getByRole('button', { name: /Berlin/i }));
     await user.type(
       screen.getByLabelText(/Why did you go vegan?/i),
       'This is a valid reason.'
@@ -325,10 +311,7 @@ describe('<SignUp />', () => {
       screen.getByLabelText(/Email Address/i),
       'test@example.com'
     );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Local Chapter/i }),
-      'Berlin'
-    );
+    await user.click(screen.getByRole('button', { name: /Berlin/i }));
     await user.type(
       screen.getByLabelText(/Why did you go vegan?/i),
       'This is a valid reason.'

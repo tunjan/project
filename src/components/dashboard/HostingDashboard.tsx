@@ -1,7 +1,8 @@
+import { Home } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { TabButton } from '@/components/ui';
-import { HomeIcon } from '@/icons';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAccommodationRequests } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 
@@ -43,49 +44,60 @@ const HostingDashboard: React.FC<HostingDashboardProps> = () => {
   });
 
   const NoRequestsMessage = () => (
-    <div className="border-black bg-white p-8 text-center md:border-2">
-      <HomeIcon className="text-red mx-auto size-12" />
-      <h3 className="mt-4 text-xl font-bold text-black">
-        {view === 'incoming'
-          ? 'No incoming requests.'
-          : "You haven't sent any requests."}
-      </h3>
-      <p className="mt-2 text-neutral-500">
-        {view === 'incoming'
-          ? 'When activists request to stay with you, they will appear here.'
-          : 'Request accommodation from an event page.'}
-      </p>
-    </div>
+    <Card>
+      <CardContent className="p-8 text-center">
+        <Home className="mx-auto size-12 text-destructive" />
+        <h3 className="mt-4 text-xl font-bold">
+          {view === 'incoming'
+            ? 'No incoming requests.'
+            : "You haven't sent any requests."}
+        </h3>
+        <p className="mt-2 text-muted-foreground">
+          {view === 'incoming'
+            ? 'When activists request to stay with you, they will appear here.'
+            : 'Request accommodation from an event page.'}
+        </p>
+      </CardContent>
+    </Card>
   );
 
   return (
     <div>
-      <div className="mb-4 flex items-center border-b border-black">
-        <TabButton
-          onClick={() => setView('incoming')}
-          isActive={view === 'incoming'}
-          count={incomingRequests.length}
-        >
-          <span>Incoming Requests</span>
-        </TabButton>
-        <TabButton
-          onClick={() => setView('sent')}
-          isActive={view === 'sent'}
-          count={0}
-        >
-          <span>Sent Requests</span>
-        </TabButton>
-      </div>
-
-      {sortedRequests.length > 0 ? (
-        <div className="space-y-4">
-          {sortedRequests.map((req) => (
-            <RequestCard key={req.id} request={req} />
-          ))}
-        </div>
-      ) : (
-        <NoRequestsMessage />
-      )}
+      <Tabs
+        value={view}
+        onValueChange={(value) => setView(value as 'incoming' | 'sent')}
+      >
+        <TabsList className="mb-4">
+          <TabsTrigger value="incoming">
+            Incoming Requests ({incomingRequests.length})
+          </TabsTrigger>
+          <TabsTrigger value="sent">
+            Sent Requests ({sentRequests.length})
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="incoming">
+          {sortedRequests.length > 0 ? (
+            <div className="space-y-4">
+              {sortedRequests.map((req) => (
+                <RequestCard key={req.id} request={req} />
+              ))}
+            </div>
+          ) : (
+            <NoRequestsMessage />
+          )}
+        </TabsContent>
+        <TabsContent value="sent">
+          {sentRequests.length > 0 ? (
+            <div className="space-y-4">
+              {sortedRequests.map((req) => (
+                <RequestCard key={req.id} request={req} />
+              ))}
+            </div>
+          ) : (
+            <NoRequestsMessage />
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

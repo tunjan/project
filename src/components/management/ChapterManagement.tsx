@@ -1,7 +1,27 @@
+import { Pencil, Trash } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-import { ConfirmationModal } from '@/components/ui';
-import { PencilIcon, TrashIcon } from '@/icons';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useChaptersActions, useUsers } from '@/store';
 import { type Chapter, Role, type User } from '@/types';
 
@@ -52,19 +72,30 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
 
   return (
     <>
-      <ConfirmationModal
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          if (chapterToDelete) {
-            handleDelete(chapterToDelete);
-          }
-        }}
-        title="Delete Chapter"
-        message={`Are you sure you want to delete the ${chapterToDelete} chapter? This cannot be undone.`}
-        confirmText="Delete"
-        variant="danger"
-      />
+      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Chapter</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the {chapterToDelete} chapter?
+              This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (chapterToDelete) {
+                  handleDelete(chapterToDelete);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {editingChapter && (
         <EditChapterModal
@@ -86,90 +117,109 @@ const ChapterManagement: React.FC<ChapterManagementProps> = ({
       )}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <h3 className="mb-4 text-xl font-bold text-black">
-            Existing Chapters ({chapters.length})
-          </h3>
-          <div className="max-h-[70vh] overflow-y-auto border-black bg-white md:border-2">
-            <ul className="divide-y-2 divide-black">
-              {chapters
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((chapter) => {
-                  const organizers =
-                    chapterOrganizersMap.get(chapter.name) || [];
-                  return (
-                    <li
-                      key={chapter.name}
-                      className="p-4 hover:bg-primary-lightest"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-bold">{chapter.name}</span>
-                          <span className="ml-2 text-sm text-neutral-500">
-                            ({chapter.country})
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setEditingChapter(chapter)}
-                            className="rounded-nonenone p-2 text-neutral-500 hover:bg-black hover:text-white"
-                            aria-label="Edit Chapter"
-                          >
-                            <PencilIcon className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(chapter.name)}
-                            className="rounded-nonenone p-2 text-neutral-500 hover:bg-danger hover:text-white"
-                            aria-label="Delete Chapter"
-                          >
-                            <TrashIcon className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="mt-2 pl-2">
-                        <p className="text-xs font-bold uppercase text-neutral-500">
-                          Organizers ({organizers.length})
-                        </p>
-                        {organizers.length > 0 ? (
-                          <div className="mt-1 flex flex-wrap gap-2">
-                            {organizers.map((org) => (
-                              <button
-                                key={org.id}
-                                onClick={() => setManagingOrganiser(org)}
-                                className="rounded-nonenone flex cursor-pointer items-center space-x-2 p-1 pr-2"
-                                title={`Click to manage ${org.name}`}
+          <Card>
+            <CardHeader>
+              <CardTitle>Existing Chapters ({chapters.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Chapter Name</TableHead>
+                    <TableHead>Country</TableHead>
+                    <TableHead>Organizers</TableHead>
+                    <TableHead className="w-[100px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {chapters
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((chapter) => {
+                      const organizers =
+                        chapterOrganizersMap.get(chapter.name) || [];
+                      return (
+                        <TableRow key={chapter.name}>
+                          <TableCell className="font-medium">
+                            {chapter.name}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {chapter.country}
+                          </TableCell>
+                          <TableCell>
+                            {organizers.length > 0 ? (
+                              <div className="flex flex-wrap gap-2">
+                                {organizers.map((org) => (
+                                  <Button
+                                    key={org.id}
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setManagingOrganiser(org)}
+                                    className="h-auto p-1"
+                                    title={`Click to manage ${org.name}`}
+                                  >
+                                    <Avatar className="size-5">
+                                      <AvatarImage
+                                        src={org.profilePictureUrl}
+                                        alt={org.name}
+                                      />
+                                      <AvatarFallback className="text-xs">
+                                        {org.name.charAt(0)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="ml-2 text-xs">
+                                      {org.name}
+                                    </span>
+                                  </Button>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                No organizers assigned
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEditingChapter(chapter)}
+                                aria-label="Edit Chapter"
                               >
-                                <img
-                                  src={org.profilePictureUrl}
-                                  alt={org.name}
-                                  className="size-5 object-cover"
-                                />
-                                <span className="text-xs font-semibold text-black hover:text-primary">
-                                  {org.name}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="mt-1 text-xs text-neutral-500">
-                            No organizers assigned.
-                          </p>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-            </ul>
-          </div>
+                                <Pencil className="size-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openDeleteModal(chapter.name)}
+                                aria-label="Delete Chapter"
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <Trash className="size-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
         <div>
-          <h3 className="mb-4 text-xl font-bold text-black">
-            Create New Chapter
-          </h3>
-          <CreateChapterForm
-            currentUser={currentUser}
-            onCreateChapter={createChapter}
-            chapters={chapters}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Create New Chapter</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CreateChapterForm
+                currentUser={currentUser}
+                onCreateChapter={createChapter}
+                chapters={chapters}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

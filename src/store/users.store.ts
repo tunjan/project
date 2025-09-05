@@ -238,6 +238,7 @@ export const useUsersStore = create<UsersState & UsersActions>()(
 
       // Mark that the user has watched the masterclass. If they're already in
       // AWAITING_MASTERCLASS, advance them to AWAITING_REVISION_CALL immediately.
+      // Also allow pre-confirmation for users in AWAITING_FIRST_CUBE.
       confirmWatchedMasterclass: (userId: string) => {
         const currentUser = get().users.find((u) => u.id === userId);
         if (!currentUser) {
@@ -245,8 +246,10 @@ export const useUsersStore = create<UsersState & UsersActions>()(
           return;
         }
 
-        // Only allow this if user is in appropriate status
+        // Allow pre-confirmation for users in AWAITING_FIRST_CUBE or AWAITING_MASTERCLASS
         if (
+          currentUser.onboardingStatus !==
+            OnboardingStatus.AWAITING_FIRST_CUBE &&
           currentUser.onboardingStatus !== OnboardingStatus.AWAITING_MASTERCLASS
         ) {
           console.warn(
@@ -286,12 +289,10 @@ export const useUsersStore = create<UsersState & UsersActions>()(
         useNotificationsStore.getState().addNotification({
           userId: userId,
           type: NotificationType.REQUEST_ACCEPTED,
-          message: `Great! You completed the masterclass. Next: pass the revision call to get verified.`,
+          message: `Great! You completed the masterclass. Next: schedule your revision call to get verified.`,
           linkTo: '/dashboard',
         });
-      },
-
-      // Validate a user's onboarding state
+      }, // Validate a user's onboarding state
       validateUserOnboarding: (userId: string) => {
         const user = get().users.find((u) => u.id === userId);
         if (!user) {

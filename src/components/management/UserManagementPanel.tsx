@@ -1,11 +1,8 @@
+import { Building, MessageSquare, Star, Users } from 'lucide-react';
 import React from 'react';
 
-import {
-  BuildingOfficeIcon,
-  ChatBubbleLeftRightIcon,
-  StarIcon,
-  UserGroupIcon,
-} from '@/icons';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Role, User } from '@/types';
 
 interface UserManagementPanelProps {
@@ -36,84 +33,89 @@ const UserManagementPanel: React.FC<UserManagementPanelProps> = ({
 }) => {
   return (
     <section>
-      <h2 className="h-section">User Management</h2>
+      <h2 className="mb-4 text-2xl font-bold tracking-tight text-foreground">
+        User Management
+      </h2>
       <div className="space-y-4">
         {/* Role Management */}
-        <div className="border-black bg-white p-4 md:border-2">
-          <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-            <UserGroupIcon className="size-5" />
-            Role Management
-          </h3>
-          <div className="space-y-2">
-            <p className="text-sm text-neutral-600">
-              Current Role: <span className="font-bold">{user.role}</span>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="size-5" />
+              Role Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Current Role:{' '}
+              <span className="font-bold text-foreground">{user.role}</span>
             </p>
-            <button
-              onClick={onOpenPromoteModal}
-              className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-            >
+            <Button onClick={onOpenPromoteModal} className="w-full">
               Promote to Organiser
-            </button>
-          </div>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Chapter Management */}
         {canEditChapters && (
-          <div className="border-black bg-white p-4 md:border-2">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-              <BuildingOfficeIcon className="size-5" />
-              Chapter Management
-            </h3>
-            <div className="space-y-2">
-              <p className="text-sm text-neutral-600">
-                Chapters: {user.chapters?.join(', ') || 'None'}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building className="size-5" />
+                Chapter Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Chapters:{' '}
+                <span className="font-bold text-foreground">
+                  {user.chapters?.join(', ') || 'None'}
+                </span>
               </p>
-              <button
-                onClick={onOpenEditChaptersModal}
-                className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-              >
+              <Button onClick={onOpenEditChaptersModal} className="w-full">
                 Edit Chapters
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {/* Recognition Management */}
         {canAwardBadges && (
-          <div className="border-black bg-white p-4 md:border-2">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-              <StarIcon className="size-5" />
-              Recognition Management
-            </h3>
-            <div className="space-y-2">
-              <p className="text-sm text-neutral-600">
-                Current Recognitions: {user.badges?.length || 0}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="size-5" />
+                Recognition Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Current Recognitions:{' '}
+                <span className="font-bold text-foreground">
+                  {user.badges?.length || 0}
+                </span>
               </p>
-              <button
-                onClick={onOpenAwardBadgeModal}
-                className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-              >
+              <Button onClick={onOpenAwardBadgeModal} className="w-full">
                 Award Recognition
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {/* Communication */}
-        <div className="border-black bg-white p-4 md:border-2">
-          <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-black">
-            <ChatBubbleLeftRightIcon className="size-5" />
-            Communication
-          </h3>
-          <div className="space-y-2">
-            <button
-              onClick={() => onSendMessage(user.id)}
-              className="w-full bg-primary px-3 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-            >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="size-5" />
+              Communication
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => onSendMessage(user.id)} className="w-full">
               Send Message
-            </button>
-          </div>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

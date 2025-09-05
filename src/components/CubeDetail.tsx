@@ -5,8 +5,12 @@ import { toast } from 'sonner';
 import EditEventModal from '@/components/events/EditEventModal';
 import EventDiscussion from '@/components/events/EventDiscussion';
 import RequestAccommodationModal from '@/components/events/RequestAccommodationModal';
-import { Avatar } from '@/components/ui';
 import { ConfirmationModal } from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import {
   CalendarIcon,
@@ -42,6 +46,7 @@ import {
 import { formatDateSafe, safeParseDate } from '@/utils';
 
 import InventoryDisplay from './charts/InventoryDisplay';
+import CubeMap from './CubeMap';
 import CancelEventModal from './events/CancelEventModal';
 import EventRoster from './events/EventRoster';
 import TourOfDutyModal from './events/TourOfDutyModal';
@@ -60,82 +65,57 @@ const ParticipantCard: React.FC<{
   isOrganizerView: boolean;
   onRemove: (participantUserId: string) => void;
 }> = ({ participant, isOrganizerView, onRemove }) => {
-  const [showConfirmation, setShowConfirmation] = useState(false);
-
   if (!participant?.user) {
     return null;
   }
 
-  const handleRemoveClick = () => {
-    setShowConfirmation(true);
-  };
-
-  const handleConfirmRemove = () => {
-    onRemove(participant.user.id);
-    setShowConfirmation(false);
-  };
-
-  const handleCancelRemove = () => {
-    setShowConfirmation(false);
-  };
-
   return (
-    <div className="group relative overflow-hidden p-2">
-      <div className="flex items-center justify-between">
-        <Link
-          to={`/members/${participant.user.id}`}
-          className="flex min-w-0 flex-1 items-center"
-        >
-          <Avatar
-            src={participant.user.profilePictureUrl}
-            alt={participant.user.name}
-            className="rounded-nonefull size-12 shrink-0 object-cover ring-2 ring-neutral-100 group-hover:ring-primary/20"
-          />
-          <div className="ml-4 min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-black dark:text-white">
-              {participant.user.name}
-            </p>
-            <p className="truncate text-sm text-neutral-500 dark:text-gray-400">
-              {participant.user.role}
-            </p>
-          </div>
-        </Link>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <Link
+            to={`/members/${participant.user.id}`}
+            className="flex min-w-0 flex-1 items-center"
+          >
+            <Avatar className="size-12 shrink-0">
+              <AvatarImage
+                src={participant.user.profilePictureUrl}
+                alt={participant.user.name}
+              />
+              <AvatarFallback>
+                {participant.user.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="ml-4 min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">
+                {participant.user.name}
+              </p>
+              <p className="truncate text-sm text-muted-foreground">
+                {participant.user.role}
+              </p>
+            </div>
+          </Link>
 
-        {isOrganizerView && (
-          <div className="ml-4 flex shrink-0 items-center">
-            {!showConfirmation ? (
-              <button
-                onClick={handleRemoveClick}
-                className="rounded-nonefull p-2 text-neutral-400 hover:bg-red-50 hover:text-red-600"
+          {isOrganizerView && (
+            <div className="ml-4 flex shrink-0 items-center">
+              <Button
+                onClick={() => onRemove(participant.user.id)}
+                variant="ghost"
+                size="sm"
+                className="size-8 p-0 text-muted-foreground hover:text-destructive"
                 aria-label={`Remove ${participant.user.name}`}
               >
                 <TrashIcon className="size-4" />
-              </button>
-            ) : (
-              <div className="rounded-nonelg flex items-center space-x-2 border border-red-200 bg-red-50 px-3 py-2">
-                <span className="text-xs font-medium text-red-700">
-                  Remove?
-                </span>
-                <button
-                  onClick={handleConfirmRemove}
-                  className="rounded px-2 py-1 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
-                  aria-label="Confirm removal"
-                >
-                  Yes
-                </button>
-                <button
-                  onClick={handleCancelRemove}
-                  className="rounded px-2 py-1 text-xs text-neutral-600 transition-colors hover:bg-neutral-100"
-                  aria-label="Cancel removal"
-                >
-                  No
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -149,39 +129,42 @@ const PendingRequestCard: React.FC<{
   }
 
   return (
-    <div className="rounded-nonelg border border-yellow-200 bg-yellow-50 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <Avatar
-            src={participant.user.profilePictureUrl}
-            alt={participant.user.name}
-            className="rounded-nonefull size-12 object-cover ring-2 ring-yellow-200"
-          />
-          <div className="ml-4">
-            <p className="text-sm font-semibold text-black dark:text-white">
-              {participant.user.name}
-            </p>
-            <p className="text-sm text-neutral-600 dark:text-gray-300">
-              {participant.user.chapters?.join(', ') || 'No chapters assigned'}
-            </p>
+    <Card className="border-warning">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Avatar className="size-12">
+              <AvatarImage
+                src={participant.user.profilePictureUrl}
+                alt={participant.user.name}
+              />
+              <AvatarFallback>
+                {participant.user.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="ml-4">
+              <p className="text-sm font-semibold">{participant.user.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {participant.user.chapters?.join(', ') ||
+                  'No chapters assigned'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button onClick={onDeny} variant="destructive" size="sm">
+              Deny
+            </Button>
+            <Button onClick={onAccept} size="sm">
+              Accept
+            </Button>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={onDeny}
-            className="rounded-nonelg bg-neutral-800 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-neutral-700"
-          >
-            Deny
-          </button>
-          <button
-            onClick={onAccept}
-            className="rounded-nonelg bg-primary px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-hover"
-          >
-            Accept
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -194,32 +177,34 @@ const HostCard: React.FC<{ host: User; onRequest: (host: User) => void }> = ({
   }
 
   return (
-    <div className="p-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <Avatar
-            src={host.profilePictureUrl}
-            alt={host.name}
-            className="rounded-nonefull size-12 object-cover ring-2 ring-neutral-100"
-          />
-          <div className="ml-4">
-            <p className="text-sm font-semibold text-black dark:text-white">
-              {host.name}
-            </p>
-            <p className="text-sm text-neutral-600 dark:text-gray-300">
-              Can host {host.hostingCapacity}{' '}
-              {host.hostingCapacity === 1 ? 'person' : 'people'}
-            </p>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Avatar className="size-12">
+              <AvatarImage src={host.profilePictureUrl} alt={host.name} />
+              <AvatarFallback>
+                {host.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="ml-4">
+              <p className="text-sm font-semibold">{host.name}</p>
+              <p className="text-sm text-muted-foreground">
+                Can host {host.hostingCapacity}{' '}
+                {host.hostingCapacity === 1 ? 'person' : 'people'}
+              </p>
+            </div>
           </div>
+          <Button onClick={() => onRequest(host)} variant="default" size="sm">
+            Request Stay
+          </Button>
         </div>
-        <button
-          onClick={() => onRequest(host)}
-          className="rounded-nonelg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
-        >
-          Request Stay
-        </button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -229,27 +214,27 @@ const StatusBadge: React.FC<{ status: EventStatus; isCancelled?: boolean }> = ({
 }) => {
   if (isCancelled) {
     return (
-      <span className="rounded-nonefull inline-flex items-center bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">
+      <Badge variant="destructive">
         <XCircleIcon className="mr-1 size-3" />
         Cancelled
-      </span>
+      </Badge>
     );
   }
 
   if (status === EventStatus.FINISHED) {
     return (
-      <span className="rounded-nonefull inline-flex items-center bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+      <Badge variant="secondary">
         <ClipboardCheckIcon className="mr-1 size-3" />
         Finished
-      </span>
+      </Badge>
     );
   }
 
   return (
-    <span className="rounded-nonefull inline-flex items-center bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
+    <Badge variant="default">
       <ClockIcon className="mr-1 size-3" />
       Upcoming
-    </span>
+    </Badge>
   );
 };
 
@@ -449,6 +434,8 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
     setRemoveParticipantModalOpen(true);
   };
 
+  const chapterForEvent = allChapters.find((c) => c.name === event.city);
+
   return (
     <>
       <ConfirmationModal
@@ -460,9 +447,9 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
           }
         }}
         title="Remove Participant"
-        message="Are you sure you want to remove this participant?"
+        description="Are you sure you want to remove this participant?"
         confirmText="Remove"
-        variant="danger"
+        variant="destructive"
       />
       {isRequestModalOpen && selectedHost && (
         <RequestAccommodationModal
@@ -500,47 +487,47 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
         <div className="mx-auto max-w-7xl py-8 lg:px-8">
           {/* Header Navigation */}
           <div className="mb-8">
-            <button
+            <Button
               onClick={onBack}
-              className="rounded-nonelg inline-flex items-center bg-white text-sm font-semibold text-neutral-700 hover:text-black dark:bg-black dark:text-gray-300 dark:hover:text-white"
+              variant="ghost"
+              className="inline-flex items-center"
             >
               <ChevronLeftIcon className="mr-2 size-5" />
               Back to all cubes
-            </button>
+            </Button>
           </div>
 
           {/* Cancellation Alert */}
           {isCancelled && (
-            <div
-              className="rounded-nonexl mb-8 border-red-200 bg-red-50 p-6 md:md:border-2"
-              role="alert"
-            >
-              <div className="flex items-start">
-                <XCircleIcon className="size-6 shrink-0 text-red-600" />
-                <div className="ml-3">
-                  <h3 className="text-lg font-bold text-red-800">
-                    This event has been cancelled
-                  </h3>
-                  {event.cancellationReason && (
-                    <p className="mt-1 text-sm text-red-700">
-                      Reason: {event.cancellationReason}
-                    </p>
-                  )}
+            <Card className="border-destructive bg-destructive/10">
+              <CardContent className="p-6">
+                <div className="flex items-start">
+                  <XCircleIcon className="size-6 shrink-0 text-destructive" />
+                  <div className="ml-3">
+                    <h3 className="text-lg font-bold text-destructive">
+                      This event has been cancelled
+                    </h3>
+                    {event.cancellationReason && (
+                      <p className="mt-1 text-sm text-destructive/80">
+                        Reason: {event.cancellationReason}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
 
           <div className="gap-8 lg:grid lg:grid-cols-3">
             {/* Main Content Area */}
             <div className="space-y-8 lg:col-span-2">
               {/* Hero Section */}
-              <div className="rounded-none2xl overflow-hidden border-black bg-white shadow-lg dark:border-white dark:bg-black md:md:border-2">
+              <Card>
                 <div className="relative">
                   <img
                     src="/default-cube-image.svg"
                     alt="Default cube event"
-                    className="h-64 w-full object-cover sm:h-80"
+                    className="h-64 w-full rounded-t-lg object-cover sm:h-80"
                   />
                   <div className="absolute right-4 top-4">
                     <StatusBadge
@@ -550,15 +537,18 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   </div>
                   {event.scope === 'Regional' && (
                     <div className="absolute left-4 top-4">
-                      <span className="rounded-nonefull inline-flex items-center bg-black px-3 py-1 text-sm font-bold uppercase tracking-wider text-white">
+                      <Badge
+                        variant="secondary"
+                        className="text-sm font-bold uppercase tracking-wider"
+                      >
                         <TagIcon className="mr-1 size-4" />
                         {event.targetRegion} Regional
-                      </span>
+                      </Badge>
                     </div>
                   )}
                 </div>
 
-                <div className="p-8">
+                <CardContent className="p-8">
                   <div className="mb-6">
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -568,7 +558,7 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                         </span>
                       </div>
                     </div>
-                    <h1 className="text-4xl font-extrabold text-black dark:text-white sm:text-5xl">
+                    <h1 className="text-4xl font-extrabold sm:text-5xl">
                       {event.location}
                     </h1>
                   </div>
@@ -576,280 +566,347 @@ const CubeDetail: React.FC<CubeDetailProps> = ({
                   {/* Event Details */}
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="flex items-start space-x-4">
-                      <div className="rounded-nonelg flex size-12 items-center justify-center bg-primary/10">
+                      <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
                         <CalendarIcon className="size-6 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-neutral-600">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Date
                         </p>
-                        <p className="text-lg font-semibold text-black">
+                        <p className="text-lg font-semibold">
                           {formattedDateRange}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-start space-x-4">
-                      <div className="rounded-nonelg flex size-12 items-center justify-center bg-primary/10">
+                      <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
                         <ClockIcon className="size-6 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-neutral-600">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Start Time
                         </p>
-                        <p className="text-lg font-semibold text-black">
-                          {formattedTime}
-                        </p>
+                        <p className="text-lg font-semibold">{formattedTime}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Organizer Section */}
-                  <div className="rounded-nonexl mt-8 border border-neutral-200 bg-neutral-50 p-6">
-                    <h3 className="mb-4 text-lg font-bold text-black dark:text-white">
-                      Event Organizer
-                    </h3>
-                    <div className="flex items-center">
-                      <Avatar
-                        src={event.organizer.profilePictureUrl}
-                        alt={event.organizer.name}
-                        className="rounded-nonefull size-16 object-cover ring-4 ring-white"
-                      />
-                      <div className="ml-4">
-                        <p className="text-lg font-semibold text-black">
-                          {event.organizer.name}
-                        </p>
-                        <p className="text-sm text-neutral-600 dark:text-gray-300">
-                          {event.organizer.role}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Regional Event Roster */}
-              {isRegionalEvent && !readOnlyPublic && (
-                <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
-                  <EventRoster event={event} />
-                </div>
-              )}
-
-              {/* Pending Requests */}
-              {canManageParticipants && pendingParticipants.length > 0 && (
-                <div className="rounded-none2xl border-yellow-200 bg-yellow-50 p-8 shadow-lg md:border-2">
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-black dark:text-white">
-                      Pending Join Requests ({pendingParticipants.length})
-                    </h2>
-                    <p className="mt-2 text-neutral-700">
-                      These activists are not from your chapter and require your
-                      approval to attend.
-                    </p>
-                  </div>
-                  <div className="space-y-4">
-                    {pendingParticipants
-                      .filter((p) => p?.user)
-                      .map((p) => (
-                        <PendingRequestCard
-                          key={p.user.id}
-                          participant={p}
-                          onAccept={() => handleAcceptRsvp(p.user.id)}
-                          onDeny={() => handleDenyRsvp(p.user.id)}
-                        />
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Available Hosts */}
-              {!readOnlyPublic &&
-                !isPastEvent &&
-                currentUser &&
-                !isRegionalEvent && (
-                  <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
-                    <div className="mb-6 flex items-center border-b border-neutral-200 pb-4">
-                      <div className="rounded-nonelg flex size-12 items-center justify-center bg-primary/10">
-                        <HomeIcon className="size-6 text-primary" />
-                      </div>
-                      <h2 className="ml-4 text-2xl font-bold text-black dark:text-white">
-                        Available Hosts
-                      </h2>
-                    </div>
-                    {availableHosts.length > 0 ? (
-                      <div className="space-y-4">
-                        {availableHosts
-                          .filter((host) => host)
-                          .map((host: User) => (
-                            <HostCard
-                              key={host.id}
-                              host={host}
-                              onRequest={handleRequestStay}
+                  <div className="mt-8">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Event Organizer</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center">
+                          <Avatar className="size-16">
+                            <AvatarImage
+                              src={event.organizer.profilePictureUrl}
+                              alt={event.organizer.name}
                             />
-                          ))}
-                      </div>
-                    ) : (
-                      <div className="py-12 text-center">
-                        <HomeIcon className="mx-auto size-12 text-neutral-400" />
-                        <p className="mt-4 text-lg font-medium text-neutral-600">
-                          No hosts available yet
-                        </p>
-                        <p className="mt-2 text-sm text-neutral-500">
-                          Check back later for accommodation options!
-                        </p>
-                      </div>
-                    )}
+                            <AvatarFallback>
+                              {event.organizer.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')
+                                .slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="ml-4">
+                            <p className="text-lg font-semibold">
+                              {event.organizer.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {event.organizer.role}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                )}
+                  {chapterForEvent && (
+                    <div className="mt-8">
+                      <CubeMap
+                        events={[event]}
+                        chapters={allChapters}
+                        onSelectCube={() => {}}
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-              {/* Event Discussion */}
-              {canParticipateInDiscussion && (
-                <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
-                  <EventDiscussion eventId={event.id} />
-                </div>
-              )}
-
-              {/* Chapter Inventory */}
-              <div className="rounded-none2xl border-black bg-white p-8 shadow-lg dark:border-white dark:bg-black md:border-2">
-                <InventoryDisplay
-                  chapterName={event.city}
-                  showTitle={true}
-                  compact={false}
-                />
-              </div>
+              <Tabs defaultValue="discussion" className="w-full">
+                <TabsList>
+                  {canParticipateInDiscussion && (
+                    <TabsTrigger value="discussion">Discussion</TabsTrigger>
+                  )}
+                  {!readOnlyPublic &&
+                    !isPastEvent &&
+                    currentUser &&
+                    !isRegionalEvent && (
+                      <TabsTrigger value="hosts">Available Hosts</TabsTrigger>
+                    )}
+                  <TabsTrigger value="inventory">Chapter Inventory</TabsTrigger>
+                  {isRegionalEvent && !readOnlyPublic && (
+                    <TabsTrigger value="roster">Regional Roster</TabsTrigger>
+                  )}
+                  {canManageParticipants && pendingParticipants.length > 0 && (
+                    <TabsTrigger value="pending">
+                      Pending Requests ({pendingParticipants.length})
+                    </TabsTrigger>
+                  )}
+                </TabsList>
+                <TabsContent value="discussion">
+                  {canParticipateInDiscussion && (
+                    <Card>
+                      <CardContent className="p-8">
+                        <EventDiscussion eventId={event.id} />
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+                <TabsContent value="hosts">
+                  {!readOnlyPublic &&
+                    !isPastEvent &&
+                    currentUser &&
+                    !isRegionalEvent && (
+                      <Card>
+                        <CardHeader>
+                          <div className="flex items-center space-x-3">
+                            <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
+                              <HomeIcon className="size-6 text-primary" />
+                            </div>
+                            <CardTitle>Available Hosts</CardTitle>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          {availableHosts.length > 0 ? (
+                            <div className="space-y-4">
+                              {availableHosts
+                                .filter((host) => host)
+                                .map((host: User) => (
+                                  <HostCard
+                                    key={host.id}
+                                    host={host}
+                                    onRequest={handleRequestStay}
+                                  />
+                                ))}
+                            </div>
+                          ) : (
+                            <div className="py-12 text-center">
+                              <HomeIcon className="mx-auto size-12 text-muted-foreground" />
+                              <p className="mt-4 text-lg font-medium text-muted-foreground">
+                                No hosts available yet
+                              </p>
+                              <p className="mt-2 text-sm text-muted-foreground">
+                                Check back later for accommodation options!
+                              </p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+                </TabsContent>
+                <TabsContent value="inventory">
+                  <Card>
+                    <CardContent className="p-8">
+                      <InventoryDisplay
+                        chapterName={event.city}
+                        showTitle={true}
+                        compact={false}
+                      />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="roster">
+                  {isRegionalEvent && !readOnlyPublic && (
+                    <Card>
+                      <CardContent className="p-8">
+                        <EventRoster event={event} />
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+                <TabsContent value="pending">
+                  {canManageParticipants && pendingParticipants.length > 0 && (
+                    <Card className="border-warning">
+                      <CardContent className="p-8">
+                        <div className="mb-6">
+                          <CardTitle>
+                            Pending Join Requests ({pendingParticipants.length})
+                          </CardTitle>
+                          <p className="mt-2 text-muted-foreground">
+                            These activists are not from your chapter and
+                            require your approval to attend.
+                          </p>
+                        </div>
+                        <div className="space-y-4">
+                          {pendingParticipants
+                            .filter((p) => p?.user)
+                            .map((p) => (
+                              <PendingRequestCard
+                                key={p.user.id}
+                                participant={p}
+                                onAccept={() => handleAcceptRsvp(p.user.id)}
+                                onDeny={() => handleDenyRsvp(p.user.id)}
+                              />
+                            ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Participants Card */}
-              <div className="rounded-none2xl border-black bg-white p-6 shadow-lg dark:border-white dark:bg-black md:border-2">
-                <div className="mb-6 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-black dark:text-white">
-                    Participants
-                  </h2>
-                  <div className="rounded-nonefull flex items-center bg-primary px-4 py-2 text-sm font-semibold text-white">
-                    <UsersIcon className="mr-2 size-4" />
-                    {attendingParticipants.length}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Participants</CardTitle>
+                    <Badge variant="secondary" className="text-sm">
+                      <UsersIcon className="mr-2 size-4" />
+                      {attendingParticipants.length}
+                    </Badge>
                   </div>
-                </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {attendingParticipants
+                      .filter((p) => p?.user)
+                      .map((p: EventParticipant) => (
+                        <ParticipantCard
+                          key={p.user.id}
+                          participant={p}
+                          isOrganizerView={
+                            canManageParticipants && !isPastEvent
+                          }
+                          onRemove={openRemoveParticipantModal}
+                        />
+                      ))}
+                  </div>
 
-                <div className="space-y-3">
-                  {attendingParticipants
-                    .filter((p) => p?.user)
-                    .map((p: EventParticipant) => (
-                      <ParticipantCard
-                        key={p.user.id}
-                        participant={p}
-                        isOrganizerView={canManageParticipants && !isPastEvent}
-                        onRemove={openRemoveParticipantModal}
-                      />
-                    ))}
-                </div>
-
-                {/* Status Display */}
-                <div className="mt-6 space-y-3">
-                  {!readOnlyPublic && isAttending && (
-                    <div className="rounded-nonelg flex items-center justify-center border-green-200 bg-green-50 px-4 py-3 md:border-2">
-                      <ClipboardCheckIcon className="mr-2 size-5 text-green-600" />
-                      <span className="font-semibold text-green-800">
-                        Status: Attending
-                      </span>
-                    </div>
-                  )}
-
-                  {!readOnlyPublic && isPending && (
-                    <div className="rounded-nonelg flex items-center justify-center border-yellow-200 bg-yellow-50 px-4 py-3 md:border-2">
-                      <ClockIcon className="mr-2 size-5 text-yellow-600" />
-                      <span className="font-semibold text-yellow-800">
-                        Status: Request Pending
-                      </span>
-                    </div>
-                  )}
-
-                  {isPastEvent || event.status === EventStatus.FINISHED ? (
-                    <div className="rounded-nonelg flex items-center justify-center border-neutral-200 bg-neutral-50 px-4 py-3 md:border-2">
-                      <span className="font-semibold text-neutral-700">
-                        Event has ended
-                      </span>
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-6 space-y-3">
-                  {!readOnlyPublic && canManageEvent ? (
-                    <button
-                      onClick={() => onManageEvent(event)}
-                      className="rounded-nonelg flex w-full items-center justify-center bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover hover:shadow-brutal"
-                    >
-                      <ClipboardCheckIcon className="mr-2 size-5" />
-                      Log Event Report
-                    </button>
-                  ) : (
-                    !readOnlyPublic &&
-                    !isPastEvent &&
-                    !isCancelled &&
-                    currentUser && (
-                      <>
-                        {!isAttending && !isPending && (
-                          <button
-                            onClick={handleRsvpClick}
-                            className="rounded-nonelg w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover hover:shadow-brutal"
-                          >
-                            {isRegionalEvent
-                              ? 'Sign Up for Duties'
-                              : isGuest
-                                ? 'Request to Join'
-                                : 'RSVP to this Cube'}
-                          </button>
-                        )}
-                        {isAttending && isRegionalEvent && (
-                          <button
-                            onClick={handleRsvpClick}
-                            className="rounded-nonelg w-full bg-primary px-4 py-3 font-bold text-white hover:bg-primary-hover hover:shadow-brutal"
-                          >
-                            Update Duties
-                          </button>
-                        )}
-                      </>
-                    )
-                  )}
-
-                  {/* Cancel RSVP Button */}
-                  {!readOnlyPublic &&
-                    (isAttending || isPending) &&
-                    !isPastEvent &&
-                    !isCancelled && (
-                      <button
-                        onClick={() => onCancelRsvp(event.id)}
-                        className="rounded-nonelg w-full border-neutral-800 bg-neutral-800 px-4 py-3 font-bold text-white transition-all hover:bg-neutral-700 hover:shadow-brutal md:border-2"
-                      >
-                        Cancel RSVP
-                      </button>
+                  {/* Status Display */}
+                  <div className="mt-6 space-y-3">
+                    {!readOnlyPublic && isAttending && (
+                      <div className="flex items-center justify-center">
+                        <Badge variant="default" className="px-4 py-2 text-sm">
+                          <ClipboardCheckIcon className="mr-2 size-4" />
+                          Status: Attending
+                        </Badge>
+                      </div>
                     )}
 
-                  {/* Event Management Buttons */}
-                  {!readOnlyPublic && canEditEvent && (
-                    <button
-                      onClick={() => setIsEditModalOpen(true)}
-                      className="rounded-nonelg w-full border-black bg-black px-4 py-3 font-bold text-white transition-all hover:bg-neutral-800 hover:shadow-brutal md:border-2"
-                    >
-                      <PencilIcon className="mr-2 size-5" />
-                      Edit Event
-                    </button>
-                  )}
+                    {!readOnlyPublic && isPending && (
+                      <div className="flex items-center justify-center">
+                        <Badge
+                          variant="secondary"
+                          className="px-4 py-2 text-sm"
+                        >
+                          <ClockIcon className="mr-2 size-4" />
+                          Status: Request Pending
+                        </Badge>
+                      </div>
+                    )}
 
-                  {!readOnlyPublic && canCancelEvent && (
-                    <button
-                      onClick={() => setIsCancelModalOpen(true)}
-                      className="rounded-nonelg w-full border-red-600 bg-red-600 px-4 py-3 font-bold text-white transition-all duration-200 hover:bg-red-700 md:border-2"
-                    >
-                      <XCircleIcon className="mr-2 size-5" />
-                      Cancel Event
-                    </button>
-                  )}
-                </div>
-              </div>
+                    {isPastEvent || event.status === EventStatus.FINISHED ? (
+                      <div className="flex items-center justify-center">
+                        <Badge variant="outline" className="px-4 py-2 text-sm">
+                          Event has ended
+                        </Badge>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-6 space-y-3">
+                    {!readOnlyPublic && canManageEvent ? (
+                      <Button
+                        onClick={() => onManageEvent(event)}
+                        className="w-full"
+                        size="lg"
+                      >
+                        <ClipboardCheckIcon className="mr-2 size-5" />
+                        Log Event Report
+                      </Button>
+                    ) : (
+                      !readOnlyPublic &&
+                      !isPastEvent &&
+                      !isCancelled &&
+                      currentUser && (
+                        <>
+                          {!isAttending && !isPending && (
+                            <Button
+                              onClick={handleRsvpClick}
+                              className="w-full"
+                              size="lg"
+                            >
+                              {isRegionalEvent
+                                ? 'Sign Up for Duties'
+                                : isGuest
+                                  ? 'Request to Join'
+                                  : 'RSVP to this Cube'}
+                            </Button>
+                          )}
+                          {isAttending && isRegionalEvent && (
+                            <Button
+                              onClick={handleRsvpClick}
+                              className="w-full"
+                              size="lg"
+                            >
+                              Update Duties
+                            </Button>
+                          )}
+                        </>
+                      )
+                    )}
+
+                    {/* Cancel RSVP Button */}
+                    {!readOnlyPublic &&
+                      (isAttending || isPending) &&
+                      !isPastEvent &&
+                      !isCancelled && (
+                        <Button
+                          onClick={() => onCancelRsvp(event.id)}
+                          variant="secondary"
+                          size="lg"
+                          className="w-full"
+                        >
+                          Cancel RSVP
+                        </Button>
+                      )}
+
+                    {/* Event Management Buttons */}
+                    {!readOnlyPublic && canEditEvent && (
+                      <Button
+                        onClick={() => setIsEditModalOpen(true)}
+                        variant="outline"
+                        size="lg"
+                        className="w-full"
+                      >
+                        <PencilIcon className="mr-2 size-5" />
+                        Edit Event
+                      </Button>
+                    )}
+
+                    {!readOnlyPublic && canCancelEvent && (
+                      <Button
+                        onClick={() => setIsCancelModalOpen(true)}
+                        variant="destructive"
+                        size="lg"
+                        className="w-full"
+                      >
+                        <XCircleIcon className="mr-2 size-5" />
+                        Cancel Event
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

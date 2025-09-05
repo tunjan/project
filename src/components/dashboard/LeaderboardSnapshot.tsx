@@ -1,6 +1,6 @@
+import { Trophy } from 'lucide-react';
 import React, { useMemo } from 'react';
 
-import { TrophyIcon } from '@/icons';
 import { useEvents, useUsers } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { CubeEvent, User } from '@/types';
@@ -55,9 +55,9 @@ const LeaderboardSnapshot: React.FC = () => {
   if (!userRank || userRank.hours === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-center">
-        <TrophyIcon className="text-grey-400 mb-4 size-12" />
-        <h3 className="font-bold">No activity this month</h3>
-        <p className="text-grey-600 text-sm">
+        <Trophy className="mb-4 size-12 text-muted-foreground" />
+        <h3 className="font-bold text-foreground">No activity this month</h3>
+        <p className="text-sm text-muted-foreground">
           Log some hours to get on the board!
         </p>
       </div>
@@ -66,11 +66,13 @@ const LeaderboardSnapshot: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      <TrophyIcon className="size-16 text-yellow" />
-      <p className="mt-4 text-lg">You are</p>
-      <h3 className="text-5xl font-bold">#{userRank.rank}</h3>
-      <p className="text-lg">out of {userRank.total} activists</p>
-      <p className="text-grey-600 mt-2 text-sm">
+      <Trophy className="size-16 text-primary" />
+      <p className="mt-4 text-lg text-foreground">You are</p>
+      <h3 className="text-5xl font-bold text-foreground">#{userRank.rank}</h3>
+      <p className="text-lg text-foreground">
+        out of {userRank.total} activists
+      </p>
+      <p className="mt-2 text-sm text-muted-foreground">
         with {userRank.hours.toFixed(1)} hours this month.
       </p>
     </div>

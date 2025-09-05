@@ -1,3 +1,11 @@
+import {
+  Building2,
+  ClipboardCheck,
+  ClipboardList,
+  Home,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,16 +22,17 @@ import MemberDirectory from '@/components/management/MemberDirectory';
 import OnboardingHealthCheck from '@/components/management/OnboardingHealthCheck';
 import OnboardingPipeline from '@/components/management/OnboardingPipeline';
 import ReviewApplicantModal from '@/components/management/ReviewApplicantModal';
-import { TabButton } from '@/components/ui';
-import { ROLE_HIERARCHY } from '@/constants';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
-  BuildingOfficeIcon,
-  ClipboardCheckIcon,
-  ClipboardListIcon,
-  HomeIcon,
-  TrendingUpIcon,
-  UserGroupIcon,
-} from '@/icons';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { ROLE_HIERARCHY } from '@/constants';
 import { generateInactivityNotifications } from '@/services/notificationService';
 import {
   useChapterJoinRequests,
@@ -78,7 +87,7 @@ const Dashboard: React.FC<{
             {tasks.length > 0 ? (
               tasks.map((task) => <ManagementTask key={task.title} {...task} />)
             ) : (
-              <p className="text-neutral-600">
+              <p className="text-muted-foreground">
                 No actionable tasks at the moment.
               </p>
             )}
@@ -227,7 +236,7 @@ const ManagementPage: React.FC = () => {
     // New applicants task
     if (newApplicants.length > 0) {
       tasks.push({
-        icon: <UserGroupIcon className="size-8" />,
+        icon: <Users className="size-8" />,
         title: 'New Applicants to Review',
         count: newApplicants.length,
         description: 'Review and approve new applicants to the platform.',
@@ -256,7 +265,7 @@ const ManagementPage: React.FC = () => {
 
     if (pendingJoinRequestsCount > 0) {
       tasks.push({
-        icon: <ClipboardCheckIcon className="size-8" />,
+        icon: <ClipboardCheck className="size-8" />,
         title: 'Chapter Join Requests',
         count: pendingJoinRequestsCount,
         description: 'Activists are waiting to join your chapter(s).',
@@ -383,7 +392,7 @@ const ManagementPage: React.FC = () => {
       return [
         ...dashboardTasks,
         {
-          icon: <TrendingUpIcon className="size-8" />,
+          icon: <TrendingUp className="size-8" />,
           title: 'Inactive Members to Re-engage',
           count: inactiveMembersCount,
           description:
@@ -441,32 +450,22 @@ const ManagementPage: React.FC = () => {
         );
       case 'members':
         return (
-          <div>
-            <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-              Member Directory
-            </h2>
-            <MemberDirectory
-              members={
-                memberFilter.showInactiveOnly ? inactiveMembers : visibleMembers
-              }
-              onSelectUser={handleSelectUser}
-              filterableChapters={filterableChaptersForDirectory}
-              pendingRequests={visibleChapterJoinRequests}
-            />
-          </div>
+          <MemberDirectory
+            members={
+              memberFilter.showInactiveOnly ? inactiveMembers : visibleMembers
+            }
+            onSelectUser={handleSelectUser}
+            filterableChapters={filterableChaptersForDirectory}
+            pendingRequests={visibleChapterJoinRequests}
+          />
         );
       case 'chapters':
         return (
           canManageChapters && (
-            <div>
-              <h2 className="mb-4 border-b-2 border-primary pb-2 text-2xl font-bold text-black">
-                Chapter Administration
-              </h2>
-              <ChapterManagement
-                chapters={manageableChaptersForDirectory}
-                currentUser={currentUser}
-              />
-            </div>
+            <ChapterManagement
+              chapters={manageableChaptersForDirectory}
+              currentUser={currentUser}
+            />
           )
         );
       case 'inventory':
@@ -474,19 +473,21 @@ const ManagementPage: React.FC = () => {
           <div>
             <div className="mb-6 flex items-center justify-between">
               {manageableChapters.length > 1 && (
-                <select
+                <Select
                   value={selectedChapterForInventory}
-                  onChange={(e) =>
-                    setSelectedChapterForInventory(e.target.value)
-                  }
-                  className="border border-black px-3 py-2 focus:border-primary focus:outline-none dark:border-white"
+                  onValueChange={setSelectedChapterForInventory}
                 >
-                  {manageableChapters.map((chapter) => (
-                    <option key={chapter.name} value={chapter.name}>
-                      {chapter.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-64">
+                    <SelectValue placeholder="Select a chapter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {manageableChapters.map((chapter) => (
+                      <SelectItem key={chapter.name} value={chapter.name}>
+                        {chapter.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
             {selectedChapterForInventory ? (
@@ -498,24 +499,28 @@ const ManagementPage: React.FC = () => {
                 }
               />
             ) : manageableChapters.length === 0 ? (
-              <div className="border-white bg-white p-8 text-center dark:border-black dark:bg-black md:border-2">
-                <h3 className="text-lg font-bold text-black">
-                  No Manageable Chapters
-                </h3>
-                <p className="text-red mt-1">
-                  You don't have permission to manage inventory for any
-                  chapters.
-                </p>
-              </div>
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-lg font-bold text-foreground">
+                    No Manageable Chapters
+                  </h3>
+                  <p className="mt-1 text-destructive">
+                    You don't have permission to manage inventory for any
+                    chapters.
+                  </p>
+                </CardContent>
+              </Card>
             ) : (
-              <div className="border-white bg-white p-8 text-center dark:border-black dark:bg-black md:border-2">
-                <h3 className="text-lg font-bold text-black">
-                  No Chapter Selected
-                </h3>
-                <p className="text-red mt-1">
-                  Please select a chapter to manage its inventory.
-                </p>
-              </div>
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-lg font-bold text-foreground">
+                    No Chapter Selected
+                  </h3>
+                  <p className="mt-1 text-destructive">
+                    Please select a chapter to manage its inventory.
+                  </p>
+                </CardContent>
+              </Card>
             )}
           </div>
         );
@@ -531,90 +536,96 @@ const ManagementPage: React.FC = () => {
   };
 
   return (
-    <div className="py-12">
-      {/* Enhanced Header Section */}
-      <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-2 bg-primary"></div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-              Management Hub
-            </h1>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                Management Hub
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                Manage your chapters, review applications, and oversee member
+                activities from one central location.
+              </p>
+            </div>
           </div>
-          <p className="text-md max-w-3xl px-4 leading-relaxed text-neutral-600 sm:px-0 sm:text-xl">
-            Manage your chapters, review applications, and oversee member
-            activities from one central location.
-          </p>
+          <Separator className="mt-6" />
         </div>
-      </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-4">
-        <aside className="md:col-span-1">
-          <nav className="flex flex-row gap-4 border-b-2 border-black bg-white p-4 dark:border-white dark:bg-black md:flex-col md:md:border-2">
-            <TabButton
-              onClick={() => handleViewChange('dashboard')}
-              isActive={view === 'dashboard'}
-              variant="management"
-            >
-              <HomeIcon className="size-5 shrink-0" />
-              <span className="hidden md:inline">Priority Tasks</span>
-            </TabButton>
-            <TabButton
-              onClick={() => handleViewChange('pipeline')}
-              isActive={view === 'pipeline'}
-              variant="management"
-            >
-              <ClipboardCheckIcon className="size-5 shrink-0" />
-              <span className="hidden truncate md:inline">
-                Onboarding & Requests
-              </span>
-            </TabButton>
-            <TabButton
-              onClick={() => handleViewChange('members')}
-              isActive={view === 'members'}
-              variant="management"
-            >
-              <UserGroupIcon className="size-5 shrink-0" />
-              <span className="hidden md:inline">Member Directory</span>
-            </TabButton>
-            {canManageChapters && (
-              <TabButton
-                onClick={() => handleViewChange('chapters')}
-                isActive={view === 'chapters'}
-                variant="management"
-              >
-                <BuildingOfficeIcon className="size-5 shrink-0" />
-                <span className="hidden md:inline">Chapters</span>
-              </TabButton>
+        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-4">
+          <aside className="md:col-span-1">
+            <Card>
+              <CardContent className="p-4">
+                <nav className="flex flex-row gap-2 md:flex-col">
+                  <Button
+                    onClick={() => handleViewChange('dashboard')}
+                    variant={view === 'dashboard' ? 'default' : 'ghost'}
+                    className="justify-start"
+                  >
+                    <Home className="mr-2 size-4" />
+                    <span className="hidden md:inline">Priority Tasks</span>
+                  </Button>
+                  <Button
+                    onClick={() => handleViewChange('pipeline')}
+                    variant={view === 'pipeline' ? 'default' : 'ghost'}
+                    className="justify-start"
+                  >
+                    <ClipboardCheck className="mr-2 size-4" />
+                    <span className="hidden truncate md:inline">
+                      Onboarding & Requests
+                    </span>
+                  </Button>
+                  <Button
+                    onClick={() => handleViewChange('members')}
+                    variant={view === 'members' ? 'default' : 'ghost'}
+                    className="justify-start"
+                  >
+                    <Users className="mr-2 size-4" />
+                    <span className="hidden md:inline">Member Directory</span>
+                  </Button>
+                  {canManageChapters && (
+                    <Button
+                      onClick={() => handleViewChange('chapters')}
+                      variant={view === 'chapters' ? 'default' : 'ghost'}
+                      className="justify-start"
+                    >
+                      <Building2 className="mr-2 size-4" />
+                      <span className="hidden md:inline">Chapters</span>
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => handleViewChange('inventory')}
+                    variant={view === 'inventory' ? 'default' : 'ghost'}
+                    className="justify-start"
+                  >
+                    <ClipboardList className="mr-2 size-4" />
+                    <span className="hidden md:inline">Inventory</span>
+                  </Button>
+                  <Button
+                    onClick={() => handleViewChange('onboarding-health')}
+                    variant={view === 'onboarding-health' ? 'default' : 'ghost'}
+                    className="justify-start"
+                  >
+                    <ClipboardCheck className="mr-2 size-4" />
+                    <span className="hidden md:inline">Onboarding Health</span>
+                  </Button>
+                </nav>
+              </CardContent>
+            </Card>
+          </aside>
+          <main className="md:col-span-3">
+            {renderContent()}
+            {isReviewModalOpen && (
+              <ReviewApplicantModal
+                applicants={newApplicants}
+                onClose={() => setReviewModalOpen(false)}
+                isOpen={isReviewModalOpen}
+              />
             )}
-            <TabButton
-              onClick={() => handleViewChange('inventory')}
-              isActive={view === 'inventory'}
-              variant="management"
-            >
-              <ClipboardListIcon className="size-5 shrink-0" />
-              <span className="hidden md:inline">Inventory</span>
-            </TabButton>
-            <TabButton
-              onClick={() => handleViewChange('onboarding-health')}
-              isActive={view === 'onboarding-health'}
-              variant="management"
-            >
-              <ClipboardCheckIcon className="size-5 shrink-0" />
-              <span className="hidden md:inline">Onboarding Health</span>
-            </TabButton>
-          </nav>
-        </aside>
-        <main className="md:col-span-3">
-          {renderContent()}
-          {isReviewModalOpen && (
-            <ReviewApplicantModal
-              applicants={newApplicants}
-              onClose={() => setReviewModalOpen(false)}
-              isOpen={isReviewModalOpen}
-            />
-          )}
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );

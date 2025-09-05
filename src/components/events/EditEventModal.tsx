@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { InputField, SelectField } from '@/components/ui';
-import { Modal } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useEventsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type Chapter, type CubeEvent } from '@/types';
@@ -58,62 +73,72 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
   };
 
   return (
-    <Modal title="Edit Event Details" onClose={onClose} isOpen={isOpen}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <SelectField
-          label="City"
-          id="city"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Event Details</DialogTitle>
+        </DialogHeader>
+        <form
+          id="edit-event-form"
+          onSubmit={handleSubmit}
+          className="space-y-4"
         >
-          {organizableChapters.map((chapter) => (
-            <option key={chapter.name} value={chapter.name}>
-              {chapter.name}
-            </option>
-          ))}
-        </SelectField>
+          <div className="space-y-2">
+            <Label htmlFor="city">City</Label>
+            <Select value={city} onValueChange={setCity}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select city" />
+              </SelectTrigger>
+              <SelectContent>
+                {organizableChapters.map((chapter) => (
+                  <SelectItem key={chapter.name} value={chapter.name}>
+                    {chapter.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <InputField
-          label="Exact Location"
-          id="location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+          <div className="space-y-2">
+            <Label htmlFor="location">Exact Location</Label>
+            <Input
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <InputField
-            label="Date"
-            id="date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-          <InputField
-            label="Time"
-            id="time"
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
-        </div>
-
-        <div className="flex items-center space-x-4 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full bg-black px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-black"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="w-full bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-          >
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </Modal>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="time">Time</Label>
+              <Input
+                id="time"
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              />
+            </div>
+          </div>
+        </form>
+      </DialogContent>
+      <DialogFooter>
+        <Button type="button" onClick={onClose} variant="outline">
+          Cancel
+        </Button>
+        <Button type="submit" form="edit-event-form">
+          Save Changes
+        </Button>
+      </DialogFooter>
+    </Dialog>
   );
 };
 

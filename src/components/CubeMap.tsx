@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { LeafletMap, type MapMarker } from '@/components/ui';
+import { Button } from '@/components/ui/button';
 import { type Chapter, type CubeEvent } from '@/types';
 
 interface CubeMapProps {
@@ -30,22 +31,19 @@ const CubeMap: React.FC<CubeMapProps> = ({
           popupContent: (
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-bold leading-tight text-black">
+                <h3 className="text-lg font-bold leading-tight">
                   {event.name}
                 </h3>
-                <p className="text-neutral-secondary text-sm font-semibold uppercase tracking-wide">
+                <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                   {event.city}
                 </p>
-                <p className="text-sm text-neutral">
+                <p className="text-sm text-muted-foreground">
                   {new Date(event.startDate).toLocaleDateString()}
                 </p>
               </div>
-              <button
-                onClick={() => onSelectCube(event)}
-                className="w-full border-black bg-black px-4 py-2 text-sm font-bold text-white hover:bg-black hover:shadow-brutal md:border-2"
-              >
+              <Button onClick={() => onSelectCube(event)} className="w-full">
                 {popupActionText}
-              </button>
+              </Button>
             </div>
           ),
         };

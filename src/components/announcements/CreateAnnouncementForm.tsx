@@ -1,6 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { InputField, SelectField, TextAreaField } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { useChapters } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { AnnouncementScope, Chapter, Role } from '@/types';
@@ -80,121 +92,141 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
 
   return (
     <div className="py-8 md:py-16">
-      <div className="mx-auto max-w-3xl border-y border-neutral-200 sm:border-black sm:bg-white sm:md:border-2">
-        <div className="border-b border-neutral-200 p-4 sm:border-b-2 sm:border-black sm:p-8">
-          <h1 className="text-2xl font-extrabold text-black sm:text-3xl">
+      <Card className="mx-auto max-w-3xl">
+        <CardHeader>
+          <CardTitle className="text-2xl sm:text-3xl">
             Create Announcement
-          </h1>
-          <p className="text-grey-600 mt-2">
+          </CardTitle>
+          <p className="text-muted-foreground">
             Your message will be visible to the audience defined by the selected
             scope.
           </p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-6 p-4 sm:p-8">
-          <InputField
-            label="Title"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <TextAreaField
-            label="Content"
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={8}
-          />
-
-          <div className="mt-6 space-y-6 border-t-2 border-black pt-6">
-            <h2 className="text-xl font-bold text-black">
-              Optional: Call to Action
-            </h2>
-            <p className="text-sm text-gray-500">
-              Add a link to encourage users to take action. The button will only
-              appear if a link is provided.
-            </p>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <InputField
-                label="CTA Link"
-                id="ctaLink"
-                value={ctaLink}
-                onChange={(e) => setCtaLink(e.target.value)}
-                placeholder="https://example.com/more-info"
-              />
-              <InputField
-                label="CTA Button Text"
-                id="ctaText"
-                value={ctaText}
-                onChange={(e) => setCtaText(e.target.value)}
-                placeholder="Learn More"
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="content">Content</Label>
+              <Textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={8}
+              />
+            </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <SelectField
-              label="Scope"
-              id="scope"
-              value={scope}
-              onChange={(e) => setScope(e.target.value as AnnouncementScope)}
-            >
-              {postableScopes.map((s: AnnouncementScope) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </SelectField>
+            <Separator className="my-6" />
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">
+                Optional: Call to Action
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Add a link to encourage users to take action. The button will
+                only appear if a link is provided.
+              </p>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="ctaLink">CTA Link</Label>
+                  <Input
+                    id="ctaLink"
+                    value={ctaLink}
+                    onChange={(e) => setCtaLink(e.target.value)}
+                    placeholder="https://example.com/more-info"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ctaText">CTA Button Text</Label>
+                  <Input
+                    id="ctaText"
+                    value={ctaText}
+                    onChange={(e) => setCtaText(e.target.value)}
+                    placeholder="Learn More"
+                  />
+                </div>
+              </div>
+            </div>
 
-            {scope === AnnouncementScope.REGIONAL && (
-              <SelectField
-                label="Target Region"
-                id="target-region"
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
-                disabled={currentUser.role === Role.REGIONAL_ORGANISER}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="scope">Scope</Label>
+                <Select
+                  value={scope}
+                  onValueChange={(value) =>
+                    setScope(value as AnnouncementScope)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select scope" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {postableScopes.map((s: AnnouncementScope) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {scope === AnnouncementScope.REGIONAL && (
+                <div className="space-y-2">
+                  <Label htmlFor="target-region">Target Region</Label>
+                  <Select value={target} onValueChange={setTarget}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCountries.map((r: string) => (
+                        <SelectItem key={r} value={r}>
+                          {r}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {scope === AnnouncementScope.CHAPTER && (
+                <div className="space-y-2">
+                  <Label htmlFor="target-chapter">Target Chapter</Label>
+                  <Select value={target} onValueChange={setTarget}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Chapter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableChapters.map((c: string) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-4 pt-4">
+              <Button
+                type="button"
+                onClick={onCancel}
+                variant="outline"
+                className="w-full"
               >
-                <option value="">Select Region</option>
-                {availableCountries.map((r: string) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </SelectField>
-            )}
-            {scope === AnnouncementScope.CHAPTER && (
-              <SelectField
-                label="Target Chapter"
-                id="target-chapter"
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
-              >
-                <option value="">Select Chapter</option>
-                {availableChapters.map((c: string) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </SelectField>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-4 pt-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="w-full bg-black px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-black"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="w-full bg-primary px-4 py-3 font-bold text-white transition-colors duration-300 hover:bg-primary-hover"
-            >
-              Publish Announcement
-            </button>
-          </div>
-        </form>
-      </div>
+                Cancel
+              </Button>
+              <Button type="submit" variant="default" className="w-full">
+                Publish Announcement
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

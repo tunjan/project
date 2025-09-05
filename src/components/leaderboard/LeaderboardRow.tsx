@@ -1,9 +1,10 @@
+import { Trophy } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Avatar } from '@/components/ui';
-import { Tag } from '@/components/ui';
-import { TrophyIcon } from '@/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { type User } from '@/types';
 
 interface LeaderboardRowProps {
@@ -17,20 +18,43 @@ interface LeaderboardRowProps {
 }
 
 const RankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
-  const rankStyles = {
-    1: 'bg-yellow text-black border-black',
-    2: 'bg-grey-300 text-black border-black',
-    3: 'bg-yellow-700 text-white border-black', // Bronze color
+  const getRankBadge = () => {
+    if (rank === 1) {
+      return (
+        <Badge
+          variant="default"
+          className="bg-yellow-400 text-yellow-900 dark:bg-yellow-600 dark:text-yellow-100"
+        >
+          <Trophy className="size-4" />
+        </Badge>
+      );
+    }
+    if (rank === 2) {
+      return (
+        <Badge
+          variant="secondary"
+          className="bg-gray-300 text-gray-900 dark:bg-gray-600 dark:text-gray-100"
+        >
+          <Trophy className="size-4" />
+        </Badge>
+      );
+    }
+    if (rank === 3) {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-amber-600 text-amber-100 dark:bg-amber-700 dark:text-amber-100"
+        >
+          <Trophy className="size-4" />
+        </Badge>
+      );
+    }
+    return <Badge variant="outline">{rank}</Badge>;
   };
 
-  const baseStyle =
-    'flex w-16 flex-shrink-0 items-center justify-center border-r-2 border-black text-2xl font-black';
-  const rankClass =
-    rank <= 3 ? rankStyles[rank as 1 | 2 | 3] : 'bg-white text-black';
-
   return (
-    <div className={`${baseStyle} ${rankClass}`}>
-      {rank <= 3 ? <TrophyIcon className="size-6" /> : <span>{rank}</span>}
+    <div className="flex w-16 shrink-0 items-center justify-center">
+      {getRankBadge()}
     </div>
   );
 };
@@ -42,9 +66,9 @@ const RankChangeIndicator: React.FC<{ change?: 'up' | 'down' | 'same' }> = ({
 
   if (change === 'up') {
     return (
-      <div className="flex items-center gap-1 text-success">
+      <Badge variant="default" className="bg-green-500 text-green-100">
         <svg
-          className="size-4"
+          className="size-3"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -56,14 +80,14 @@ const RankChangeIndicator: React.FC<{ change?: 'up' | 'down' | 'same' }> = ({
             d="M5 10l7-7m0 0l7 7m-7-7v18"
           />
         </svg>
-      </div>
+      </Badge>
     );
   }
 
   return (
-    <div className="flex items-center gap-1 text-danger">
+    <Badge variant="destructive">
       <svg
-        className="size-4"
+        className="size-3"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -75,7 +99,7 @@ const RankChangeIndicator: React.FC<{ change?: 'up' | 'down' | 'same' }> = ({
           d="M19 14l-7 7m0 0l-7-7m7 7V3"
         />
       </svg>
-    </div>
+    </Badge>
   );
 };
 
@@ -93,51 +117,52 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
 
   return (
     <li
-      className={`sm:border-1 flex transform-gpu flex-col border-y border-black hover:shadow-brutal sm:border-black ${
-        isCurrentUser ? 'bg-primary-lightest ring-2 ring-primary' : 'bg-white'
+      className={`transition-all duration-200 hover:shadow-md ${
+        isCurrentUser ? 'ring-2 ring-primary' : ''
       }`}
     >
       <Link
         to={`/members/${user.id}`}
         className="flex min-w-0 grow items-stretch"
       >
-        <RankIndicator rank={rank} />
-        <div className="flex min-w-0 grow items-center p-3">
-          <Avatar
-            src={user.profilePictureUrl}
-            alt={user.name}
-            className="size-12 shrink-0 border-black object-cover md:border-2"
-          />
+        <div className="flex min-w-0 grow items-center p-4">
+          <RankIndicator rank={rank} />
+          <Avatar className="ml-4 size-12 shrink-0">
+            <AvatarImage
+              src={user.profilePictureUrl}
+              alt={user.name}
+              className="object-cover"
+            />
+            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+          </Avatar>
           <div className="ml-4 min-w-0 grow">
             <div className="flex items-center gap-2">
-              <p className="truncate font-bold text-black">{user.name}</p>
-              {isCurrentUser && <Tag variant="primary">YOU</Tag>}
+              <p className="truncate font-bold text-foreground">{user.name}</p>
+              {isCurrentUser && <Badge variant="default">YOU</Badge>}
             </div>
-            <p className="truncate text-sm text-neutral-600">
+            <p className="truncate text-sm text-muted-foreground">
               {primaryChapter}
             </p>
 
             {/* Compact progress bar to give visual weight to higher ranks */}
-            <div className="rounded-nonesm mt-2 h-2 w-full bg-neutral-200">
-              <div
-                className="h-2 bg-primary"
-                style={{
-                  width: `${Math.max(
-                    3,
-                    Math.round(((value || 0) / (topValue || value || 1)) * 100)
-                  )}%`,
-                }}
+            <div className="mt-2">
+              <Progress
+                value={Math.max(
+                  3,
+                  Math.round(((value || 0) / (topValue || value || 1)) * 100)
+                )}
+                className="h-2"
               />
             </div>
           </div>
 
-          <div className="ml-4 hidden shrink-0 items-center gap-2 sm:flex">
+          <div className="ml-4 hidden shrink-0 items-center justify-end gap-2 sm:flex sm:w-24">
             <RankChangeIndicator change={rankChange} />
             <div className="text-right">
-              <p className="text-2xl font-extrabold text-black">
+              <p className="text-2xl font-extrabold text-foreground">
                 {value.toLocaleString()}
               </p>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {unit}
               </p>
             </div>

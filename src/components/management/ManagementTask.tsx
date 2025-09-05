@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+
 interface ManagementTaskProps {
   icon: React.ReactNode;
   title: string;
@@ -18,14 +21,14 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
   priority,
 }) => {
   const priorityStyles = {
-    high: 'border-l-4 border-red bg-white',
-    medium: 'border-l-4 border-gray-500 bg-white',
-    low: 'border-l-4 border-black bg-white',
+    high: 'border-l-4 border-destructive',
+    medium: 'border-l-4 border-yellow-500',
+    low: 'border-l-4 border-muted-foreground',
   };
 
   return (
-    <button
-      className={`card-brutal card-padding border-2 border-black py-4 ${priorityStyles[priority]} w-full cursor-pointer text-left hover:shadow-brutal-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
+    <Card
+      className={`cursor-pointer transition-all focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:shadow-md ${priorityStyles[priority]}`}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -33,29 +36,25 @@ const ManagementTask: React.FC<ManagementTaskProps> = ({
           onClick();
         }
       }}
+      tabIndex={0}
+      role="button"
       aria-label={`${title}: ${description}`}
     >
-      <div className="flex justify-between">
-        <div className="flex items-center gap-4 px-4">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-4">
           <div className="text-2xl text-primary" aria-hidden="true">
             {icon}
           </div>
-          <div>
+          <div className="flex-1">
             <div className="mb-2 flex items-center gap-2">
-              <h3 className="text-lg font-bold text-black dark:text-white">
-                {title}
-              </h3>
-              <span className="rounded-full bg-primary px-2 py-1 text-xs font-bold text-white">
-                {count}
-              </span>
+              <h3 className="text-lg font-semibold">{title}</h3>
+              <Badge variant="default">{count}</Badge>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {description}
-            </p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
-      </div>
-    </button>
+      </CardContent>
+    </Card>
   );
 };
 

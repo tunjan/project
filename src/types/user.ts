@@ -1,3 +1,6 @@
+import type { EarnedBadge } from './entities';
+export type { EarnedBadge } from './entities';
+
 export enum Role {
   APPLICANT = 'Applicant',
   ACTIVIST = 'Activist',
@@ -73,13 +76,4 @@ export interface User {
   lastLogin: Date;
   activityLevel?: 'high' | 'medium' | 'low';
   leaveDate?: Date;
-}
-
-// Re-export from entities for circular dependency
-export interface EarnedBadge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  awardedAt: Date;
 }

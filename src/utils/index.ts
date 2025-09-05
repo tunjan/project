@@ -2,7 +2,8 @@
 export {
   type ChapterOutreachStats,
   type ChapterStats,
-  getActivistPerformanceDistribution,
+  getActivistConversationsDistribution,
+  getActivistHoursDistribution,
   getActivistRetention,
   getAverageActivistsPerEvent,
   getChapterOutreachStats,
@@ -62,10 +63,10 @@ export {
 export { getNotificationIcon } from './notificationUtils';
 
 // Rewards utilities
-export { calculateDiscountTier,type TierProgress } from './rewards';
+export { calculateDiscountTier, type TierProgress } from './rewards';
 
 // Scorecard utilities
-export { calculateChapterScorecard,type ScorecardData } from './scorecard';
+export { calculateChapterScorecard, type ScorecardData } from './scorecard';
 
 // String utilities
 export { getInitials, stringToColor } from './string';

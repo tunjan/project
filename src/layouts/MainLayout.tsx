@@ -12,7 +12,7 @@ import { useSearchActions } from '@/store/search.store';
 const MainLayout: React.FC = () => {
   const { init } = useUsersActions();
   const { open } = useSearchActions();
-  const { theme } = useTheme();
+  const { theme = 'light' } = useTheme();
 
   // Initialize store when layout mounts
   useEffect(() => {
@@ -32,7 +32,7 @@ const MainLayout: React.FC = () => {
   }, [open]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-black">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Sidebar />
       <Header />
       {/* 
@@ -42,28 +42,14 @@ const MainLayout: React.FC = () => {
       */}
       <Toaster
         position="bottom-right"
-        toastOptions={{
-          style: {
-            background: theme === 'dark' ? 'black' : 'white',
-            border: theme === 'dark' ? '2px solid white' : '2px solid black',
-            boxShadow:
-              theme === 'dark'
-                ? '4px 4px 0px 0px rgba(255,255,255,1)'
-                : '4px 4px 0px 0px rgba(0,0,0,1)',
-            borderRadius: '0px',
-            color: theme === 'dark' ? 'white' : 'black',
-            fontFamily: 'Libre Franklin, sans-serif',
-            fontWeight: '600',
-          },
-        }}
-        theme={theme}
+        theme={theme as 'light' | 'dark' | 'system'}
       />
       <CommandPalette />
       <main className="flex-1 sm:px-6 lg:ml-64">
         <Outlet />
       </main>
-      <footer className="bg-black py-6 dark:bg-white lg:ml-64">
-        <div className="mx-auto text-center text-sm text-white dark:text-black">
+      <footer className="bg-primary py-6 lg:ml-64">
+        <div className="mx-auto text-center text-sm text-primary-foreground">
           <p>
             &copy; {new Date().getFullYear()} Anonymous for the Voiceless hub.
             Powered by respect for animals.
