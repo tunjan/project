@@ -34,12 +34,10 @@ const signUpSchema = z.object({
   veganReason: z
     .string()
     .min(10, 'Please provide a reason (min. 10 characters)'),
-  // Radio button values are strings, so we transform them to boolean
-  abolitionistAlignment: z
-    .enum(['true', 'false'], {
-      errorMap: () => ({ message: 'Please select an option' }),
-    })
-    .transform((val) => val === 'true'),
+  // Keep as string enum to avoid type conflicts with react-hook-form
+  abolitionistAlignment: z.enum(['true', 'false'], {
+    message: 'Please select an option',
+  }),
   customAnswer: z
     .string()
     .min(10, 'Please provide an answer (min. 10 characters)'),
@@ -94,7 +92,7 @@ const SignUp: React.FC<SignUpProps> = ({
       chapter: data.chapter,
       answers: {
         veganReason: data.veganReason,
-        abolitionistAlignment: data.abolitionistAlignment,
+        abolitionistAlignment: data.abolitionistAlignment === 'true',
         customAnswer: data.customAnswer,
       },
     });
@@ -190,9 +188,9 @@ const SignUp: React.FC<SignUpProps> = ({
                   anti-oppression stance)?
                 </Label>
                 <RadioGroup
-                  value={watch('abolitionistAlignment') ? 'true' : 'false'}
+                  value={watch('abolitionistAlignment')}
                   onValueChange={(value: string) =>
-                    setValue('abolitionistAlignment', value === 'true')
+                    setValue('abolitionistAlignment', value as 'true' | 'false')
                   }
                   className="flex flex-col space-y-2"
                 >
