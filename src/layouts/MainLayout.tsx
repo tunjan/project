@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useTheme } from 'next-themes';
@@ -20,22 +20,26 @@ const MainLayout: React.FC = () => {
     setMounted(true);
   }, []);
 
-  // Initialize store when layout mounts
+  // Initialize store when layout mounts - only run once
   useEffect(() => {
     init();
-  }, [init]);
+  }, []); // Empty dependency array since init should only run once
 
   // Add global keyboard shortcut for search
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         open();
       }
-    };
+    },
+    [open]
+  );
+
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open]);
+  }, [handleKeyDown]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">

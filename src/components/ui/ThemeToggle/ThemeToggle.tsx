@@ -31,6 +31,9 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
 
   if (!mounted) {
     // Return a placeholder that matches the expected structure
+    const iconSize =
+      size === 'sm' ? 'h-4 w-4' : size === 'md' ? 'h-5 w-5' : 'h-6 w-6';
+
     return (
       <Button
         variant="outline"
@@ -39,9 +42,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
         aria-label="Toggle theme"
         disabled
       >
-        <Monitor
-          className={`h-${size === 'sm' ? '4' : size === 'md' ? '5' : '6'} w-${size === 'sm' ? '4' : size === 'md' ? '5' : '6'}`}
-        />
+        <Monitor className={iconSize} />
         {showLabel && <span className="ml-2 text-sm font-bold">System</span>}
       </Button>
     );
