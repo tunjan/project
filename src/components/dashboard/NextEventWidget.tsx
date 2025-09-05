@@ -42,6 +42,9 @@ const UpcomingEventCard: React.FC<{
   onManage: () => void;
   isNext?: boolean;
 }> = ({ event, onManage, isNext }) => {
+  // FIX: Memoize the Date object to prevent re-creating it on every render
+  const startDate = useMemo(() => new Date(event.startDate), [event.startDate]);
+
   if (isNext) {
     return (
       <div
@@ -75,14 +78,14 @@ const UpcomingEventCard: React.FC<{
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="size-4 shrink-0" />
               <span>
-                {new Date(event.startDate).toLocaleDateString([], {
+                {startDate.toLocaleDateString([], {
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
                 })}{' '}
                 at{' '}
-                {new Date(event.startDate).toLocaleTimeString([], {
+                {startDate.toLocaleTimeString([], {
                   hour: 'numeric',
                   minute: '2-digit',
                 })}
@@ -99,7 +102,8 @@ const UpcomingEventCard: React.FC<{
           <div className="flex items-center gap-2 border-t border-border pt-2">
             <Calendar className="size-4 text-primary" />
             <span className="text-sm font-medium text-primary">
-              <Countdown date={new Date(event.startDate)} />
+              {/* Pass the memoized startDate object */}
+              <Countdown date={startDate} />
             </span>
           </div>
         </div>
@@ -133,13 +137,13 @@ const UpcomingEventCard: React.FC<{
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="size-3 shrink-0" />
               <span>
-                {new Date(event.startDate).toLocaleDateString([], {
+                {startDate.toLocaleDateString([], {
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric',
                 })}{' '}
                 at{' '}
-                {new Date(event.startDate).toLocaleTimeString([], {
+                {startDate.toLocaleTimeString([], {
                   hour: 'numeric',
                   minute: '2-digit',
                 })}

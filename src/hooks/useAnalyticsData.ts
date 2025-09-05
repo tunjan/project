@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { ROLE_HIERARCHY } from '@/constants';
 import { useChapters, useEvents, useOutreachLogs, useUsers } from '@/store';
@@ -96,10 +96,9 @@ export function useAnalyticsData() {
   const [selectedCountry, setSelectedCountry] = useState(defaultCountry);
   const [selectedChapter, setSelectedChapter] = useState(defaultChapter);
 
-  useEffect(() => {
-    setSelectedCountry(defaultCountry);
-    setSelectedChapter(defaultChapter);
-  }, [defaultCountry, defaultChapter]);
+  // CRITICAL FIX: Removed the problematic useEffect that was causing infinite loops
+  // The useState initialization already handles setting the correct initial values
+  // If defaults need to change (e.g., user login), the component will re-mount with new defaults
 
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCountry(e.target.value);
