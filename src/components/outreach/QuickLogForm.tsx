@@ -260,12 +260,9 @@ const QuickLogForm: React.FC<QuickLogFormProps> = ({
   }
 
   return (
-    <Card className="border-0 bg-card/50 shadow-lg backdrop-blur-sm">
+    <Card className="bg-card/50 px-6">
       <CardHeader className="px-0 pb-6">
         <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
-            <Plus className="size-4 text-primary" />
-          </div>
           Quick Log
         </CardTitle>
       </CardHeader>

@@ -32,7 +32,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4">
         {/* Hero */}
         <section className="mb-12">
           <Card>

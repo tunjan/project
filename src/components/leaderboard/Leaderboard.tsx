@@ -22,8 +22,6 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
 }) => {
   const rankedData = calculateRanks(data);
 
-  const maxValue = rankedData[0]?.value ?? 0;
-
   const currentUserEntry = rankedData.find(
     (d) => d.user.id === currentUser?.id
   );
@@ -47,7 +45,6 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 user={entry.user}
                 value={entry.value}
                 unit={unit}
-                topValue={maxValue}
                 isCurrentUser={currentUser?.id === entry.user.id}
               />
             ))}
@@ -63,7 +60,6 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                   user={currentUserEntry.user}
                   value={currentUserEntry.value}
                   unit={unit}
-                  topValue={maxValue}
                   isCurrentUser={true}
                 />
               </>

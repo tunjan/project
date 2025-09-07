@@ -10,7 +10,6 @@ import RootSuspense from './RootSuspense';
 
 const CubeListPage = React.lazy(() => import('@/pages/CubeListPage'));
 const CubeDetailPage = React.lazy(() => import('@/pages/CubeDetailPage'));
-const CreateCubePage = React.lazy(() => import('@/pages/CreateCubePage'));
 const ManageEventPage = React.lazy(() => import('@/pages/ManageEventPage'));
 const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
 
@@ -18,9 +17,6 @@ const ManagementPage = React.lazy(() => import('@/pages/ManagementPage'));
 const ManageProfilePage = React.lazy(() => import('@/pages/ManageProfilePage'));
 const AnalyticsPage = React.lazy(() => import('@/pages/AnalyticsPage'));
 const AnnouncementsPage = React.lazy(() => import('@/pages/AnnouncementsPage'));
-const CreateAnnouncementPage = React.lazy(
-  () => import('@/pages/CreateAnnouncementPage')
-);
 const ResourcesPage = React.lazy(() => import('@/pages/ResourcesPage'));
 const OutreachLogPage = React.lazy(() => import('@/pages/OutreachLogPage'));
 const ChapterListPage = React.lazy(() => import('@/pages/ChapterListPage'));
@@ -141,22 +137,6 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute requireFullAccess>
                 <OutreachLogPage />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: 'cubes/create',
-            element: (
-              <ProtectedRoute requiredRole="organizer" requireFullAccess>
-                <CreateCubePage />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: 'announcements/create',
-            element: (
-              <ProtectedRoute requiredRole="organizer" requireFullAccess>
-                <CreateAnnouncementPage />
               </ProtectedRoute>
             ),
           },

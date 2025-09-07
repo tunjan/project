@@ -1,10 +1,4 @@
-import {
-  ChevronLeft,
-  Map,
-  MessageCircle,
-  Pencil,
-  ShieldCheck,
-} from 'lucide-react';
+import { ChevronLeft, Pencil, ShieldCheck } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -32,22 +26,6 @@ import { getUserRoleDisplay } from '@/utils';
 interface UserProfileProps {
   user: User;
 }
-
-const QuickActionButton: React.FC<{
-  icon: React.ReactNode;
-  text: string;
-  onClick: () => void;
-}> = ({ icon, text, onClick }) => (
-  <Card className="cursor-pointer transition-all duration-200 hover:shadow-md">
-    <CardContent
-      className="flex size-full flex-col items-center justify-center p-6 text-center"
-      onClick={onClick}
-    >
-      <div className="text-primary">{icon}</div>
-      <p className="mt-2 text-lg font-semibold text-foreground">{text}</p>
-    </CardContent>
-  </Card>
-);
 
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   const navigate = useNavigate();
@@ -131,7 +109,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
         />
       )}
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="container mx-auto max-w-7xl px-4">
           {/* BACK BUTTON (PUBLIC/MANAGEMENT VIEW ONLY) */}
           {!isOwnProfile && (
             <Button
@@ -215,27 +193,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
               {/* PENDING AWARDS (OWNER ONLY) */}
               {isOwnProfile && (
                 <BadgeAwardsDashboard pendingAwards={pendingAwards} />
-              )}
-
-              {/* QUICK ACTIONS (OWNER ONLY) */}
-              {isOwnProfile && (
-                <section>
-                  <h2 className="mb-6 text-xl font-semibold text-foreground">
-                    Quick Actions
-                  </h2>
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <QuickActionButton
-                      icon={<Map className="size-10" />}
-                      text="Find a Cube"
-                      onClick={() => navigate('/cubes')}
-                    />
-                    <QuickActionButton
-                      icon={<MessageCircle className="size-10" />}
-                      text="Log Outreach"
-                      onClick={() => navigate('/outreach')}
-                    />
-                  </div>
-                </section>
               )}
 
               <section>

@@ -29,6 +29,7 @@ import { type Announcement, AnnouncementScope, Role } from '@/types';
 import { formatDateSafe } from '@/utils';
 
 import EditAnnouncementModal from './EditAnnouncementModal';
+import AnnouncementComments from './AnnouncementComments';
 
 const ScopeBadge: React.FC<{ scope: AnnouncementScope; target?: string }> = ({
   scope,
@@ -193,7 +194,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         </CardContent>
 
         <CardFooter className="border-t p-6">
-          <div className="flex items-center">
+          <div className="flex w-full items-center">
             <Avatar className="size-10">
               <AvatarImage
                 src={announcement.author.profilePictureUrl}
@@ -214,6 +215,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             </div>
           </div>
         </CardFooter>
+
+        {/* Comments Section - Integrated into the card */}
+        <div className="border-t px-6 pb-6">
+          <AnnouncementComments announcementId={announcement.id} />
+        </div>
       </Card>
     </>
   );

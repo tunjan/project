@@ -548,7 +548,7 @@ const ManagementPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4">
         {/* Header Section */}
         <div className="mb-8">
           <div className="mb-6 flex items-center justify-between">
@@ -569,13 +569,13 @@ const ManagementPage: React.FC = () => {
           <aside className="md:col-span-1">
             <Card>
               <CardContent className="p-4">
-                <nav className="flex flex-row gap-2 md:flex-col">
+                <nav className="flex flex-row justify-between gap-2 md:flex-col">
                   <Button
                     onClick={() => handleViewChange('dashboard')}
                     variant={view === 'dashboard' ? 'default' : 'ghost'}
                     className="justify-start"
                   >
-                    <Home className="mr-2 size-4" />
+                    <Home className="size-4 md:mr-4" />
                     <span className="hidden md:inline">Priority Tasks</span>
                   </Button>
                   <Button
@@ -583,7 +583,7 @@ const ManagementPage: React.FC = () => {
                     variant={view === 'pipeline' ? 'default' : 'ghost'}
                     className="justify-start"
                   >
-                    <ClipboardCheck className="mr-2 size-4" />
+                    <ClipboardCheck className="size-4 md:mr-4" />
                     <span className="hidden truncate md:inline">
                       Onboarding & Requests
                     </span>
@@ -593,7 +593,7 @@ const ManagementPage: React.FC = () => {
                     variant={view === 'members' ? 'default' : 'ghost'}
                     className="justify-start"
                   >
-                    <Users className="mr-2 size-4" />
+                    <Users className="size-4 md:mr-4" />
                     <span className="hidden md:inline">Member Directory</span>
                   </Button>
                   {canManageChapters && (
@@ -602,7 +602,7 @@ const ManagementPage: React.FC = () => {
                       variant={view === 'chapters' ? 'default' : 'ghost'}
                       className="justify-start"
                     >
-                      <Building2 className="mr-2 size-4" />
+                      <Building2 className="size-4 md:mr-4" />
                       <span className="hidden md:inline">Chapters</span>
                     </Button>
                   )}
@@ -611,7 +611,7 @@ const ManagementPage: React.FC = () => {
                     variant={view === 'inventory' ? 'default' : 'ghost'}
                     className="justify-start"
                   >
-                    <ClipboardList className="mr-2 size-4" />
+                    <ClipboardList className="size-4 md:mr-4" />
                     <span className="hidden md:inline">Inventory</span>
                   </Button>
                   <Button
@@ -619,7 +619,7 @@ const ManagementPage: React.FC = () => {
                     variant={view === 'onboarding-health' ? 'default' : 'ghost'}
                     className="justify-start"
                   >
-                    <ClipboardCheck className="mr-2 size-4" />
+                    <ClipboardCheck className="size-4 md:mr-4" />
                     <span className="hidden md:inline">Onboarding Health</span>
                   </Button>
                 </nav>

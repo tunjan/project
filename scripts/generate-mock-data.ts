@@ -268,51 +268,131 @@ const CITIES_COUNTRIES = [
   { city: 'London', country: 'United Kingdom', lat: 51.5072, lng: -0.1276 },
   { city: 'Manchester', country: 'United Kingdom', lat: 53.4808, lng: -2.2426 },
   { city: 'Bristol', country: 'United Kingdom', lat: 51.4545, lng: -2.5879 },
+  { city: 'Birmingham', country: 'United Kingdom', lat: 52.4862, lng: -1.8904 },
+  { city: 'Edinburgh', country: 'United Kingdom', lat: 55.9533, lng: -3.1883 },
   { city: 'Berlin', country: 'Germany', lat: 52.52, lng: 13.405 },
   { city: 'Munich', country: 'Germany', lat: 48.1351, lng: 11.582 },
   { city: 'Hamburg', country: 'Germany', lat: 53.5511, lng: 9.9937 },
+  { city: 'Cologne', country: 'Germany', lat: 50.9375, lng: 6.9603 },
+  { city: 'Frankfurt', country: 'Germany', lat: 50.1109, lng: 8.6821 },
   { city: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522 },
   { city: 'Lyon', country: 'France', lat: 45.764, lng: 4.8357 },
+  { city: 'Marseille', country: 'France', lat: 43.2965, lng: 5.3698 },
+  { city: 'Toulouse', country: 'France', lat: 43.6047, lng: 1.4442 },
   { city: 'New York', country: 'USA', lat: 40.7128, lng: -74.006 },
   { city: 'Los Angeles', country: 'USA', lat: 34.0522, lng: -118.2437 },
   { city: 'Chicago', country: 'USA', lat: 41.8781, lng: -87.6298 },
   { city: 'Miami', country: 'USA', lat: 25.7617, lng: -80.1918 },
+  { city: 'San Francisco', country: 'USA', lat: 37.7749, lng: -122.4194 },
+  { city: 'Seattle', country: 'USA', lat: 47.6062, lng: -122.3321 },
+  { city: 'Portland', country: 'USA', lat: 45.5152, lng: -122.6784 },
+  { city: 'Austin', country: 'USA', lat: 30.2672, lng: -97.7431 },
   { city: 'Toronto', country: 'Canada', lat: 43.6532, lng: -79.3832 },
   { city: 'Vancouver', country: 'Canada', lat: 49.2827, lng: -123.1207 },
   { city: 'Montreal', country: 'Canada', lat: 45.5017, lng: -73.5673 },
+  { city: 'Calgary', country: 'Canada', lat: 51.0447, lng: -114.0719 },
   { city: 'Sydney', country: 'Australia', lat: -33.8688, lng: 151.2093 },
   { city: 'Melbourne', country: 'Australia', lat: -37.8136, lng: 144.9631 },
   { city: 'Brisbane', country: 'Australia', lat: -27.4698, lng: 153.0251 },
+  { city: 'Perth', country: 'Australia', lat: -31.9505, lng: 115.8605 },
   { city: 'Auckland', country: 'New Zealand', lat: -36.8485, lng: 174.7633 },
   { city: 'Wellington', country: 'New Zealand', lat: -41.2865, lng: 174.7762 },
   { city: 'Stockholm', country: 'Sweden', lat: 59.3293, lng: 18.0686 },
+  { city: 'Gothenburg', country: 'Sweden', lat: 57.7089, lng: 11.9746 },
   { city: 'Oslo', country: 'Norway', lat: 59.9139, lng: 10.7522 },
+  { city: 'Copenhagen', country: 'Denmark', lat: 55.6761, lng: 12.5683 },
   { city: 'Amsterdam', country: 'Netherlands', lat: 52.3676, lng: 4.9041 },
   { city: 'Brussels', country: 'Belgium', lat: 50.8503, lng: 4.3517 },
+  { city: 'Vienna', country: 'Austria', lat: 48.2082, lng: 16.3738 },
+  { city: 'Zurich', country: 'Switzerland', lat: 47.3769, lng: 8.5417 },
+  { city: 'Dublin', country: 'Ireland', lat: 53.3498, lng: -6.2603 },
   { city: 'Tel Aviv', country: 'Israel', lat: 32.0853, lng: 34.7818 },
+  { city: 'Barcelona', country: 'Spain', lat: 41.3851, lng: 2.1734 },
+  { city: 'Madrid', country: 'Spain', lat: 40.4168, lng: -3.7038 },
+  { city: 'Rome', country: 'Italy', lat: 41.9028, lng: 12.4964 },
+  { city: 'Milan', country: 'Italy', lat: 45.4642, lng: 9.19 },
 ];
 
-const HOLIDAYS = ['2024-01-01', '2024-12-25', '2024-07-04'];
+const HOLIDAYS = [
+  '2024-01-01',
+  '2024-12-25',
+  '2024-07-04',
+  '2024-11-28',
+  '2024-12-24',
+  '2023-01-01',
+  '2023-12-25',
+  '2023-07-04',
+  '2023-11-28',
+  '2023-12-24',
+];
 
 const generateRealisticEventDate = () => {
   let date: Date;
+  let attempts = 0;
+  const maxAttempts = 50;
+
   do {
-    date = faker.date.between({
-      from: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-      to: new Date(new Date().setMonth(new Date().getMonth() + 2)),
-    });
+    // More realistic distribution: more recent/upcoming events, fewer very old ones
+    const timeRanges = [
+      { from: -365, to: -90, weight: 10 }, // Older events (less common)
+      { from: -90, to: -30, weight: 25 }, // Recent past events
+      { from: -30, to: 0, weight: 35 }, // Very recent events
+      { from: 0, to: 30, weight: 20 }, // Near future events
+      { from: 30, to: 90, weight: 10 }, // Future events
+    ];
+
+    const selectedRange = faker.helpers.weightedArrayElement(
+      timeRanges.map((r) => ({
+        weight: r.weight,
+        value: r,
+      }))
+    );
+
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() + selectedRange.from);
+
+    const toDate = new Date();
+    toDate.setDate(toDate.getDate() + selectedRange.to);
+
+    date = faker.date.between({ from: fromDate, to: toDate });
+
     if (config.REALISTIC_DATES) {
       const day = date.getDay();
-      if (day !== 0 && day !== 6) {
-        const adjustment = day === 5 ? 1 : 6 - day;
+      // Most events happen on weekends, some on Friday evenings
+      if (day !== 0 && day !== 6 && day !== 5) {
+        // Move to nearest weekend
+        const daysToSaturday = 6 - day;
+        const daysToSunday = 7 - day;
+        const adjustment =
+          daysToSaturday <= daysToSunday ? daysToSaturday : daysToSunday;
         date.setDate(date.getDate() + adjustment);
       }
     }
+    attempts++;
   } while (
     config.REALISTIC_DATES &&
-    HOLIDAYS.includes(date.toISOString().split('T')[0])
+    HOLIDAYS.includes(date.toISOString().split('T')[0]) &&
+    attempts < maxAttempts
   );
-  date.setHours(faker.number.int({ min: 12, max: 16 }), 0, 0, 0);
+
+  // More realistic event times - most happen in the afternoon
+  const eventTimes = [
+    { hour: 11, weight: 5 }, // Late morning
+    { hour: 12, weight: 15 }, // Lunch time
+    { hour: 13, weight: 25 }, // Early afternoon (most popular)
+    { hour: 14, weight: 25 }, // Mid afternoon (most popular)
+    { hour: 15, weight: 20 }, // Late afternoon
+    { hour: 16, weight: 10 }, // Evening
+  ];
+
+  const selectedTime = faker.helpers.weightedArrayElement(
+    eventTimes.map((t) => ({
+      weight: t.weight,
+      value: t.hour,
+    }))
+  );
+
+  date.setHours(selectedTime, 0, 0, 0);
   return date;
 };
 
@@ -336,23 +416,39 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
   const countries = [...new Set(chapters.map((c) => c.country))];
 
   const createKeyUser = (role: Role, overrides: Partial<User> = {}): User => {
-    const name = overrides.name || `${faker.person.firstName()} (${role})`;
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const name = overrides.name || `${firstName} ${lastName}`;
     const id = nanoid();
+
+    // More realistic join dates for key users (they've been around longer)
+    const joinDate =
+      role === Role.GODMODE || role === Role.GLOBAL_ADMIN
+        ? faker.date.past({ years: faker.number.int({ min: 2, max: 5 }) })
+        : role === Role.REGIONAL_ORGANISER
+          ? faker.date.past({ years: faker.number.int({ min: 1, max: 3 }) })
+          : faker.date.past({ years: faker.number.int({ min: 0.5, max: 2 }) });
+
+    // Key users are more active
+    const lastLogin = faker.date.recent({
+      days: faker.number.int({ min: 1, max: 7 }),
+    });
+
     return {
       id,
       name,
-      email: faker.internet.email({ firstName: name.split(' ')[0] }),
+      email: faker.internet.email({ firstName, lastName }),
       role,
       chapters: [],
       onboardingStatus: OnboardingStatus.CONFIRMED,
       activityLevel: faker.helpers.weightedArrayElement([
-        { weight: 50, value: 'high' },
-        { weight: 30, value: 'medium' },
-        { weight: 20, value: 'low' },
+        { weight: 70, value: 'high' }, // Key users are mostly high activity
+        { weight: 25, value: 'medium' },
+        { weight: 5, value: 'low' },
       ]),
       profilePictureUrl: generateAvatarUrl(id),
-      joinDate: faker.date.past({ years: 3 }),
-      lastLogin: faker.date.recent({ days: 10 }),
+      joinDate,
+      lastLogin,
       stats: {
         totalHours: 0,
         cubesAttended: 0,
@@ -361,8 +457,8 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
         cities: [],
       },
       badges: [],
-      hostingAvailability: faker.datatype.boolean({ probability: 0.6 }),
-      hostingCapacity: faker.number.int({ min: 1, max: 3 }),
+      hostingAvailability: faker.datatype.boolean({ probability: 0.8 }), // Key users more likely to host
+      hostingCapacity: faker.number.int({ min: 2, max: 5 }), // Higher capacity for key users
       ...overrides,
     };
   };
@@ -370,14 +466,14 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
   if (count > 0)
     users.push(
       createKeyUser(Role.GODMODE, {
-        name: 'Dev Admin (Godmode)',
+        name: 'Alex Chen (Founder)',
         chapters: chapters.map((c) => c.name),
       })
     );
   if (count > 1)
     users.push(
       createKeyUser(Role.GLOBAL_ADMIN, {
-        name: 'Global Admin',
+        name: 'Sarah Martinez (Global Coordinator)',
         chapters: chapters.map((c) => c.name),
       })
     );
@@ -388,9 +484,11 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
   );
   for (let i = 0; i < numRegional && users.length < count; i++) {
     const country = countries[i];
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
     users.push(
       createKeyUser(Role.REGIONAL_ORGANISER, {
-        name: `Regional Organiser (${country})`,
+        name: `${firstName} ${lastName}`,
         managedCountry: country,
         chapters: chapters
           .filter((c) => c.country === country)
@@ -404,9 +502,11 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
       u.organiserOf?.includes(chapter.name)
     );
     if (!hasOrganiser && users.length < count) {
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
       users.push(
         createKeyUser(Role.CHAPTER_ORGANISER, {
-          name: `${faker.person.firstName()} (${chapter.name} Org)`,
+          name: `${firstName} ${lastName}`,
           organiserOf: [chapter.name],
           chapters: [chapter.name],
         })
@@ -415,14 +515,18 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
   });
 
   while (users.length < count) {
-    const name = faker.person.fullName();
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const name = `${firstName} ${lastName}`;
     const id = nanoid();
+
+    // More realistic onboarding status distribution
     const onboardingStatus = faker.helpers.weightedArrayElement([
-      { weight: 70, value: OnboardingStatus.CONFIRMED },
-      { weight: 8, value: OnboardingStatus.PENDING_APPLICATION_REVIEW },
+      { weight: 75, value: OnboardingStatus.CONFIRMED },
+      { weight: 10, value: OnboardingStatus.PENDING_APPLICATION_REVIEW },
       { weight: 8, value: OnboardingStatus.AWAITING_FIRST_CUBE },
-      { weight: 8, value: OnboardingStatus.PENDING_ONBOARDING_CALL },
-      { weight: 6, value: OnboardingStatus.DENIED },
+      { weight: 5, value: OnboardingStatus.PENDING_ONBOARDING_CALL },
+      { weight: 2, value: OnboardingStatus.DENIED },
     ]);
 
     const role =
@@ -430,30 +534,65 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
         ? Role.ACTIVIST
         : Role.APPLICANT;
 
-    const homeCountry = faker.helpers.arrayElement(countries);
+    // More realistic geographic distribution (people more likely to be in bigger chapters)
+    const homeCountry = faker.helpers.weightedArrayElement([
+      ...countries
+        .slice(0, Math.min(5, countries.length))
+        .map((country) => ({ weight: 3, value: country })), // Major countries
+      ...countries.slice(5).map((country) => ({ weight: 1, value: country })), // Other countries
+    ]);
+
     const chaptersInCountry = chapters
       .filter((c) => c.country === homeCountry)
       .map((c) => c.name);
+
+    // Most users are in 1 chapter, some in 2, very few in more
+    const numChapters = faker.helpers.weightedArrayElement([
+      { weight: 70, value: 1 },
+      { weight: 25, value: 2 },
+      { weight: 5, value: Math.min(3, chaptersInCountry.length) },
+    ]);
+
     const userChapters = faker.helpers.arrayElements(chaptersInCountry, {
-      min: 1,
-      max: Math.min(2, chaptersInCountry.length),
+      min: Math.min(numChapters, chaptersInCountry.length),
+      max: Math.min(numChapters, chaptersInCountry.length),
+    });
+
+    // More realistic activity level distribution
+    const activityLevel = faker.helpers.weightedArrayElement([
+      { weight: 15, value: 'high' }, // Dedicated activists
+      { weight: 45, value: 'medium' }, // Regular participants
+      { weight: 40, value: 'low' }, // Occasional participants
+    ]);
+
+    // Realistic join date based on activity level
+    const joinYearsAgo =
+      activityLevel === 'high'
+        ? faker.number.float({ min: 0.2, max: 3 }) // High activity users have been around longer
+        : activityLevel === 'medium'
+          ? faker.number.float({ min: 0.1, max: 2 }) // Medium activity mix of new and old
+          : faker.number.float({ min: 0.05, max: 1.5 }); // Low activity mostly newer
+
+    const joinDate = faker.date.past({ years: joinYearsAgo });
+
+    // Last login correlates with activity level
+    const maxDaysSinceLogin =
+      activityLevel === 'high' ? 7 : activityLevel === 'medium' ? 30 : 120;
+    const lastLogin = faker.date.recent({
+      days: faker.number.int({ min: 1, max: maxDaysSinceLogin }),
     });
 
     const user: User = {
       id,
       name,
-      email: faker.internet.email({ firstName: name.split(' ')[0] }),
+      email: faker.internet.email({ firstName, lastName }),
       role,
       chapters: userChapters,
       onboardingStatus,
-      activityLevel: faker.helpers.weightedArrayElement([
-        { weight: 20, value: 'high' },
-        { weight: 50, value: 'medium' },
-        { weight: 30, value: 'low' },
-      ]),
+      activityLevel,
       profilePictureUrl: generateAvatarUrl(id),
-      joinDate: faker.date.past({ years: 2 }),
-      lastLogin: faker.date.recent({ days: 120 }),
+      joinDate,
+      lastLogin,
       stats: {
         totalHours: 0,
         cubesAttended: 0,
@@ -462,17 +601,53 @@ const generateUsers = (count: number, chapters: Chapter[]): User[] => {
         cities: [],
       },
       badges: [],
-      hostingAvailability: faker.datatype.boolean({ probability: 0.3 }),
+      // Hosting availability correlates with activity and experience
+      hostingAvailability: faker.datatype.boolean({
+        probability:
+          activityLevel === 'high'
+            ? 0.6
+            : activityLevel === 'medium'
+              ? 0.3
+              : 0.1,
+      }),
       hostingCapacity: faker.number.int({ min: 1, max: 4 }),
-      instagram: faker.datatype.boolean({ probability: 0.7 })
-        ? `@${faker.internet.username().toLowerCase()}`
+      // Instagram handle more likely for younger demographics and active users
+      instagram: faker.datatype.boolean({
+        probability:
+          activityLevel === 'high'
+            ? 0.8
+            : activityLevel === 'medium'
+              ? 0.6
+              : 0.4,
+      })
+        ? `@${faker.internet.username({ firstName, lastName }).toLowerCase()}`
         : undefined,
     };
+
     if (onboardingStatus !== OnboardingStatus.CONFIRMED) {
+      // More realistic onboarding answers
+      const veganReasons = [
+        "I became vegan after learning about factory farming conditions and couldn't continue supporting animal suffering.",
+        'Environmental impact was my main driver - livestock agriculture is devastating our planet.',
+        'Health benefits initially drew me in, but ethical concerns keep me committed long-term.',
+        'Watching documentaries like Dominion and Earthlings opened my eyes to animal exploitation.',
+        'I grew up vegetarian and veganism felt like the natural next step for consistency.',
+        "Meeting farm sanctuary animals made me realize there's no difference between pets and farm animals.",
+      ];
+
+      const customAnswers = [
+        "I'm excited to connect with like-minded people and learn how to be more effective in my advocacy.",
+        'I want to help others make the transition to veganism in a supportive, non-judgmental way.',
+        'I believe in grassroots activism and think Anonymous for the Voiceless is doing important work.',
+        "I've been vegan for a while but want to get more involved in organized activism.",
+        'I think cube demonstrations are a powerful way to educate people about animal agriculture.',
+        'I want to develop my advocacy skills and help create a more compassionate world.',
+      ];
+
       user.onboardingAnswers = {
-        veganReason: faker.lorem.paragraph(),
-        abolitionistAlignment: faker.datatype.boolean({ probability: 0.8 }),
-        customAnswer: faker.lorem.paragraph(),
+        veganReason: faker.helpers.arrayElement(veganReasons),
+        abolitionistAlignment: faker.datatype.boolean({ probability: 0.85 }), // Most align with abolitionist approach
+        customAnswer: faker.helpers.arrayElement(customAnswers),
       };
     }
     users.push(user);
@@ -595,16 +770,79 @@ const generateOutreachLogs = (users: User[], events: CubeEvent[]) => {
             : participant.user.activityLevel === 'medium'
               ? 1
               : 0.5;
-        const logCount = faker.number.int({ min: 1, max: 10 * mult });
+        const logCount = faker.number.int({ min: 1, max: Math.ceil(8 * mult) });
+
         for (let i = 0; i < logCount; i++) {
+          // More realistic outcome distribution based on real outreach data
+          const outcome = faker.helpers.weightedArrayElement([
+            { weight: 45, value: OutreachOutcome.NO_CHANGE }, // Most common - dismissive/no interest
+            { weight: 25, value: OutreachOutcome.NOT_SURE }, // Uncertain/thinking about it
+            { weight: 15, value: OutreachOutcome.MOSTLY_SURE }, // Positive response, likely to change
+            { weight: 8, value: OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST }, // Already vegan, now interested in activism
+            { weight: 5, value: OutreachOutcome.BECAME_VEGAN }, // Actually committed to veganism
+            { weight: 2, value: OutreachOutcome.BECAME_VEGAN_ACTIVIST }, // Rare - both vegan and activist
+          ]);
+
+          // More realistic notes based on outcome
+          let notes: string | undefined;
+          if (faker.datatype.boolean({ probability: 0.3 })) {
+            const notesByOutcome = {
+              [OutreachOutcome.NO_CHANGE]: [
+                "Said they 'need their meat' and walked away quickly",
+                'Argued that animals are meant to be food',
+                "Complained about 'vegan propaganda'",
+                'Made jokes about bacon and left',
+                "Watched briefly, said 'interesting' but clearly not interested",
+                'Dismissive of environmental concerns',
+              ],
+              [OutreachOutcome.NOT_SURE]: [
+                'Asked about protein sources and environmental impact',
+                'Surprised by footage, seemed conflicted',
+                'Said they need to think about it more',
+                'Interested but concerned about practicality',
+                'Acknowledged the message but seemed uncertain',
+                'Asked thoughtful questions but made no commitments',
+              ],
+              [OutreachOutcome.MOSTLY_SURE]: [
+                'Very engaged, asked for social media contacts',
+                'Emotional response to footage, genuinely considering change',
+                'Asked about transitioning gradually vs. all at once',
+                'Wanted to know about local vegan community',
+                'Took multiple leaflets for friends and family',
+                'Interested in our starter guide and recipes',
+              ],
+              [OutreachOutcome.ALREADY_VEGAN_NOW_ACTIVIST]: [
+                'Vegan for 3 years, appreciated our work',
+                'Plant-based for health, learning about ethics',
+                'Long-time vegan, interested in getting involved',
+                'Vegetarian for years, recently went fully vegan',
+              ],
+              [OutreachOutcome.BECAME_VEGAN]: [
+                'Committed to trying plant-based for 30 days',
+                "Said they're done with animal products starting today",
+                'Asked for mentoring and support resources',
+                'Already started reducing meat, ready to go fully vegan',
+              ],
+              [OutreachOutcome.BECAME_VEGAN_ACTIVIST]: [
+                'Immediately wanted to join our next cube event',
+                'Asked how to get trained as an activist',
+                'Deeply moved by footage, wants to help others see truth',
+                'Committed to veganism and spreading the message',
+              ],
+            };
+
+            const possibleNotes = notesByOutcome[outcome] || [
+              'Standard interaction',
+            ];
+            notes = faker.helpers.arrayElement(possibleNotes);
+          }
+
           logs.push({
             id: nanoid(),
             userId: participant.user.id,
             eventId: event.id,
-            outcome: faker.helpers.objectValue(OutreachOutcome),
-            notes: faker.datatype.boolean({ probability: 0.2 })
-              ? faker.lorem.sentence()
-              : undefined,
+            outcome,
+            notes,
             createdAt: event.startDate,
           });
         }

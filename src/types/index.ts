@@ -23,6 +23,7 @@ export {
 
 export {
   type Announcement,
+  type AnnouncementComment,
   AnnouncementScope,
   type BadgeAward,
   type BadgeTemplate,

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Vegan Action Hub">
-  <title>Vegan Action Hub</title>
+<!-- Favicon SVG for Anonymous for the Voiceless Hub -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Anonymous for the Voiceless Hub">
+  <title>Anonymous for the Voiceless Hub</title>
   <desc>Minimal brutalist favicon with dark-mode aware colors</desc>
   <style>
     :root { --bg: #ffffff; --fg: #000000; --accent: #d81313; }

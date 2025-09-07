@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { type CubeEvent, type OutreachLog } from '@/types';
 
@@ -24,8 +24,8 @@ const LogHistory: React.FC<LogHistoryProps> = ({
   updateOutreachLog,
   removeOutreachLog,
 }) => {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [editingLog, setEditingLog] = useState<OutreachLog | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
     new Set()
@@ -34,12 +34,18 @@ const LogHistory: React.FC<LogHistoryProps> = ({
 
   const filteredLogs = useMemo(() => {
     if (!startDate && !endDate) return logs;
-    const start = startDate ? new Date(`${startDate}T00:00:00`) : null;
-    const end = endDate ? new Date(`${endDate}T23:59:59`) : null;
     return logs.filter((log) => {
       const logDate = new Date(log.createdAt);
-      if (start && logDate < start) return false;
-      if (end && logDate > end) return false;
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        if (logDate < start) return false;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        if (logDate > end) return false;
+      }
       return true;
     });
   }, [logs, startDate, endDate]);
@@ -129,24 +135,20 @@ const LogHistory: React.FC<LogHistoryProps> = ({
                 <Label htmlFor="start-date" className="text-sm">
                   From
                 </Label>
-                <Input
-                  id="start-date"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="h-8 w-[150px]"
+                <DatePicker
+                  date={startDate}
+                  onDateChange={setStartDate}
+                  placeholder="Start date"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <Label htmlFor="end-date" className="text-sm">
                   To
                 </Label>
-                <Input
-                  id="end-date"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="h-8 w-[150px]"
+                <DatePicker
+                  date={endDate}
+                  onDateChange={setEndDate}
+                  placeholder="End date"
                 />
               </div>
               {hasActiveFilters && (
@@ -154,8 +156,8 @@ const LogHistory: React.FC<LogHistoryProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setStartDate('');
-                    setEndDate('');
+                    setStartDate(undefined);
+                    setEndDate(undefined);
                   }}
                 >
                   <X className="mr-2 size-4" />

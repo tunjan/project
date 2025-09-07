@@ -1,4 +1,4 @@
-# Vegan Action Hub
+# Anonymous for the Voiceless Hub
 
 [![React](https://img.shields.io/badge/React-19.1-blue?logo=react)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.1-purple?logo=vite)](https://vitejs.dev/)
@@ -7,13 +7,15 @@
 [![Zustand](https://img.shields.io/badge/Zustand-5.0-orange)](https://github.com/pmndrs/zustand)
 [![Vitest](https://img.shields.io/badge/Vitest-3.2-yellowgreen?logo=vitest)](https://vitest.dev/)
 
-Vegan Action Hub is a comprehensive, feature-rich platform designed to empower vegan activists and organizers. It provides a centralized hub for managing chapters, organizing events ("Cubes of Truth"), tracking outreach impact, and fostering a global community dedicated to animal advocacy.
+# Anonymous for the Voiceless Hub
 
-The application is built with a modern, brutalist design aesthetic and features a robust set of tools for both individual activists and chapter organizers, including detailed analytics, role-based access control, and a sophisticated mock data generation pipeline for development and testing.
+A modern, comprehensive platform for AV organizers and activists.
 
-**[Live Demo (Placeholder)](#)**
+---
 
-![Vegan Action Hub Screenshot (Placeholder)](https://via.placeholder.com/800x450.png?text=Vegan+Action+Hub+Dashboard)
+## 📸 **Screenshots**
+
+![Anonymous for the Voiceless Hub Screenshot (Placeholder)](https://via.placeholder.com/800x450.png?text=AV+Hub+Dashboard)
 
 ## ✨ Key Features
 
@@ -64,36 +66,37 @@ Follow these instructions to set up and run the project locally.
 
 ### Installation & Setup
 
-1.  **Clone the repository:**
+1. **Clone the Repository**
 
-    ```bash
-    git clone https://github.com/your-username/vegan-action-hub.git
-    cd vegan-action-hub
-    ```
+   ```bash
+   git clone https://github.com/your-username/anonymous-for-the-voiceless-hub.git
+   cd anonymous-for-the-voiceless-hub
 
-2.  **Install frontend dependencies:**
+   ```
 
-    ```bash
-    npm install
-    ```
+2. **Install frontend dependencies:**
 
-3.  **Set up environment variables:**
-    - Maps use free OpenStreetMap tiles via Leaflet - no API keys required!
+   ```bash
+   npm install
+   ```
 
-4.  **Generate mock data:**
-    - The application relies on a generated TypeScript file for all its data. Run the TypeScript script to create it.
+3. **Set up environment variables:**
+   - Maps use free OpenStreetMap tiles via Leaflet - no API keys required!
 
-    ```bash
-    npm run generate-data
-    ```
+4. **Generate mock data:**
+   - The application relies on a generated TypeScript file for all its data. Run the TypeScript script to create it.
 
-    This will create `src/data/mockData.ts` which is imported by the application's state management.
+   ```bash
+   npm run generate-data
+   ```
 
-5.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-    The application will be available at `http://localhost:5173`.
+   This will create `src/data/mockData.ts` which is imported by the application's state management.
+
+5. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   The application will be available at `http://localhost:5173`.
 
 ## ⚙️ Available Scripts
 

@@ -159,7 +159,7 @@ const ChapterDetailPage: React.FC = () => {
         onClose={() => setIsPastEventsModalOpen(false)}
       />
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row">
             <Button
               onClick={() => navigate('/chapters')}

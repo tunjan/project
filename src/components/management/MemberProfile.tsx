@@ -154,7 +154,7 @@ const MemberProfile: React.FC<MemberProfileProps> = ({ user, onBack }) => {
           onConfirm={handleAwardBadge}
         />
       )}
-      <div className="animate-fade-in py-8 md:py-12">
+      <div className="animate-fade-in">
         <Button
           onClick={onBack}
           variant="ghost"

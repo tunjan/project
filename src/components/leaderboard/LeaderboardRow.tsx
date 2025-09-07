@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { type User } from '@/types';
 
 interface LeaderboardRowProps {
@@ -12,7 +11,6 @@ interface LeaderboardRowProps {
   user: User;
   value: number;
   unit: string;
-  topValue?: number;
   isCurrentUser: boolean;
   rankChange?: 'up' | 'down' | 'same';
 }
@@ -21,32 +19,23 @@ const RankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
   const getRankBadge = () => {
     if (rank === 1) {
       return (
-        <Badge
-          variant="default"
-          className="bg-yellow-400 text-yellow-900 dark:bg-yellow-600 dark:text-yellow-100"
-        >
+        <div className="text-yellow-600 dark:text-yellow-400">
           <Trophy className="size-4" />
-        </Badge>
+        </div>
       );
     }
     if (rank === 2) {
       return (
-        <Badge
-          variant="secondary"
-          className="bg-gray-300 text-gray-900 dark:bg-gray-600 dark:text-gray-100"
-        >
+        <div className="text-gray-600 dark:text-gray-400">
           <Trophy className="size-4" />
-        </Badge>
+        </div>
       );
     }
     if (rank === 3) {
       return (
-        <Badge
-          variant="outline"
-          className="bg-amber-600 text-amber-100 dark:bg-amber-700 dark:text-amber-100"
-        >
+        <div className="text-amber-600 dark:text-amber-400">
           <Trophy className="size-4" />
-        </Badge>
+        </div>
       );
     }
     return <Badge variant="outline">{rank}</Badge>;
@@ -108,7 +97,6 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
   user,
   value,
   unit,
-  topValue,
   isCurrentUser,
   rankChange,
 }) => {
@@ -117,13 +105,13 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
 
   return (
     <li
-      className={`transition-all duration-200 hover:shadow-md ${
+      className={`rounded-lg transition-all duration-200 ${
         isCurrentUser ? 'ring-2 ring-primary' : ''
       }`}
     >
       <Link
         to={`/members/${user.id}`}
-        className="flex min-w-0 grow items-stretch"
+        className="flex min-w-0 grow items-stretch rounded-lg transition-all duration-200 hover:bg-accent/50 hover:shadow-md"
       >
         <div className="flex min-w-0 grow items-center p-4">
           <RankIndicator rank={rank} />
@@ -143,23 +131,12 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
             <p className="truncate text-sm text-muted-foreground">
               {primaryChapter}
             </p>
-
-            {/* Compact progress bar to give visual weight to higher ranks */}
-            <div className="mt-2">
-              <Progress
-                value={Math.max(
-                  3,
-                  Math.round(((value || 0) / (topValue || value || 1)) * 100)
-                )}
-                className="h-2"
-              />
-            </div>
           </div>
 
-          <div className="ml-4 hidden shrink-0 items-center justify-end gap-2 sm:flex sm:w-24">
+          <div className="ml-4 flex w-20 shrink-0 items-center justify-end gap-2 sm:w-24">
             <RankChangeIndicator change={rankChange} />
             <div className="text-right">
-              <p className="text-2xl font-extrabold text-foreground">
+              <p className="text-xl font-extrabold text-foreground sm:text-2xl">
                 {value.toLocaleString()}
               </p>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

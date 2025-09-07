@@ -7,16 +7,20 @@ import { type ChapterStats } from '@/utils';
 interface ChapterCardProps {
   chapterStats: ChapterStats;
   onSelect: () => void;
+  isUserChapter?: boolean;
 }
 
 const ChapterCard: React.FC<ChapterCardProps> = ({
   chapterStats,
   onSelect,
+  isUserChapter = false,
 }) => {
   return (
     <Card
       onClick={onSelect}
-      className="w-full cursor-pointer overflow-hidden text-left transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      className={`w-full cursor-pointer overflow-hidden text-left transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+        isUserChapter ? 'bg-primary/5 ring-2 ring-primary' : ''
+      }`}
     >
       <CardHeader className="pb-3">
         <p className="text-sm font-semibold uppercase tracking-wide text-primary">

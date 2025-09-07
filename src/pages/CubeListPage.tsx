@@ -1,16 +1,25 @@
 import { List, Map, Plus, Search } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import CubeCard from '@/components/CubeCard';
 import CubeMap from '@/components/CubeMap';
+import CreateEventForm from '@/components/events/CreateEventForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { can, Permission } from '@/config';
-import { useChapters, useEvents } from '@/store';
+import { useChapters, useEvents, useEventsActions } from '@/store';
 import { useCurrentUser } from '@/store/auth.store';
 import { type Chapter, type CubeEvent } from '@/types';
 
@@ -22,11 +31,13 @@ const CubeListPage: React.FC = () => {
   const currentUser = useCurrentUser();
   const allEvents = useEvents();
   const chapters = useChapters();
+  const { createEvent } = useEventsActions();
 
   const [cubesView, setCubesView] = useState<CubesView>('list');
   const [eventTimeView, setEventTimeView] = useState<EventTimeView>('upcoming');
   const [selectedRegion] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
 
   const eventsToDisplay = useMemo(() => {
     const now = new Date();
@@ -83,8 +94,33 @@ const CubeListPage: React.FC = () => {
   );
 
   const handleCreateCube = useCallback(() => {
-    navigate('/cubes/create');
-  }, [navigate]);
+    setIsCreateEventModalOpen(true);
+  }, []);
+
+  const handleCreateEvent = useCallback(
+    (eventData: {
+      name: string;
+      city: string;
+      location: string;
+      startDate: Date;
+      endDate?: Date;
+      scope: 'Chapter' | 'Regional' | 'Global';
+      targetRegion?: string;
+    }) => {
+      if (!currentUser) {
+        toast.error('You must be logged in to create an event.');
+        return;
+      }
+      createEvent(eventData, currentUser);
+      toast.success('Event created successfully!');
+      setIsCreateEventModalOpen(false);
+    },
+    [currentUser, createEvent]
+  );
+
+  const handleCancelCreateEvent = useCallback(() => {
+    setIsCreateEventModalOpen(false);
+  }, []);
 
   const totalParticipants = eventsToDisplay.reduce(
     (sum, event) => sum + event.participants.length,
@@ -94,7 +130,7 @@ const CubeListPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4">
         {/* Header Section */}
         <div className="mb-8">
           <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -269,6 +305,26 @@ const CubeListPage: React.FC = () => {
           </Card>
         )}
       </div>
+
+      {/* Create Event Modal */}
+      <Dialog
+        open={isCreateEventModalOpen}
+        onOpenChange={setIsCreateEventModalOpen}
+      >
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Event</DialogTitle>
+            <DialogDescription>
+              Schedule a standard chapter cube or organize a special multi-day
+              regional event.
+            </DialogDescription>
+          </DialogHeader>
+          <CreateEventForm
+            onCreateEvent={handleCreateEvent}
+            onCancel={handleCancelCreateEvent}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

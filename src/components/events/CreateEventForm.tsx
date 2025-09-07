@@ -2,14 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -50,9 +44,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [location, setLocation] = useState('');
-  const [startDate, setStartDate] = useState('');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [endTime, setEndTime] = useState('');
   const [targetRegion, setTargetRegion] = useState('');
 
@@ -126,10 +120,17 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
       toast.error('Please select a valid start date and time.');
       return;
     }
-    const finalStartDate = new Date(`${startDate}T${startTime}`);
+
+    const finalStartDate = new Date(startDate);
+    const [hours, minutes] = startTime.split(':').map(Number);
+    finalStartDate.setHours(hours, minutes, 0, 0);
+
     let finalEndDate: Date | undefined;
     if (eventType === 'Special' && endDate && endTime) {
-      finalEndDate = new Date(`${endDate}T${endTime}`);
+      finalEndDate = new Date(endDate);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+      finalEndDate.setHours(endHours, endMinutes, 0, 0);
+
       if (finalEndDate <= finalStartDate) {
         toast.error('End date must be after the start date.');
         return;
@@ -151,16 +152,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-12">
+    <div className="max-w-2xl">
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Create New Event</CardTitle>
-          <CardDescription>
-            Schedule a standard chapter cube or organize a special multi-day
-            regional event.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="event-name">Event Name</Label>
@@ -255,12 +249,10 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="start-date">Start Date</Label>
-                <Input
-                  id="start-date"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  required
+                <DatePicker
+                  date={startDate}
+                  onDateChange={setStartDate}
+                  placeholder="Select start date"
                 />
               </div>
               <div className="space-y-2">
@@ -278,11 +270,10 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="end-date">End Date (Optional)</Label>
-                  <Input
-                    id="end-date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                  <DatePicker
+                    date={endDate}
+                    onDateChange={setEndDate}
+                    placeholder="Select end date"
                   />
                 </div>
                 <div className="space-y-2">

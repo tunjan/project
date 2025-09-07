@@ -17,7 +17,7 @@ const ManageEventPage: React.FC = () => {
   if (!event) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="container mx-auto max-w-7xl px-4">
           <Card>
             <CardContent className="p-8 text-center">
               <p className="text-foreground">Event not found.</p>

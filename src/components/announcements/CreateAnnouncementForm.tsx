@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -91,18 +91,9 @@ const CreateAnnouncementForm: React.FC<CreateAnnouncementFormProps> = ({
   };
 
   return (
-    <div className="py-8 md:py-16">
-      <Card className="mx-auto max-w-3xl">
-        <CardHeader>
-          <CardTitle className="text-2xl sm:text-3xl">
-            Create Announcement
-          </CardTitle>
-          <p className="text-muted-foreground">
-            Your message will be visible to the audience defined by the selected
-            scope.
-          </p>
-        </CardHeader>
-        <CardContent>
+    <div className="max-w-3xl">
+      <Card>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
 import {
   Dialog,
   DialogContent,
@@ -40,9 +41,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
 
   const [city, setCity] = useState(event.city);
   const [location, setLocation] = useState(event.location);
-  const [date, setDate] = useState(
-    new Date(event.startDate).toISOString().split('T')[0]
-  );
+  const [date, setDate] = useState<Date | undefined>(new Date(event.startDate));
   const [time, setTime] = useState(
     new Date(event.startDate).toTimeString().slice(0, 5)
   );
@@ -57,7 +56,12 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
       toast.error('Please fill out all fields.');
       return;
     }
-    const newStartDate = new Date(`${date}T${time}`);
+
+    // Combine date and time into a single Date object
+    const [hours, minutes] = time.split(':').map(Number);
+    const newStartDate = new Date(date);
+    newStartDate.setHours(hours, minutes, 0, 0);
+
     if (isNaN(newStartDate.getTime())) {
       toast.error('The selected date or time is invalid.');
       return;
@@ -111,11 +115,10 @@ const EditEventModal: React.FC<EditEventModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+              <DatePicker
+                date={date}
+                onDateChange={setDate}
+                placeholder="Select date"
               />
             </div>
             <div className="space-y-2">

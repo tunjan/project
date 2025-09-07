@@ -17,32 +17,23 @@ const ChapterRankIndicator: React.FC<{ rank: number }> = ({ rank }) => {
   const getRankBadge = () => {
     if (rank === 1) {
       return (
-        <Badge
-          variant="default"
-          className="bg-yellow-400 text-yellow-900 dark:bg-yellow-600 dark:text-yellow-100"
-        >
+        <div className="text-yellow-600 dark:text-yellow-400">
           <Trophy className="size-4" />
-        </Badge>
+        </div>
       );
     }
     if (rank === 2) {
       return (
-        <Badge
-          variant="secondary"
-          className="bg-gray-300 text-gray-900 dark:bg-gray-600 dark:text-gray-100"
-        >
+        <div className="text-gray-600 dark:text-gray-400">
           <Trophy className="size-4" />
-        </Badge>
+        </div>
       );
     }
     if (rank === 3) {
       return (
-        <Badge
-          variant="outline"
-          className="bg-amber-600 text-amber-100 dark:bg-amber-700 dark:text-amber-100"
-        >
+        <div className="text-amber-600 dark:text-amber-400">
           <Trophy className="size-4" />
-        </Badge>
+        </div>
       );
     }
     return <Badge variant="outline">{rank}</Badge>;

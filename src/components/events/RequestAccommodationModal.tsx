@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { type AccommodationRequest, type CubeEvent, type User } from '@/types';
@@ -39,12 +39,8 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
   const departureDate = new Date(eventStartDate);
   departureDate.setDate(eventStartDate.getDate() + 1);
 
-  const [startDate, setStartDate] = useState(
-    arrivalDate.toISOString().split('T')[0]
-  );
-  const [endDate, setEndDate] = useState(
-    departureDate.toISOString().split('T')[0]
-  );
+  const [startDate, setStartDate] = useState<Date | undefined>(arrivalDate);
+  const [endDate, setEndDate] = useState<Date | undefined>(departureDate);
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,13 +49,13 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
       toast.error('Please fill out all fields.');
       return;
     }
-    if (new Date(endDate) < new Date(startDate)) {
+    if (endDate < startDate) {
       toast.error('End date cannot be before start date.');
       return;
     }
     onCreateRequest({
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate,
+      endDate,
       message,
       createdAt: new Date(),
     });
@@ -76,20 +72,18 @@ const RequestAccommodationModal: React.FC<RequestAccommodationModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="start-date">Arrival Date</Label>
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+              <DatePicker
+                date={startDate}
+                onDateChange={setStartDate}
+                placeholder="Select arrival date"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="end-date">Departure Date</Label>
-              <Input
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+              <DatePicker
+                date={endDate}
+                onDateChange={setEndDate}
+                placeholder="Select departure date"
               />
             </div>
           </div>

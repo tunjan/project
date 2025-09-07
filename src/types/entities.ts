@@ -84,6 +84,15 @@ export interface Announcement {
   ctaText?: string;
 }
 
+export interface AnnouncementComment {
+  id: string;
+  announcementId: string;
+  author: User;
+  content: string;
+  createdAt: Date;
+  parentId?: string;
+}
+
 export enum ResourceType {
   DOCUMENT = 'Document',
   VIDEO = 'Video',

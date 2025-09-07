@@ -26,7 +26,7 @@ const UpcomingEventCard: React.FC<{
   onManage: () => void;
   isNext?: boolean;
 }> = ({ event, onManage, isNext }) => {
-  const startDate = event.startDate;
+  const startDate = new Date(event.startDate);
 
   if (isNext) {
     return (

@@ -18,6 +18,7 @@ import CityAttendanceModal from '@/components/profile/CityAttendanceModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import {
   Dialog,
   DialogContent,
@@ -142,7 +143,8 @@ const DashboardPage: React.FC = () => {
   const [showMasterclassModal, setShowMasterclassModal] = useState(false);
   const [showScheduleCallModal, setShowScheduleCallModal] = useState(false);
   const [selectedOrganiserId, setSelectedOrganiserId] = useState<string>('');
-  const [callWhen, setCallWhen] = useState<string>('');
+  const [callWhen, setCallWhen] = useState<Date | undefined>();
+  const [callTime, setCallTime] = useState<string>('');
   const [contactInfo, setContactInfo] = useState('');
   const [showCityAttendanceModal, setShowCityAttendanceModal] = useState(false);
 
@@ -336,7 +338,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4">
         {/* Header Section */}
         <div className="mb-8">
           <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -458,13 +460,20 @@ const DashboardPage: React.FC = () => {
                     >
                       Date & Time
                     </Label>
-                    <Input
-                      id="call-datetime"
-                      type="datetime-local"
-                      value={callWhen}
-                      onChange={(e) => setCallWhen(e.target.value)}
-                      className="w-full"
-                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <DatePicker
+                        date={callWhen}
+                        onDateChange={setCallWhen}
+                        placeholder="Select date"
+                      />
+                      <Input
+                        id="call-time"
+                        type="time"
+                        value={callTime}
+                        onChange={(e) => setCallTime(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label
@@ -486,12 +495,25 @@ const DashboardPage: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <Button
                       onClick={() => {
-                        if (!selectedOrganiserId || !callWhen || !contactInfo) {
+                        if (
+                          !selectedOrganiserId ||
+                          !callWhen ||
+                          !callTime ||
+                          !contactInfo
+                        ) {
                           toast.error(
                             'Please fill all fields to schedule the call.'
                           );
                           return;
                         }
+
+                        // Combine date and time into a single Date object
+                        const [hours, minutes] = callTime
+                          .split(':')
+                          .map(Number);
+                        const combinedDateTime = new Date(callWhen);
+                        combinedDateTime.setHours(hours, minutes, 0, 0);
+
                         if (
                           currentUser.onboardingStatus ===
                           OnboardingStatus.AWAITING_REVISION_CALL
@@ -499,22 +521,27 @@ const DashboardPage: React.FC = () => {
                           scheduleRevisionCall(
                             currentUser.id,
                             selectedOrganiserId,
-                            new Date(callWhen),
+                            combinedDateTime,
                             contactInfo
                           );
                         } else {
                           scheduleOnboardingCall(
                             currentUser.id,
                             selectedOrganiserId,
-                            new Date(callWhen),
+                            combinedDateTime,
                             contactInfo
                           );
                         }
                         setShowScheduleCallModal(false);
                         setContactInfo('');
+                        setCallWhen(undefined);
+                        setCallTime('');
                       }}
                       disabled={
-                        !selectedOrganiserId || !callWhen || !contactInfo
+                        !selectedOrganiserId ||
+                        !callWhen ||
+                        !callTime ||
+                        !contactInfo
                       }
                     >
                       Schedule
